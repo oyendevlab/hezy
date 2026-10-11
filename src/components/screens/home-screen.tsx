@@ -224,7 +224,7 @@ function Summary({ entry, reading, onRetry, size, profile }: SummaryProps) {
       <Headline reading={reading} entry={entry} size={size} profile={profile} />
       {entry && <ReadingNotices entry={entry} onRetry={onRetry} />}
       {advice && (
-        <ul className="grid grid-cols-3 gap-2">
+        <ul className="grid auto-cols-fr grid-flow-col gap-2">
           {advice.tips.slice(0, 3).map((tip) => (
             <li
               key={tip}
