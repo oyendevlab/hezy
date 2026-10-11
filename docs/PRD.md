@@ -88,11 +88,11 @@ Hezy ialah aplikasi web progresif (PWA) untuk menyemak Indeks Pencemar Udara (IP
 
 ### Sumber data
 
-| Sumber                     | Peranan                | Nota                                                                    |
-| -------------------------- | ---------------------- | ----------------------------------------------------------------------- |
-| **Open-Meteo Air Quality** | Sumber MVP dan ramalan | Percuma tanpa kunci API, tetapi datanya ialah data model                |
-| **APIMS (JAS)**            | Bacaan rasmi (fasa 2)  | Tiada API awam rasmi, jadi perlu proksi di sisi pelayan                 |
-| **WAQI**                   | Sandaran               | Perlu token dan menggunakan skala AQI AS, jadi perlu ditukar kepada IPU |
+| Sumber                     | Peranan                | Nota                                                                                                                                                                                              |
+| -------------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Open-Meteo Air Quality** | Sumber MVP dan ramalan | Percuma tanpa kunci API, tetapi datanya ialah data model                                                                                                                                          |
+| **APIMS (JAS)**            | Bacaan rasmi (v0.2)    | Endpoint JSON awam yang digunakan portal `eqms.doe.gov.my/APIMS` (`/api3/publicportalapims/mapcaqm`); tidak didokumenkan, jadi bentuk data disahkan dan Hezy kembali ke anggaran model jika gagal |
+| **WAQI**                   | Sandaran               | Perlu token dan menggunakan skala AQI AS, jadi perlu ditukar kepada IPU                                                                                                                           |
 
 ### Stack cadangan
 

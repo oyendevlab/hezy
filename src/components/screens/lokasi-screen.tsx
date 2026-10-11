@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { areaToLocation } from "@/lib/locations";
+import { primaryReading } from "@/lib/official";
 import {
   MAX_FAVOURITES,
   addFavourite,
@@ -193,7 +194,7 @@ function LocationReading({
   onSelect: () => void;
 }) {
   const { entry } = useReading(location);
-  const current = entry?.reading?.current;
+  const current = primaryReading(entry?.reading);
   return (
     <button
       type="button"

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { HEALTH_PROFILES, adviceFor, type QuickTone } from "@/lib/advice";
 import { CATEGORY_STYLE, NEUTRAL_SKY } from "@/lib/category-style";
 import { formatChange, formatClock } from "@/lib/format";
+import { primaryReading } from "@/lib/official";
 import type { Prefs, SavedLocation } from "@/lib/prefs";
 import type { Reading } from "@/lib/reading";
 import { useReading, type ReadingEntry } from "@/lib/use-reading";
@@ -68,7 +69,7 @@ type ViewProps = {
 
 function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
   const reading = entry?.reading;
-  const current = reading?.current ?? null;
+  const current = primaryReading(reading);
   const palette = current ? CATEGORY_STYLE[current.category].sky : NEUTRAL_SKY;
   const shareText = current
     ? `IPU ${location.name}: ${current.ipu} (${current.label}) · via Hezy`
@@ -210,7 +211,7 @@ type SummaryProps = {
 };
 
 function Summary({ entry, reading, onRetry, size, profile }: SummaryProps) {
-  const current = reading?.current;
+  const current = primaryReading(reading);
 
   if (!reading && entry?.status === "error") {
     return (
@@ -252,7 +253,7 @@ function Headline({
   size,
   profile,
 }: Omit<SummaryProps, "onRetry">) {
-  const current = reading?.current;
+  const current = primaryReading(reading);
   if (!reading) {
     return (
       <div aria-busy="true" className="flex flex-col gap-3">
@@ -269,7 +270,10 @@ function Headline({
     );
   }
 
-  const change = formatChange(reading.change3h);
+  // Perubahan 3 jam dikira daripada model, jadi hanya dipaparkan bila nombor utama ialah anggaran model.
+  const change =
+    current.source === "model" ? formatChange(reading.change3h) : null;
+  const official = reading.official;
   const big = size === "desktop" ? "text-[112px]" : "text-[84px]";
   return (
     <>
@@ -303,10 +307,19 @@ function Headline({
       >
         {adviceFor(current.category, profile).headline}
       </p>
-      <p className="text-muted text-xs font-medium">
-        Dikemas kini {formatClock(current.time)} · Anggaran daripada PM2.5
-        (Open-Meteo)
-      </p>
+      {official ? (
+        <p className="text-muted text-xs font-medium">
+          Rasmi APIMS · Stesen {official.stationName} ({official.distanceKm} km)
+          {official.pollutant ? ` · ${official.pollutant}` : ""} ·{" "}
+          {formatClock(official.time)}
+          {reading.current ? ` · Anggaran model: ${reading.current.ipu}` : ""}
+        </p>
+      ) : (
+        <p className="text-muted text-xs font-medium">
+          Dikemas kini {formatClock(current.time)} · Anggaran daripada PM2.5
+          (Open-Meteo); tiada stesen APIMS berdekatan
+        </p>
+      )}
     </>
   );
 }
@@ -416,7 +429,7 @@ function FavouriteStrip({ favourites }: { favourites: SavedLocation[] }) {
 
 function FavouriteMini({ location }: { location: SavedLocation }) {
   const { entry } = useReading(location);
-  const current = entry?.reading?.current;
+  const current = primaryReading(entry?.reading);
   return (
     <li className="bg-surface min-h-24 flex-[1_1_170px] rounded-[18px] px-4 py-3.5">
       <div className="text-muted text-xs font-semibold">{location.name}</div>

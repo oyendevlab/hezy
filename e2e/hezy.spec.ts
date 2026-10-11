@@ -1,5 +1,11 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, seedLocation, test } from "./fixtures";
+import {
+  OFFICIAL_SHAH_ALAM,
+  expect,
+  fakeReading,
+  seedLocation,
+  test,
+} from "./fixtures";
 
 test.describe("aliran utama", () => {
   test("pengguna baharu memilih kawasan dan nampak IPU", async ({ page }) => {
@@ -98,6 +104,31 @@ test.describe("aliran utama", () => {
       }),
     ).toBeVisible();
     await expect(page.getByRole("button", { name: "Cuba lagi" })).toBeVisible();
+  });
+});
+
+test.describe("bacaan rasmi APIMS", () => {
+  test("IPU rasmi stesen terdekat diutamakan berbanding anggaran", async ({
+    page,
+  }) => {
+    await seedLocation(page);
+    await page.route("**/api/aqi?**", (route) =>
+      route.fulfill({ json: fakeReading(OFFICIAL_SHAH_ALAM) }),
+    );
+    await page.goto("/");
+    await expect(
+      page.getByRole("heading", { name: "IPU 172, Tidak Sihat" }),
+    ).toBeVisible();
+    await expect(
+      page
+        .getByText("Rasmi APIMS · Stesen Shah Alam (5.6 km)", { exact: false })
+        .filter({ visible: true }),
+    ).toBeVisible();
+    await expect(
+      page
+        .getByText("Anggaran model: 156", { exact: false })
+        .filter({ visible: true }),
+    ).toBeVisible();
   });
 });
 
