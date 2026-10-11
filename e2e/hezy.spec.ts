@@ -182,6 +182,27 @@ test.describe("peta stesen", () => {
 });
 
 test.describe("API", () => {
+  test("push: menolak langganan tidak sah", async ({ request }) => {
+    const res = await request.post("/api/push/subscribe", {
+      data: {
+        subscription: { endpoint: "http://bukan-https" },
+        lat: 3.07,
+        lon: 101.52,
+      },
+    });
+    expect(res.status()).toBe(400);
+    const bad = await request.post("/api/push/unsubscribe", {
+      data: { endpoint: 42 },
+    });
+    expect(bad.status()).toBe(400);
+  });
+
+  test("push: semakan berkala memerlukan rahsia", async ({ request }) => {
+    const res = await request.get("/api/push/check");
+    // 401 bila CRON_SECRET dikonfigurasi, 503 bila belum (cth. dalam CI).
+    expect([401, 503]).toContain(res.status());
+  });
+
   test("menolak koordinat di luar Malaysia", async ({ request }) => {
     const res = await request.get("/api/aqi?lat=13.75&lon=100.5");
     expect(res.status()).toBe(400);
