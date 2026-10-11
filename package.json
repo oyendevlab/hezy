@@ -12,9 +12,11 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "icons": "node scripts/generate-icons.mjs",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:e2e:prod": "E2E_BASE_URL=https://hezy.vercel.app playwright test"
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "next": "16.4.0",
     "react": "19.3.0",
     "react-dom": "19.3.0"

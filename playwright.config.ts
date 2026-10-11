@@ -1,6 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
 
 const PORT = 3100;
+/** Tetapkan E2E_BASE_URL (cth. https://hezy.vercel.app) untuk menguji deployment sedia ada. */
+const REMOTE = process.env.E2E_BASE_URL;
 
 export default defineConfig({
   testDir: "e2e",
@@ -9,7 +11,7 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? "github" : "list",
   use: {
-    baseURL: `http://localhost:${PORT}`,
+    baseURL: REMOTE ?? `http://localhost:${PORT}`,
     locale: "ms-MY",
     timezoneId: "Asia/Kuala_Lumpur",
     // SW disekat secara lalai supaya page.route boleh meniru /api/aqi; ujian luar talian membenarkannya.
@@ -26,10 +28,12 @@ export default defineConfig({
       },
     },
   ],
-  webServer: {
-    command: `npm run build && npx next start -p ${PORT}`,
-    url: `http://localhost:${PORT}`,
-    reuseExistingServer: !process.env.CI,
-    timeout: 240_000,
-  },
+  webServer: REMOTE
+    ? undefined
+    : {
+        command: `npm run build && npx next start -p ${PORT}`,
+        url: `http://localhost:${PORT}`,
+        reuseExistingServer: !process.env.CI,
+        timeout: 240_000,
+      },
 });

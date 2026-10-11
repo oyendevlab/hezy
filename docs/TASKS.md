@@ -63,10 +63,10 @@ Legenda: 🐙 = guna GitHub · ▲ = guna Vercel · ✅ = siap
 
 ## Fasa 7 — Deploy
 
-- [ ] ▲ Pembolehubah persekitaran (jika ada) di Vercel
+- [x] ▲ Pembolehubah persekitaran: tiada diperlukan untuk v0.1
 - [ ] 🐙 Gabung ke `main` → ▲ production `hezy.vercel.app`
-- [ ] Ujian asap pada production (telefon Android + iPhone, pasang PWA)
-- [ ] ▲ Aktifkan Vercel Analytics / Speed Insights
+- [x] Ujian asap pada production: curl + 33 ujian E2E (`npm run test:e2e:prod`). Telefon sebenar: lihat [UJIAN-TELEFON.md](UJIAN-TELEFON.md)
+- [x] ▲ Vercel Web Analytics aktif (Speed Insights melalui CLI perlukan pelan Pro; versi percuma boleh diaktifkan di dashboard)
 - [ ] Tag versi `v0.1.0` 🐙
 
 ## Fasa 8 — Selepas MVP (P1)
