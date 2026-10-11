@@ -48,9 +48,9 @@ Legenda: 🐙 = guna GitHub · ▲ = guna Vercel · ✅ = siap
 
 ## Fasa 5 — PWA (F6–F8)
 
-- [ ] `manifest.webmanifest`, ikon 192/512/maskable, splash
-- [ ] Service worker (Serwist): cache shell + bacaan terakhir
-- [ ] Banner luar talian, butang "Pasang Hezy"
+- [x] `manifest.webmanifest`, ikon 192/512/maskable, ikon Apple (dijana dengan `npm run icons`)
+- [x] Service worker (`public/sw.js`, tanpa Serwist): cache halaman + fail statik; bacaan terakhir dalam `localStorage`
+- [x] Banner luar talian, butang "Pasang Hezy" (Chromium) dan arahan iOS di Tetapan
 - [x] Mod gelap/cerah (ikut peranti, Cerah, Gelap — tanpa kelipan)
 
 ## Fasa 6 — Kualiti
