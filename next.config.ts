@@ -12,6 +12,10 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  async rewrites() {
+    // Pelayar meminta /favicon.ico secara automatik walaupun <link rel="icon"> ada.
+    return [{ source: "/favicon.ico", destination: "/icons/icon-192.png" }];
+  },
   async headers() {
     return [
       {
