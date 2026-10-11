@@ -33,17 +33,17 @@ Legenda: 🐙 = guna GitHub · ▲ = guna Vercel · ✅ = siap
 
 ## Fasa 3 — Skrin mudah alih (MVP F1–F5)
 
-- [ ] **Utama (C)**: komponen SVG kaki langit (warna + kabus ikut kategori), kad IPU, nasihat, masa kemas kini
-- [ ] **Trend (G)**: masa terbaik untuk keluar, graf bar 24 jam, purata pagi/petang/malam
-- [ ] **Lokasi (L)**: lokasi semasa (GPS), kegemaran (maks 5, `localStorage`), carian, togol Senarai/Peta (peta = placeholder "Akan datang")
-- [ ] **Tetapan (M)**: profil kesihatan, tema, bahasa, maklumat sumber data
-- [ ] Keadaan khas: skeleton, luar talian, lokasi ditolak, data lapuk, ralat
+- [x] **Utama (C)**: komponen SVG kaki langit (warna + kabus ikut kategori), kad IPU, nasihat, masa kemas kini
+- [x] **Trend (G)**: masa terbaik untuk keluar, graf bar 24 jam, purata pagi/petang/malam
+- [x] **Lokasi (L)**: lokasi semasa (GPS), kegemaran (maks 5, `localStorage`), carian, togol Senarai/Peta (peta = placeholder "Akan datang")
+- [x] **Tetapan (M)**: profil kesihatan, tema, bahasa, maklumat sumber data
+- [x] Keadaan khas: skeleton, luar talian, lokasi ditolak, data lapuk, ralat
 
 ## Fasa 4 — Tablet & desktop (pilihan 2)
 
-- [ ] Banner panorama + kad IPU
-- [ ] Dua lajur: "Boleh keluar hari ini?" + Nasihat | Trend 24 jam
-- [ ] Baris lokasi kegemaran, footer sumber data
+- [x] Banner panorama + kad IPU
+- [x] Dua lajur: "Boleh keluar hari ini?" + Nasihat | Trend 24 jam
+- [x] Baris lokasi kegemaran (footer sumber data dipaparkan dalam kad IPU)
 - [ ] Pintasan papan kekunci (`/`, `1`–`5`, `T`)
 
 ## Fasa 5 — PWA (F6–F8)
@@ -51,7 +51,7 @@ Legenda: 🐙 = guna GitHub · ▲ = guna Vercel · ✅ = siap
 - [ ] `manifest.webmanifest`, ikon 192/512/maskable, splash
 - [ ] Service worker (Serwist): cache shell + bacaan terakhir
 - [ ] Banner luar talian, butang "Pasang Hezy"
-- [ ] Mod gelap/cerah
+- [x] Mod gelap/cerah (ikut peranti, Cerah, Gelap — tanpa kelipan)
 
 ## Fasa 6 — Kualiti
 
