@@ -1,6 +1,7 @@
 "use client";
 
 import { HEALTH_PROFILES } from "@/lib/advice";
+import { promptInstall, useInstallStatus } from "@/lib/install";
 import {
   DEFAULT_PREFS,
   updatePrefs,
@@ -108,6 +109,19 @@ export function TetapanScreen() {
 
           <section>
             <h2 className="text-muted mb-2 text-sm font-bold tracking-wide">
+              APLIKASI
+            </h2>
+            <div className="divide-line bg-surface divide-y rounded-2xl px-4 text-sm">
+              <InstallRow />
+              <Row
+                label="Luar talian"
+                value="Bacaan terakhir disimpan di peranti"
+              />
+            </div>
+          </section>
+
+          <section>
+            <h2 className="text-muted mb-2 text-sm font-bold tracking-wide">
               TENTANG DATA
             </h2>
             <div className="divide-line bg-surface divide-y rounded-2xl px-4 text-sm">
@@ -141,6 +155,36 @@ function Row({ label, value }: { label: string; value: string }) {
     <div className="flex min-h-12 items-center justify-between gap-3">
       <span className="font-semibold">{label}</span>
       <span className="text-muted text-right">{value}</span>
+    </div>
+  );
+}
+
+const INSTALL_HELP = {
+  installed: "Hezy sudah dipasang di peranti ini.",
+  ios: "Di iPhone atau iPad: ketik butang Kongsi dalam Safari, kemudian pilih “Tambah ke Skrin Utama”.",
+  manual:
+    "Buka menu pelayar dan pilih “Pasang aplikasi” atau “Tambah ke skrin utama”.",
+} as const;
+
+function InstallRow() {
+  const status = useInstallStatus();
+  if (status === null) return <div className="min-h-12" />;
+  return (
+    <div className="flex min-h-12 flex-wrap items-center justify-between gap-3 py-3">
+      <span className="font-semibold">Pasang Hezy</span>
+      {status === "available" ? (
+        <button
+          type="button"
+          onClick={() => void promptInstall()}
+          className="bg-ink text-page min-h-11 rounded-xl px-4 text-sm font-semibold"
+        >
+          Pasang
+        </button>
+      ) : (
+        <span className="text-muted max-w-[60%] text-right">
+          {INSTALL_HELP[status]}
+        </span>
+      )}
     </div>
   );
 }

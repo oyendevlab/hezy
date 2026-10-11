@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Plus_Jakarta_Sans } from "next/font/google";
 import { BottomNav, TopNav } from "@/components/app-nav";
+import { OfflineBanner, PwaSetup } from "@/components/pwa";
 import { THEME_BOOT_SCRIPT } from "@/lib/storage-keys";
 import "./globals.css";
 
@@ -22,6 +23,8 @@ export const metadata: Metadata = {
   description:
     "Semak Indeks Pencemar Udara (IPU) di lokasi anda dengan pantas.",
   applicationName: "Hezy",
+  appleWebApp: { capable: true, title: "Hezy", statusBarStyle: "default" },
+  icons: { apple: "/icons/apple-touch-icon.png" },
 };
 
 export const viewport: Viewport = {
@@ -42,6 +45,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
       </head>
       <body className="flex min-h-full flex-col font-sans">
+        <PwaSetup />
+        <OfflineBanner />
         <TopNav />
         <main className="flex-1 pb-28 md:pb-12">{children}</main>
         <BottomNav />
