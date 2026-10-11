@@ -144,7 +144,7 @@ export function TetapanScreen() {
               <Row label="Bacaan rasmi" value="APIMS (JAS), stesen ≤ 30 km" />
               <Row label="Anggaran & ramalan" value="Open-Meteo (model CAMS)" />
               <Row label="Kaedah anggaran" value="Formula JAS, PM2.5 sahaja" />
-              <Row label="Versi" value="0.1.0" />
+              <Row label="Versi" value="0.2.0" />
             </div>
             <p className="text-muted mt-2 text-xs leading-relaxed">
               Bila ada stesen APIMS dalam 30 km dengan bacaan 3 jam terakhir,
