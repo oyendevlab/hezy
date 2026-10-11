@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { NAV_ITEMS, isActive } from "@/lib/nav";
 import { NavIcon } from "./icons";
+import { Logo } from "./logo";
 
 /** Bar atas untuk tablet dan desktop (≥ 768 px). */
 export function TopNav() {
@@ -14,8 +15,9 @@ export function TopNav() {
       <div className="mx-auto flex max-w-[1200px] items-center gap-3 px-10 py-5">
         <Link
           href="/"
-          className="font-display text-[28px] font-extrabold tracking-tight"
+          className="font-display flex items-center gap-2.5 text-[28px] font-extrabold tracking-tight"
         >
+          <Logo size={36} />
           Hezy
         </Link>
         <nav

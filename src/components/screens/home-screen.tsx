@@ -9,6 +9,7 @@ import type { Reading } from "@/lib/reading";
 import { useReading, type ReadingEntry } from "@/lib/use-reading";
 import { ChooseLocation } from "../choose-location";
 import { IpuPill } from "../ipu-pill";
+import { Logo } from "../logo";
 import { ReadingNotices } from "../reading-notices";
 import { ShareButton } from "../share-button";
 import { Skyline } from "../skyline";
@@ -43,6 +44,7 @@ function HomeSkeleton() {
 function Welcome() {
   return (
     <div className="mx-auto max-w-md px-5 pt-13 md:pt-16">
+      <Logo size={72} className="mb-4" />
       <h1 className="font-display text-[32px] leading-tight font-bold">
         Selamat datang ke Hezy
       </h1>
