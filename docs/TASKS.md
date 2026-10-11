@@ -25,11 +25,11 @@ Legenda: 🐙 = guna GitHub · ▲ = guna Vercel · ✅ = siap
 
 ## Fasa 2 — Data
 
-- [ ] Fungsi penukaran PM2.5 → IPU (sahkan formula dengan dokumen JAS) + ujian unit
-- [ ] Fungsi kategori IPU (label, warna, nasihat ikut profil)
-- [ ] Route `/api/aqi?lat=&lon=` — ambil data Open-Meteo, cache 15 minit
-- [ ] Senarai stesen/kawasan (negeri → kawasan) untuk pemilih manual
-- [ ] Pengendalian ralat: data lapuk > 3 jam, API gagal → guna cache
+- [x] Fungsi penukaran PM2.5 → IPU (formula disahkan dengan dokumen JAS) + ujian unit
+- [x] Fungsi kategori IPU (label, warna, nasihat ikut profil)
+- [x] Route `/api/aqi?lat=&lon=` — ambil data Open-Meteo, cache 15 minit
+- [x] Senarai stesen/kawasan (negeri → kawasan) untuk pemilih manual
+- [x] Pengendalian ralat di pelayan: tanda data lapuk > 3 jam, ralat 502 bila Open-Meteo gagal (cache di peranti → Fasa 5)
 
 ## Fasa 3 — Skrin mudah alih (MVP F1–F5)
 
