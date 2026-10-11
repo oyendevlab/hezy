@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { STATES, findArea } from "./areas";
+import { STATES, findArea, nearestArea, searchAreas } from "./areas";
 import { isInMalaysia } from "./coords";
 
 const allAreas = STATES.flatMap((s) => s.areas);
@@ -22,5 +22,20 @@ describe("findArea", () => {
       state: "Selangor",
     });
     expect(findArea("tiada")).toBeUndefined();
+  });
+});
+
+describe("nearestArea", () => {
+  it("memilih kawasan terdekat dengan koordinat", () => {
+    expect(nearestArea(3.08, 101.53).id).toBe("shah-alam");
+    expect(nearestArea(1.5, 110.3).id).toBe("kuching");
+  });
+});
+
+describe("searchAreas", () => {
+  it("mencari mengikut nama kawasan atau negeri", () => {
+    expect(searchAreas("klang").map((a) => a.id)).toContain("klang");
+    expect(searchAreas("sabah").every((a) => a.state === "Sabah")).toBe(true);
+    expect(searchAreas("  ")).toEqual([]);
   });
 });

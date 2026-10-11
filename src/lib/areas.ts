@@ -163,3 +163,41 @@ export function findArea(id: string): (Area & { state: string }) | undefined {
   }
   return undefined;
 }
+
+/** Kawasan terdekat (jarak kasar) untuk menamakan koordinat GPS. */
+export function nearestArea(
+  lat: number,
+  lon: number,
+): Area & { state: string } {
+  let best: (Area & { state: string }) | null = null;
+  let bestDistance = Infinity;
+  for (const state of STATES) {
+    for (const a of state.areas) {
+      const dLat = a.lat - lat;
+      const dLon = (a.lon - lon) * Math.cos((lat * Math.PI) / 180);
+      const distance = dLat * dLat + dLon * dLon;
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        best = { ...a, state: state.name };
+      }
+    }
+  }
+  return best as Area & { state: string };
+}
+
+/** Cari kawasan atau negeri mengikut nama (tidak peka huruf besar/kecil). */
+export function searchAreas(
+  query: string,
+  limit = 8,
+): (Area & { state: string })[] {
+  const q = query.trim().toLowerCase();
+  if (!q) return [];
+  return STATES.flatMap((s) =>
+    s.areas
+      .filter(
+        (a) =>
+          a.name.toLowerCase().includes(q) || s.name.toLowerCase().includes(q),
+      )
+      .map((a) => ({ ...a, state: s.name })),
+  ).slice(0, limit);
+}
