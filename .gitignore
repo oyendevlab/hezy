@@ -1,11 +1,28 @@
+# dependencies
 node_modules/
+
+# next.js
 .next/
 out/
-.vercel/
-.env*
-!.env.example
-.DS_Store
-*.log
+build/
+*.tsbuildinfo
+
+# testing
 coverage/
 playwright-report/
 test-results/
+
+# env files
+.env*
+!.env.example
+
+# vercel
+.vercel/
+
+# misc
+.DS_Store
+*.pem
+*.log
+
+# alat tempatan
+.claude/launch.json

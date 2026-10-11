@@ -12,15 +12,15 @@ Legenda: 🐙 = guna GitHub · ▲ = guna Vercel · ✅ = siap
 - [x] 🐙 Tetapkan `main` sebagai cabang utama; kerja baharu dibuat dalam cabang `feat/*` dan digabung melalui PR
 - [x] ▲ Cipta projek Vercel bernama **`hezy`** → domain `hezy.vercel.app`
 - [x] ▲ Sambungkan repo GitHub ke projek Vercel (deploy automatik: PR → preview, `main` → production)
-- [ ] Pasang pnpm, sahkan Node 22+
+- [x] Pengurus pakej: npm (pnpm tidak dipasang), Node 22+
 
 ## Fasa 1 — Rangka projek
 
-- [ ] Scaffold Next.js (App Router) + TypeScript + Tailwind CSS
-- [ ] ESLint + Prettier, skrip `lint`, `typecheck`, `test`
-- [ ] Fon: Bricolage Grotesque + Plus Jakarta Sans (`next/font`)
-- [ ] Token reka bentuk: warna kategori IPU, ink, latar (dari mockup C)
-- [ ] Susun atur responsif: < 768 px bar bawah, ≥ 768 px bar atas (pilihan 2)
+- [x] Scaffold Next.js (App Router) + TypeScript + Tailwind CSS
+- [x] ESLint + Prettier, skrip `lint`, `typecheck`, `test`
+- [x] Fon: Bricolage Grotesque + Plus Jakarta Sans (`next/font`)
+- [x] Token reka bentuk: warna kategori IPU, ink, latar (dari mockup C)
+- [x] Susun atur responsif: < 768 px bar bawah, ≥ 768 px bar atas (pilihan 2)
 - [ ] 🐙 PR pertama → ▲ semak preview deployment
 
 ## Fasa 2 — Data
