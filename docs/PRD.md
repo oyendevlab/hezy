@@ -190,10 +190,10 @@ Pilihan lain yang dipertimbangkan: A (latar dinamik), B (kad dan cincin), E (Ya/
 
 ## 11. Risiko dan soalan terbuka
 
-| Risiko atau soalan                               | Tindakan                                                         |
-| ------------------------------------------------ | ---------------------------------------------------------------- |
-| APIMS menukar format atau menyekat scraping      | Guna Open-Meteo sebagai sandaran dan cache di pelayan            |
-| Data model Open-Meteo berbeza daripada IPU rasmi | Label sebagai "Anggaran" sehingga APIMS disambungkan             |
-| Formula penukaran PM2.5 kepada IPU               | Sahkan dengan dokumen rasmi JAS                                  |
-| Ambang penutupan sekolah KPM                     | Sahkan dengan garis panduan terkini sebelum F11                  |
-| Sokongan Web Push di iOS terhad                  | Beri penerangan dalam aplikasi supaya pengguna pasang PWA dahulu |
+| Risiko atau soalan                               | Tindakan                                                                                                                         |
+| ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
+| APIMS menukar format atau menyekat scraping      | Guna Open-Meteo sebagai sandaran dan cache di pelayan                                                                            |
+| Data model Open-Meteo berbeza daripada IPU rasmi | Label sebagai "Anggaran" sehingga APIMS disambungkan                                                                             |
+| Formula penukaran PM2.5 kepada IPU               | Selesai: guna formula sub-indeks PM2.5 JAS (purata 24 jam). IPU rasmi = maksimum 6 pencemar, jadi Hezy label nilainya "Anggaran" |
+| Ambang penutupan sekolah KPM                     | Sahkan dengan garis panduan terkini sebelum F11                                                                                  |
+| Sokongan Web Push di iOS terhad                  | Beri penerangan dalam aplikasi supaya pengguna pasang PWA dahulu                                                                 |
