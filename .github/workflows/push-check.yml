@@ -1,0 +1,20 @@
+name: Semak amaran IPU
+
+on:
+  schedule:
+    # Setiap jam pada minit ke-12 (bacaan APIMS dikemas kini sekitar awal jam).
+    - cron: "12 * * * *"
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Panggil /api/push/check
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          curl -fsS --max-time 120 \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            https://hezy.vercel.app/api/push/check

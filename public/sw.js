@@ -1,7 +1,7 @@
 /* Service worker Hezy: cache aplikasi supaya boleh dibuka tanpa internet.
  * Bacaan IPU (/api/*) TIDAK dicache di sini — aplikasi menyimpannya sendiri dalam localStorage. */
 
-const VERSION = "v1";
+const VERSION = "v2";
 const SHELL = `hezy-shell-${VERSION}`;
 const STATIC = `hezy-static-${VERSION}`;
 const STATIC_LIMIT = 150;
@@ -113,3 +113,42 @@ async function networkFirst(request) {
     throw error;
   }
 }
+
+/* Notifikasi amaran IPU (dihantar oleh /api/push/check). */
+self.addEventListener("push", (event) => {
+  let data = { title: "Hezy", body: "Kemas kini kualiti udara", url: "/" };
+  try {
+    data = { ...data, ...event.data?.json() };
+  } catch {
+    // Muatan bukan JSON: guna teks lalai.
+  }
+  event.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: "/icons/icon-192.png",
+      badge: "/icons/icon-192.png",
+      tag: "hezy-ipu",
+      renotify: true,
+      lang: "ms",
+      data: { url: data.url },
+    }),
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const url = new URL(event.notification.data?.url ?? "/", self.location.origin)
+    .href;
+  event.waitUntil(
+    self.clients
+      .matchAll({ type: "window", includeUncontrolled: true })
+      .then((windows) => {
+        const open = windows.find((w) =>
+          w.url.startsWith(self.location.origin),
+        );
+        return open
+          ? open.focus().then((w) => w.navigate(url))
+          : self.clients.openWindow(url);
+      }),
+  );
+});

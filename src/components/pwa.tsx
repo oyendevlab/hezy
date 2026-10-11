@@ -2,6 +2,8 @@
 
 import { useEffect } from "react";
 import { listenForInstall } from "@/lib/install";
+import { usePrefs } from "@/lib/prefs";
+import { syncPushLocation } from "@/lib/push-client";
 import { useOnline } from "@/lib/online";
 
 /** Daftar service worker (production sahaja) dan dengar peristiwa pemasangan. */
@@ -29,6 +31,13 @@ export function PwaSetup() {
         // Tanpa SW, aplikasi masih berfungsi dalam talian.
       });
   }, []);
+
+  // Amaran push mengikut lokasi semasa: kemas kini pelayan bila lokasi bertukar.
+  const current = usePrefs()?.current ?? null;
+  useEffect(() => {
+    if (current && process.env.NODE_ENV === "production")
+      void syncPushLocation(current);
+  }, [current]);
 
   return null;
 }

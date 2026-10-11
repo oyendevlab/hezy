@@ -75,4 +75,4 @@ Legenda: 🐙 = guna GitHub · ▲ = guna Vercel · ✅ = siap
 - [x] Peta stesen (Leaflet + OpenStreetMap): 68 stesen APIMS, pin ikut IPU rasmi, senarai stesen terdekat
 - [x] Ramalan 3 hari (purata + maks IPU sejam) dan kongsi status (Web Share)
 - [ ] Panduan status sekolah (sahkan ambang KPM)
-- [ ] Notifikasi Web Push (IPU > 100)
+- [x] Notifikasi Web Push (IPU > 100): langganan dalam Vercel Blob (private), semakan setiap jam oleh GitHub Actions, amaran ulang bila kategori berubah / 12 jam, notifikasi pulih

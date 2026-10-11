@@ -1,13 +1,21 @@
 "use client";
 
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { HEALTH_PROFILES } from "@/lib/advice";
 import { promptInstall, useInstallStatus } from "@/lib/install";
 import {
   DEFAULT_PREFS,
   updatePrefs,
   usePrefs,
+  type SavedLocation,
   type ThemePref,
 } from "@/lib/prefs";
+import {
+  currentSubscription,
+  disablePush,
+  enablePush,
+  pushSupport,
+} from "@/lib/push-client";
 import { Skeleton } from "../status";
 
 const THEMES: { key: ThemePref; label: string }[] = [
@@ -109,6 +117,13 @@ export function TetapanScreen() {
 
           <section>
             <h2 className="text-muted mb-2 text-sm font-bold tracking-wide">
+              AMARAN
+            </h2>
+            <AlertRow location={prefs.current} />
+          </section>
+
+          <section>
+            <h2 className="text-muted mb-2 text-sm font-bold tracking-wide">
               APLIKASI
             </h2>
             <div className="divide-line bg-surface divide-y rounded-2xl px-4 text-sm">
@@ -186,6 +201,102 @@ function InstallRow() {
         <span className="text-muted max-w-[60%] text-right">
           {INSTALL_HELP[status]}
         </span>
+      )}
+    </div>
+  );
+}
+
+const noopSubscribe = () => () => {};
+
+const SUPPORT_HELP = {
+  unconfigured: "Notifikasi belum tersedia.",
+  unsupported: "Pelayar ini tidak menyokong notifikasi.",
+  "ios-install":
+    "Di iPhone atau iPad, pasang Hezy di skrin utama dahulu, kemudian buka Hezy dari ikon untuk menghidupkan amaran.",
+} as const;
+
+/** Suis amaran IPU > 100 untuk lokasi semasa (Web Push). */
+function AlertRow({ location }: { location: SavedLocation | null }) {
+  const support = useSyncExternalStore(noopSubscribe, pushSupport, () => null);
+  const [enabled, setEnabled] = useState<boolean | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (support !== "supported") return;
+    void currentSubscription().then((sub) => setEnabled(sub !== null));
+  }, [support]);
+
+  async function toggle() {
+    if (!location) return;
+    setBusy(true);
+    setMessage(null);
+    try {
+      if (enabled) {
+        await disablePush();
+        setEnabled(false);
+      } else if ((await enablePush(location)) === "denied") {
+        setMessage(
+          "Kebenaran notifikasi ditolak. Benarkan notifikasi untuk Hezy dalam tetapan pelayar.",
+        );
+      } else {
+        setEnabled(true);
+      }
+    } catch (error) {
+      setMessage(
+        error instanceof Error ? error.message : "Ralat tidak diketahui.",
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  let content: React.ReactNode;
+  if (support === null) {
+    content = <div className="min-h-12" />;
+  } else if (support !== "supported") {
+    content = <p className="text-muted py-3">{SUPPORT_HELP[support]}</p>;
+  } else if (!location) {
+    content = (
+      <p className="text-muted py-3">
+        Pilih lokasi dahulu untuk menerima amaran.
+      </p>
+    );
+  } else {
+    content = (
+      <div className="flex min-h-14 items-center gap-3 py-3">
+        <div className="flex-1">
+          <div id="amaran-label" className="font-semibold">
+            Amaran bila IPU melebihi 100
+          </div>
+          <div className="text-muted mt-0.5 text-xs">
+            Untuk {location.name} · disemak setiap jam
+          </div>
+        </div>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={enabled === true}
+          aria-labelledby="amaran-label"
+          disabled={busy || enabled === null}
+          onClick={() => void toggle()}
+          className={`flex h-8 w-13 shrink-0 items-center rounded-full p-[3px] transition-colors disabled:opacity-50 ${
+            enabled ? "justify-end bg-[#2e7d4a]" : "justify-start bg-[#8a857c]"
+          }`}
+        >
+          <span className="size-[26px] rounded-full bg-white shadow" />
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-surface rounded-2xl px-4 text-sm">
+      {content}
+      {message && (
+        <p role="alert" className="pb-3 text-xs font-semibold">
+          {message}
+        </p>
       )}
     </div>
   );
