@@ -6,6 +6,7 @@ import {
   rolling24hAverage,
   type IpuCategoryKey,
 } from "./ipu";
+import type { OfficialReading } from "./official";
 import type { AirQualitySeries } from "./openmeteo";
 
 export const TIME_ZONE = "Asia/Kuala_Lumpur";
@@ -45,6 +46,8 @@ export type Reading = {
   /** Tetingkap 3 jam terbaik untuk keluar dalam 24 jam akan datang, berdasarkan IPU sejam (ramalan). */
   bestWindow: BestWindow | null;
   stale: boolean;
+  /** Bacaan rasmi APIMS stesen terdekat (≤ 30 km, ≤ 3 jam); diisi oleh route API. */
+  official: OfficialReading | null;
 };
 
 /** Jam semasa dalam waktu Malaysia, format `YYYY-MM-DDTHH:00` (sama seperti Open-Meteo). */
@@ -121,6 +124,7 @@ export function buildReading(series: AirQualitySeries, now: Date): Reading {
     change3h,
     today,
     bestWindow,
+    official: null,
     stale:
       current === null ||
       hoursBetween(current.time, nowKey) > STALE_AFTER_HOURS,

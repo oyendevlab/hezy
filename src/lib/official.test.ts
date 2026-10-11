@@ -1,0 +1,71 @@
+import { describe, expect, it } from "vitest";
+import type { Station } from "./apims";
+import { officialFor, primaryReading } from "./official";
+
+const shahAlam: Station = {
+  id: "CA20B",
+  name: "Shah Alam",
+  state: "Selangor",
+  lat: 3.104,
+  lon: 101.556,
+  ipu: 156,
+  pollutant: "PM2.5",
+  time: "2026-10-11T22:00",
+};
+
+describe("officialFor", () => {
+  it("memulangkan bacaan rasmi stesen terdekat", () => {
+    expect(
+      officialFor([shahAlam], { lat: 3.07, lon: 101.52 }, "2026-10-11T23:00"),
+    ).toMatchObject({
+      stationName: "Shah Alam",
+      ipu: 156,
+      category: "tidak-sihat",
+      label: "Tidak Sihat",
+      pollutant: "PM2.5",
+    });
+  });
+
+  it("mengabaikan bacaan yang lebih lama daripada 3 jam", () => {
+    expect(
+      officialFor([shahAlam], { lat: 3.07, lon: 101.52 }, "2026-10-12T02:00"),
+    ).toBeNull();
+  });
+
+  it("mengabaikan stesen yang terlalu jauh", () => {
+    expect(
+      officialFor([shahAlam], { lat: 4.6, lon: 101.08 }, "2026-10-11T23:00"),
+    ).toBeNull();
+  });
+});
+
+describe("primaryReading", () => {
+  const current = {
+    time: "2026-10-11T23:00",
+    ipu: 65,
+    category: "sederhana" as const,
+    label: "Sederhana",
+    emergency: false,
+    pm25Average: 30,
+  };
+
+  it("mengutamakan bacaan rasmi", () => {
+    const official = officialFor(
+      [shahAlam],
+      { lat: 3.07, lon: 101.52 },
+      "2026-10-11T23:00",
+    );
+    expect(primaryReading({ current, official })).toMatchObject({
+      ipu: 156,
+      source: "apims",
+    });
+  });
+
+  it("menggunakan anggaran model bila tiada bacaan rasmi", () => {
+    expect(primaryReading({ current, official: null })).toMatchObject({
+      ipu: 65,
+      source: "model",
+    });
+    expect(primaryReading(undefined)).toBeNull();
+  });
+});

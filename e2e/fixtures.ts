@@ -3,7 +3,7 @@ import { test as base, type Page } from "@playwright/test";
 const PREFS_KEY = "hezy:prefs:v1";
 
 /** Respons /api/aqi rekaan: Tidak Sihat (156), masa terbaik 9–11 malam. */
-export function fakeReading() {
+export function fakeReading(official: Record<string, unknown> | null = null) {
   const hourly = [
     70, 68, 66, 64, 62, 60, 62, 70, 90, 120, 156, 160, 165, 170, 172, 168, 160,
     150, 130, 110, 90, 70, 75, 80,
@@ -33,6 +33,7 @@ export function fakeReading() {
       averageIpu: 78,
     },
     stale: false,
+    official,
   };
 }
 
@@ -78,3 +79,16 @@ export const test = base.extend<{ mockApi: void }>({
 });
 
 export { expect } from "@playwright/test";
+
+/** Bacaan rasmi APIMS rekaan untuk stesen Shah Alam. */
+export const OFFICIAL_SHAH_ALAM = {
+  stationId: "CA20B",
+  stationName: "Shah Alam",
+  distanceKm: 5.6,
+  ipu: 172,
+  category: "tidak-sihat",
+  label: "Tidak Sihat",
+  emergency: false,
+  pollutant: "PM2.5",
+  time: "2026-10-11T10:00",
+};

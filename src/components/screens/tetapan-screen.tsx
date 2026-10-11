@@ -126,14 +126,16 @@ export function TetapanScreen() {
             </h2>
             <div className="divide-line bg-surface divide-y rounded-2xl px-4 text-sm">
               <Row label="Bahasa" value="Bahasa Melayu" />
-              <Row label="Sumber bacaan" value="Open-Meteo (model CAMS)" />
-              <Row label="Kaedah IPU" value="Formula JAS, PM2.5 sahaja" />
+              <Row label="Bacaan rasmi" value="APIMS (JAS), stesen ≤ 30 km" />
+              <Row label="Anggaran & ramalan" value="Open-Meteo (model CAMS)" />
+              <Row label="Kaedah anggaran" value="Formula JAS, PM2.5 sahaja" />
               <Row label="Versi" value="0.1.0" />
             </div>
             <p className="text-muted mt-2 text-xs leading-relaxed">
-              IPU rasmi JAS ialah nilai tertinggi daripada 6 pencemar dan diukur
-              di stesen APIMS. Hezy mengira anggaran daripada PM2.5 model, jadi
-              nilainya mungkin berbeza daripada bacaan rasmi.
+              Bila ada stesen APIMS dalam 30 km dengan bacaan 3 jam terakhir,
+              Hezy memaparkan IPU rasmi stesen itu. Jika tidak, Hezy memaparkan
+              anggaran daripada PM2.5 model, yang mungkin berbeza daripada
+              bacaan rasmi. Graf dan masa terbaik sentiasa menggunakan model.
             </p>
           </section>
 

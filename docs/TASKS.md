@@ -71,7 +71,7 @@ Legenda: 🐙 = guna GitHub · ▲ = guna Vercel · ✅ = siap
 
 ## Fasa 8 — Selepas MVP (P1)
 
-- [ ] Proksi APIMS (bacaan rasmi), label "Anggaran" untuk Open-Meteo
+- [x] Proksi APIMS (bacaan rasmi): endpoint awam portal eqms.doe.gov.my, cache 15 minit, stesen ≤ 30 km & ≤ 3 jam; `/api/stations` untuk peta
 - [ ] Peta stesen (Leaflet + OpenStreetMap)
 - [ ] Ramalan 3 hari, kongsi status (Web Share)
 - [ ] Panduan status sekolah (sahkan ambang KPM)

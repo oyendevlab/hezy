@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { primaryReading } from "@/lib/official";
 import { ChooseLocation } from "../choose-location";
 import { IpuPill } from "../ipu-pill";
 import { ReadingNotices } from "../reading-notices";
@@ -11,7 +12,7 @@ import { useCurrent } from "../use-current";
 export function TrendScreen() {
   const { prefs, location, entry, refresh } = useCurrent();
   const reading = entry?.reading;
-  const current = reading?.current;
+  const current = primaryReading(reading);
 
   return (
     <div className="mx-auto flex max-w-[720px] flex-col gap-4 px-5 pt-13 md:pt-10">
