@@ -72,7 +72,7 @@ Legenda: 🐙 = guna GitHub · ▲ = guna Vercel · ✅ = siap
 ## Fasa 8 — Selepas MVP (P1)
 
 - [x] Proksi APIMS (bacaan rasmi): endpoint awam portal eqms.doe.gov.my, cache 15 minit, stesen ≤ 30 km & ≤ 3 jam; `/api/stations` untuk peta
-- [ ] Peta stesen (Leaflet + OpenStreetMap)
-- [ ] Ramalan 3 hari, kongsi status (Web Share)
+- [x] Peta stesen (Leaflet + OpenStreetMap): 68 stesen APIMS, pin ikut IPU rasmi, senarai stesen terdekat
+- [x] Ramalan 3 hari (purata + maks IPU sejam) dan kongsi status (Web Share)
 - [ ] Panduan status sekolah (sahkan ambang KPM)
 - [ ] Notifikasi Web Push (IPU > 100)

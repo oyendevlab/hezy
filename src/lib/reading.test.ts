@@ -107,3 +107,26 @@ describe("buildReading — IPU sejam", () => {
     });
   });
 });
+
+describe("buildReading — ramalan 3 hari", () => {
+  it("mengira purata dan maksimum IPU sejam bagi 3 hari selepas hari ini", () => {
+    // 9–14 Okt; hari selepas 11 Okt mempunyai PM2.5 malar berbeza.
+    const reading = buildReading(
+      series((h) => (h < 72 ? 35 : h < 96 ? 12 : h < 120 ? 100 : 160), 6),
+      NOW,
+    );
+    expect(reading.days).toEqual([
+      { date: "2026-10-12", averageIpu: 50, maxIpu: 50 },
+      { date: "2026-10-13", averageIpu: 133, maxIpu: 133 },
+      { date: "2026-10-14", averageIpu: 210, maxIpu: 210 },
+    ]);
+  });
+
+  it("melangkau hari yang datanya tidak mencukupi", () => {
+    const reading = buildReading(
+      series((h) => (h >= 96 ? null : 35), 5),
+      NOW,
+    );
+    expect(reading.days.map((d) => d.date)).toEqual(["2026-10-12"]);
+  });
+});

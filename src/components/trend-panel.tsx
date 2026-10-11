@@ -1,5 +1,5 @@
 import { CATEGORY_STYLE } from "@/lib/category-style";
-import { formatHour, formatWindow } from "@/lib/format";
+import { formatDay, formatHour, formatWindow } from "@/lib/format";
 import { ipuCategory } from "@/lib/ipu";
 import type { HourPoint, Reading } from "@/lib/reading";
 import { HourBars } from "./hour-bars";
@@ -26,6 +26,8 @@ export function TrendPanel({
   barHeight?: number;
 }) {
   const { today, bestWindow } = reading;
+  // Bacaan lama dalam cache peranti mungkin belum mempunyai medan days.
+  const days = reading.days ?? [];
   const todayDate = today[0]?.time.slice(0, 10) ?? "";
   const lastPast = today.findLast((h) => !h.forecast);
   const bestCategory = bestWindow ? ipuCategory(bestWindow.averageIpu) : null;
@@ -90,9 +92,42 @@ export function TrendPanel({
         ))}
       </div>
 
+      {days.length > 0 && (
+        <section aria-labelledby="ramalan-3-hari">
+          <div className="flex items-baseline justify-between gap-2">
+            <h2 id="ramalan-3-hari" className="font-display text-xl font-bold">
+              Ramalan 3 hari
+            </h2>
+            <span className="text-muted text-xs font-semibold">Anggaran</span>
+          </div>
+          <ul className="mt-3 grid grid-cols-3 gap-2.5">
+            {days.map((d) => (
+              <li key={d.date} className="bg-surface rounded-2xl p-3">
+                <div className="text-sm font-bold">
+                  {formatDay(d.date, todayDate)}
+                </div>
+                <div className="font-display text-2xl font-bold">
+                  {d.averageIpu}
+                </div>
+                <div className="text-muted text-[11px] font-medium">
+                  Purata · maks {d.maxIpu}
+                </div>
+                <div
+                  className="mt-1 h-1.5 rounded-full"
+                  style={{
+                    background:
+                      CATEGORY_STYLE[ipuCategory(d.averageIpu).key].accent,
+                  }}
+                />
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       <p className="text-muted text-xs">
-        Graf dan masa terbaik menggunakan IPU sejam, iaitu formula JAS pada
-        PM2.5 setiap jam. Nombor IPU utama menggunakan purata 24 jam.
+        Graf, masa terbaik dan ramalan menggunakan IPU sejam, iaitu formula JAS
+        pada PM2.5 model setiap jam.
       </p>
     </div>
   );
