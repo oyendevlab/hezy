@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+/* Token reka bentuk Hezy — diambil daripada mockup C (Langit berilustrasi). */
+:root {
+  --page: #ffffff;
+  --ink: #1c1a16;
+  --muted: #5a564e;
+  --surface: #f5f3ef;
+  --line: #ece9e3;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --page: #121316;
+    --ink: #ecedef;
+    --muted: #a6a29a;
+    --surface: #1e1f22;
+    --line: #2c2d31;
+  }
+}
+
+:root[data-theme="dark"] {
+  --page: #121316;
+  --ink: #ecedef;
+  --muted: #a6a29a;
+  --surface: #1e1f22;
+  --line: #2c2d31;
+}
+
+@theme inline {
+  --color-page: var(--page);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-surface: var(--surface);
+  --color-line: var(--line);
+
+  --font-sans: var(--font-jakarta), system-ui, sans-serif;
+  --font-display: var(--font-bricolage), var(--font-jakarta), sans-serif;
+}
+
+/* Kategori IPU (JAS). `-tint` untuk latar, `-ink` untuk teks di atas tint. */
+@theme {
+  --color-ipu-baik: #3a7bd5;
+  --color-ipu-baik-tint: #dcebfa;
+  --color-ipu-baik-ink: #0e2a45;
+  --color-ipu-sederhana: #2e9e5b;
+  --color-ipu-sederhana-tint: #d8eedd;
+  --color-ipu-sederhana-ink: #10331c;
+  --color-ipu-tidak-sihat: #e0a800;
+  --color-ipu-tidak-sihat-tint: #fbebb8;
+  --color-ipu-tidak-sihat-ink: #4a3500;
+  --color-ipu-sangat-tidak-sihat: #e8731c;
+  --color-ipu-sangat-tidak-sihat-tint: #f9d7ba;
+  --color-ipu-sangat-tidak-sihat-ink: #4a1f02;
+  --color-ipu-berbahaya: #d23b3b;
+  --color-ipu-berbahaya-tint: #f6cfcf;
+  --color-ipu-berbahaya-ink: #4a0b0b;
+}
+
+body {
+  background: var(--page);
+  color: var(--ink);
+}
