@@ -8,10 +8,10 @@ Legenda: 🐙 = guna GitHub · ▲ = guna Vercel · ✅ = siap
 
 ## Fasa 0 — Persediaan
 
-- [ ] 🐙 Cipta repo GitHub `hezy` (private) dan sambungkan folder projek
-- [ ] 🐙 Tetapkan `main` sebagai cabang utama; kerja baharu dibuat dalam cabang `feat/*` dan digabung melalui PR
-- [ ] ▲ Cipta projek Vercel bernama **`hezy`** → domain `hezy.vercel.app`
-- [ ] ▲ Sambungkan repo GitHub ke projek Vercel (deploy automatik: PR → preview, `main` → production)
+- [x] 🐙 Cipta repo GitHub `oyendevlab/hezy` (public) dan sambungkan folder projek
+- [x] 🐙 Tetapkan `main` sebagai cabang utama; kerja baharu dibuat dalam cabang `feat/*` dan digabung melalui PR
+- [x] ▲ Cipta projek Vercel bernama **`hezy`** → domain `hezy.vercel.app`
+- [x] ▲ Sambungkan repo GitHub ke projek Vercel (deploy automatik: PR → preview, `main` → production)
 - [ ] Pasang pnpm, sahkan Node 22+
 
 ## Fasa 1 — Rangka projek
