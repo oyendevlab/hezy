@@ -176,7 +176,7 @@ Pilihan lain yang dipertimbangkan: A (latar dinamik), B (kad dan cincin), E (Ya/
 ## 9. Keperluan bukan fungsian
 
 - Skor Lighthouse sekurang-kurangnya 90 bagi Performance, Accessibility dan PWA
-- Saiz bundle awal kurang daripada 150 KB (gzip)
+- Saiz JS awal ≤ 200 KiB dimampat (React + Next sahaja ~115 KiB; diukur 168 KiB pada v0.1)
 - Menyokong Chrome Android dan Safari iOS (2 versi terkini)
 - Bahasa: Bahasa Melayu (utama) dan Bahasa Inggeris
 

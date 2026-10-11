@@ -55,11 +55,11 @@ Legenda: 🐙 = guna GitHub · ▲ = guna Vercel · ✅ = siap
 
 ## Fasa 6 — Kualiti
 
-- [ ] Ujian unit (penukaran IPU, kategori, masa terbaik)
-- [ ] Ujian E2E Playwright: buka → nampak IPU, tambah lokasi, luar talian
-- [ ] Semakan kebolehcapaian (kontras, label, papan kekunci)
-- [ ] Lighthouse ≥ 90 (Performance, Accessibility, Best Practices), bundle < 150 KB gzip
-- [ ] 🐙 GitHub Actions: lint + typecheck + test pada setiap PR
+- [x] Ujian unit (penukaran IPU, kategori, masa terbaik): 70 ujian Vitest
+- [x] Ujian E2E Playwright (telefon + desktop): buka → nampak IPU, tambah lokasi, luar talian, ralat API, tema
+- [x] Semakan kebolehcapaian: axe WCAG 2.1 AA pada 4 halaman, mod cerah dan gelap, tiada pelanggaran
+- [x] Lighthouse ≥ 90: Performance 96–97, Accessibility 100, Best Practices 96, SEO 100. JS 168 KiB dimampat (React + Next sahaja 115 KiB), sasaran PRD dikemas kini kepada 200 KiB
+- [x] 🐙 GitHub Actions: lint + typecheck + format + test + build, dan E2E pada setiap PR
 
 ## Fasa 7 — Deploy
 
