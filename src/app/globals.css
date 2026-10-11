@@ -61,3 +61,36 @@ body {
   background: var(--page);
   color: var(--ink);
 }
+
+/* Pin stesen pada peta (Leaflet divIcon). Warna tint datang daripada kelas kategori. */
+.hezy-pin-wrap {
+  background: none;
+  border: 0;
+}
+.hezy-pin {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  height: 30px;
+  padding: 0 8px;
+  box-sizing: border-box;
+  border: 2px solid;
+  border-radius: 10px;
+  font:
+    700 13px var(--font-jakarta),
+    system-ui,
+    sans-serif;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.18);
+}
+.hezy-pin-na {
+  background: #e5e5e5;
+  color: #3a3a3a;
+}
+.leaflet-container {
+  font-family: var(--font-jakarta), system-ui, sans-serif;
+}
+/* Pautan atribusi mesti boleh dibezakan tanpa bergantung pada warna (WCAG 1.4.1). */
+.leaflet-container .leaflet-control-attribution a {
+  text-decoration: underline;
+}

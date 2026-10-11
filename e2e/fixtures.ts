@@ -34,8 +34,47 @@ export function fakeReading(official: Record<string, unknown> | null = null) {
     },
     stale: false,
     official,
+    days: [
+      { date: "2026-10-12", averageIpu: 120, maxIpu: 150 },
+      { date: "2026-10-13", averageIpu: 95, maxIpu: 110 },
+      { date: "2026-10-14", averageIpu: 60, maxIpu: 75 },
+    ],
   };
 }
+
+/** Stesen APIMS rekaan untuk peta. */
+export const FAKE_STATIONS = [
+  {
+    id: "CA20B",
+    name: "Shah Alam",
+    state: "Selangor",
+    lat: 3.104,
+    lon: 101.556,
+    ipu: 72,
+    pollutant: "PM2.5",
+    time: "2026-10-11T10:00",
+  },
+  {
+    id: "CA21B",
+    name: "Klang",
+    state: "Selangor",
+    lat: 3.01,
+    lon: 101.408,
+    ipu: 146,
+    pollutant: "PM2.5",
+    time: "2026-10-11T10:00",
+  },
+  {
+    id: "CA13A",
+    name: "Seri Manjung",
+    state: "Perak",
+    lat: 4.2,
+    lon: 100.66,
+    ipu: null,
+    pollutant: null,
+    time: null,
+  },
+];
 
 export const SHAH_ALAM = {
   id: "area:shah-alam",
@@ -71,6 +110,13 @@ export const test = base.extend<{ mockApi: void }>({
     async ({ page }, use) => {
       await page.route("**/api/aqi?**", (route) =>
         route.fulfill({ json: fakeReading() }),
+      );
+      await page.route("**/api/stations", (route) =>
+        route.fulfill({ json: { source: "apims", stations: FAKE_STATIONS } }),
+      );
+      // Jubin peta luaran tidak diperlukan dalam ujian.
+      await page.route("https://tile.openstreetmap.org/**", (route) =>
+        route.abort(),
       );
       await use();
     },

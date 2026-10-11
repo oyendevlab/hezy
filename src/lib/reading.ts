@@ -14,6 +14,12 @@ export const TIME_ZONE = "Asia/Kuala_Lumpur";
 /** Bacaan dianggap lapuk jika jam terkini yang ada lebih 3 jam lebih awal daripada sekarang. */
 export const STALE_AFTER_HOURS = 3;
 
+/** Ramalan satu hari: purata dan maksimum IPU sejam. */
+export type DayForecast = { date: string; averageIpu: number; maxIpu: number };
+
+/** Jam minimum dengan data untuk mengira ramalan sehari. */
+const MIN_HOURS_PER_DAY = 12;
+
 export type HourPoint = {
   time: string;
   /** IPU kaedah JAS (purata PM2.5 24 jam). */
@@ -45,6 +51,8 @@ export type Reading = {
   today: HourPoint[];
   /** Tetingkap 3 jam terbaik untuk keluar dalam 24 jam akan datang, berdasarkan IPU sejam (ramalan). */
   bestWindow: BestWindow | null;
+  /** Ramalan harian bagi 3 hari selepas hari ini, daripada IPU sejam model. */
+  days: DayForecast[];
   stale: boolean;
   /** Bacaan rasmi APIMS stesen terdekat (≤ 30 km, ≤ 3 jam); diisi oleh route API. */
   official: OfficialReading | null;
@@ -116,6 +124,21 @@ export function buildReading(series: AirQualitySeries, now: Date): Reading {
     .map((h) => ({ time: h.time, ipu: h.hourlyIpu }));
   const bestWindow = findBestWindow(upcoming, 0);
 
+  const byDate = new Map<string, number[]>();
+  for (const h of hours) {
+    const date = h.time.slice(0, 10);
+    if (date <= todayDate || h.hourlyIpu === null) continue;
+    byDate.set(date, [...(byDate.get(date) ?? []), h.hourlyIpu]);
+  }
+  const days: DayForecast[] = [...byDate]
+    .filter(([, values]) => values.length >= MIN_HOURS_PER_DAY)
+    .slice(0, 3)
+    .map(([date, values]) => ({
+      date,
+      averageIpu: Math.round(values.reduce((a, b) => a + b, 0) / values.length),
+      maxIpu: Math.max(...values),
+    }));
+
   return {
     source: "open-meteo",
     estimate: true,
@@ -124,6 +147,7 @@ export function buildReading(series: AirQualitySeries, now: Date): Reading {
     change3h,
     today,
     bestWindow,
+    days,
     official: null,
     stale:
       current === null ||

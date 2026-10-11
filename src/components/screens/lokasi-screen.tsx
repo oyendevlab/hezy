@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { areaToLocation } from "@/lib/locations";
@@ -18,6 +19,15 @@ import { ChooseLocation } from "../choose-location";
 import { IpuPill } from "../ipu-pill";
 import { LocationSearch } from "../location-search";
 import { Skeleton } from "../status";
+
+// Leaflet hanya dimuatkan bila tab Peta dibuka.
+const StationMap = dynamic(
+  () => import("../station-map").then((m) => m.StationMap),
+  {
+    ssr: false,
+    loading: () => <Skeleton className="h-[420px] md:h-[520px]" />,
+  },
+);
 
 export function LokasiScreen() {
   const prefs = usePrefs();
@@ -54,15 +64,7 @@ export function LokasiScreen() {
         ))}
       </div>
 
-      {view === "map" && (
-        <div className="bg-surface rounded-3xl p-6 text-[15px]">
-          <p className="font-bold">Peta stesen akan datang</p>
-          <p className="text-muted mt-1">
-            Paparan peta dengan pin stesen akan ditambah dalam fasa seterusnya.
-            Buat masa ini, gunakan carian di tab Senarai.
-          </p>
-        </div>
-      )}
+      {view === "map" && <StationMap />}
 
       {view === "list" && prefs === null && <Skeleton className="h-64" />}
 

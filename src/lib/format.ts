@@ -49,3 +49,13 @@ export function formatChange(change: number | null): string | null {
   if (change === 0) return "Stabil dalam 3 jam";
   return `${change > 0 ? "Naik" : "Turun"} ${Math.abs(change)} dalam 3 jam`;
 }
+
+const DAY_NAMES = ["Ahd", "Isn", "Sel", "Rab", "Kha", "Jum", "Sab"];
+
+/** "2026-10-13" → "Esok" (jika hari selepas `today`) atau "Sel 13/10". */
+export function formatDay(date: string, today: string): string {
+  const d = new Date(`${date}T00:00:00Z`);
+  const t = new Date(`${today}T00:00:00Z`);
+  if (d.getTime() - t.getTime() === 86_400_000) return "Esok";
+  return `${DAY_NAMES[d.getUTCDay()]} ${d.getUTCDate()}/${d.getUTCMonth() + 1}`;
+}

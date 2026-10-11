@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { formatChange, formatClock, formatHour, formatWindow } from "./format";
+import {
+  formatChange,
+  formatClock,
+  formatDay,
+  formatHour,
+  formatWindow,
+} from "./format";
 
 describe("formatHour", () => {
   it.each([
@@ -42,5 +48,13 @@ describe("formatChange", () => {
     [null, null],
   ])("%s → %s", (change, label) => {
     expect(formatChange(change)).toBe(label);
+  });
+});
+
+describe("formatDay", () => {
+  it("menamakan esok dan hari seterusnya", () => {
+    expect(formatDay("2026-10-12", "2026-10-11")).toBe("Esok");
+    expect(formatDay("2026-10-13", "2026-10-11")).toBe("Sel 13/10");
+    expect(formatDay("2026-10-18", "2026-10-11")).toBe("Ahd 18/10");
   });
 });

@@ -38,6 +38,10 @@ test.describe("aliran utama", () => {
     await expect(
       page.getByRole("img", { name: /Graf IPU sejam hari ini/ }),
     ).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Ramalan 3 hari" }),
+    ).toBeVisible();
+    await expect(page.getByText("Esok")).toBeVisible();
   });
 
   test("menambah dan membuang lokasi kegemaran", async ({ page }) => {
@@ -129,6 +133,51 @@ test.describe("bacaan rasmi APIMS", () => {
         .getByText("Anggaran model: 156", { exact: false })
         .filter({ visible: true }),
     ).toBeVisible();
+  });
+});
+
+test.describe("peta stesen", () => {
+  test("memaparkan stesen APIMS dan memilih stesen sebagai lokasi semasa", async ({
+    page,
+  }) => {
+    await seedLocation(page);
+    await page.goto("/lokasi");
+    await page.getByRole("tab", { name: "Peta" }).click();
+    await expect(
+      page.getByRole("region", { name: "Peta stesen APIMS" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "STESEN TERDEKAT" }),
+    ).toBeVisible();
+
+    await page.getByRole("button", { name: /Klang.*146/ }).click();
+    await expect(page.getByRole("heading", { name: "Klang" })).toBeVisible();
+    await page.getByRole("button", { name: "Jadikan lokasi semasa" }).click();
+
+    await expect(page).toHaveURL(/\/$/);
+    await expect(
+      page
+        .getByRole("link", { name: /Klang/ })
+        .filter({ visible: true })
+        .first(),
+    ).toBeVisible();
+  });
+
+  test("tiada pelanggaran kebolehcapaian pada tab Peta", async ({ page }) => {
+    await seedLocation(page);
+    await page.goto("/lokasi");
+    await page.getByRole("tab", { name: "Peta" }).click();
+    await expect(
+      page.getByRole("heading", { name: "STESEN TERDEKAT" }),
+    ).toBeVisible();
+    const results = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+      .analyze();
+    expect(
+      results.violations.map(
+        (v) => `${v.id}: ${v.nodes.map((n) => n.target.join(" ")).join(", ")}`,
+      ),
+    ).toEqual([]);
   });
 });
 
