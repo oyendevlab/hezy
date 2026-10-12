@@ -77,7 +77,7 @@ Legenda: 🐙 = guna GitHub · ▲ = guna Vercel · ✅ = siap
 - [ ] Panduan status sekolah → dipindahkan ke Fasa 9 (v0.3.0)
 - [x] Notifikasi Web Push (IPU > 100): langganan dalam Vercel Blob (private), semakan setiap jam oleh GitHub Actions, amaran ulang bila kategori berubah / 12 jam, notifikasi pulih
 
-## Fasa 9 — v0.3.0 (menunggu pengesahan)
+## Fasa 9 — v0.3.0
 
 Fokus: kumpulan sasaran utama (ibu bapa dan pesakit asma), kebolehpercayaan data, dan capaian.
 Setiap item dibuat dalam cabang `feat/*` dan PR sendiri; digabung selepas CI lulus.

@@ -201,7 +201,7 @@ export function TetapanScreen() {
                 label={t("Kaedah anggaran")}
                 value={t("Formula JAS, PM2.5 sahaja")}
               />
-              <Row label={t("Versi")} value="0.2.0" />
+              <Row label={t("Versi")} value="0.3.0" />
             </div>
             <p className="text-muted mt-2 text-xs leading-relaxed">
               {t(

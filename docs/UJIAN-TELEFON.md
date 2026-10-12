@@ -24,6 +24,16 @@ Buka **https://hezy.vercel.app** pada telefon.
 - [ ] Mod pesawat → buka Hezy → bacaan terakhir dipaparkan
 - [ ] Tema Gelap di Tetapan kekal selepas aplikasi ditutup dan dibuka semula
 
+## Ciri baharu v0.3.0 (kedua-dua telefon)
+
+- [ ] Tetapan → profil **Kanak-kanak** → kad **Status sekolah** dipaparkan di Utama dan Trend
+- [ ] Trend: graf jam lepas (rasmi APIMS) dan jam akan datang (pudar) dengan legenda
+- [ ] Tetapan → **Amaran**: hidupkan, pilih ambang 50 / 100 / 200 (Android, atau iPhone selepas dipasang)
+- [ ] Lokasi → ketik loceng pada lokasi kegemaran → notifikasi amaran menyebut nama lokasi itu
+- [ ] Kongsi dari Utama ke WhatsApp/Telegram → pratonton kad bergambar dengan IPU dan warna kategori
+- [ ] Lokasi → **Lihat IPU semua stesen mengikut negeri** → jadual stesen negeri
+- [ ] Tetapan → **Bahasa** → English: semua skrin dan notifikasi seterusnya dalam Bahasa Inggeris; kembali ke Bahasa Melayu
+
 ## Jika ada masalah
 
 Ambil tangkapan skrin dan catat model telefon serta versi OS, kemudian buka isu di
