@@ -226,15 +226,6 @@ export function CompareLocations({ prefs }: { prefs: Prefs }) {
                 {t("Kini")}
               </span>
             )}
-            {scrub.moved && (
-              <button
-                type="button"
-                onClick={scrub.reset}
-                className="text-muted min-h-8 text-xs font-semibold underline"
-              >
-                {t("Kembali ke jam semasa")}
-              </button>
-            )}
           </div>
           <ul className="flex flex-wrap gap-x-5 gap-y-2 text-sm">
             {chosen.map((l, i) => (

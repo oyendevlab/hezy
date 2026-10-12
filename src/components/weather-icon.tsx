@@ -17,6 +17,7 @@ import {
   isWet,
   weatherKind,
   type CurrentWeather,
+  type DayWeather,
 } from "@/lib/weather";
 
 type Look = { icon: Icon; color: string; label: string };
@@ -96,5 +97,27 @@ export function WeatherNow({
       </span>
       <span className="text-muted text-xs font-semibold">{t(look.label)}</span>
     </div>
+  );
+}
+
+/** Ikon cuaca harian kecil (Ramalan 3 hari), dengan suhu maks/min dalam label. */
+export function DayWeatherIcon({ day }: { day: DayWeather | undefined }) {
+  const { t } = useI18n();
+  if (!day) return null;
+  const look = weatherLook(day.code, true);
+  const Icon = look.icon;
+  return (
+    <span
+      role="img"
+      aria-label={t("{label}, {max}°/{min}°", {
+        label: t(look.label),
+        max: day.max,
+        min: day.min,
+      })}
+      title={`${t(look.label)} · ${day.max}°/${day.min}°`}
+      className="shrink-0"
+    >
+      <Icon aria-hidden="true" size={20} weight="duotone" color={look.color} />
+    </span>
   );
 }

@@ -293,10 +293,10 @@ Urutan: 10 → A → B → C → D → 1 → 8 → 9.
 
 ### C. Trend
 
-- [ ] Pengepala: nombor IPU dan pil sebaris dan sejajar; lokasi sebagai cip (📍 lokasi ⌄) ke tab Lokasi
-- [ ] Graf: tekan dan seret untuk melihat jam lain; lepas → kembali ke jam semasa (butang "Kembali" dibuang); tetikus keluar / fokus beralih → kembali
-- [ ] Baris bacaan tinggi tetap (masa | nombor + pil | sumber) supaya tidak melompat semasa diseret
-- [ ] Ikon kecil pada bento Pagi/Petang/Malam dan ikon cuaca harian pada Ramalan 3 hari
+- [x] Pengepala: nombor IPU dan pil sebaris dan sejajar; lokasi sebagai cip (📍 lokasi ⌄) ke tab Lokasi
+- [x] Graf: tekan dan seret untuk melihat jam lain; lepas → kembali ke jam semasa (butang "Kembali" dibuang); tetikus keluar / fokus beralih → kembali
+- [x] Baris bacaan tinggi tetap (masa | nombor + pil | sumber) supaya tidak melompat semasa diseret
+- [x] Ikon kecil pada bento Pagi/Petang/Malam dan ikon cuaca harian pada Ramalan 3 hari
 
 ### D. Lokasi
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { CaretDown, MapPin } from "@phosphor-icons/react";
 import Link from "next/link";
 import { primaryReading } from "@/lib/official";
 import { useI18n } from "@/lib/use-i18n";
@@ -26,25 +27,37 @@ export function TrendScreen() {
   return (
     <div className="mx-auto flex max-w-[720px] flex-col gap-4 px-5 pt-13 md:pt-10">
       <PullToRefresh />
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <h1 className="font-display text-[30px] font-bold">{t("Trend")}</h1>
+      <div className="flex items-end justify-between gap-3">
+        <div className="flex min-w-0 flex-col items-start gap-2">
+          <h1 className="font-display text-[30px] leading-none font-bold">
+            {t("Trend")}
+          </h1>
           {location && (
             <Link
               href="/lokasi"
-              className="text-muted text-sm font-semibold underline"
+              className="bg-surface hover:bg-line inline-flex min-h-9 max-w-full items-center gap-1.5 rounded-full py-1.5 pr-2.5 pl-2 text-sm font-semibold transition-colors"
             >
-              {t(location.name)}
+              <MapPin aria-hidden="true" size={16} weight="fill" />
+              <span className="truncate">{t(location.name)}</span>
+              <CaretDown aria-hidden="true" size={14} weight="bold" />
+              <span className="sr-only">{t("— tukar lokasi")}</span>
             </Link>
           )}
         </div>
         {current && (
-          <div className="flex items-center gap-2">
-            <RefreshButton className="mr-1 hidden md:inline-flex" />
-            <span className="font-display text-2xl font-bold">
-              {current.ipu}
-            </span>
-            <IpuPill category={current.category} label={t(current.label)} />
+          <div className="flex items-center gap-3">
+            <RefreshButton className="hidden md:inline-flex" />
+            <div className="flex flex-col items-end gap-1">
+              <span className="text-muted text-[11px] font-bold tracking-[0.14em]">
+                {t("IPU")}
+              </span>
+              <div className="flex items-center gap-2">
+                <span className="font-display text-[34px] leading-none font-bold tabular-nums">
+                  {current.ipu}
+                </span>
+                <IpuPill category={current.category} label={t(current.label)} />
+              </div>
+            </div>
           </div>
         )}
       </div>
