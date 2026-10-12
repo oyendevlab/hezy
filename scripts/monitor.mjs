@@ -58,6 +58,19 @@ const checks = [
     },
   },
   {
+    name: "Sejarah: /api/history (Shah Alam CA20B)",
+    async run() {
+      const { status, body } = await getJson("/api/history?station=CA20B");
+      if (status !== 200)
+        return `status ${status}: ${body?.error ?? "tiada mesej"}`;
+      // Pengumpul berjalan setiap 3 jam: semalam atau hari ini mesti ada data.
+      const recent = (body?.days ?? []).slice(-2);
+      if (!recent.some((d) => d.max !== null))
+        return "tiada data sejarah untuk semalam atau hari ini (pengumpul tidak berjalan?)";
+      return null;
+    },
+  },
+  {
     name: "Open-Meteo: /api/aqi (Kuching)",
     async run() {
       const { status, body } = await getJson("/api/aqi?lat=1.55&lon=110.36");

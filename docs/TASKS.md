@@ -210,9 +210,10 @@ Masalah: model CAMS (Open-Meteo) kurang menganggar jerebu. Contoh Putrajaya 12 O
    - [ ] API `/api/hotspots` (cache 1 jam): titik VIIRS 24 jam terakhir bagi Malaysia, Sumatera dan Kalimantan
    - [ ] Lapisan "Titik panas" pada peta + bilangan titik panas di Utama bila angin dari arah itu
 3. **Sejarah IPU: heatmap gaya GitHub** (sumber: APIMS sahaja; data WAQI tidak boleh disimpan mengikut terma mereka)
-   - [ ] Tugas harian GitHub Actions menyimpan IPU sejam semua stesen APIMS dalam Vercel Blob; isi awal 7 hari lepas (had sejarah endpoint APIMS)
-   - [ ] Heatmap 12 minggu di Trend: satu kotak sehari, warna ikut IPU maksimum harian; ketik kotak → tarikh, maksimum dan purata
-   - [ ] Legenda warna ikut kategori APIMS: Baik 0–50 (biru), Sederhana 51–100 (hijau), Tidak Sihat 101–200 (kuning), Sangat Tidak Sihat 201–300 (jingga), Berbahaya > 300 (merah), Kecemasan > 500; kotak kelabu = tiada data
+   - [x] Tugas harian GitHub Actions menyimpan IPU sejam semua stesen APIMS dalam Vercel Blob; isi awal 7 hari lepas (had sejarah endpoint APIMS)
+   - [x] Heatmap 12 minggu di Trend: satu kotak sehari, warna ikut IPU maksimum harian; ketik kotak → tarikh, maksimum dan purata
+   - [x] Legenda warna ikut kategori APIMS: Baik 0–50 (biru), Sederhana 51–100 (hijau), Tidak Sihat 101–200 (kuning), Sangat Tidak Sihat 201–300 (jingga), Berbahaya > 300 (merah), Kecemasan > 500; kotak kelabu = tiada data
+   - [x] Semakan harian `pantau.yml`: data sejarah semalam/hari ini wujud
 4. **Ketepatan anggaran**
    - [ ] Bandingkan anggaran model dengan bacaan APIMS bagi stesen yang sama (data sejarah item 3)
    - [ ] Paparkan "biasanya ±N" bila nombor utama ialah anggaran, dan "ramalan ±N" pada graf

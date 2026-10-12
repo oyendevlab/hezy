@@ -1,0 +1,32 @@
+name: Kumpul sejarah IPU
+
+on:
+  schedule:
+    # Setiap 3 jam pada minit ke-40: simpan IPU sejam APIMS semalam dan hari ini (heatmap).
+    - cron: "40 */3 * * *"
+  workflow_dispatch:
+    inputs:
+      days:
+        description: "Bilangan hari ke belakang (1–8; APIMS menyimpan ~7 hari)"
+        default: "2"
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Panggil /api/history/collect
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          DAYS: ${{ github.event.inputs.days || '2' }}
+        run: |
+          RESULT=$(curl -fsS --max-time 240 \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            "https://hezy.vercel.app/api/history/collect?days=$DAYS")
+          echo "$RESULT" | jq .
+          echo "### Sejarah: \`$(echo "$RESULT" | jq -c .)\`" >> "$GITHUB_STEP_SUMMARY"
+          FAILED=$(echo "$RESULT" | jq '.failed')
+          if [ "$FAILED" -gt 0 ]; then
+            echo "::error::$FAILED hari gagal diambil dari APIMS"
+            exit 1
+          fi

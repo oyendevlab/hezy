@@ -81,3 +81,45 @@ export function formatDay(
     return lang === "en" ? "Tomorrow" : "Esok";
   return `${DAY_NAMES[lang][d.getUTCDay()]} ${d.getUTCDate()}/${d.getUTCMonth() + 1}`;
 }
+
+const MONTH_NAMES: Record<Lang, string[]> = {
+  ms: [
+    "Jan",
+    "Feb",
+    "Mac",
+    "Apr",
+    "Mei",
+    "Jun",
+    "Jul",
+    "Ogo",
+    "Sep",
+    "Okt",
+    "Nov",
+    "Dis",
+  ],
+  en: [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ],
+};
+
+/** Nama bulan ringkas bagi tarikh `YYYY-MM-DD`. */
+export function formatMonth(date: string, lang: Lang = "ms"): string {
+  return MONTH_NAMES[lang][Number(date.slice(5, 7)) - 1];
+}
+
+/** "2026-10-12" → "Isn 12 Okt" / "Mon 12 Oct". */
+export function formatShortDate(date: string, lang: Lang = "ms"): string {
+  const d = new Date(`${date}T00:00:00Z`);
+  return `${DAY_NAMES[lang][d.getUTCDay()]} ${d.getUTCDate()} ${formatMonth(date, lang)}`;
+}

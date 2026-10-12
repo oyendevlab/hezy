@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  formatShortDate,
   formatChange,
   formatClock,
   formatDay,
@@ -75,5 +76,12 @@ describe("format EN", () => {
     expect(formatChange(0, "en")).toBe("Steady over 3 hours");
     expect(formatDay("2026-10-14", "2026-10-11", "en")).toBe("Wed 14/10");
     expect(formatDay("2026-10-12", "2026-10-11", "en")).toBe("Tomorrow");
+  });
+});
+
+describe("formatShortDate", () => {
+  it("memaparkan hari, tarikh dan bulan", () => {
+    expect(formatShortDate("2026-10-12")).toBe("Isn 12 Okt");
+    expect(formatShortDate("2026-08-02", "en")).toBe("Sun 2 Aug");
   });
 });
