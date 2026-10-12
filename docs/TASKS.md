@@ -263,3 +263,61 @@ Masalah: model CAMS (Open-Meteo) kurang menganggar jerebu. Contoh Putrajaya 12 O
 - [x] Semua ujian unit dan E2E lulus pada CI dan production; axe tanpa pelanggaran (185 unit, 99 E2E tempatan / 97 production)
 - [x] Lighthouse ≥ 90 dikekalkan (production 12 Okt 2026: telefon 99/100/100/100, desktop 100/100/100/100)
 - [x] Kemas kini `UJIAN-TELEFON.md`, versi 0.4.0, tag dan GitHub Release
+
+## Fasa 12 — v0.5.0 (menunggu pengesahan)
+
+Fokus: rupa yang lebih hidup, pengalaman iPhone, dan domain sendiri. Setiap kumpulan dalam cabang dan PR sendiri.
+Urutan: 10 → A → B → C → D → 1 → 8 → 9.
+
+### 10. Domain hezy.my
+
+- [x] Tambah `hezy.my` dan `www.hezy.my` ke projek Vercel
+- [ ] **Pengguna**: di Hostinger (hPanel → DNS), tukar rekod `A @` kepada `76.76.21.21` (buang `A`/`AAAA` lama 2.57.91.91); `www` kekal CNAME ke `hezy.my` atau `A www 76.76.21.21`
+- [ ] `hezy.my` jadi domain utama: `www` dan `hezy.vercel.app` ubah hala 308 ke `hezy.my` (tiada banner pindah — pengguna masih sedikit)
+- [ ] Kemas kini `SITE_URL`, sitemap, imej kongsi, `VAPID_SUBJECT`, workflow (push, sejarah, ketepatan, pantau) dan E2E production ke `hezy.my`
+- [ ] Nota: tetapan dan langganan amaran terikat pada domain; pengguna sedia ada perlu memilih lokasi dan menghidupkan amaran semula
+
+### A. Langit hidup (Utama)
+
+- [ ] Data cuaca Open-Meteo (tanpa token): litupan awan, jarak penglihatan, siang/malam, matahari terbit/terbenam, kod cuaca, suhu
+- [ ] Shader WebGL ringan (tanpa three.js, ~5–8 KB): warna langit ikut IPU + jarak penglihatan (jernih → kelabu-kuning berjerebu), awan bergerak ikut litupan dan arah angin, matahari pudar dalam jerebu
+- [ ] Malam: bulan (fasa sebenar) dan bintang berkelip yang pudar bila jerebu tebal; senja dan subuh; titisan hujan bila hujan
+- [ ] Menara KL dibuang untuk semua lokasi; langit penuh
+- [ ] Dimuat selepas paparan pertama, berhenti bila tab tidak aktif; imej statik untuk `prefers-reduced-motion` dan peranti tanpa WebGL; Lighthouse ≥ 90 dikekalkan
+
+### B. Bacaan utama dan cuaca (Utama)
+
+- [ ] Label "IPU" di atas nombor; penanda sumber ("Rasmi · APIMS" / "Anggaran")
+- [ ] Ikon cuaca semasa + suhu di sebelah kanan (cth. "31° Berawan"); siang/malam
+- [ ] Ikon garisan pada bento nasihat (topeng, tingkap, air, dll.) — dilukis sendiri dahulu; tukar ke set ikon sedia ada jika kurang sesuai
+
+### C. Trend
+
+- [ ] Pengepala: nombor IPU dan pil sebaris dan sejajar; lokasi sebagai cip (📍 lokasi ⌄) ke tab Lokasi
+- [ ] Graf: tekan dan seret untuk melihat jam lain; lepas → kembali ke jam semasa (butang "Kembali" dibuang); tetikus keluar / fokus beralih → kembali
+- [ ] Baris bacaan tinggi tetap (masa | nombor + pil | sumber) supaya tidak melompat semasa diseret
+- [ ] Ikon kecil pada bento Pagi/Petang/Malam dan ikon cuaca harian pada Ramalan 3 hari
+
+### D. Lokasi
+
+- [ ] Tab **Peta | Senarai**; Peta dipaparkan dahulu
+- [ ] Kegemaran yang sama dengan lokasi semasa ditanda "semasa" (tidak diulang)
+
+### 1. Banner pasang Hezy (iPhone/iPad)
+
+- [ ] Di Utama untuk Safari yang belum memasang Hezy: "Pasang Hezy untuk amaran dan akses pantas" → panduan 4 langkah; boleh ditutup (tidak muncul semula 14 hari)
+
+### 8. Halaman Privasi
+
+- [ ] `/privasi` (BM/EN): lokasi dan tetapan hanya di peranti; langganan notifikasi (lokasi dibundarkan ~1 km) sehingga amaran dimatikan; log ralat tanpa data peribadi 14 hari; Vercel Web Analytics tanpa kuki; sumber data pihak ketiga (APIMS, Open-Meteo, NASA FIRMS, WAQI); cara padam data
+- [ ] Pautan dari Tetapan dan kaki halaman
+
+### 9. Halaman negeri dan kongsi dalam English
+
+- [ ] Halaman `/negeri`, `/negeri/[negeri]` dan `/kongsi` mengikut bahasa pengguna (BM/EN); metadata kekal BM untuk SEO
+
+### Selesai v0.5.0
+
+- [ ] Semua ujian unit dan E2E lulus pada CI dan production (`hezy.my`); axe tanpa pelanggaran
+- [ ] Lighthouse ≥ 90 dikekalkan dengan langit WebGL
+- [ ] Kemas kini `UJIAN-TELEFON.md`, versi 0.5.0, tag dan GitHub Release
