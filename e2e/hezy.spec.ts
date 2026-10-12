@@ -10,7 +10,7 @@ import {
 
 test.describe("aliran utama", () => {
   test("pengumpul sejarah memerlukan rahsia", async ({ request }) => {
-    const res = await request.get("/api/history/collect");
+    const res = await request.get("/api/history/collect?back=0");
     expect([401, 503]).toContain(res.status());
   });
 
