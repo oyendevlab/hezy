@@ -168,6 +168,20 @@ export const test = base.extend<{ mockApi: void }>({
       await page.route("**/api/stations", (route) =>
         route.fulfill({ json: { source: "apims", stations: FAKE_STATIONS } }),
       );
+      await page.route("**/api/hotspots", (route) =>
+        route.fulfill({
+          json: {
+            source: "NASA FIRMS (VIIRS)",
+            days: 2,
+            updatedAt: "2026-10-12T05:00:00.000Z",
+            cells: [
+              [2.9, 101.5, 3, 12],
+              [-1.5, 103.6, 2, 13],
+              [0.5, 101.4, 1, 5],
+            ],
+          },
+        }),
+      );
       await page.route("**/api/accuracy", (route) =>
         route.fulfill({
           json: {

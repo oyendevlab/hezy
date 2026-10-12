@@ -9,6 +9,13 @@ import {
 } from "./apims";
 import type { DailyIndex } from "./history";
 import type { AccuracyIndex } from "./accuracy";
+import {
+  FIRMS_SOURCES,
+  aggregate,
+  firmsUrl,
+  parseFirmsCsv,
+  type HotspotCell,
+} from "./hotspots";
 import { parseWind, windUrl, type WindSeries } from "./wind";
 import { readAccuracy, readIndex } from "./history-store";
 import {
@@ -107,4 +114,29 @@ export async function getWind(lat: number, lon: number): Promise<WindSeries> {
   if (!res.ok)
     throw new Error(`Open-Meteo (angin) memulangkan status ${res.status}`);
   return parseWind(await res.json());
+}
+
+/** Titik panas FIRMS (2 hari, VIIRS SNPP + NOAA-20) digabung ikut sel ~5 km, dicache 1 jam. */
+export async function getHotspots(): Promise<{
+  updatedAt: string;
+  cells: HotspotCell[];
+}> {
+  "use cache";
+  cacheLife({ stale: 1800, revalidate: 3600, expire: 10800 });
+  const key = process.env.FIRMS_MAP_KEY;
+  if (!key) throw new Error("FIRMS_MAP_KEY belum ditetapkan.");
+  const points = [];
+  for (const source of FIRMS_SOURCES) {
+    const res = await fetch(firmsUrl(key, source), {
+      signal: AbortSignal.timeout(20_000),
+    });
+    if (!res.ok) throw new Error(`FIRMS memulangkan status ${res.status}`);
+    const text = await res.text();
+    // FIRMS memulangkan teks ralat (bukan CSV) bila kunci tidak sah atau had dicapai.
+    if (!text.startsWith("latitude")) {
+      throw new Error(`Respons FIRMS tidak dijangka: ${text.slice(0, 80)}`);
+    }
+    points.push(...parseFirmsCsv(text));
+  }
+  return { updatedAt: new Date().toISOString(), cells: aggregate(points) };
 }

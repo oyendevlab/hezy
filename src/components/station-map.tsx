@@ -23,6 +23,7 @@ import {
   waqiBoundsUrl,
   type Sensor,
 } from "@/lib/waqi";
+import type { HotspotCell } from "@/lib/hotspots";
 import { useReading } from "@/lib/use-reading";
 import { CALM_KMH } from "@/lib/wind";
 import { IpuPill } from "./ipu-pill";
@@ -65,6 +66,8 @@ export function StationMap() {
   const [sensors, setSensors] = useState<Sensor[] | null>(null);
   const [showSensors, setShowSensors] = useState(true);
   const [sensorUid, setSensorUid] = useState<number | null>(null);
+  const [fires, setFires] = useState<HotspotCell[] | null>(null);
+  const [showFires, setShowFires] = useState(true);
 
   // Ambil senarai stesen.
   useEffect(() => {
@@ -176,6 +179,55 @@ export function StationMap() {
     };
   }, [stations]);
 
+  // Titik panas NASA FIRMS (dicache di pelayan 1 jam).
+  useEffect(() => {
+    if (!mapReady || fires !== null) return;
+    let cancelled = false;
+    fetch("/api/hotspots")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((body: { cells?: HotspotCell[] } | null) => {
+        if (!cancelled && body?.cells) setFires(body.cells);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [mapReady, fires]);
+
+  useEffect(() => {
+    const m = map.current;
+    if (!mapReady || !m || !showFires || !fires?.length) return;
+    let layer: import("leaflet").LayerGroup | null = null;
+    let renderer: import("leaflet").Canvas | null = null;
+    let disposed = false;
+    const attribution =
+      'Titik panas: <a href="https://firms.modaps.eosdis.nasa.gov/">NASA FIRMS</a>';
+    void import("leaflet").then((L) => {
+      if (disposed) return;
+      // Kanvas: ribuan titik tanpa elemen DOM berasingan.
+      renderer = L.canvas({ padding: 0.5 });
+      layer = L.layerGroup(
+        fires.map(([lat, lon, count]) =>
+          L.circleMarker([lat, lon], {
+            renderer: renderer!,
+            radius: 2.5 + Math.min(count, 6) * 0.5,
+            stroke: false,
+            fillColor: "#d23b3b",
+            fillOpacity: 0.75,
+            interactive: false,
+          }),
+        ),
+      ).addTo(m);
+      m.attributionControl.addAttribution(attribution);
+    });
+    return () => {
+      disposed = true;
+      layer?.remove();
+      renderer?.remove();
+      m.attributionControl.removeAttribution(attribution);
+    };
+  }, [mapReady, fires, showFires]);
+
   useEffect(() => {
     const m = map.current;
     if (!mapReady || !m || !showSensors || !sensors?.length) return;
@@ -263,6 +315,31 @@ export function StationMap() {
           </div>
         )}
       </div>
+
+      {fires !== null && fires.length > 0 && (
+        <div className="flex flex-col gap-1.5">
+          <label className="bg-surface flex min-h-12 cursor-pointer items-center gap-3 rounded-2xl px-3.5 text-sm font-semibold">
+            <input
+              type="checkbox"
+              checked={showFires}
+              onChange={(e) => setShowFires(e.target.checked)}
+              className="size-4 accent-[#1c1a16]"
+            />
+            <span
+              aria-hidden="true"
+              className="size-3 shrink-0 rounded-full bg-[#d23b3b]"
+            />
+            {t("Titik panas ({count}) · NASA FIRMS, 2 hari", {
+              count: fires.length.toLocaleString("ms-MY"),
+            })}
+          </label>
+          <p className="text-muted text-xs">
+            {t(
+              "Titik merah ialah kebakaran yang dikesan satelit VIIRS dalam 2 hari terakhir (setiap titik ≈ kawasan 5 km). Satelit tidak mengesan semua kebakaran, terutama api gambut di bawah permukaan atau di bawah awan.",
+            )}
+          </p>
+        </div>
+      )}
 
       {WAQI_TOKEN && sensors !== null && sensors.length > 0 && (
         <div className="flex flex-col gap-1.5">
