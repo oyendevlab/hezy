@@ -364,3 +364,46 @@ Penambahbaikan sebelum ciri baharu. Cadangan v0.6.0 (notifikasi ujian, semalam v
 - [x] Ujian unit dan E2E lulus pada CI dan production; axe tanpa pelanggaran (199 unit, 110 E2E; production 108 lulus)
 - [x] Lighthouse ≥ 90 dikekalkan (production 12 Okt 2026: telefon 98/100/100/100, desktop 98/100/100/100)
 - [x] Kemas kini `UJIAN-TELEFON.md`, versi 0.5.1, tag dan GitHub Release
+
+## Fasa 14 — v0.6.0
+
+Fokus: UI/UX yang lebih licin dan seperti aplikasi asli. Termasuk pembetulan kedudukan kad putih (v0.5.1 tambahan) dalam versi ini.
+**KIV:** semakan mod gelap (dibuat selepas semua komponen siap); peta haba IPU, aliran angin, mod gambar negeri, amaran lonjakan dan amaran jerebu dijangka (v0.7.0).
+
+### Utama
+
+1. **Kad putih sebagai bottom sheet** (menyelesaikan isu "tolak ke atas" yang KIV)
+   - [ ] Dua kedudukan snap: rehat (kandungan muat di atas navigasi) dan atas (~124 px); kad melekat pada kedudukan terdekat bila dilepaskan
+   - [ ] Kandungan panjang ditatal di dalam kad; tarik ke bawah untuk muat semula kekal
+2. **Menu lokasi pada cip lokasi** (Utama dan Trend)
+   - [ ] Telefon: helaian bawah; desktop: dropdown di bawah cip
+   - [ ] Lokasi semasa (✓), kegemaran dengan IPU mini dan warna kategori, "Guna lokasi saya", "+ Tambah bandar" → Lokasi › Senarai dengan carian kegemaran terbuka
+   - [ ] Tiada kegemaran: teks ringkas + "+ Tambah bandar"; boleh diguna dengan papan kekunci dan pembaca skrin
+3. **Nombor IPU beranimasi** (kira naik/turun) bila bacaan berubah; tiada animasi untuk `prefers-reduced-motion`
+4. **Getaran ringan** bila tarikan mencapai ambang muat semula (Android, `navigator.vibrate`)
+5. **Rangka muat (skeleton)** mengikut bentuk baharu: langit, kad putih, baris angin, bento
+
+### Seluruh aplikasi
+
+6. **Navigasi berikon Phosphor** (Utama, Trend, Lokasi, Tetapan); ikon terisi bila aktif
+7. **Peralihan antara skrin** (View Transitions) yang licin; dimatikan untuk `prefers-reduced-motion`
+8. **Skrin pembuka iOS** (splash) dengan logo awan untuk saiz iPhone/iPad biasa
+9. **Pengenalan ringkas pengguna baharu** (3 skrin): apa itu IPU, pilih lokasi, hidupkan amaran / pasang di iPhone; boleh dilangkau, dipaparkan sekali
+
+### Lokasi dan peta
+
+10. **Kad stesen terpilih sebagai bottom sheet di atas peta** (seperti Google Maps)
+11. **Suis lapisan sebagai cip terapung di atas peta** (Titik panas, Sensor, Angin)
+12. **Himpunan pin (clustering)** bila dizum keluar
+13. **Kegemaran**: leret untuk buang, seret untuk susun semula (dengan alternatif butang untuk papan kekunci)
+
+### Amaran
+
+14. **Butang "Hantar notifikasi ujian"** di Tetapan → Amaran (had kadar; tidak mengubah status amaran)
+
+### Selesai v0.6.0
+
+- [ ] Semakan mod gelap untuk semua komponen baharu (selepas item 1–14)
+- [ ] Ujian unit dan E2E lulus pada CI dan production; axe tanpa pelanggaran
+- [ ] Lighthouse ≥ 90 dikekalkan
+- [ ] Kemas kini `UJIAN-TELEFON.md`, versi 0.6.0, tag dan GitHub Release
