@@ -248,7 +248,12 @@ Masalah: model CAMS (Open-Meteo) kurang menganggar jerebu. Contoh Putrajaya 12 O
 13. **Pemantauan ralat klien**
     - [x] Endpoint `/api/log` (had kadar, tiada data peribadi) + ralat disimpan dalam Blob; ringkasan dalam semakan harian `pantau.yml`
 14. **Keputusan berasaskan data**
-    - [ ] Semak Vercel Analytics (halaman popular, peranti, kadar pasang) dan laporkan untuk keputusan item KIV
+    - [x] Semak Vercel Analytics (halaman popular, peranti, kadar pasang) dan laporkan untuk keputusan item KIV
+    - Laporan 11–12 Okt 2026 (data bermula 11 Okt; termasuk ujian pasukan, jadi sampel kecil): **19 pelawat, 274 paparan**
+      - Peranti: telefon 12 pelawat (179 paparan), desktop 7 (95); **iOS 10 pelawat** (Mobile Safari 9), Android 2, Windows 4, Mac 2
+      - Halaman: Utama 114, Lokasi 58, Trend 56, Tetapan 30, /negeri 11, /negeri/[negeri] 4, /kongsi 1
+      - Negara: Malaysia 14 pelawat (267 paparan); hampir semua akses terus (tiada perujuk)
+      - Kesimpulan: pengguna iPhone majoriti → keutamaan pada panduan pasang iOS dan notifikasi iOS (perlu dipasang); halaman negeri dan kongsi masih jarang digunakan; tiada data untuk menyokong item KIV 8–10 lagi — semak semula selepas musim jerebu dengan lebih ramai pengguna. Acara tersuai (cth. pilihan bahasa, butang kongsi) memerlukan pelan Vercel Pro, jadi tidak diaktifkan
 15. **Model pembelajaran mesin untuk ramalan — KIV**
     - [ ] Nilai selepas ≥ 3 bulan data sejarah (item 3) dan keputusan ketepatan (item 4): model kecil (cth. regresi/gradient boosting) dengan input CAMS, bacaan rasmi terakhir, titik panas, angin dan waktu
     - [ ] Hanya digunakan jika lebih tepat daripada pembetulan nisbah item 15; tanya pengguna dahulu jika memerlukan perkhidmatan berbayar
