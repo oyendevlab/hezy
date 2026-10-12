@@ -7,6 +7,7 @@ import { formatChange, formatClock } from "@/lib/format";
 import { primaryReading } from "@/lib/official";
 import type { Prefs, SavedLocation } from "@/lib/prefs";
 import type { Reading } from "@/lib/reading";
+import { buildSharePath } from "@/lib/share";
 import { useReading, type ReadingEntry } from "@/lib/use-reading";
 import { ChooseLocation } from "../choose-location";
 import { IpuPill } from "../ipu-pill";
@@ -76,6 +77,13 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
   const shareText = current
     ? `IPU ${location.name}: ${current.ipu} (${current.label}) · via Hezy`
     : "Hezy — semak jerebu";
+  const sharePath = current
+    ? buildSharePath({
+        name: location.name,
+        ipu: current.ipu,
+        source: current.source,
+      })
+    : "/";
 
   return (
     <>
@@ -91,6 +99,7 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
             <LocationLink location={location} />
             <ShareButton
               text={shareText}
+              path={sharePath}
               className="bg-white/70 text-[#1c1a16]"
             />
           </div>
@@ -120,6 +129,7 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
               <LocationLink location={location} />
               <ShareButton
                 text={shareText}
+                path={sharePath}
                 className="bg-white/70 text-[#1c1a16]"
               />
             </div>
