@@ -13,6 +13,27 @@ export default function manifest(): MetadataRoute.Manifest {
     background_color: "#ffffff",
     theme_color: "#ffffff",
     categories: ["health", "weather"],
+    // Tekan lama ikon (Android/desktop) untuk terus ke skrin ini.
+    shortcuts: [
+      {
+        name: "Trend IPU hari ini",
+        short_name: "Trend",
+        url: "/trend",
+        icons: [{ src: "/icons/shortcut-trend.png", sizes: "96x96" }],
+      },
+      {
+        name: "Peta stesen dan titik panas",
+        short_name: "Peta",
+        url: "/lokasi#peta",
+        icons: [{ src: "/icons/shortcut-peta.png", sizes: "96x96" }],
+      },
+      {
+        name: "Tetapan dan amaran",
+        short_name: "Tetapan",
+        url: "/tetapan",
+        icons: [{ src: "/icons/shortcut-tetapan.png", sizes: "96x96" }],
+      },
+    ],
     icons: [
       {
         src: "/icons/icon-192.png",

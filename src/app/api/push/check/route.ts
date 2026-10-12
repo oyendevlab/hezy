@@ -62,6 +62,8 @@ export async function GET(request: Request) {
             url: "/",
             // Tag berasingan supaya amaran satu lokasi tidak menggantikan lokasi lain.
             tag: note.tag,
+            lang: record.lang ?? "ms",
+            ...(note.badge !== undefined ? { badge: note.badge } : {}),
           }),
           { TTL: 3600, urgency: note.urgency },
         );

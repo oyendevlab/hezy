@@ -158,6 +158,43 @@ test.describe("aliran utama", () => {
   });
 });
 
+test.describe("pintasan dan lencana", () => {
+  test("pintasan #peta membuka tab Peta terus", async ({ page }) => {
+    await seedLocation(page);
+    await page.goto("/lokasi#peta");
+    await expect(page.getByRole("tab", { name: "Peta" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    await expect(
+      page.getByRole("region", { name: "Peta stesen APIMS" }),
+    ).toBeVisible();
+  });
+
+  test("lencana ikon menunjukkan IPU bila melebihi ambang", async ({
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      const calls: (number | null)[] = [];
+      (window as unknown as { badgeCalls: typeof calls }).badgeCalls = calls;
+      Object.assign(navigator, {
+        setAppBadge: async (n: number) => void calls.push(n),
+        clearAppBadge: async () => void calls.push(null),
+      });
+    });
+    await seedLocation(page);
+    await page.goto("/");
+    // Bacaan tiruan: IPU 156 > ambang lalai 100.
+    await expect
+      .poll(() =>
+        page.evaluate(
+          () => (window as unknown as { badgeCalls: unknown[] }).badgeCalls,
+        ),
+      )
+      .toEqual([156]);
+  });
+});
+
 test.describe("rutin amaran", () => {
   test("ringkasan pagi, amaran ramalan dan waktu senyap disimpan", async ({
     page,
@@ -928,6 +965,15 @@ test.describe("API", () => {
     expect(
       manifest.icons.some((i: { purpose: string }) => i.purpose === "maskable"),
     ).toBe(true);
+    expect(manifest.shortcuts.map((x: { url: string }) => x.url)).toEqual([
+      "/trend",
+      "/lokasi#peta",
+      "/tetapan",
+    ]);
+    for (const shortcut of manifest.shortcuts) {
+      const icon = await request.get(shortcut.icons[0].src);
+      expect(icon.headers()["content-type"]).toBe("image/png");
+    }
   });
 });
 

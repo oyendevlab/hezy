@@ -37,6 +37,10 @@ const StationMap = dynamic(
 );
 
 const noopSubscribe = () => () => {};
+const subscribeHash = (listener: () => void) => {
+  window.addEventListener("hashchange", listener);
+  return () => window.removeEventListener("hashchange", listener);
+};
 
 export function LokasiScreen() {
   const { t } = useI18n();
@@ -47,7 +51,14 @@ export function LokasiScreen() {
     () => false,
   );
   const router = useRouter();
-  const [view, setView] = useState<"list" | "map">("list");
+  // `/lokasi#peta` (pintasan aplikasi) membuka tab Peta terus.
+  const mapHash = useSyncExternalStore(
+    subscribeHash,
+    () => window.location.hash === "#peta",
+    () => false,
+  );
+  const [chosenView, setView] = useState<"list" | "map" | null>(null);
+  const view = chosenView ?? (mapHash ? "map" : "list");
   const [changing, setChanging] = useState(false);
   const [adding, setAdding] = useState(false);
 

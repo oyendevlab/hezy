@@ -242,9 +242,9 @@ Masalah: model CAMS (Open-Meteo) kurang menganggar jerebu. Contoh Putrajaya 12 O
 ### Aplikasi dan kualiti
 
 11. **Pintasan Android**
-    - [ ] `shortcuts` dalam manifest: Trend, Peta, Tetapan
+    - [x] `shortcuts` dalam manifest: Trend, Peta, Tetapan
 12. **Lencana ikon**
-    - [ ] Badging API: nombor IPU pada ikon aplikasi bila melebihi ambang (Android/desktop; iOS 16.4+ bila dipasang)
+    - [x] Badging API: nombor IPU pada ikon aplikasi bila melebihi ambang (Android/desktop; iOS 16.4+ bila dipasang)
 13. **Pemantauan ralat klien**
     - [ ] Endpoint `/api/log` (had kadar, tiada data peribadi) + ralat disimpan dalam Blob; ringkasan dalam semakan harian `pantau.yml`
 14. **Keputusan berasaskan data**

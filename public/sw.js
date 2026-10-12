@@ -1,7 +1,7 @@
 /* Service worker Hezy: cache aplikasi supaya boleh dibuka tanpa internet.
  * Bacaan IPU (/api/*) TIDAK dicache di sini — aplikasi menyimpannya sendiri dalam localStorage. */
 
-const VERSION = "v3";
+const VERSION = "v4";
 const SHELL = `hezy-shell-${VERSION}`;
 const STATIC = `hezy-static-${VERSION}`;
 const STATIC_LIMIT = 150;
@@ -121,6 +121,7 @@ self.addEventListener("push", (event) => {
     body: "Kemas kini kualiti udara",
     url: "/",
     tag: "hezy-ipu",
+    lang: "ms",
   };
   try {
     data = { ...data, ...event.data?.json() };
@@ -128,17 +129,32 @@ self.addEventListener("push", (event) => {
     // Muatan bukan JSON: guna teks lalai.
   }
   event.waitUntil(
-    self.registration.showNotification(data.title, {
-      body: data.body,
-      icon: "/icons/icon-192.png",
-      badge: "/icons/icon-192.png",
-      tag: data.tag,
-      renotify: true,
-      lang: "ms",
-      data: { url: data.url },
-    }),
+    Promise.all([
+      self.registration.showNotification(data.title, {
+        body: data.body,
+        icon: "/icons/icon-192.png",
+        badge: "/icons/icon-192.png",
+        tag: data.tag,
+        renotify: true,
+        lang: data.lang,
+        data: { url: data.url },
+      }),
+      updateAppBadge(data.badge),
+    ]),
   );
 });
+
+/** Lencana ikon aplikasi: nombor IPU semasa amaran, padam bila udara pulih (Badging API). */
+async function updateAppBadge(badge) {
+  if (badge === undefined || !("setAppBadge" in self.navigator)) return;
+  try {
+    if (typeof badge === "number" && badge > 0)
+      await self.navigator.setAppBadge(badge);
+    else await self.navigator.clearAppBadge();
+  } catch {
+    // Pelayar tidak menyokong lencana: abaikan.
+  }
+}
 
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();

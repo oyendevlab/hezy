@@ -32,6 +32,11 @@ export type Planned = {
   tag: string;
   urgency: "normal" | "high";
   update: PlannedUpdate;
+  /**
+   * Lencana ikon aplikasi (item 12): nombor IPU bila amaran lokasi semasa aktif,
+   * `null` untuk padam (udara pulih); tiada = tidak diubah.
+   */
+  badge?: number | null;
 };
 
 export function inQuietHours(
@@ -82,6 +87,9 @@ export function planNotifications(
           tag: `hezy-ipu-${location.id}`,
           urgency: primary.ipu > 200 ? "high" : "normal",
           update: { kind: "alert", index, next: decision.next },
+          ...(index === 0
+            ? { badge: decision.next.lastAlertKey ? primary.ipu : null }
+            : {}),
         });
       }
     }
