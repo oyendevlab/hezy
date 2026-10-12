@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import type { PrimaryReading } from "@/lib/official";
 import { useI18n } from "@/lib/use-i18n";
+import { AnimatedNumber } from "./animated-number";
 import { IpuPill } from "./ipu-pill";
 
 /** Tinggi kira-kira pengepala: nombor di bawahnya dianggap tersorok. */
@@ -71,7 +72,7 @@ export function HomeHeader({
               }`}
             >
               <span className="font-display text-xl leading-none font-bold tabular-nums">
-                {current.ipu}
+                <AnimatedNumber value={current.ipu} />
               </span>
               <IpuPill
                 category={current.category}

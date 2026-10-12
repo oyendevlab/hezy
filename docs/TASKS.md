@@ -379,7 +379,7 @@ Fokus: UI/UX yang lebih licin dan seperti aplikasi asli. Termasuk pembetulan ked
    - [x] Telefon: helaian bawah; desktop: dropdown di bawah cip
    - [x] Lokasi semasa (✓), kegemaran dengan IPU mini dan warna kategori, "Guna lokasi saya", "+ Tambah bandar" → Lokasi › Senarai dengan carian kegemaran terbuka
    - [x] Tiada kegemaran: teks ringkas + "+ Tambah bandar"; boleh diguna dengan papan kekunci dan pembaca skrin
-3. **Nombor IPU beranimasi** (kira naik/turun) bila bacaan berubah; tiada animasi untuk `prefers-reduced-motion`
+3. **Nombor IPU beranimasi** (kira naik/turun) bila bacaan berubah; tiada animasi untuk `prefers-reduced-motion` — ✅ siap (PR #66)
 4. **Getaran ringan** bila tarikan mencapai ambang muat semula (Android, `navigator.vibrate`)
 5. **Rangka muat (skeleton)** mengikut bentuk baharu: langit, kad putih, baris angin, bento
 
