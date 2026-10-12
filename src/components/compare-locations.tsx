@@ -206,7 +206,8 @@ export function CompareLocations({ prefs }: { prefs: Prefs }) {
               y2={H - BOTTOM}
               stroke="var(--ink)"
               strokeWidth="2"
-              opacity="0.6"
+              strokeDasharray="5 5"
+              opacity="0.45"
             />
             {chosen.map((l, i) => (
               <SeriesDot

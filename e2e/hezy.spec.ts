@@ -2,6 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import {
   KLANG,
   OFFICIAL_SHAH_ALAM,
+  SHAH_ALAM,
   expect,
   fakeReading,
   seedLocation,
@@ -134,6 +135,7 @@ test.describe("aliran utama", () => {
   test("menambah dan membuang lokasi kegemaran", async ({ page }) => {
     await seedLocation(page);
     await page.goto("/lokasi");
+    await page.getByRole("tab", { name: "Senarai" }).click();
     await page
       .getByRole("button", { name: "+ Tambah lokasi kegemaran" })
       .click();
@@ -142,6 +144,7 @@ test.describe("aliran utama", () => {
 
     await expect(page.getByText("KEGEMARAN (1/5)")).toBeVisible();
     await page.reload();
+    await page.getByRole("tab", { name: "Senarai" }).click();
     await expect(page.getByText("KEGEMARAN (1/5)")).toBeVisible();
 
     await page
@@ -239,9 +242,13 @@ test.describe("langit hidup", () => {
 });
 
 test.describe("pintasan dan lencana", () => {
-  test("pintasan #peta membuka tab Peta terus", async ({ page }) => {
-    await seedLocation(page);
-    await page.goto("/lokasi#peta");
+  test("Lokasi: Peta dahulu (tab kiri), Senarai melalui #senarai", async ({
+    page,
+  }) => {
+    await seedLocation(page, [SHAH_ALAM]);
+    await page.goto("/lokasi");
+    const tabs = page.getByRole("tab");
+    await expect(tabs).toHaveText(["Peta", "Senarai"]);
     await expect(page.getByRole("tab", { name: "Peta" })).toHaveAttribute(
       "aria-selected",
       "true",
@@ -249,6 +256,15 @@ test.describe("pintasan dan lencana", () => {
     await expect(
       page.getByRole("region", { name: "Peta stesen APIMS" }),
     ).toBeVisible();
+
+    await page.goto("/lokasi#senarai");
+    await page.reload();
+    await expect(page.getByRole("tab", { name: "Senarai" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    // Kegemaran yang sama dengan lokasi semasa ditanda "SEMASA".
+    await expect(page.getByText("SEMASA", { exact: true })).toHaveCount(1);
   });
 
   test("lencana ikon menunjukkan IPU bila melebihi ambang", async ({
@@ -1047,7 +1063,7 @@ test.describe("API", () => {
     ).toBe(true);
     expect(manifest.shortcuts.map((x: { url: string }) => x.url)).toEqual([
       "/trend",
-      "/lokasi#peta",
+      "/lokasi",
       "/tetapan",
     ]);
     for (const shortcut of manifest.shortcuts) {

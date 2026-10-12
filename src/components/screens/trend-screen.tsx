@@ -9,7 +9,6 @@ import { CompareLocations } from "../compare-locations";
 import { HistoryHeatmap } from "../history-heatmap";
 import { SchoolCard } from "../school-card";
 import { ChooseLocation } from "../choose-location";
-import { IpuPill } from "../ipu-pill";
 import { PullToRefresh } from "../pull-to-refresh";
 import { ReadingNotices } from "../reading-notices";
 import { RefreshButton } from "../refresh-button";
@@ -44,22 +43,7 @@ export function TrendScreen() {
             </Link>
           )}
         </div>
-        {current && (
-          <div className="flex items-center gap-3">
-            <RefreshButton className="hidden md:inline-flex" />
-            <div className="flex flex-col items-end gap-1">
-              <span className="text-muted text-[11px] font-bold tracking-[0.14em]">
-                {t("IPU")}
-              </span>
-              <div className="flex items-center gap-2">
-                <span className="font-display text-[34px] leading-none font-bold tabular-nums">
-                  {current.ipu}
-                </span>
-                <IpuPill category={current.category} label={t(current.label)} />
-              </div>
-            </div>
-          </div>
-        )}
+        <RefreshButton className="hidden md:inline-flex" />
       </div>
 
       {prefs === null && <Skeleton className="h-[420px]" />}

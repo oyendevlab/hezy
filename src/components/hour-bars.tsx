@@ -111,7 +111,13 @@ export function HourBars({
             </div>
           )}
           <span className="text-muted ml-auto truncate text-xs font-semibold">
-            {sourceOf(selected)}
+            {t(
+              selected.forecast
+                ? "Ramalan"
+                : selected.officialIpu != null
+                  ? "Rasmi APIMS"
+                  : "Anggaran",
+            )}
           </span>
         </div>
       )}
@@ -160,7 +166,7 @@ export function HourBars({
         {scrub.index >= 0 && (
           <span
             aria-hidden="true"
-            className="bg-ink pointer-events-none absolute -top-1 bottom-0 w-0.5 -translate-x-1/2 rounded-full opacity-70"
+            className="border-ink pointer-events-none absolute -top-1 bottom-0 w-0 -translate-x-1/2 border-l-2 border-dashed opacity-45"
             style={{
               left: `${((scrub.index + 0.5) / points.length) * 100}%`,
             }}

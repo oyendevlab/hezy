@@ -24,7 +24,7 @@ export default function manifest(): MetadataRoute.Manifest {
       {
         name: "Peta stesen dan titik panas",
         short_name: "Peta",
-        url: "/lokasi#peta",
+        url: "/lokasi",
         icons: [{ src: "/icons/shortcut-peta.png", sizes: "96x96" }],
       },
       {
