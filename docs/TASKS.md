@@ -145,7 +145,7 @@ Setiap item dibuat dalam cabang `feat/*` dan PR sendiri; digabung selepas CI lul
 ### Selesai v0.3.0
 
 - [x] 90+ ujian unit dan E2E lulus pada CI dan production; axe tanpa pelanggaran (126 unit, 65 E2E)
-- [x] Lighthouse ≥ 90 dikekalkan (production 12 Okt 2026: telefon 99/100/100/100, desktop 100/100/100/100)
+- [x] Lighthouse ≥ 90 dikekalkan (production: telefon 92/100/100/100, desktop 100/100/100/100) (production 12 Okt 2026: telefon 99/100/100/100, desktop 100/100/100/100)
 - [x] Kemas kini `UJIAN-TELEFON.md`, versi 0.3.0, tag dan GitHub Release
 
 ## Fasa 10 — v0.3.1 (penambahbaikan selepas v0.3.0)
@@ -404,6 +404,6 @@ Fokus: UI/UX yang lebih licin dan seperti aplikasi asli. Termasuk pembetulan ked
 ### Selesai v0.6.0
 
 - [x] Semakan mod gelap untuk semua komponen baharu (selepas item 1–14)
-- [ ] Ujian unit dan E2E lulus pada CI dan production; axe tanpa pelanggaran
-- [ ] Lighthouse ≥ 90 dikekalkan
-- [ ] Kemas kini `UJIAN-TELEFON.md`, versi 0.6.0, tag dan GitHub Release
+- [x] Ujian unit dan E2E lulus pada CI dan production; axe tanpa pelanggaran
+- [x] Lighthouse ≥ 90 dikekalkan
+- [x] Kemas kini `UJIAN-TELEFON.md`, versi 0.6.0, tag dan GitHub Release
