@@ -287,6 +287,20 @@ const EN: Record<string, string> = {
   "Kebenaran notifikasi ditolak. Benarkan notifikasi untuk Hezy dalam tetapan pelayar.":
     "Notification permission denied. Allow notifications for Hezy in your browser settings.",
   "Ambang amaran": "Alert threshold",
+  "Rutin amaran": "Alert routine",
+  "Ringkasan pagi (7 pagi)": "Morning summary (7 am)",
+  "IPU semasa dan masa terbaik untuk keluar hari ini":
+    "Current API and the best time to go out today",
+  "Amaran ramalan esok (8 malam)": "Tomorrow's forecast alert (8 pm)",
+  "Bila purata ramalan esok melebihi ambang anda":
+    "When tomorrow's average forecast is above your threshold",
+  "Waktu senyap": "Quiet hours",
+  "Amaran ditangguh hingga waktu senyap tamat, kecuali IPU melebihi 300":
+    "Alerts wait until quiet hours end, unless the API is above 300",
+  Dari: "From",
+  "Waktu senyap bermula": "Quiet hours start",
+  "Waktu senyap tamat": "Quiet hours end",
+  hingga: "to",
   " · lalai untuk profil {profile}": " · default for the {profile} profile",
   "IPU {threshold}": "API {threshold}",
   "50 = amaran awal (disyorkan untuk asma, kanak-kanak dan warga emas) · 100 = Tidak Sihat · 200 = Sangat Tidak Sihat":
@@ -375,6 +389,13 @@ const EN: Record<string, string> = {
   "Jerebu di {name}: IPU {ipu} ({label})":
     "Haze in {name}: API {ipu} ({label})",
   "Udara pulih di {name}: IPU {ipu}": "Air has improved in {name}: API {ipu}",
+  "Esok di {name}: ramalan IPU {ipu} ({label})":
+    "Tomorrow in {name}: forecast API {ipu} ({label})",
+  "Puncak ~{max}.": "Peak ~{max}.",
+  "Pagi ini di {name}: IPU {ipu} ({label})":
+    "This morning in {name}: API {ipu} ({label})",
+  "Masa terbaik keluar: {window} (~{ipu}).":
+    "Best time to go out: {window} (~{ipu}).",
 };
 
 /** Corak untuk teks yang disimpan dengan nama tempat, cth. nama lokasi GPS. */

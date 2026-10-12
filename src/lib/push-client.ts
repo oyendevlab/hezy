@@ -1,7 +1,7 @@
 import type { Lang } from "./i18n";
 import { isAppleMobile } from "./install";
 import type { SavedLocation } from "./prefs";
-import type { AlertThreshold } from "./push-validate";
+import type { AlertThreshold, PushOptions } from "./push-validate";
 
 const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? "";
 /** Tandatangan tetapan terakhir yang dihantar ke pelayan (lokasi + ambang + bahasa). */
@@ -11,8 +11,9 @@ const signature = (
   locations: SavedLocation[],
   threshold: AlertThreshold,
   lang: Lang,
+  options: PushOptions,
 ) =>
-  `${lang}|${threshold}|${locations.map((l) => `${l.id}@${l.lat},${l.lon}`).join(";")}`;
+  `${lang}|${threshold}|${JSON.stringify(options)}|${locations.map((l) => `${l.id}@${l.lat},${l.lon}`).join(";")}`;
 
 export type PushSupport =
   "supported" | "unsupported" | "ios-install" | "unconfigured";
@@ -54,6 +55,7 @@ async function sendSubscription(
   locations: SavedLocation[],
   threshold: AlertThreshold,
   lang: Lang,
+  options: PushOptions,
 ) {
   const res = await fetch("/api/push/subscribe", {
     method: "POST",
@@ -62,6 +64,7 @@ async function sendSubscription(
       subscription: subscription.toJSON(),
       threshold,
       lang,
+      options,
       locations: locations.map(({ id, name, lat, lon }) => ({
         id,
         name,
@@ -77,7 +80,10 @@ async function sendSubscription(
     throw new Error(body?.error ?? "Langganan tidak dapat disimpan.");
   }
   try {
-    localStorage.setItem(SYNC_KEY, signature(locations, threshold, lang));
+    localStorage.setItem(
+      SYNC_KEY,
+      signature(locations, threshold, lang, options),
+    );
   } catch {
     // Abaikan.
   }
@@ -88,6 +94,7 @@ export async function enablePush(
   locations: SavedLocation[],
   threshold: AlertThreshold,
   lang: Lang,
+  options: PushOptions,
 ): Promise<"enabled" | "denied"> {
   const permission = await Notification.requestPermission();
   if (permission !== "granted") return "denied";
@@ -98,7 +105,7 @@ export async function enablePush(
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
     }));
-  await sendSubscription(subscription, locations, threshold, lang);
+  await sendSubscription(subscription, locations, threshold, lang, options);
   return "enabled";
 }
 
@@ -123,13 +130,15 @@ export async function syncPushSettings(
   locations: SavedLocation[],
   threshold: AlertThreshold,
   lang: Lang,
+  options: PushOptions,
 ) {
   if (locations.length === 0) return;
   if (pushSupport() !== "supported" || Notification.permission !== "granted")
     return;
   try {
     if (
-      localStorage.getItem(SYNC_KEY) === signature(locations, threshold, lang)
+      localStorage.getItem(SYNC_KEY) ===
+      signature(locations, threshold, lang, options)
     )
       return;
   } catch {
@@ -137,7 +146,11 @@ export async function syncPushSettings(
   }
   const subscription = await currentSubscription();
   if (subscription)
-    await sendSubscription(subscription, locations, threshold, lang).catch(
-      () => undefined,
-    );
+    await sendSubscription(
+      subscription,
+      locations,
+      threshold,
+      lang,
+      options,
+    ).catch(() => undefined);
 }

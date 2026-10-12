@@ -158,6 +158,60 @@ test.describe("aliran utama", () => {
   });
 });
 
+test.describe("rutin amaran", () => {
+  test("ringkasan pagi, amaran ramalan dan waktu senyap disimpan", async ({
+    page,
+  }) => {
+    test.skip(
+      !!process.env.E2E_BASE_URL,
+      "Kunci VAPID ujian hanya dalam binaan tempatan",
+    );
+    await seedLocation(page);
+    await page.goto("/tetapan");
+    const routine = page.getByRole("group", { name: "Rutin amaran" });
+    await expect(routine).toBeVisible();
+    const morning = routine.getByRole("checkbox", {
+      name: /Ringkasan pagi \(7 pagi\)/,
+    });
+    const forecast = routine.getByRole("checkbox", {
+      name: /Amaran ramalan esok \(8 malam\)/,
+    });
+    const quiet = routine.getByRole("checkbox", { name: /Waktu senyap/ });
+    await expect(morning).not.toBeChecked();
+    await expect(forecast).toBeChecked();
+    await expect(quiet).toBeChecked();
+
+    await morning.check();
+    await routine
+      .getByRole("combobox", { name: "Waktu senyap bermula" })
+      .selectOption("22");
+    await routine
+      .getByRole("combobox", { name: "Waktu senyap tamat" })
+      .selectOption("7");
+    await page.reload();
+    await expect(morning).toBeChecked();
+    await expect(
+      routine.getByRole("combobox", { name: "Waktu senyap bermula" }),
+    ).toHaveValue("22");
+    await expect(
+      routine.getByRole("combobox", { name: "Waktu senyap tamat" }),
+    ).toHaveValue("7");
+    const saved = await page.evaluate(() =>
+      JSON.parse(localStorage.getItem("hezy:prefs:v1") ?? "{}"),
+    );
+    expect(saved).toMatchObject({
+      morningSummary: true,
+      forecastAlert: true,
+      quietHours: { start: 22, end: 7 },
+    });
+
+    await quiet.uncheck();
+    await expect(
+      routine.getByRole("combobox", { name: "Waktu senyap bermula" }),
+    ).toHaveCount(0);
+  });
+});
+
 test.describe("arah angin", () => {
   test("Utama dan peta memaparkan angin dan asal jerebu", async ({ page }) => {
     const reading = {

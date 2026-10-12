@@ -33,11 +33,52 @@ export type AlertLocation = {
   lon: number;
 };
 
+/** Pilihan rutin amaran (v0.4.0). Jam dalam waktu Malaysia (0–23). */
+export type PushOptions = {
+  /** Ringkasan pagi jam 7 (item 5). */
+  morning: boolean;
+  /** Amaran ramalan esok jam 8 malam (item 6/7). */
+  forecast: boolean;
+  /** Waktu senyap; `null` = tiada. Amaran ditangguh kecuali IPU > 300. */
+  quiet: { start: number; end: number } | null;
+};
+
+/** Rekod lama tanpa pilihan: tiada ringkasan, tiada amaran ramalan, tiada waktu senyap. */
+export const LEGACY_OPTIONS: PushOptions = {
+  morning: false,
+  forecast: false,
+  quiet: null,
+};
+
+const isHour = (v: unknown): v is number =>
+  Number.isInteger(v) && (v as number) >= 0 && (v as number) <= 23;
+
+export function parseOptions(raw: unknown): PushOptions {
+  const r = raw as {
+    morning?: unknown;
+    forecast?: unknown;
+    quiet?: { start?: unknown; end?: unknown } | null;
+  } | null;
+  const quiet =
+    r?.quiet &&
+    isHour(r.quiet.start) &&
+    isHour(r.quiet.end) &&
+    r.quiet.start !== r.quiet.end
+      ? { start: r.quiet.start, end: r.quiet.end }
+      : null;
+  return {
+    morning: r?.morning === true,
+    forecast: r?.forecast === true,
+    quiet,
+  };
+}
+
 export type SubscribeInput = {
   subscription: PushSubscriptionData;
   threshold: AlertThreshold;
   locations: AlertLocation[];
   lang: Lang;
+  options: PushOptions;
 };
 
 const BASE64URL = /^[A-Za-z0-9_-]+={0,2}$/;
@@ -86,6 +127,7 @@ export function parseSubscribeBody(
     locations?: unknown;
     threshold?: unknown;
     lang?: unknown;
+    options?: unknown;
   } | null;
   const sub = b?.subscription;
   const endpoint = sub?.endpoint;
@@ -132,6 +174,7 @@ export function parseSubscribeBody(
         : DEFAULT_ALERT_THRESHOLD,
       locations,
       lang: isLang(b?.lang) ? b.lang : "ms",
+      options: b?.options ? parseOptions(b.options) : LEGACY_OPTIONS,
     },
   };
 }

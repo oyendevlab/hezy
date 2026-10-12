@@ -2,7 +2,12 @@
 
 import { useEffect } from "react";
 import { listenForInstall } from "@/lib/install";
-import { alertLocations, effectiveThreshold, usePrefs } from "@/lib/prefs";
+import {
+  alertLocations,
+  effectiveThreshold,
+  pushOptions,
+  usePrefs,
+} from "@/lib/prefs";
 import { syncPushSettings } from "@/lib/push-client";
 import { useI18n } from "@/lib/use-i18n";
 import { useOnline } from "@/lib/online";
@@ -55,6 +60,7 @@ export function PwaSetup() {
       alertLocations(prefs),
       effectiveThreshold(prefs),
       prefs.lang,
+      pushOptions(prefs),
     );
   }, [prefs]);
 

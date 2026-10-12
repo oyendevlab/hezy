@@ -118,7 +118,29 @@ describe("parseSubscribeBody", () => {
           { id: "semasa", name: "Shah Alam", lat: 3.07, lon: 101.52 },
         ],
         lang: "ms",
+        options: { morning: false, forecast: false, quiet: null },
       },
+    });
+  });
+
+  it("membaca pilihan rutin dan menolak jam tidak sah", () => {
+    const p = parseSubscribeBody({
+      ...valid,
+      options: { morning: true, forecast: true, quiet: { start: 23, end: 6 } },
+    });
+    expect(p.ok && p.value.options).toEqual({
+      morning: true,
+      forecast: true,
+      quiet: { start: 23, end: 6 },
+    });
+    const bad = parseSubscribeBody({
+      ...valid,
+      options: { morning: "ya", quiet: { start: 25, end: 6 } },
+    });
+    expect(bad.ok && bad.value.options).toEqual({
+      morning: false,
+      forecast: false,
+      quiet: null,
     });
   });
 
