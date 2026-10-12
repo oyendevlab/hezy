@@ -158,6 +158,75 @@ test.describe("aliran utama", () => {
   });
 });
 
+test.describe("kongsi imej kad", () => {
+  test("helaian kongsi memaparkan pratonton dan memuat turun imej", async ({
+    page,
+    context,
+  }) => {
+    await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+    await seedLocation(page);
+    await page.route("**/api/aqi?**", (route) =>
+      route.fulfill({ json: fakeReading(OFFICIAL_SHAH_ALAM) }),
+    );
+    await page.goto("/");
+    // Pelayar ujian tiada Web Share: kongsi fail jatuh ke muat turun.
+    await page.evaluate(() => {
+      Object.defineProperty(navigator, "canShare", { value: undefined });
+    });
+    await page
+      .getByRole("button", { name: "Kongsi status" })
+      .filter({ visible: true })
+      .click();
+    const dialog = page.getByRole("dialog", { name: "Kongsi IPU terkini" });
+    await expect(dialog).toBeVisible();
+    await expect(dialog.getByRole("img")).toHaveJSProperty("complete", true);
+    expect(
+      await dialog
+        .getByRole("img")
+        .evaluate((img: HTMLImageElement) => img.naturalWidth),
+    ).toBe(1080);
+
+    const axe = await new AxeBuilder({ page })
+      .include("dialog[open]")
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+      .analyze();
+    expect(axe.violations.map((v) => v.id)).toEqual([]);
+
+    const share = dialog.getByRole("button", { name: "Untuk Status (9:16)" });
+    await expect(share).toBeEnabled();
+    const download = page.waitForEvent("download");
+    await share.click();
+    expect((await download).suggestedFilename()).toBe(
+      "hezy-shah-alam-story.png",
+    );
+    await expect(
+      dialog.getByText("Imej dimuat turun dan pautan disalin."),
+    ).toBeVisible();
+
+    await dialog.getByRole("button", { name: "Salin pautan" }).click();
+    const clip = await page.evaluate(() => navigator.clipboard.readText());
+    expect(clip).toMatch(
+      /IPU Shah Alam: 172 \(Tidak Sihat\).*\/kongsi\?n=Shah\+Alam/,
+    );
+
+    await page.keyboard.press("Escape");
+    await expect(dialog).toBeHidden();
+  });
+
+  test("imej kad: dua format dan parameter tidak sah ditolak", async ({
+    request,
+  }) => {
+    const base = "/kongsi/kad?n=Klang&i=146&s=apims&h=80,90,146&k=2&t=10:00";
+    const square = await request.get(`${base}&f=square`);
+    expect(square.status()).toBe(200);
+    expect(square.headers()["content-type"]).toBe("image/png");
+    const story = await request.get(`${base}&f=story`);
+    expect(story.status()).toBe(200);
+    expect((await story.body()).length).toBeGreaterThan(10_000);
+    expect((await request.get("/kongsi/kad?n=Klang&i=abc")).status()).toBe(400);
+  });
+});
+
 test.describe("muat semula", () => {
   /** Kira permintaan /api/aqi (menggantikan tiruan lalai). */
   async function countAqi(page: import("@playwright/test").Page) {

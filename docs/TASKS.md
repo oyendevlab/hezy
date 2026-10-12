@@ -186,8 +186,8 @@ Urutan: v0.3.1 → A, B, C → 15 → 3 → 4 → D → 1, 2 → 5, 6, 7 → 11�
 
 ### D. Kongsi paparan indeks terkini (menggantikan item 8–10 dalam v0.4.0)
 
-- [ ] Butang Kongsi menjana imej kad (IPU, kategori, lokasi, nasihat, masa, graf mini 24 jam) dan menghantarnya sebagai gambar melalui Web Share (`navigator.share({ files })`), bersama pautan Hezy
-- [ ] Dua format: segi empat (chat) dan menegak 9:16 (Status/Story); sandaran muat turun imej jika pelayar tidak menyokong kongsi fail
+- [x] Butang Kongsi menjana imej kad (IPU, kategori, lokasi, nasihat, masa, graf mini 24 jam) dan menghantarnya sebagai gambar melalui Web Share (`navigator.share({ files })`), bersama pautan Hezy
+- [x] Dua format: segi empat (chat) dan menegak 9:16 (Status/Story); sandaran muat turun imej jika pelayar tidak menyokong kongsi fail
 
 ### 15. Pembetulan ramalan (keutamaan selepas A–C)
 

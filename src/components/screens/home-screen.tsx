@@ -5,10 +5,11 @@ import { shownError } from "@/lib/accuracy";
 import { HEALTH_PROFILES, adviceFor, type QuickTone } from "@/lib/advice";
 import { CATEGORY_STYLE, NEUTRAL_SKY } from "@/lib/category-style";
 import { formatChange, formatClock } from "@/lib/format";
-import { primaryReading } from "@/lib/official";
+import { displayIpu, primaryReading } from "@/lib/official";
 import type { Prefs, SavedLocation } from "@/lib/prefs";
 import type { Reading } from "@/lib/reading";
 import { buildSharePath } from "@/lib/share";
+import { buildCardPath, type CardFormat } from "@/lib/share-card";
 import { useI18n } from "@/lib/use-i18n";
 import { useReading, type ReadingEntry } from "@/lib/use-reading";
 import { ChooseLocation } from "../choose-location";
@@ -76,7 +77,7 @@ type ViewProps = {
 };
 
 function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const reading = entry?.reading;
   const current = primaryReading(reading);
   const showSchool = prefs.profile === "anak" || prefs.showSchool;
@@ -95,6 +96,24 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
         source: current.source,
       })
     : "/";
+  const card =
+    current && reading
+      ? (format: CardFormat) =>
+          buildCardPath({
+            name: location.name,
+            ipu: current.ipu,
+            source: current.source,
+            hours: reading.today.map(displayIpu),
+            now: reading.today.findLastIndex((h) => !h.forecast),
+            time: formatClock(current.time, lang),
+            lang,
+            format,
+          })
+      : undefined;
+  const fileName = `hezy-${location.name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")}`;
 
   return (
     <>
@@ -112,6 +131,8 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
             <ShareButton
               text={shareText}
               path={sharePath}
+              card={card}
+              fileName={fileName}
               className="bg-white/70 text-[#1c1a16]"
             />
           </div>
@@ -144,6 +165,8 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
                 <ShareButton
                   text={shareText}
                   path={sharePath}
+                  card={card}
+                  fileName={fileName}
                   className="bg-white/70 text-[#1c1a16]"
                 />
               </div>
