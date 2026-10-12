@@ -1,16 +1,19 @@
 "use client";
 
+import { useId } from "react";
 import { CATEGORY_STYLE } from "@/lib/category-style";
 import { formatHour } from "@/lib/format";
 import { ipuCategory } from "@/lib/ipu";
 import { displayIpu } from "@/lib/official";
 import type { HourPoint } from "@/lib/reading";
+import { useHourScrub } from "@/lib/use-hour-scrub";
 import { useI18n } from "@/lib/use-i18n";
+import { IpuPill } from "./ipu-pill";
 
 const SCALE_MAX = 200;
 
 /**
- * Graf bar IPU bagi hari ini (mockup G).
+ * Graf bar IPU bagi hari ini (mockup G), boleh disentuh dan dileret untuk melihat nilai setiap jam.
  * Jam lepas: IPU rasmi APIMS jika ada, jika tidak anggaran model. Jam akan datang: ramalan model (pudar).
  */
 export function HourBars({
@@ -27,6 +30,10 @@ export function HourBars({
   );
   const nowIndex = hours.findLastIndex((h) => !h.forecast);
   const officialPast = hours.some((h) => !h.forecast && h.officialIpu != null);
+  const scrub = useHourScrub(points.length, nowIndex);
+  const summaryId = useId();
+  const selected = scrub.index >= 0 ? points[scrub.index] : null;
+
   const peak = known.reduce<(typeof known)[number] | null>(
     (a, p) => (a && a.value >= p.value ? a : p),
     null,
@@ -48,12 +55,67 @@ export function HourBars({
         )
       : t("Graf IPU hari ini. Data tidak mencukupi.");
 
+  const sourceOf = (p: (typeof points)[number]) =>
+    p.forecast
+      ? t("Ramalan model")
+      : p.officialIpu != null
+        ? t("Bacaan rasmi APIMS")
+        : t("Anggaran model");
+  const valueText = selected
+    ? selected.value === null
+      ? `${formatHour(selected.time, lang)}: ${t("Tiada data")}`
+      : `${formatHour(selected.time, lang)}: ${t("IPU {ipu}, {label}", {
+          ipu: selected.value,
+          label: t(ipuCategory(selected.value).label),
+        })} · ${sourceOf(selected)}`
+    : "";
+
   return (
     <figure className="m-0">
+      {selected && (
+        <div
+          aria-hidden="true"
+          className="mb-3 flex min-h-12 flex-wrap items-center gap-x-3 gap-y-1"
+        >
+          <span className="text-sm font-bold">
+            {formatHour(selected.time, lang)}
+            {scrub.index === nowIndex && (
+              <span className="bg-ink text-page ml-1.5 rounded-full px-2 py-0.5 text-[11px]">
+                {t("Kini")}
+              </span>
+            )}
+          </span>
+          {selected.value === null ? (
+            <span className="text-muted text-sm">{t("Tiada data")}</span>
+          ) : (
+            <>
+              <span className="font-display text-[28px] leading-none font-bold tabular-nums">
+                {selected.value}
+              </span>
+              <IpuPill
+                category={ipuCategory(selected.value).key}
+                label={t(ipuCategory(selected.value).label)}
+                className="!px-2 !py-0.5 !text-xs"
+              />
+            </>
+          )}
+          <span className="text-muted text-xs font-semibold">
+            {sourceOf(selected)}
+          </span>
+        </div>
+      )}
       <div
-        role="img"
-        aria-label={summary}
-        className="flex items-end gap-[3px] md:gap-1"
+        role="slider"
+        tabIndex={0}
+        aria-label={t("Graf IPU hari ini, jam demi jam")}
+        aria-describedby={summaryId}
+        aria-valuemin={0}
+        aria-valuemax={Math.max(points.length - 1, 0)}
+        aria-valuenow={Math.max(scrub.index, 0)}
+        aria-valuetext={valueText}
+        data-no-pull
+        {...scrub.handlers}
+        className="focus-visible:outline-ink relative flex cursor-crosshair touch-pan-y items-end gap-[3px] rounded-md select-none focus-visible:outline-2 focus-visible:outline-offset-4 md:gap-1"
         style={{ height }}
       >
         {points.map((p, i) => {
@@ -61,17 +123,13 @@ export function HourBars({
             p.value === null
               ? "transparent"
               : CATEGORY_STYLE[ipuCategory(p.value).key].accent;
-          const official = !p.forecast && p.officialIpu != null;
           return (
             <div
               key={p.time}
-              title={
-                p.value === null
-                  ? undefined
-                  : `${formatHour(p.time, lang)} · ${t("IPU {threshold}", { threshold: p.value })} (${t(p.forecast ? "ramalan" : official ? "rasmi" : "anggaran")})`
-              }
               className={`flex-1 rounded-[4px] ${p.forecast ? "opacity-45" : ""} ${
-                i === nowIndex ? "outline-ink outline-2 outline-offset-2" : ""
+                i === scrub.index
+                  ? "outline-ink outline-2 outline-offset-2"
+                  : ""
               }`}
               style={{
                 height:
@@ -88,8 +146,20 @@ export function HourBars({
             />
           );
         })}
+        {scrub.index >= 0 && (
+          <span
+            aria-hidden="true"
+            className="bg-ink pointer-events-none absolute -top-1 bottom-0 w-0.5 -translate-x-1/2 rounded-full opacity-70"
+            style={{
+              left: `${((scrub.index + 0.5) / points.length) * 100}%`,
+            }}
+          />
+        )}
       </div>
       <figcaption>
+        <p id={summaryId} className="sr-only">
+          {summary}
+        </p>
         <div className="text-muted mt-1.5 flex justify-between text-[11px] font-semibold md:text-xs">
           <span>{t("12 pg")}</span>
           <span>{t("6 pg")}</span>
@@ -97,7 +167,7 @@ export function HourBars({
           <span>{t("6 ptg")}</span>
           <span>{t("11 mlm")}</span>
         </div>
-        <div className="text-muted mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs font-semibold">
+        <div className="text-muted mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-semibold">
           <span className="flex items-center gap-1.5">
             <span aria-hidden="true" className="bg-ink size-2.5 rounded-sm" />
             {t(
@@ -113,6 +183,19 @@ export function HourBars({
             />
             {t("Jam akan datang: ramalan model")}
           </span>
+          {scrub.moved ? (
+            <button
+              type="button"
+              onClick={scrub.reset}
+              className="text-ink min-h-8 underline"
+            >
+              {t("Kembali ke jam semasa")}
+            </button>
+          ) : (
+            <span className="md:hidden">
+              {t("Leret graf untuk lihat jam lain")}
+            </span>
+          )}
         </div>
       </figcaption>
     </figure>

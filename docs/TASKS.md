@@ -172,10 +172,10 @@ Urutan: v0.3.1 → A, B, C → 15 → 3 → 4 → D → 1, 2 → 5, 6, 7 → 11�
 
 ### B. Graf trend interaktif
 
-- [ ] Nilai jam semasa dipaparkan secara lalai di atas graf (jam, IPU, kategori, rasmi/anggaran/ramalan)
-- [ ] Sentuh dan leret di atas graf untuk melihat nilai setiap jam; penanda menegak mengikut jari/tetikus
-- [ ] Papan kekunci: graf boleh difokus, anak panah ←/→ menukar jam (`role="slider"` dengan `aria-valuetext`)
-- [ ] Sama untuk graf Bandingkan lokasi (desktop): satu penanda, nilai semua lokasi
+- [x] Nilai jam semasa dipaparkan secara lalai di atas graf (jam, IPU, kategori, rasmi/anggaran/ramalan)
+- [x] Sentuh dan leret di atas graf untuk melihat nilai setiap jam; penanda menegak mengikut jari/tetikus
+- [x] Papan kekunci: graf boleh difokus, anak panah ←/→ menukar jam (`role="slider"` dengan `aria-valuetext`)
+- [x] Sama untuk graf Bandingkan lokasi (desktop): satu penanda, nilai semua lokasi
 
 ### C. Halaman negeri lebih jelas
 

@@ -37,12 +37,48 @@ test.describe("aliran utama", () => {
     await expect(page.getByText("MASA TERBAIK UNTUK KELUAR")).toBeVisible();
     await expect(page.getByText("8 – 10 malam")).toBeVisible();
     await expect(
-      page.getByRole("img", { name: /Graf IPU hari ini/ }),
+      page.getByRole("slider", { name: "Graf IPU hari ini, jam demi jam" }),
     ).toBeVisible();
     await expect(
       page.getByRole("heading", { name: "Ramalan 3 hari" }),
     ).toBeVisible();
     await expect(page.getByText("Esok")).toBeVisible();
+  });
+
+  test("graf trend boleh dileret dan dikawal dengan papan kekunci", async ({
+    page,
+  }) => {
+    await seedLocation(page);
+    await page.goto("/trend");
+    const chart = page.getByRole("slider", {
+      name: "Graf IPU hari ini, jam demi jam",
+    });
+    // Lalai: jam semasa (10 pagi, anggaran model 156).
+    await expect(chart).toHaveAttribute(
+      "aria-valuetext",
+      "10 pagi: IPU 156, Tidak Sihat · Anggaran model",
+    );
+    await expect(page.getByText("Kini", { exact: true })).toBeVisible();
+
+    await chart.focus();
+    await page.keyboard.press("ArrowRight");
+    await expect(chart).toHaveAttribute(
+      "aria-valuetext",
+      "11 pagi: IPU 160, Tidak Sihat · Ramalan model",
+    );
+    await page.keyboard.press("End");
+    await expect(chart).toHaveAttribute("aria-valuetext", /^11 malam: IPU 80/);
+
+    // Sentuh/klik di hujung kiri graf → tengah malam.
+    const box = (await chart.boundingBox())!;
+    await page.mouse.click(box.x + 3, box.y + box.height / 2);
+    await expect(chart).toHaveAttribute(
+      "aria-valuetext",
+      /^12 tengah malam: IPU 70/,
+    );
+
+    await page.getByRole("button", { name: "Kembali ke jam semasa" }).click();
+    await expect(chart).toHaveAttribute("aria-valuetext", /^10 pagi/);
   });
 
   test("menambah dan membuang lokasi kegemaran", async ({ page }) => {
@@ -297,8 +333,8 @@ test.describe("trend rasmi APIMS", () => {
       page.getByText("Jam akan datang: ramalan model"),
     ).toBeVisible();
     await expect(
-      page.getByRole("img", { name: /Tertinggi 172/ }),
-    ).toBeVisible();
+      page.getByRole("slider", { name: "Graf IPU hari ini, jam demi jam" }),
+    ).toHaveAccessibleDescription(/Tertinggi 172/);
   });
 
   test("kembali ke anggaran model bila tiada sejarah rasmi", async ({
@@ -471,9 +507,14 @@ test.describe("bandingkan lokasi", () => {
     await expect(
       page.getByRole("button", { name: "Klang", pressed: true }),
     ).toBeVisible();
-    await expect(
-      page.getByRole("img", { name: "Graf perbandingan IPU hari ini" }),
-    ).toBeVisible();
+    const compare = page.getByRole("slider", {
+      name: "Graf perbandingan IPU hari ini",
+    });
+    await expect(compare).toBeVisible();
+    await expect(compare).toHaveAttribute("aria-valuetext", "10 pagi");
+    await compare.focus();
+    await page.keyboard.press("ArrowRight");
+    await expect(compare).toHaveAttribute("aria-valuetext", "11 pagi");
     await page.getByRole("button", { name: "Klang", pressed: true }).click();
     await expect(
       page.getByRole("button", { name: "Klang", pressed: false }),
