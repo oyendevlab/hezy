@@ -34,6 +34,12 @@ Buka **https://hezy.vercel.app** pada telefon.
 - [ ] Lokasi → **Lihat IPU semua stesen mengikut negeri** → jadual stesen negeri
 - [ ] Tetapan → **Bahasa** → English: semua skrin dan notifikasi seterusnya dalam Bahasa Inggeris; kembali ke Bahasa Melayu
 
+## Ciri baharu v0.3.1
+
+- [ ] iPhone/iPad (Safari, belum dipasang): Tetapan → **Cara pasang** memaparkan 4 langkah; ikut langkah itu untuk memasang Hezy
+- [ ] Lokasi → **Peta**: pin bergaris putus (sensor tambahan WAQI) dipaparkan; ketik pin → kad "Sensor tambahan WAQI · skala AQI AS"
+- [ ] Matikan suis **Sensor tambahan** → pin bergaris putus hilang
+
 ## Jika ada masalah
 
 Ambil tangkapan skrin dan catat model telefon serta versi OS, kemudian buka isu di
