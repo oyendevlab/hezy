@@ -40,6 +40,21 @@ Buka **https://hezy.vercel.app** pada telefon.
 - [ ] Lokasi → **Peta**: pin bergaris putus (sensor tambahan WAQI) dipaparkan; ketik pin → kad "Sensor tambahan WAQI · skala AQI AS"
 - [ ] Matikan suis **Sensor tambahan** → pin bergaris putus hilang
 
+## Ciri baharu v0.4.0
+
+- [ ] Utama, Trend, Lokasi: tarik ke bawah dari atas → awan berputar → bacaan dimuat semula (termasuk Hezy yang dipasang di iPhone)
+- [ ] Trend: leret jari di atas graf → nilai setiap jam dipaparkan di atas graf; "Kembali ke jam semasa"
+- [ ] Trend: ramalan tidak lagi jatuh mendadak selepas jam semasa (label "Ramalan dibetulkan")
+- [ ] Trend: heatmap "Sejarah 12 minggu" → ketik kotak untuk melihat maksimum dan purata hari itu
+- [ ] Utama: baris angin, cth. "Angin dari tenggara (arah Kalimantan) · N titik panas di hulu angin"
+- [ ] Lokasi → Peta: titik merah (titik panas NASA FIRMS) dan penunjuk angin; suis untuk matikan
+- [ ] Lokasi: butang "IPU mengikut negeri ›" → negeri tersusun ikut peta (Perlis → Johor, Sarawak, Sabah, kemudian Wilayah)
+- [ ] Utama → Kongsi: pratonton kad; "Kongsi gambar" dan "Untuk Status (9:16)" menghantar gambar ke WhatsApp
+- [ ] Tetapan → Amaran → Rutin amaran: hidupkan Ringkasan pagi → notifikasi antara 7–11 pagi esok
+- [ ] Tetapan → Tentang data: "Ketepatan anggaran ±N IPU"
+- [ ] Android: tekan lama ikon Hezy → pintasan Trend, Peta, Tetapan
+- [ ] Ikon Hezy yang dipasang menunjukkan nombor IPU (lencana) bila melebihi ambang amaran
+
 ## Jika ada masalah
 
 Ambil tangkapan skrin dan catat model telefon serta versi OS, kemudian buka isu di
