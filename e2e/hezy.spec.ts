@@ -618,6 +618,19 @@ test.describe("muat semula", () => {
   }) => {
     test.skip(!isMobile, "Gerak isyarat sentuh untuk telefon");
     await seedLocation(page);
+    // Rekod getaran (Android) tanpa menggetarkan apa-apa.
+    await page.addInitScript(() => {
+      const w = window as unknown as { hezyVibrations: number };
+      w.hezyVibrations = 0;
+      navigator.vibrate = () => {
+        w.hezyVibrations++;
+        return true;
+      };
+    });
+    const vibrations = () =>
+      page.evaluate(
+        () => (window as unknown as { hezyVibrations: number }).hezyVibrations,
+      );
     const calls = await countAqi(page);
     await page.goto("/");
     await expect(
@@ -645,6 +658,8 @@ test.describe("muat semula", () => {
     const pulled = await offset();
     expect(pulled).toBeGreaterThan(64);
     expect(pulled).toBeLessThanOrEqual(140);
+    // Satu getaran ringan bila melepasi ambang, bukan setiap gerakan.
+    expect(await vibrations()).toBe(1);
     await expect(page.getByTestId("sky")).toHaveCount(1);
     expect(
       await page
@@ -665,6 +680,7 @@ test.describe("muat semula", () => {
     await touch("touchEnd");
     await page.waitForTimeout(300);
     expect(calls.n).toBe(2);
+    expect(await vibrations()).toBe(1);
   });
 
   test("desktop: butang Muat semula dan pintasan R", async ({

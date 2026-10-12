@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useI18n } from "@/lib/use-i18n";
 import { refreshReadings } from "@/lib/use-reading";
 import { Logo } from "./logo";
+import { crossedThreshold, hapticTick } from "@/lib/rubber-band";
 
 /** Jarak tarikan (selepas redaman) untuk mencetuskan muat semula. */
 const THRESHOLD = 64;
@@ -65,7 +66,9 @@ export function PullToRefresh({
       }
       if (e.cancelable) e.preventDefault();
       setDragging(true);
-      update(Math.min(dy * 0.5, MAX_PULL));
+      const next = Math.min(dy * 0.5, MAX_PULL);
+      if (crossedThreshold(s.pull, next, THRESHOLD)) hapticTick();
+      update(next);
     };
 
     const onEnd = async () => {
