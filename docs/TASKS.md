@@ -325,3 +325,41 @@ Urutan: 10 → A → B → C → D → 1 → 8 → 9.
 - [x] Semua ujian unit dan E2E lulus pada CI dan production (`hezy.my`); axe tanpa pelanggaran (197 unit, 107 E2E; ralat rangkaian tempatan ERR_TIMED_OUT diulang dan lulus)
 - [x] Lighthouse ≥ 90 dikekalkan dengan langit WebGL (production 12 Okt 2026: telefon 98/100/100/100, desktop 100/100/100/100, /trend 99/100/100/100)
 - [x] Kemas kini `UJIAN-TELEFON.md`, versi 0.5.0, tag dan GitHub Release
+
+## Fasa 13 — v0.5.1 (penambahbaikan Utama, menunggu pengesahan)
+
+Penambahbaikan sebelum ciri baharu. Cadangan v0.6.0 (notifikasi ujian, semalam vs sebenar, pembetulan ikut stesen, pencemar utama, amaran lonjakan, amaran jerebu dijangka, peta haba, aliran angin, mod gambar negeri) **KIV**.
+
+### A. Pengepala tetap
+
+- [ ] Cip lokasi dan butang kongsi (dan ⟳ di desktop) kekal di atas semasa menatal
+- [ ] Latar kaca kabur yang semakin pekat bila menatal supaya kekal mudah dibaca di atas kad putih
+- [ ] Bila nombor IPU besar keluar dari skrin, pengepala memaparkan versi ringkas: "Putrajaya · 152 Tidak Sihat"
+
+### B. Kad putih elastik (tarik untuk muat semula)
+
+- [ ] Semasa ditarik: kad turun dengan rintangan seperti getah dan lebih banyak langit kelihatan
+- [ ] Semasa dilepaskan: kad melantun semula dengan sedikit lajakan (spring)
+- [ ] Penunjuk awan berputar di ruang langit di atas kad (menggantikan bulatan putih di Utama)
+- [ ] Tiada lantunan untuk `prefers-reduced-motion`; Trend dan Lokasi kekal dengan penunjuk sedia ada
+
+### C. Angin dan titik panas berikon
+
+- [ ] Baris angin: ikon _Wind_ (Phosphor) + anak panah kecil arah tiupan + "Angin dari tenggara · 8 km/j"
+- [ ] Baris titik panas: ikon _Fire_ (Phosphor, jingga) + bilangan ditebalkan, cth. "**33** titik panas di hulu angin · 2 hari"
+
+### D. Baris sumber ringkas
+
+- [ ] Ringkas: "Stesen Putrajaya · 1.1 km · 8:00 malam" (atau "Anggaran model · dikemas kini 8:00 malam")
+- [ ] Butang ⓘ membuka butiran: sumber penuh (APIMS/Open-Meteo), pencemar utama, anggaran model, ketepatan ±N
+
+### E. Butang "Lihat trend"
+
+- [ ] Kad butang di bawah sekali (telefon): graf mini 24 jam + "Lihat trend jam demi jam ›" → `/trend`
+- [ ] Ruang bawah ditambah supaya bento nasihat dan butang tidak tersorok oleh bar navigasi
+
+### Selesai v0.5.1
+
+- [ ] Ujian unit dan E2E lulus pada CI dan production; axe tanpa pelanggaran
+- [ ] Lighthouse ≥ 90 dikekalkan
+- [ ] Kemas kini `UJIAN-TELEFON.md`, versi 0.5.1, tag dan GitHub Release
