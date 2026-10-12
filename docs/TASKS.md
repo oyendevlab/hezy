@@ -365,7 +365,7 @@ Penambahbaikan sebelum ciri baharu. Cadangan v0.6.0 (notifikasi ujian, semalam v
 - [x] Lighthouse ≥ 90 dikekalkan (production 12 Okt 2026: telefon 98/100/100/100, desktop 98/100/100/100)
 - [x] Kemas kini `UJIAN-TELEFON.md`, versi 0.5.1, tag dan GitHub Release
 
-## Fasa 14 — v0.6.0 (menunggu pengesahan)
+## Fasa 14 — v0.6.0
 
 Fokus: UI/UX yang lebih licin dan seperti aplikasi asli. Termasuk pembetulan kedudukan kad putih (v0.5.1 tambahan) dalam versi ini.
 **KIV:** semakan mod gelap (dibuat selepas semua komponen siap); peta haba IPU, aliran angin, mod gambar negeri, amaran lonjakan dan amaran jerebu dijangka (v0.7.0).
