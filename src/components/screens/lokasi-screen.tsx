@@ -4,12 +4,12 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useSyncExternalStore } from "react";
+import { distanceKm } from "@/lib/apims";
 import { areaToLocation } from "@/lib/locations";
 import { primaryReading } from "@/lib/official";
 import {
   MAX_FAVOURITES,
   addFavourite,
-  isFavourite,
   removeFavourite,
   toggleAlertFavourite,
   updatePrefs,
@@ -37,6 +37,10 @@ const StationMap = dynamic(
 );
 
 const noopSubscribe = () => () => {};
+
+/** Lokasi sama: id sama atau dalam 2 km (cth. GPS "Berhampiran Putrajaya" dan kawasan Putrajaya). */
+const samePlace = (a: SavedLocation, b: SavedLocation) =>
+  a.id === b.id || distanceKm(a, b) < 2;
 const subscribeHash = (listener: () => void) => {
   window.addEventListener("hashchange", listener);
   return () => window.removeEventListener("hashchange", listener);
@@ -51,14 +55,14 @@ export function LokasiScreen() {
     () => false,
   );
   const router = useRouter();
-  // `/lokasi#peta` (pintasan aplikasi) membuka tab Peta terus.
-  const mapHash = useSyncExternalStore(
+  // Peta dipaparkan dahulu; `/lokasi#senarai` membuka tab Senarai terus.
+  const listHash = useSyncExternalStore(
     subscribeHash,
-    () => window.location.hash === "#peta",
+    () => window.location.hash === "#senarai",
     () => false,
   );
   const [chosenView, setView] = useState<"list" | "map" | null>(null);
-  const view = chosenView ?? (mapHash ? "map" : "list");
+  const view = chosenView ?? (listHash ? "list" : "map");
   const [changing, setChanging] = useState(false);
   const [adding, setAdding] = useState(false);
 
@@ -80,7 +84,7 @@ export function LokasiScreen() {
         aria-label={t("Paparan lokasi")}
         className="bg-surface grid grid-cols-2 gap-1 rounded-2xl p-1"
       >
-        {(["list", "map"] as const).map((v) => (
+        {(["map", "list"] as const).map((v) => (
           <button
             key={v}
             type="button"
@@ -143,7 +147,9 @@ export function LokasiScreen() {
                   onSelect={() => select(prefs.current!)}
                 />
                 <div className="flex gap-2 *:flex-1 sm:*:flex-none">
-                  {!isFavourite(prefs, prefs.current.id) &&
+                  {!prefs.favourites.some((f) =>
+                    samePlace(f, prefs.current!),
+                  ) &&
                     prefs.favourites.length < MAX_FAVOURITES && (
                       <button
                         type="button"
@@ -200,7 +206,11 @@ export function LokasiScreen() {
                   key={f.id}
                   className="bg-surface flex items-center gap-2 rounded-[18px] p-3.5"
                 >
-                  <LocationReading location={f} onSelect={() => select(f)} />
+                  <LocationReading
+                    location={f}
+                    onSelect={() => select(f)}
+                    isCurrent={!!prefs.current && samePlace(prefs.current, f)}
+                  />
                   {canAlert && (
                     <button
                       type="button"
@@ -301,9 +311,12 @@ export function LokasiScreen() {
 function LocationReading({
   location,
   onSelect,
+  isCurrent = false,
 }: {
   location: SavedLocation;
   onSelect: () => void;
+  /** Kegemaran ini ialah lokasi semasa (tanda "Semasa"). */
+  isCurrent?: boolean;
 }) {
   const { t } = useI18n();
   const { entry } = useReading(location);
@@ -318,8 +331,15 @@ function LocationReading({
         <span className="block truncate text-[15px] font-bold">
           {t(location.name)}
         </span>
-        <span className="text-muted block text-xs font-medium">
-          {location.detail && t(location.detail)}
+        <span className="text-muted flex min-w-0 items-center gap-1.5 text-xs font-medium">
+          <span className="truncate">
+            {location.detail && t(location.detail)}
+          </span>
+          {isCurrent && (
+            <span className="bg-ink text-page shrink-0 rounded-full px-1.5 py-px text-[10px] font-bold tracking-wide">
+              {t("SEMASA")}
+            </span>
+          )}
         </span>
       </span>
       {current ? (

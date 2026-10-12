@@ -293,15 +293,15 @@ Urutan: 10 → A → B → C → D → 1 → 8 → 9.
 
 ### C. Trend
 
-- [x] Pengepala: nombor IPU dan pil sebaris dan sejajar; lokasi sebagai cip (📍 lokasi ⌄) ke tab Lokasi
+- [x] Pengepala: lokasi sebagai cip (📍 lokasi ⌄) ke tab Lokasi; IPU dibuang dari pengepala (berulang dengan baris KINI di atas graf, pilihan pengguna)
 - [x] Graf: tekan dan seret untuk melihat jam lain; lepas → kembali ke jam semasa (butang "Kembali" dibuang); tetikus keluar / fokus beralih → kembali
 - [x] Baris bacaan tinggi tetap (masa | nombor + pil | sumber) supaya tidak melompat semasa diseret
 - [x] Ikon kecil pada bento Pagi/Petang/Malam dan ikon cuaca harian pada Ramalan 3 hari
 
 ### D. Lokasi
 
-- [ ] Tab **Peta | Senarai**; Peta dipaparkan dahulu
-- [ ] Kegemaran yang sama dengan lokasi semasa ditanda "semasa" (tidak diulang)
+- [x] Tab **Peta | Senarai**; Peta dipaparkan dahulu
+- [x] Kegemaran yang sama dengan lokasi semasa ditanda "semasa" (tidak diulang)
 
 ### 1. Banner pasang Hezy (iPhone/iPad)
 

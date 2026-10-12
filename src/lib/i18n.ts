@@ -235,6 +235,7 @@ const EN: Record<string, string> = {
   Peta: "Map",
   "Paparan lokasi": "Location view",
   "LOKASI SEMASA": "CURRENT LOCATION",
+  SEMASA: "CURRENT",
   Simpan: "Save",
   Tukar: "Change",
   Batal: "Cancel",
@@ -341,6 +342,8 @@ const EN: Record<string, string> = {
   "Bila ada stesen APIMS dalam 30 km dengan bacaan 3 jam terakhir, Hezy memaparkan IPU rasmi stesen itu dan membetulkan ramalan model dengan bacaan tersebut. Jika tidak, Hezy memaparkan anggaran dan ramalan daripada PM2.5 model, yang mungkin berbeza daripada bacaan rasmi.":
     "When an APIMS station within 30 km has a reading from the last 3 hours, Hezy shows that station's official API and corrects the model forecast with it. Otherwise Hezy shows an estimate and forecast from model PM2.5, which may differ from official readings.",
   "Ramalan dibetulkan": "Corrected forecast",
+  Ramalan: "Forecast",
+  "Rasmi APIMS": "Official APIMS",
   "Anggaran dibetulkan": "Corrected estimate",
   IPU: "API",
   "Rasmi · APIMS": "Official · APIMS",

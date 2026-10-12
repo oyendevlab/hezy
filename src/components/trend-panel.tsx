@@ -3,7 +3,7 @@
 import { shownError } from "@/lib/accuracy";
 import { Moon, Sun, SunHorizon } from "@phosphor-icons/react";
 import { CATEGORY_STYLE } from "@/lib/category-style";
-import { formatDay, formatHour, formatWindow } from "@/lib/format";
+import { formatDay, formatWindow } from "@/lib/format";
 import { ipuCategory } from "@/lib/ipu";
 import { displayIpu } from "@/lib/official";
 import type { HourPoint, Reading } from "@/lib/reading";
@@ -37,7 +37,6 @@ export function TrendPanel({
   // Bacaan lama dalam cache peranti mungkin belum mempunyai medan days.
   const days = reading.days ?? [];
   const todayDate = today[0]?.time.slice(0, 10) ?? "";
-  const lastPast = today.findLast((h) => !h.forecast);
   const bestCategory = bestWindow ? ipuCategory(bestWindow.averageIpu) : null;
   const blocks = [
     {
@@ -86,13 +85,6 @@ export function TrendPanel({
           <h2 className="font-display text-xl font-bold">
             {t("Hari ini, jam demi jam")}
           </h2>
-          {lastPast && (
-            <span className="text-muted text-xs font-semibold">
-              {t("Selepas {time}: ramalan", {
-                time: formatHour(lastPast.time, lang),
-              })}
-            </span>
-          )}
         </div>
         <div className="mt-3">
           <HourBars
