@@ -147,3 +147,43 @@ Setiap item dibuat dalam cabang `feat/*` dan PR sendiri; digabung selepas CI lul
 - [x] 90+ ujian unit dan E2E lulus pada CI dan production; axe tanpa pelanggaran (126 unit, 65 E2E)
 - [x] Lighthouse ≥ 90 dikekalkan (production 12 Okt 2026: telefon 99/100/100/100, desktop 100/100/100/100)
 - [x] Kemas kini `UJIAN-TELEFON.md`, versi 0.3.0, tag dan GitHub Release
+
+## Fasa 10 — v0.3.1 (penambahbaikan selepas v0.3.0)
+
+Perubahan yang digabung selepas tag `v0.3.0`, dikeluarkan sebagai versi tampalan sebelum kerja v0.4.0.
+
+- [x] Panduan pasang langkah demi langkah di iPhone/iPad (butang "Cara pasang", termasuk menu ⋯ di iOS 26); iPadOS dikesan dengan betul (PR #24)
+- [x] Lapisan sensor tambahan WAQI pada peta (PR #25)
+- [ ] Versi 0.3.1 (package.json + Tetapan)
+- [ ] `UJIAN-TELEFON.md`: semakan panduan pasang iPhone dan lapisan sensor WAQI
+- [ ] Ujian E2E pada production, tag `v0.3.1` dan GitHub Release
+
+## Fasa 11 — v0.4.0 (cadangan, menunggu pilihan)
+
+Pilih item yang mahu dibuat; pelan terperinci ditulis selepas pilihan disahkan.
+
+### Data dan ramalan
+
+1. **Arah angin & asal jerebu**: anak panah angin di peta dan ayat ringkas "Angin dari barat daya (Sumatera)" (Open-Meteo, tanpa token)
+2. **Titik panas kebakaran (NASA FIRMS)**: lapisan titik api Sumatera/Kalimantan dalam 24–48 jam (**pengguna** daftar kunci API percuma)
+3. **Sejarah 7 dan 30 hari**: graf IPU harian daripada APIMS untuk melihat trend jangka panjang
+4. **Ketepatan anggaran**: bandingkan anggaran model dengan bacaan APIMS dan paparkan "biasanya ±N" bila nombor utama ialah anggaran
+
+### Amaran dan rutin harian
+
+5. **Ringkasan pagi**: notifikasi pilihan jam 7 pagi dengan IPU dan masa terbaik untuk keluar
+6. **Waktu senyap**: tiada amaran antara jam pilihan (cth. 11 mlm – 6 pg) kecuali IPU > 300
+7. **Amaran ramalan**: maklumkan petang sebelumnya jika ramalan esok melebihi ambang
+
+### Ibu bapa, sekolah dan komuniti
+
+8. **Mod guru / sekolah**: halaman ikut daerah dengan status aktiviti luar dan teks makluman sedia dikongsi kepada ibu bapa
+9. **Senarai semak jerebu**: topeng N95, penapis udara, ubat asma; tanda siap disimpan di peranti
+10. **Bahasa Cina dan Tamil**: menggunakan kamus i18n sedia ada; perlu semakan penutur asli
+
+### Aplikasi dan kualiti
+
+11. **Pintasan Android**: tekan lama ikon untuk terus ke Trend atau Peta (manifest shortcuts)
+12. **Lencana ikon** (Badging API): nombor IPU pada ikon aplikasi bila amaran aktif (Android/desktop; iOS 16.4+ dipasang)
+13. **Pemantauan ralat klien**: log ralat JavaScript ke endpoint sendiri + ringkasan dalam semakan harian (tanpa akaun pihak ketiga)
+14. **Keputusan berasaskan data**: semak Vercel Analytics (halaman, peranti, kadar pasang) sebelum memilih item seterusnya
