@@ -7,6 +7,7 @@ import {
   toggleAlertFavourite,
   effectiveThreshold,
   parsePrefs,
+  moveFavourite,
   removeFavourite,
   type Prefs,
   type SavedLocation,
@@ -146,5 +147,34 @@ describe("migrasi nama lokasi GPS", () => {
     );
     expect(prefs.current?.name).toBe("Putrajaya");
     expect(prefs.favourites[0].name).toBe("Berhampiran Laut");
+  });
+});
+
+describe("moveFavourite", () => {
+  const loc = (id: string): SavedLocation => ({
+    id,
+    name: id,
+    detail: "",
+    lat: 3,
+    lon: 101,
+    source: "area",
+  });
+  const prefs: Prefs = {
+    ...DEFAULT_PREFS,
+    favourites: [loc("a"), loc("b"), loc("c")],
+  };
+  const ids = (p: Prefs) => p.favourites.map((f) => f.id);
+
+  it("memindah ke bawah dan ke atas", () => {
+    expect(ids(moveFavourite(prefs, "a", 2))).toEqual(["b", "c", "a"]);
+    expect(ids(moveFavourite(prefs, "c", 0))).toEqual(["c", "a", "b"]);
+  });
+  it("kedudukan di luar julat diapit", () => {
+    expect(ids(moveFavourite(prefs, "b", 9))).toEqual(["a", "c", "b"]);
+    expect(ids(moveFavourite(prefs, "b", -3))).toEqual(["b", "a", "c"]);
+  });
+  it("tiada perubahan: objek sama", () => {
+    expect(moveFavourite(prefs, "b", 1)).toBe(prefs);
+    expect(moveFavourite(prefs, "x", 0)).toBe(prefs);
   });
 });

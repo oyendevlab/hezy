@@ -25,6 +25,7 @@ import { LocationSearch } from "../location-search";
 import { PullToRefresh } from "../pull-to-refresh";
 import { RefreshButton } from "../refresh-button";
 import { Skeleton } from "../status";
+import { FavouriteList } from "../favourite-list";
 
 // Leaflet hanya dimuatkan bila tab Peta dibuka.
 const StationMap = dynamic(
@@ -199,12 +200,10 @@ export function LokasiScreen() {
                 )}
               </p>
             )}
-            <ul className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
-              {prefs.favourites.map((f) => (
-                <li
-                  key={f.id}
-                  className="bg-surface flex items-center gap-2 rounded-[18px] p-3.5"
-                >
+            <FavouriteList
+              favourites={prefs.favourites}
+              renderRow={(f) => (
+                <>
                   <LocationReading
                     location={f}
                     onSelect={() => select(f)}
@@ -268,9 +267,9 @@ export function LokasiScreen() {
                       <line x1="18" y1="6" x2="6" y2="18" />
                     </svg>
                   </button>
-                </li>
-              ))}
-            </ul>
+                </>
+              )}
+            />
 
             {prefs.favourites.length < MAX_FAVOURITES &&
               (adding ? (

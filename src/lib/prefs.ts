@@ -151,6 +151,18 @@ export function removeFavourite(prefs: Prefs, id: string): Prefs {
   };
 }
 
+/** Pindah kegemaran `id` ke kedudukan `to` (diapit ke julat senarai). */
+export function moveFavourite(prefs: Prefs, id: string, to: number): Prefs {
+  const from = prefs.favourites.findIndex((f) => f.id === id);
+  if (from < 0) return prefs;
+  const target = Math.min(Math.max(to, 0), prefs.favourites.length - 1);
+  if (target === from) return prefs;
+  const favourites = [...prefs.favourites];
+  const [item] = favourites.splice(from, 1);
+  favourites.splice(target, 0, item);
+  return { ...prefs, favourites };
+}
+
 export function isFavourite(prefs: Prefs, id: string): boolean {
   return prefs.favourites.some((f) => f.id === id);
 }

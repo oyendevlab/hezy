@@ -145,6 +145,13 @@ const EN: Record<string, string> = {
   "(semasa)": "(current)",
   "Tiada lokasi kegemaran lagi.": "No favourite locations yet.",
   "Tambah bandar": "Add a city",
+  // Kegemaran: leret dan susun semula
+  "{name} dipindah ke kedudukan {n} daripada {total}":
+    "{name} moved to position {n} of {total}",
+  "{name} dibuang daripada kegemaran": "{name} removed from favourites",
+  "Susun semula {name}, kedudukan {n} daripada {total}. Guna anak panah atas atau bawah.":
+    "Reorder {name}, position {n} of {total}. Use the up or down arrow keys.",
+  Buang: "Remove",
   // Peta: cip lapisan dan himpunan pin
   "Lapisan peta": "Map layers",
   "Titik panas ({count})": "Hotspots ({count})",
