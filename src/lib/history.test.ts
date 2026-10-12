@@ -3,6 +3,7 @@ import {
   addDays,
   firstDate,
   hoursForDate,
+  monthLabelWeeks,
   mergeHours,
   stationHistory,
   summarize,
@@ -92,5 +93,31 @@ describe("toWeeks", () => {
     expect(weeks[1][0]?.date).toBe("2026-10-12");
     expect(weeks[1][5]?.date).toBe("2026-10-17");
     expect(weeks[1][6]).toBeNull();
+  });
+});
+
+describe("monthLabelWeeks", () => {
+  const range = (start: string, n: number) =>
+    Array.from({ length: n }, (_, i) => ({
+      date: addDays(start, i),
+      max: null,
+      avg: null,
+      hours: 0,
+    }));
+
+  it("satu label bagi setiap bulan pada minggu hari pertama bulan", () => {
+    // 84 hari berakhir 12 Okt 2026 (bermula Selasa 21 Jul).
+    const labels = monthLabelWeeks(toWeeks(range("2026-07-21", 84)));
+    expect(labels.filter(Boolean)).toEqual([
+      "2026-08-01",
+      "2026-09-01",
+      "2026-10-01",
+    ]);
+  });
+
+  it("melabel minggu pertama bila minggu kedua tiada label", () => {
+    const labels = monthLabelWeeks(toWeeks(range("2026-09-08", 30)));
+    expect(labels[0]).toBe("2026-09-08");
+    expect(labels.filter(Boolean)).toEqual(["2026-09-08", "2026-10-01"]);
   });
 });

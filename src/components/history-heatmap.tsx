@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { CATEGORY_STYLE } from "@/lib/category-style";
 import { formatMonth, formatShortDate } from "@/lib/format";
-import { toWeeks, type HistoryDay } from "@/lib/history";
+import { monthLabelWeeks, toWeeks, type HistoryDay } from "@/lib/history";
 import { IPU_CATEGORIES, ipuCategory } from "@/lib/ipu";
 import { useI18n } from "@/lib/use-i18n";
 import { IpuPill } from "./ipu-pill";
@@ -71,6 +71,7 @@ export function HistoryHeatmap({
 
   const days = data.days;
   const weeks = toWeeks(days);
+  const months = monthLabelWeeks(weeks);
   const current = selected ?? data.today;
   const day = days.find((d) => d.date === current) ?? days[days.length - 1];
   const withData = days.filter((d) => d.max !== null).length;
@@ -144,18 +145,13 @@ export function HistoryHeatmap({
           }}
         >
           {weeks.map((week, w) => {
-            // Label bulan pada minggu pertama dan minggu yang mengandungi awal bulan.
-            const monthDay =
-              w === 0
-                ? week.find((d) => d)
-                : week.find((d) => d && Number(d.date.slice(8, 10)) <= 7);
             return [
               <span
                 key={`m${w}`}
                 aria-hidden="true"
                 className="text-muted overflow-visible text-[10px] leading-none font-semibold whitespace-nowrap"
               >
-                {monthDay ? formatMonth(monthDay.date, lang) : ""}
+                {months[w] ? formatMonth(months[w], lang) : ""}
               </span>,
               ...week.map((d, i) =>
                 d ? (
