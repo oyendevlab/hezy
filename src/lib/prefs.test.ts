@@ -3,6 +3,7 @@ import {
   DEFAULT_PREFS,
   MAX_FAVOURITES,
   addFavourite,
+  effectiveThreshold,
   parsePrefs,
   removeFavourite,
   type SavedLocation,
@@ -37,6 +38,7 @@ describe("parsePrefs", () => {
       profile: "umum",
       theme: "dark",
       showSchool: false,
+      alertThreshold: null,
     });
   });
 });
@@ -59,5 +61,21 @@ describe("kegemaran", () => {
   it("membuang kegemaran mengikut id", () => {
     const prefs = removeFavourite(addFavourite(DEFAULT_PREFS, loc("a")), "a");
     expect(prefs.favourites).toEqual([]);
+  });
+});
+
+describe("effectiveThreshold", () => {
+  it("ikut profil bila pengguna belum memilih", () => {
+    expect(effectiveThreshold({ alertThreshold: null, profile: "asma" })).toBe(
+      50,
+    );
+    expect(effectiveThreshold({ alertThreshold: null, profile: "umum" })).toBe(
+      100,
+    );
+  });
+  it("mengutamakan pilihan pengguna", () => {
+    expect(effectiveThreshold({ alertThreshold: 200, profile: "asma" })).toBe(
+      200,
+    );
   });
 });

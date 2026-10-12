@@ -1,8 +1,11 @@
 import type { SavedLocation } from "./prefs";
+import type { AlertThreshold } from "./push-validate";
 
 const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? "";
 /** Lokasi terakhir yang dihantar ke pelayan untuk amaran (id lokasi). */
 const LOCATION_KEY = "hezy:push:location";
+/** Ambang terakhir yang dihantar ke pelayan. */
+const THRESHOLD_KEY = "hezy:push:threshold";
 
 export type PushSupport =
   "supported" | "unsupported" | "ios-install" | "unconfigured";
@@ -42,6 +45,7 @@ export async function currentSubscription(): Promise<PushSubscription | null> {
 async function sendSubscription(
   subscription: PushSubscription,
   location: SavedLocation,
+  threshold: AlertThreshold,
 ) {
   const res = await fetch("/api/push/subscribe", {
     method: "POST",
@@ -51,6 +55,7 @@ async function sendSubscription(
       lat: location.lat,
       lon: location.lon,
       locationName: location.name,
+      threshold,
     }),
   });
   if (!res.ok) {
@@ -61,6 +66,7 @@ async function sendSubscription(
   }
   try {
     localStorage.setItem(LOCATION_KEY, location.id);
+    localStorage.setItem(THRESHOLD_KEY, String(threshold));
   } catch {
     // Abaikan.
   }
@@ -69,6 +75,7 @@ async function sendSubscription(
 /** Minta kebenaran, langgan push dan daftar lokasi untuk amaran. */
 export async function enablePush(
   location: SavedLocation,
+  threshold: AlertThreshold,
 ): Promise<"enabled" | "denied"> {
   const permission = await Notification.requestPermission();
   if (permission !== "granted") return "denied";
@@ -79,7 +86,7 @@ export async function enablePush(
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
     }));
-  await sendSubscription(subscription, location);
+  await sendSubscription(subscription, location, threshold);
   return "enabled";
 }
 
@@ -94,21 +101,32 @@ export async function disablePush() {
   await subscription.unsubscribe();
   try {
     localStorage.removeItem(LOCATION_KEY);
+    localStorage.removeItem(THRESHOLD_KEY);
   } catch {
     // Abaikan.
   }
 }
 
-/** Kemas kini lokasi amaran bila lokasi semasa berubah (jika sudah melanggan). */
-export async function syncPushLocation(location: SavedLocation) {
+/** Kemas kini lokasi dan ambang amaran di pelayan bila berubah (jika sudah melanggan). */
+export async function syncPushSettings(
+  location: SavedLocation,
+  threshold: AlertThreshold,
+) {
   if (pushSupport() !== "supported" || Notification.permission !== "granted")
     return;
   try {
-    if (localStorage.getItem(LOCATION_KEY) === location.id) return;
+    if (
+      localStorage.getItem(LOCATION_KEY) === location.id &&
+      localStorage.getItem(THRESHOLD_KEY) === String(threshold)
+    ) {
+      return;
+    }
   } catch {
     return;
   }
   const subscription = await currentSubscription();
   if (subscription)
-    await sendSubscription(subscription, location).catch(() => undefined);
+    await sendSubscription(subscription, location, threshold).catch(
+      () => undefined,
+    );
 }

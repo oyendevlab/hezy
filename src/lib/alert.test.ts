@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { decideAlert } from "./alert";
-import { parseSubscribeBody } from "./push-validate";
+import { defaultThreshold, parseSubscribeBody } from "./push-validate";
 
 const NOW = new Date("2026-10-12T02:00:00Z");
 const unhealthy = {
@@ -90,7 +90,7 @@ describe("parseSubscribeBody", () => {
   it("menerima langganan sah dan membundarkan koordinat", () => {
     expect(parseSubscribeBody(valid)).toEqual({
       ok: true,
-      value: { ...valid, lat: 3.07, lon: 101.52 },
+      value: { ...valid, lat: 3.07, lon: 101.52, threshold: 100 },
     });
   });
 
@@ -114,5 +114,57 @@ describe("parseSubscribeBody", () => {
       false,
     );
     expect(parseSubscribeBody(null).ok).toBe(false);
+  });
+});
+
+describe("ambang amaran", () => {
+  it("menggunakan ambang langganan", () => {
+    const state = { lastAlertKey: null, lastAlertAt: null };
+    expect(decideAlert(state, moderate, "X", NOW, 50)).toMatchObject({
+      send: true,
+      title: "Jerebu: IPU 80 (Sederhana)",
+    });
+    expect(decideAlert(state, moderate, "X", NOW, 100).send).toBe(false);
+    expect(decideAlert(state, unhealthy, "X", NOW, 200).send).toBe(false);
+  });
+
+  it("notifikasi pulih bila IPU turun ke bawah ambang sendiri", () => {
+    const d = decideAlert(
+      { lastAlertKey: "sederhana", lastAlertAt: "2026-10-12T00:00:00Z" },
+      { ipu: 45, category: "baik", label: "Baik" },
+      "X",
+      NOW,
+      50,
+    );
+    expect(d).toMatchObject({
+      send: true,
+      title: "Udara kembali pulih: IPU 45",
+    });
+  });
+
+  it("lalai 50 untuk profil berisiko dan 100 untuk umum", () => {
+    expect(defaultThreshold("asma")).toBe(50);
+    expect(defaultThreshold("anak")).toBe(50);
+    expect(defaultThreshold("emas")).toBe(50);
+    expect(defaultThreshold("umum")).toBe(100);
+  });
+
+  it("menerima ambang sah dan menolak yang lain", () => {
+    const base = {
+      subscription: {
+        endpoint: "https://x.example/p",
+        keys: { p256dh: "BA", auth: "a" },
+      },
+      lat: 3.07,
+      lon: 101.52,
+    };
+    expect(parseSubscribeBody({ ...base, threshold: 50 })).toMatchObject({
+      ok: true,
+      value: { threshold: 50 },
+    });
+    expect(parseSubscribeBody({ ...base, threshold: 75 })).toMatchObject({
+      ok: true,
+      value: { threshold: 100 },
+    });
   });
 });

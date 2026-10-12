@@ -7,6 +7,7 @@ import {
   type PrimaryReading,
 } from "@/lib/official";
 import { allRecords, deleteRecord, saveRecord } from "@/lib/push-store";
+import { DEFAULT_ALERT_THRESHOLD } from "@/lib/push-validate";
 import { buildReading, localHourKey } from "@/lib/reading";
 
 /**
@@ -61,7 +62,14 @@ export async function GET(request: Request) {
     summary.checked++;
     const primary = await readingFor(record.lat, record.lon);
     if (!primary) continue;
-    const decision = decideAlert(record, primary, record.locationName, now);
+    // Rekod sebelum v0.3.0 tiada ambang: anggap 100.
+    const decision = decideAlert(
+      record,
+      primary,
+      record.locationName,
+      now,
+      record.threshold ?? DEFAULT_ALERT_THRESHOLD,
+    );
     if (!decision.send) continue;
     try {
       await webpush.sendNotification(

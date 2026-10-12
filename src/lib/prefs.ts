@@ -24,6 +24,8 @@ export type Prefs = {
   theme: ThemePref;
   /** Papar kad status sekolah walaupun profil bukan Kanak-kanak. */
   showSchool: boolean;
+  /** Ambang amaran pilihan pengguna; `null` = ikut profil kesihatan. */
+  alertThreshold: 50 | 100 | 200 | null;
 };
 
 export const MAX_FAVOURITES = 5;
@@ -34,6 +36,7 @@ export const DEFAULT_PREFS: Prefs = {
   profile: "umum",
   theme: "system",
   showSchool: false,
+  alertThreshold: null,
 };
 
 const PROFILES: readonly HealthProfile[] = ["umum", "anak", "asma", "emas"];
@@ -67,6 +70,9 @@ export function parsePrefs(raw: string | null): Prefs {
         ? (v.theme as ThemePref)
         : "system",
       showSchool: v.showSchool === true,
+      alertThreshold: [50, 100, 200].includes(v.alertThreshold as number)
+        ? (v.alertThreshold as 50 | 100 | 200)
+        : null,
     };
   } catch {
     return DEFAULT_PREFS;
@@ -141,4 +147,11 @@ export function applyTheme(theme: ThemePref) {
 /** Prefs semasa; `null` semasa render pelayan dan hidrasi pertama. */
 export function usePrefs(): Prefs | null {
   return useSyncExternalStore(subscribe, getSnapshot, () => null);
+}
+
+/** Ambang amaran berkesan: pilihan pengguna, atau lalai ikut profil (50 berisiko, 100 umum). */
+export function effectiveThreshold(
+  prefs: Pick<Prefs, "alertThreshold" | "profile">,
+): 50 | 100 | 200 {
+  return prefs.alertThreshold ?? (prefs.profile === "umum" ? 100 : 50);
 }

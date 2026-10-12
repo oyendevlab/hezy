@@ -2,8 +2,8 @@
 
 import { useEffect } from "react";
 import { listenForInstall } from "@/lib/install";
-import { usePrefs } from "@/lib/prefs";
-import { syncPushLocation } from "@/lib/push-client";
+import { effectiveThreshold, usePrefs } from "@/lib/prefs";
+import { syncPushSettings } from "@/lib/push-client";
 import { useOnline } from "@/lib/online";
 
 /** Daftar service worker (production sahaja) dan dengar peristiwa pemasangan. */
@@ -32,12 +32,15 @@ export function PwaSetup() {
       });
   }, []);
 
-  // Amaran push mengikut lokasi semasa: kemas kini pelayan bila lokasi bertukar.
-  const current = usePrefs()?.current ?? null;
+  // Amaran push ikut lokasi semasa dan ambang: kemas kini pelayan bila berubah.
+  const prefs = usePrefs();
+  const current = prefs?.current ?? null;
+  const threshold = prefs ? effectiveThreshold(prefs) : null;
   useEffect(() => {
-    if (current && process.env.NODE_ENV === "production")
-      void syncPushLocation(current);
-  }, [current]);
+    if (current && threshold && process.env.NODE_ENV === "production") {
+      void syncPushSettings(current, threshold);
+    }
+  }, [current, threshold]);
 
   return null;
 }

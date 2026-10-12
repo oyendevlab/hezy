@@ -1,6 +1,6 @@
 import { adviceFor } from "./advice";
 import type { IpuCategoryKey } from "./ipu";
-import { ALERT_THRESHOLD } from "./push-validate";
+import { DEFAULT_ALERT_THRESHOLD } from "./push-validate";
 
 /** Ulang amaran untuk kategori yang sama selepas tempoh ini. */
 export const REPEAT_AFTER_HOURS = 12;
@@ -16,16 +16,17 @@ export type AlertDecision =
 
 /**
  * Tentukan sama ada notifikasi perlu dihantar.
- * - IPU > 100: hantar bila kategori berubah atau sudah 12 jam sejak amaran terakhir.
- * - IPU kembali ≤ 100 selepas amaran: hantar sekali "udara kembali pulih".
+ * - IPU > ambang: hantar bila kategori berubah atau sudah 12 jam sejak amaran terakhir.
+ * - IPU kembali ≤ ambang selepas amaran: hantar sekali "udara kembali pulih".
  */
 export function decideAlert(
   state: AlertState,
   reading: { ipu: number; category: IpuCategoryKey; label: string },
   locationName: string,
   now: Date,
+  threshold: number = DEFAULT_ALERT_THRESHOLD,
 ): AlertDecision {
-  if (reading.ipu > ALERT_THRESHOLD) {
+  if (reading.ipu > threshold) {
     const hoursSince = state.lastAlertAt
       ? (now.getTime() - Date.parse(state.lastAlertAt)) / 3_600_000
       : Infinity;
