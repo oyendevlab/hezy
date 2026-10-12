@@ -15,6 +15,14 @@ jobs:
         env:
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
-          curl -fsS --max-time 120 \
+          RESULT=$(curl -fsS --max-time 120 \
             -H "Authorization: Bearer $CRON_SECRET" \
-            https://hezy.vercel.app/api/push/check
+            https://hezy.vercel.app/api/push/check)
+          echo "$RESULT"
+          echo "### Semakan amaran: \`$RESULT\`" >> "$GITHUB_STEP_SUMMARY"
+          # Gagalkan job jika ada notifikasi yang gagal dihantar (bukan langganan tamat).
+          FAILED=$(echo "$RESULT" | jq '.failed')
+          if [ "$FAILED" -gt 0 ]; then
+            echo "::error::$FAILED notifikasi gagal dihantar"
+            exit 1
+          fi

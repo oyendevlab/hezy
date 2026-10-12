@@ -1,0 +1,43 @@
+name: Pantau sumber data
+
+on:
+  schedule:
+    # Setiap hari 9:00 pagi waktu Malaysia (01:00 UTC).
+    - cron: "0 1 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  pantau:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Semak production
+        id: semak
+        env:
+          MONITOR_REPORT: ${{ runner.temp }}/laporan.md
+        run: node scripts/monitor.mjs
+      - name: Buka atau kemas kini issue
+        if: failure() && steps.semak.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          LAPORAN: ${{ runner.temp }}/laporan.md
+        run: |
+          TITLE="Pemantauan: sumber data gagal"
+          gh label create pemantauan --color B60205 --description "Masalah dikesan oleh pemantauan automatik" 2>/dev/null || true
+          NUM=$(gh issue list --label pemantauan --state open --search "in:title \"$TITLE\"" --json number --jq '.[0].number')
+          BODY="$(cat "$LAPORAN")
+
+          Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          if [ -n "$NUM" ]; then
+            gh issue comment "$NUM" --body "$BODY"
+          else
+            gh issue create --title "$TITLE" --label pemantauan --body "$BODY"
+          fi

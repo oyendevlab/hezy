@@ -110,9 +110,9 @@ Setiap item dibuat dalam cabang `feat/*` dan PR sendiri; digabung selepas CI lul
 
 ### 5. Pemantauan sumber data
 
-- [ ] Workflow GitHub harian: semak `/api/stations` (APIMS) dan `/api/aqi` (Open-Meteo) pada production
-- [ ] Buka _issue_ GitHub secara automatik bila semakan gagal (tanpa pendua jika issue masih terbuka)
-- [ ] Ringkasan `/api/push/check` (bilangan gagal) turut dipantau
+- [x] Workflow GitHub harian: semak `/api/stations` (APIMS) dan `/api/aqi` (Open-Meteo) pada production
+- [x] Buka _issue_ GitHub secara automatik bila semakan gagal (tanpa pendua jika issue masih terbuka)
+- [x] Ringkasan `/api/push/check` (bilangan gagal) turut dipantau
 
 ### 6. Bahasa Inggeris
 
