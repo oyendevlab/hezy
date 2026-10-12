@@ -232,32 +232,64 @@ function Row({ label, value }: { label: string; value: string }) {
   );
 }
 
-const INSTALL_HELP = {
+const INSTALL_HELP: Record<"installed" | "manual", string> = {
   installed: "Hezy sudah dipasang di peranti ini.",
-  ios: "Di iPhone atau iPad: ketik butang Kongsi dalam Safari, kemudian pilih “Tambah ke Skrin Utama”.",
   manual:
     "Buka menu pelayar dan pilih “Pasang aplikasi” atau “Tambah ke skrin utama”.",
 } as const;
 
+/** Langkah pasang di iPhone/iPad: Apple tidak membenarkan butang pasang dalam laman web. */
+const IOS_STEPS = [
+  "Ketik butang Kongsi di bar Safari (di iOS 26, ketik ⋯ dahulu, kemudian Kongsi).",
+  "Tatal ke bawah dan pilih “Tambah ke Skrin Utama”.",
+  "Pastikan “Buka sebagai Apl Web” dihidupkan, kemudian ketik Tambah.",
+  "Buka Hezy dari ikon di skrin utama.",
+];
+
 function InstallRow() {
   const { t } = useI18n();
   const status = useInstallStatus();
+  const [guide, setGuide] = useState(false);
   if (status === null) return <div className="min-h-12" />;
   return (
-    <div className="flex min-h-12 flex-wrap items-center justify-between gap-3 py-3">
-      <span className="font-semibold">{t("Pasang Hezy")}</span>
-      {status === "available" ? (
-        <button
-          type="button"
-          onClick={() => void promptInstall()}
-          className="bg-ink text-page min-h-11 rounded-xl px-4 text-sm font-semibold"
-        >
-          {t("Pasang")}
-        </button>
-      ) : (
-        <span className="text-muted max-w-[60%] text-right">
-          {t(INSTALL_HELP[status])}
-        </span>
+    <div className="py-3">
+      <div className="flex min-h-12 flex-wrap items-center justify-between gap-3">
+        <span className="font-semibold">{t("Pasang Hezy")}</span>
+        {status === "available" ? (
+          <button
+            type="button"
+            onClick={() => void promptInstall()}
+            className="bg-ink text-page min-h-11 rounded-xl px-4 text-sm font-semibold"
+          >
+            {t("Pasang")}
+          </button>
+        ) : status === "ios" ? (
+          <button
+            type="button"
+            aria-expanded={guide}
+            aria-controls="panduan-pasang"
+            onClick={() => setGuide((g) => !g)}
+            className="bg-ink text-page min-h-11 rounded-xl px-4 text-sm font-semibold"
+          >
+            {guide ? t("Tutup panduan") : t("Cara pasang")}
+          </button>
+        ) : (
+          <span className="text-muted max-w-[60%] text-right">
+            {t(INSTALL_HELP[status])}
+          </span>
+        )}
+      </div>
+      {status === "ios" && guide && (
+        <ol id="panduan-pasang" className="mt-2 flex flex-col gap-2.5 pb-1">
+          {IOS_STEPS.map((step, i) => (
+            <li key={step} className="flex gap-3">
+              <span className="bg-ink text-page flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-bold">
+                {i + 1}
+              </span>
+              <span className="leading-snug">{t(step)}</span>
+            </li>
+          ))}
+        </ol>
       )}
     </div>
   );

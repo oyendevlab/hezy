@@ -41,6 +41,14 @@ export function listenForInstall() {
   });
 }
 
+/** iPhone/iPad, termasuk iPadOS yang melaporkan diri sebagai Mac. */
+export function isAppleMobile(): boolean {
+  return (
+    /iphone|ipad|ipod/i.test(navigator.userAgent) ||
+    (/macintosh/i.test(navigator.userAgent) && navigator.maxTouchPoints > 1)
+  );
+}
+
 function getStatus(): InstallStatus {
   const standalone =
     installed ||
@@ -48,7 +56,7 @@ function getStatus(): InstallStatus {
     (navigator as Navigator & { standalone?: boolean }).standalone === true;
   return installStatus({
     standalone,
-    ios: /iphone|ipad|ipod/i.test(navigator.userAgent),
+    ios: isAppleMobile(),
     canPrompt: deferred !== null,
   });
 }
