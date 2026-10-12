@@ -7,6 +7,8 @@ import {
   type HourlyOfficial,
   type Station,
 } from "./apims";
+import type { DailyIndex } from "./history";
+import { readIndex } from "./history-store";
 import {
   airQualityUrl,
   parseAirQuality,
@@ -60,4 +62,27 @@ export async function getStateHistory(
   }
   // Objek biasa (bukan Map) supaya boleh disimpan dalam cache.
   return Object.fromEntries(parseHourly(await res.json()));
+}
+
+/** Indeks sejarah harian (Vercel Blob), dicache 30 minit; dikemas kini oleh /api/history/collect. */
+export async function getDailyIndex(): Promise<DailyIndex | null> {
+  "use cache";
+  cacheLife({ stale: 600, revalidate: 1800, expire: 7200 });
+  return readIndex();
+}
+
+/** Sejarah 25 jam terus dari APIMS tanpa cache (untuk pengumpul sejarah). */
+export async function fetchStateHourly(
+  stateId: number,
+  hourKey: string,
+): Promise<Map<string, HourlyOfficial[]>> {
+  const res = await fetch(apimsHourlyUrl(stateId, hourKey), {
+    headers: { "User-Agent": "Hezy/0.4 (+https://hezy.vercel.app)" },
+    signal: AbortSignal.timeout(10_000),
+    cache: "no-store",
+  });
+  if (!res.ok) {
+    throw new Error(`APIMS (sejarah) memulangkan status ${res.status}`);
+  }
+  return parseHourly(await res.json());
 }

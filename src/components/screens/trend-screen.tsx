@@ -5,6 +5,7 @@ import { primaryReading } from "@/lib/official";
 import { useI18n } from "@/lib/use-i18n";
 import { useMediaQuery } from "@/lib/use-media-query";
 import { CompareLocations } from "../compare-locations";
+import { HistoryHeatmap } from "../history-heatmap";
 import { SchoolCard } from "../school-card";
 import { ChooseLocation } from "../choose-location";
 import { IpuPill } from "../ipu-pill";
@@ -63,6 +64,12 @@ export function TrendScreen() {
         <SchoolCard reading={current} />
       )}
       {reading && <TrendPanel reading={reading} />}
+      {reading?.official && (
+        <HistoryHeatmap
+          stationId={reading.official.stationId}
+          stationName={reading.official.stationName}
+        />
+      )}
       {wide && prefs?.current && <CompareLocations prefs={prefs} />}
     </div>
   );

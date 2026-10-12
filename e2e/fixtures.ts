@@ -142,6 +142,23 @@ export const FAKE_WAQI = () => {
   };
 };
 
+/** Respons /api/history: 84 hari berakhir 12 Okt 2026; data hanya 7 hari terakhir. */
+export const FAKE_HISTORY = () => {
+  const values = [96, 120, 135, 99, 88, 160, 153];
+  const days = Array.from({ length: 84 }, (_, i) => {
+    const d = new Date(Date.UTC(2026, 9, 12 - 83 + i));
+    const date = d.toISOString().slice(0, 10);
+    const v = i >= 77 ? values[i - 77] : null;
+    return {
+      date,
+      max: v,
+      avg: v === null ? null : v - 20,
+      hours: v === null ? 0 : i === 83 ? 13 : 24,
+    };
+  });
+  return { station: "CA20B", today: "2026-10-12", first: "2026-10-06", days };
+};
+
 export const test = base.extend<{ mockApi: void }>({
   mockApi: [
     async ({ page }, use) => {
@@ -150,6 +167,9 @@ export const test = base.extend<{ mockApi: void }>({
       );
       await page.route("**/api/stations", (route) =>
         route.fulfill({ json: { source: "apims", stations: FAKE_STATIONS } }),
+      );
+      await page.route("**/api/history?**", (route) =>
+        route.fulfill({ json: FAKE_HISTORY() }),
       );
       await page.route("https://api.waqi.info/**", (route) =>
         route.fulfill({ json: FAKE_WAQI() }),

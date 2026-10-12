@@ -172,6 +172,23 @@ const EN: Record<string, string> = {
   "Jam akan datang: ramalan model": "Coming hours: model forecast",
   ramalan: "forecast",
   Kini: "Now",
+  "Sejarah 12 minggu": "12-week history",
+  "IPU maks harian · Stesen {station}": "Daily max API · {station} station",
+  Isn: "Mon",
+  Rab: "Wed",
+  Jum: "Fri",
+  "Heatmap IPU harian, 12 minggu": "Daily API heatmap, 12 weeks",
+  "maks {max}, {label}": "max {max}, {label}",
+  "(setakat ini)": "(so far)",
+  Maks: "Max",
+  "Purata {avg} · {hours} jam data": "Average {avg} · {hours} hours of data",
+  "Petunjuk warna (kategori IPU APIMS)": "Colour key (APIMS API categories)",
+  "Warna ikut IPU maksimum harian dan kategori APIMS (JAS). IPU melebihi 500 ialah tahap Kecemasan.":
+    "Colours follow the daily maximum API and APIMS (DOE) categories. An API above 500 is an Emergency.",
+  "Data dikumpul sejak {date} ({count} hari).":
+    "Data collected since {date} ({count} days).",
+  "Data sedang dikumpul; heatmap akan terisi dari hari ke hari.":
+    "Data is being collected; the heatmap will fill in day by day.",
   "Ramalan model": "Model forecast",
   "Bacaan rasmi APIMS": "Official APIMS reading",
   "Anggaran model": "Model estimate",

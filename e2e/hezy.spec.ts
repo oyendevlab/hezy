@@ -9,6 +9,11 @@ import {
 } from "./fixtures";
 
 test.describe("aliran utama", () => {
+  test("pengumpul sejarah memerlukan rahsia", async ({ request }) => {
+    const res = await request.get("/api/history/collect");
+    expect([401, 503]).toContain(res.status());
+  });
+
   test("pengguna baharu memilih kawasan dan nampak IPU", async ({ page }) => {
     await page.goto("/");
     await expect(
@@ -370,6 +375,50 @@ test.describe("trend rasmi APIMS", () => {
       "aria-valuetext",
       /· Ramalan dibetulkan$/,
     );
+  });
+
+  test("heatmap sejarah 12 minggu dengan legenda APIMS", async ({ page }) => {
+    await seedLocation(page);
+    await page.route("**/api/aqi?**", (route) =>
+      route.fulfill({ json: fakeReading(OFFICIAL_SHAH_ALAM) }),
+    );
+    await page.goto("/trend");
+    await expect(
+      page.getByRole("heading", { name: "Sejarah 12 minggu" }),
+    ).toBeVisible();
+    const grid = page.getByRole("group", {
+      name: "Heatmap IPU harian, 12 minggu",
+    });
+    await expect(grid.getByRole("button")).toHaveCount(84);
+    // Lalai: hari ini.
+    const today = grid.getByRole("button", { name: /^Isn 12 Okt/ });
+    await expect(today).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByText("Isn 12 Okt (setakat ini)")).toBeVisible();
+    await expect(page.getByText("Purata 133 · 13 jam data")).toBeVisible();
+
+    await grid
+      .getByRole("button", { name: "Jum 9 Okt: maks 99, Sederhana" })
+      .click();
+    await expect(page.getByText("Purata 79 · 24 jam data")).toBeVisible();
+
+    // Papan kekunci: anak panah ke atas = hari sebelumnya.
+    await page.keyboard.press("ArrowUp");
+    await expect(
+      grid.getByRole("button", { name: /^Kha 8 Okt/ }),
+    ).toBeFocused();
+
+    await expect(
+      page.getByRole("list", { name: "Petunjuk warna (kategori IPU APIMS)" }),
+    ).toContainText("Sangat Tidak Sihat 201–300");
+    await expect(
+      page.getByText("Data dikumpul sejak Sel 6 Okt (7 hari)."),
+    ).toBeVisible();
+    const results = await new AxeBuilder({ page })
+      .include("#sejarah-ipu")
+      .include('[aria-labelledby="sejarah-ipu"]')
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+      .analyze();
+    expect(results.violations.map((v) => v.id)).toEqual([]);
   });
 
   test("kembali ke anggaran model bila tiada sejarah rasmi", async ({
