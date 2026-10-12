@@ -145,6 +145,30 @@ const EN: Record<string, string> = {
   "(semasa)": "(current)",
   "Tiada lokasi kegemaran lagi.": "No favourite locations yet.",
   "Tambah bandar": "Add a city",
+  // Pengenalan pengguna baharu
+  Langkau: "Skip",
+  Kembali: "Back",
+  Seterusnya: "Next",
+  "Mula guna Hezy": "Start using Hezy",
+  "LANGKAH {n} DARIPADA {total}": "STEP {n} OF {total}",
+  "Apa itu IPU?": "What is the API?",
+  "Di mana anda berada?": "Where are you?",
+  "Dapatkan amaran jerebu": "Get haze alerts",
+  "Indeks Pencemar Udara (IPU) mengukur kebersihan udara. Semakin tinggi nombornya, semakin teruk jerebu.":
+    "The Air Pollutant Index (API) measures how clean the air is. The higher the number, the worse the haze.",
+  "Sumber rasmi: APIMS, Jabatan Alam Sekitar.":
+    "Official source: APIMS, Department of Environment.",
+  "Pilih lokasi untuk melihat IPU dan nasihat kesihatan untuk kawasan anda.":
+    "Choose a location to see the API and health advice for your area.",
+  "Lokasi dipilih: {name}": "Location chosen: {name}",
+  "Hezy boleh memberitahu anda bila IPU di lokasi anda melepasi tahap tidak sihat, dan ringkasan setiap pagi.":
+    "Hezy can notify you when the API at your location becomes unhealthy, plus a summary every morning.",
+  "Hidupkan amaran": "Turn on alerts",
+  "Amaran dihidupkan": "Alerts on",
+  "Di iPhone, pasang Hezy di skrin utama dahulu:":
+    "On iPhone, add Hezy to your Home Screen first:",
+  "Anda boleh menukar amaran bila-bila masa di Tetapan.":
+    "You can change alerts any time in Settings.",
   "IPU {ipu}, {label}": "API {ipu}, {label}",
   "Data mungkin tidak terkini.": "Data may be out of date.",
   "{error} Memaparkan bacaan {time}.":

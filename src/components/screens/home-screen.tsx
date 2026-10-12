@@ -41,13 +41,27 @@ import { InstallBanner } from "../install-banner";
 import { HomeHeader } from "../home-header";
 import { ElasticCard } from "../elastic-card";
 import { TrendLink, TrendLinkSkeleton } from "../trend-link";
+import { Onboarding } from "../onboarding";
+import { useOnboarded } from "@/lib/onboarding";
 import { AnimatedNumber } from "../animated-number";
 import { LocationMenu } from "../location-menu";
 
 export function HomeScreen() {
   const { prefs, location, entry, refresh } = useCurrent();
+  const onboarded = useOnboarded();
+  // Langkah pengenalan; kekal dipaparkan selepas lokasi dipilih hingga pengguna selesai.
+  const [step, setStep] = useState<number | null>(null);
 
   if (prefs === null) return <HomeSkeleton />;
+  if (!onboarded && (!location || step !== null))
+    return (
+      <Onboarding
+        prefs={prefs}
+        step={step ?? 0}
+        onStep={setStep}
+        onDone={() => setStep(null)}
+      />
+    );
   if (!location) return <Welcome />;
   return (
     <HomeView
