@@ -29,6 +29,7 @@ import { WindLine } from "../wind-line";
 import { AdviceIcon } from "../advice-icon";
 import { WeatherNow } from "../weather-icon";
 import { InstallBanner } from "../install-banner";
+import { HomeHeader } from "../home-header";
 
 export function HomeScreen() {
   const { prefs, location, entry, refresh } = useCurrent();
@@ -131,12 +132,13 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
       <PullToRefresh />
       {/* Telefon: mockup C */}
       <section className="md:hidden">
-        <div className="relative h-[440px]">
-          {!wide && (
-            <SkyCanvas {...sky} className="absolute inset-0 h-full w-full" />
-          )}
-          <div className="absolute inset-x-5 top-13 flex items-center justify-between">
-            <LocationLink location={location} />
+        {/* Pengepala tetap menindih langit (margin negatif = tinggi pengepala). */}
+        <HomeHeader
+          current={current}
+          className="-mb-[76px]"
+          innerClassName="px-5 pt-[max(env(safe-area-inset-top),16px)] pb-3"
+          left={<LocationLink location={location} />}
+          right={
             <ShareButton
               text={shareText}
               path={sharePath}
@@ -144,7 +146,12 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
               fileName={fileName}
               className="bg-white/70 text-[#1c1a16]"
             />
-          </div>
+          }
+        />
+        <div className="relative h-[440px]">
+          {!wide && (
+            <SkyCanvas {...sky} className="absolute inset-0 h-full w-full" />
+          )}
         </div>
         <div className="bg-page relative -mt-8 flex flex-col gap-4 rounded-t-[28px] px-5.5 pt-6">
           <Summary
@@ -161,25 +168,28 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
 
       {/* Tablet & desktop: pilihan 2 */}
       <section className="hidden md:block">
+        <HomeHeader
+          current={current}
+          className="-mb-[72px]"
+          innerClassName="mx-auto max-w-[1200px] px-10 py-3.5"
+          left={<LocationLink location={location} />}
+          right={
+            <>
+              <RefreshButton className="inline-flex border-transparent bg-white/70 text-[#1c1a16] hover:bg-white" />
+              <ShareButton
+                text={shareText}
+                path={sharePath}
+                card={card}
+                fileName={fileName}
+                className="bg-white/70 text-[#1c1a16]"
+              />
+            </>
+          }
+        />
         <div className="relative h-[420px] overflow-hidden">
           {wide && (
             <SkyCanvas {...sky} className="absolute inset-0 h-full w-full" />
           )}
-          <div className="absolute inset-x-0 top-6">
-            <div className="mx-auto flex max-w-[1200px] items-center justify-between px-10">
-              <LocationLink location={location} />
-              <div className="flex items-center gap-2">
-                <RefreshButton className="inline-flex border-transparent bg-white/70 text-[#1c1a16] hover:bg-white" />
-                <ShareButton
-                  text={shareText}
-                  path={sharePath}
-                  card={card}
-                  fileName={fileName}
-                  className="bg-white/70 text-[#1c1a16]"
-                />
-              </div>
-            </div>
-          </div>
           <div className="absolute inset-x-0 bottom-16">
             <div className="mx-auto max-w-[1200px] px-10">
               <div className="bg-page inline-flex max-w-[560px] flex-col gap-2 rounded-[28px] px-7 py-6">
@@ -351,6 +361,7 @@ function Headline({
           </div>
           <div className="flex items-center gap-3.5">
             <h1
+              data-ipu-headline
               aria-label={t("IPU {ipu}, {label}", {
                 ipu: current.ipu,
                 label: t(current.label),

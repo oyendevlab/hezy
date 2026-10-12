@@ -201,6 +201,30 @@ test.describe("aliran utama", () => {
   });
 });
 
+test.describe("pengepala tetap", () => {
+  test("kekal di atas semasa menatal dan memaparkan IPU ringkas", async ({
+    page,
+    isMobile,
+  }) => {
+    await seedLocation(page);
+    // Skrin pendek supaya nombor IPU besar boleh ditatal keluar.
+    await page.setViewportSize(
+      isMobile ? { width: 412, height: 380 } : { width: 1280, height: 520 },
+    );
+    await page.goto("/");
+    const header = page.getByTestId("home-header").filter({ visible: true });
+    await expect(header).toHaveAttribute("data-compact", "false");
+    await expect(
+      page.getByRole("heading", { name: /^IPU 156/ }).filter({ visible: true }),
+    ).toBeVisible();
+    await page.evaluate(() => window.scrollTo(0, 900));
+    await expect(header).toHaveAttribute("data-compact", "true");
+    const box = (await header.boundingBox())!;
+    expect(box.y).toBeLessThanOrEqual(1);
+    await expect(header.getByRole("link", { name: /Shah Alam/ })).toBeVisible();
+  });
+});
+
 test.describe("langit hidup", () => {
   test("Utama memaparkan langit WebGL (tiada menara KL)", async ({ page }) => {
     await seedLocation(page);
