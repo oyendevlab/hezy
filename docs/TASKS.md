@@ -235,15 +235,15 @@ Masalah: model CAMS (Open-Meteo) kurang menganggar jerebu. Contoh Putrajaya 12 O
    - [ ] Teks makluman sedia dikongsi kepada ibu bapa (WhatsApp/Telegram)
 9. **Senarai semak jerebu** — KIV
    - [ ] Senarai persediaan (topeng N95, penapis udara, ubat asma, dll.) ikut profil; tanda siap disimpan di peranti
-10. **Bahasa Cina dan Tamil** — KIV — ✅ siap
+10. **Bahasa Cina dan Tamil** — KIV
     - [ ] Kamus 中文 dan தமிழ் dalam `i18n.ts`, pilihan di Tetapan
     - [ ] **Pengguna**: semakan terjemahan oleh penutur asli sebelum dikeluarkan
 
 ### Aplikasi dan kualiti
 
-11. **Pintasan Android** — ✅ siap
+11. **Pintasan Android**
     - [x] `shortcuts` dalam manifest: Trend, Peta, Tetapan
-12. **Lencana ikon** — ✅ siap
+12. **Lencana ikon**
     - [x] Badging API: nombor IPU pada ikon aplikasi bila melebihi ambang (Android/desktop; iOS 16.4+ bila dipasang)
 13. **Pemantauan ralat klien**
     - [x] Endpoint `/api/log` (had kadar, tiada data peribadi) + ralat disimpan dalam Blob; ringkasan dalam semakan harian `pantau.yml`
