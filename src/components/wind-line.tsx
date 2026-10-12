@@ -1,5 +1,6 @@
 "use client";
 
+import { Fire, Wind as WindIcon } from "@phosphor-icons/react";
 import { useI18n } from "@/lib/use-i18n";
 import { CALM_KMH, type Compass, type Wind } from "@/lib/wind";
 
@@ -60,27 +61,61 @@ export function useWindText() {
   };
 }
 
-/** Baris ringkas angin dan asal jerebu di skrin Utama. */
+/** Angin (ikon angin + anak panah arah tiupan) dan titik panas (ikon api) di skrin Utama. */
 export function WindLine({ wind }: { wind: Wind }) {
   const { t } = useI18n();
   const text = useWindText()(wind);
-  const hotspotNote =
-    wind.hotspots != null && wind.speed >= CALM_KMH
-      ? wind.hotspots > 0
-        ? t("· {n} titik panas di hulu angin (2 hari, NASA FIRMS)", {
-            n: wind.hotspots.toLocaleString("ms-MY"),
-          })
-        : t("· tiada titik panas dikesan di hulu angin (2 hari)")
-      : wind.source
-        ? t("· kawasan kebakaran biasa di hulu angin")
-        : null;
+  const moving = wind.speed >= CALM_KMH;
+  const hotspots = moving ? wind.hotspots : null;
   return (
-    <p className="flex flex-wrap items-center gap-x-1.5 text-sm font-semibold">
-      {wind.speed >= CALM_KMH && <WindArrow direction={wind.direction} />}
-      <span>{text}</span>
-      {hotspotNote && (
-        <span className="text-muted text-xs font-medium">{hotspotNote}</span>
+    <div className="flex flex-col gap-1.5 text-sm">
+      <p className="flex items-center gap-2 font-semibold">
+        <WindIcon
+          aria-hidden="true"
+          size={20}
+          weight="duotone"
+          color="#3a7bd5"
+          className="shrink-0"
+        />
+        {moving && <WindArrow direction={wind.direction} size={14} />}
+        <span>{text}</span>
+      </p>
+      {hotspots != null ? (
+        <p className="flex items-center gap-2 font-medium">
+          <Fire
+            aria-hidden="true"
+            size={20}
+            weight="duotone"
+            color={hotspots > 0 ? "#e8731c" : "#8a857c"}
+            className="shrink-0"
+          />
+          {hotspots > 0 ? (
+            <span>
+              <strong className="font-bold">
+                {hotspots.toLocaleString("ms-MY")}
+              </strong>{" "}
+              {t("titik panas di hulu angin · 2 hari")}
+            </span>
+          ) : (
+            <span className="text-muted">
+              {t("Tiada titik panas dikesan di hulu angin · 2 hari")}
+            </span>
+          )}
+        </p>
+      ) : (
+        wind.source && (
+          <p className="text-muted flex items-center gap-2 font-medium">
+            <Fire
+              aria-hidden="true"
+              size={20}
+              weight="duotone"
+              color="#8a857c"
+              className="shrink-0"
+            />
+            {t("Kawasan kebakaran biasa di hulu angin")}
+          </p>
+        )
       )}
-    </p>
+    </div>
   );
 }

@@ -225,6 +225,24 @@ test.describe("pengepala tetap", () => {
   });
 });
 
+test.describe("butang lihat trend", () => {
+  test("kad graf mini membawa ke Trend (telefon)", async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(
+      !isMobile,
+      "Kad Lihat trend untuk telefon; desktop ada graf penuh",
+    );
+    await seedLocation(page);
+    await page.goto("/");
+    const link = page.getByRole("link", { name: "Lihat trend jam demi jam" });
+    await link.scrollIntoViewIfNeeded();
+    await link.click();
+    await expect(page).toHaveURL(/\/trend$/);
+  });
+});
+
 test.describe("langit hidup", () => {
   test("Utama memaparkan langit WebGL (tiada menara KL)", async ({ page }) => {
     await seedLocation(page);
@@ -406,7 +424,7 @@ test.describe("arah angin", () => {
     ).toBeVisible();
     await expect(
       page
-        .getByText("· 1,234 titik panas di hulu angin (2 hari, NASA FIRMS)")
+        .getByText("titik panas di hulu angin · 2 hari", { exact: false })
         .filter({ visible: true })
         .first(),
     ).toBeVisible();
@@ -593,14 +611,24 @@ test.describe("bacaan rasmi APIMS", () => {
     ).toBeVisible();
     await expect(
       page
-        .getByText("Rasmi APIMS · Stesen Shah Alam (5.6 km)", { exact: false })
+        .getByText("Stesen Shah Alam · 5.6 km", { exact: false })
         .filter({ visible: true }),
     ).toBeVisible();
-    await expect(
-      page
-        .getByText("Anggaran model: 156", { exact: false })
-        .filter({ visible: true }),
-    ).toBeVisible();
+    // Butiran di sebalik ⓘ: sumber penuh, pencemar dan anggaran model.
+    const info = page
+      .getByRole("button", { name: "Butiran sumber bacaan" })
+      .filter({ visible: true });
+    await expect(info).toHaveAttribute("aria-expanded", "false");
+    await info.click();
+    await expect(info).toHaveAttribute("aria-expanded", "true");
+    const details = page.locator(
+      `[id="${await info.getAttribute("aria-controls")}"]`,
+    );
+    await expect(details).toContainText(
+      "IPU rasmi APIMS (Jabatan Alam Sekitar)",
+    );
+    await expect(details).toContainText("PM2.5");
+    await expect(details).toContainText("Anggaran model156");
   });
 });
 
@@ -795,6 +823,10 @@ test.describe("trend rasmi APIMS", () => {
       route.fulfill({ json: reading }),
     );
     await page.goto("/");
+    await page
+      .getByRole("button", { name: "Butiran sumber bacaan" })
+      .filter({ visible: true })
+      .click();
     await expect(
       page
         .getByText(/biasanya ±24 berbanding bacaan rasmi/)

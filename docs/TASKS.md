@@ -346,18 +346,18 @@ Penambahbaikan sebelum ciri baharu. Cadangan v0.6.0 (notifikasi ujian, semalam v
 
 ### C. Angin dan titik panas berikon
 
-- [ ] Baris angin: ikon _Wind_ (Phosphor) + anak panah kecil arah tiupan + "Angin dari tenggara · 8 km/j"
-- [ ] Baris titik panas: ikon _Fire_ (Phosphor, jingga) + bilangan ditebalkan, cth. "**33** titik panas di hulu angin · 2 hari"
+- [x] Baris angin: ikon _Wind_ (Phosphor) + anak panah kecil arah tiupan + "Angin dari tenggara · 8 km/j"
+- [x] Baris titik panas: ikon _Fire_ (Phosphor, jingga) + bilangan ditebalkan, cth. "**33** titik panas di hulu angin · 2 hari"
 
 ### D. Baris sumber ringkas
 
-- [ ] Ringkas: "Stesen Putrajaya · 1.1 km · 8:00 malam" (atau "Anggaran model · dikemas kini 8:00 malam")
-- [ ] Butang ⓘ membuka butiran: sumber penuh (APIMS/Open-Meteo), pencemar utama, anggaran model, ketepatan ±N
+- [x] Ringkas: "Stesen Putrajaya · 1.1 km · 8:00 malam" (atau "Anggaran model · dikemas kini 8:00 malam")
+- [x] Butang ⓘ membuka butiran: sumber penuh (APIMS/Open-Meteo), pencemar utama, anggaran model, ketepatan ±N
 
 ### E. Butang "Lihat trend"
 
-- [ ] Kad butang di bawah sekali (telefon): graf mini 24 jam + "Lihat trend jam demi jam ›" → `/trend`
-- [ ] Ruang bawah ditambah supaya bento nasihat dan butang tidak tersorok oleh bar navigasi
+- [x] Kad butang di bawah sekali (telefon): graf mini 24 jam + "Lihat trend jam demi jam ›" → `/trend`
+- [x] Ruang bawah ditambah supaya bento nasihat dan butang tidak tersorok oleh bar navigasi
 
 ### Selesai v0.5.1
 
