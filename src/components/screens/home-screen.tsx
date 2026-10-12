@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { shownError } from "@/lib/accuracy";
 import { HEALTH_PROFILES, adviceFor, type QuickTone } from "@/lib/advice";
-import { CATEGORY_STYLE, NEUTRAL_SKY } from "@/lib/category-style";
+import { CATEGORY_STYLE } from "@/lib/category-style";
+import { useMediaQuery } from "@/lib/use-media-query";
 import { formatChange, formatClock } from "@/lib/format";
 import { displayIpu, primaryReading } from "@/lib/official";
 import type { Prefs, SavedLocation } from "@/lib/prefs";
@@ -20,7 +21,7 @@ import { PullToRefresh } from "../pull-to-refresh";
 import { ReadingNotices } from "../reading-notices";
 import { RefreshButton } from "../refresh-button";
 import { ShareButton } from "../share-button";
-import { Skyline } from "../skyline";
+import { SkyCanvas } from "../sky-canvas";
 import { Notice, Skeleton } from "../status";
 import { TrendPanel } from "../trend-panel";
 import { useCurrent } from "../use-current";
@@ -82,7 +83,13 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
   const reading = entry?.reading;
   const current = primaryReading(reading);
   const showSchool = prefs.profile === "anak" || prefs.showSchool;
-  const palette = current ? CATEGORY_STYLE[current.category].sky : NEUTRAL_SKY;
+  // Satu konteks WebGL sahaja: langit telefon atau panorama desktop.
+  const wide = useMediaQuery("(min-width: 768px)");
+  const sky = {
+    ipu: current?.ipu ?? null,
+    weather: reading?.weather,
+    wind: reading?.wind,
+  };
   const shareText = current
     ? t("IPU {name}: {ipu} ({label}) · via Hezy", {
         name: t(location.name),
@@ -122,11 +129,9 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
       {/* Telefon: mockup C */}
       <section className="md:hidden">
         <div className="relative h-[440px]">
-          <Skyline
-            variant="phone"
-            palette={palette}
-            className="absolute inset-0 h-full w-full"
-          />
+          {!wide && (
+            <SkyCanvas {...sky} className="absolute inset-0 h-full w-full" />
+          )}
           <div className="absolute inset-x-5 top-13 flex items-center justify-between">
             <LocationLink location={location} />
             <ShareButton
@@ -153,11 +158,9 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
       {/* Tablet & desktop: pilihan 2 */}
       <section className="hidden md:block">
         <div className="relative h-[420px] overflow-hidden">
-          <Skyline
-            variant="panorama"
-            palette={palette}
-            className="absolute inset-0 h-full w-full"
-          />
+          {wide && (
+            <SkyCanvas {...sky} className="absolute inset-0 h-full w-full" />
+          )}
           <div className="absolute inset-x-0 top-6">
             <div className="mx-auto flex max-w-[1200px] items-center justify-between px-10">
               <LocationLink location={location} />

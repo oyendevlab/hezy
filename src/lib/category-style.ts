@@ -88,14 +88,3 @@ export const CATEGORY_STYLE: Record<IpuCategoryKey, CategoryStyle> = {
     },
   },
 };
-
-/** Langit neutral semasa bacaan belum tersedia. */
-export const NEUTRAL_SKY: SkyPalette = {
-  sky: "#dfe3e6",
-  sun: "#f2f2f2",
-  sunOpacity: 0.6,
-  far: "#c7cdd2",
-  near: "#8e979e",
-  haze: 0.2,
-  hazeTop: 0.1,
-};

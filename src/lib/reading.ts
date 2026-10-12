@@ -1,4 +1,5 @@
 import type { AccuracySummary } from "./accuracy";
+import type { CurrentWeather, DayWeather } from "./weather";
 import type { Wind } from "./wind";
 import type { HourlyOfficial } from "./apims";
 import { findBestWindow, type BestWindow } from "./best-time";
@@ -68,6 +69,10 @@ export type Reading = {
   stale: boolean;
   /** Bacaan rasmi APIMS stesen terdekat (≤ 30 km, ≤ 3 jam); diisi oleh route API. */
   official: OfficialReading | null;
+  /** Cuaca semasa (langit hidup, ikon dan suhu); diisi oleh route API. */
+  weather?: CurrentWeather | null;
+  /** Cuaca harian hari-hari akan datang (ikon ramalan 3 hari). */
+  weatherDays?: DayWeather[];
   /** Angin 850 hPa semasa dan anggaran asal jerebu (item 1); diisi oleh route API. */
   wind?: Wind | null;
   /** Ralat purata 14 hari berbanding bacaan rasmi (item 4); diisi oleh route API. */

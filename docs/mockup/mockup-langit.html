@@ -1,0 +1,820 @@
+<!doctype html>
+<html lang="ms">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mockup Langit Hezy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Grotesk:wght@700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --page: #f4f2ee;
+        --ink: #1c1a16;
+        --muted: #6b665d;
+        --card: #ffffff;
+        --line: #e4e0d8;
+        --accent: #1c1a16;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+          --page: #121316;
+          --ink: #f2efe9;
+          --muted: #a39e94;
+          --card: #1c1d21;
+          --line: #2c2d33;
+          --accent: #f2efe9;
+        }
+      }
+      :root[data-theme="dark"] {
+        --page: #121316;
+        --ink: #f2efe9;
+        --muted: #a39e94;
+        --card: #1c1d21;
+        --line: #2c2d33;
+        --accent: #f2efe9;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--page);
+        color: var(--ink);
+        font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+      }
+      .wrap {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 24px 16px 48px;
+        display: grid;
+        gap: 24px;
+        grid-template-columns: 1fr;
+      }
+      @media (min-width: 900px) {
+        .wrap {
+          grid-template-columns: 400px 1fr;
+          align-items: start;
+        }
+      }
+      h1 {
+        font-size: 22px;
+        margin: 0 0 4px;
+      }
+      p.lead {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .phone {
+        width: 100%;
+        max-width: 390px;
+        margin: 0 auto;
+        border-radius: 36px;
+        overflow: hidden;
+        background: #fff;
+        box-shadow: 0 20px 50px rgb(0 0 0 / 0.18);
+        border: 1px solid var(--line);
+        position: relative;
+      }
+      .sky {
+        position: relative;
+        height: 440px;
+      }
+      canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+      .chips {
+        position: absolute;
+        inset: 52px 20px auto 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgb(255 255 255 / 0.72);
+        backdrop-filter: blur(6px);
+        color: #1c1a16;
+        font-weight: 600;
+        font-size: 16px;
+        padding: 10px 14px;
+        border-radius: 999px;
+      }
+      .round {
+        width: 44px;
+        height: 44px;
+        justify-content: center;
+        padding: 0;
+      }
+      .card {
+        position: relative;
+        margin-top: -32px;
+        background: #fff;
+        color: #1c1a16;
+        border-radius: 28px 28px 0 0;
+        padding: 22px 22px 26px;
+      }
+      .row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+      }
+      .label {
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        color: #6b665d;
+      }
+      .num {
+        font-family: "Space Grotesk", sans-serif;
+        font-weight: 700;
+        font-size: 84px;
+        line-height: 0.9;
+        letter-spacing: -0.04em;
+      }
+      .pill {
+        display: inline-block;
+        border-radius: 999px;
+        padding: 4px 12px;
+        font-weight: 700;
+        font-size: 14px;
+      }
+      .src {
+        font-size: 12px;
+        color: #6b665d;
+        font-weight: 600;
+        margin-top: 6px;
+      }
+      .weather {
+        text-align: right;
+      }
+      .weather svg {
+        width: 44px;
+        height: 44px;
+      }
+      .temp {
+        font-family: "Space Grotesk", sans-serif;
+        font-weight: 700;
+        font-size: 30px;
+        line-height: 1;
+      }
+      .cond {
+        font-size: 13px;
+        color: #6b665d;
+        font-weight: 600;
+      }
+      .advice {
+        font-family: "Space Grotesk", sans-serif;
+        font-weight: 700;
+        font-size: 21px;
+        margin: 14px 0 0;
+      }
+
+      .panel {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        padding: 20px;
+      }
+      .presets {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 14px 0 18px;
+      }
+      .presets button {
+        min-height: 40px;
+        padding: 0 14px;
+        border-radius: 999px;
+        border: 1.5px solid var(--line);
+        background: transparent;
+        color: var(--ink);
+        font:
+          600 14px "Plus Jakarta Sans",
+          sans-serif;
+        cursor: pointer;
+      }
+      .presets button[aria-pressed="true"] {
+        background: var(--accent);
+        color: var(--page);
+        border-color: var(--accent);
+      }
+      .ctl {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+      label.s {
+        display: grid;
+        gap: 4px;
+        font-size: 13px;
+        font-weight: 600;
+      }
+      label.s span.v {
+        color: var(--muted);
+        font-weight: 500;
+      }
+      input[type="range"] {
+        width: 100%;
+        accent-color: var(--accent);
+      }
+      .note {
+        font-size: 12px;
+        color: var(--muted);
+        line-height: 1.6;
+        margin-top: 16px;
+      }
+      .note b {
+        color: var(--ink);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div>
+        <div class="phone">
+          <div class="sky">
+            <canvas id="sky" aria-label="Langit animasi"></canvas>
+            <div class="chips">
+              <span class="chip">
+                <svg
+                  width="17"
+                  height="17"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M12 21s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12z"
+                  />
+                  <circle cx="12" cy="9" r="2.5" />
+                </svg>
+                Putrajaya
+                <svg
+                  width="15"
+                  height="15"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.2"
+                  stroke-linecap="round"
+                >
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              </span>
+              <span class="chip round">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7" />
+                  <polyline points="16 6 12 2 8 6" />
+                  <line x1="12" y1="2" x2="12" y2="15" />
+                </svg>
+              </span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="row">
+              <div>
+                <div class="label">IPU</div>
+                <div class="num" id="num">156</div>
+                <div
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    margin-top: 8px;
+                  "
+                >
+                  <span class="pill" id="pill">Tidak Sihat</span>
+                </div>
+                <div class="src">Rasmi · APIMS Putrajaya</div>
+              </div>
+              <div class="weather">
+                <span id="wicon"></span>
+                <div class="temp" id="temp">31°</div>
+                <div class="cond" id="cond">Berawan</div>
+              </div>
+            </div>
+            <p class="advice" id="advice">Elak bersenam di luar hari ini.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h1>Mockup langit Hezy</h1>
+        <p class="lead">
+          Shader WebGL ringan (tanpa three.js). Pilih keadaan atau ubah nilai di
+          bawah.
+        </p>
+        <div class="presets" role="group" aria-label="Keadaan">
+          <button data-p="jernih">Siang jernih</button>
+          <button data-p="jerebu">Siang berjerebu</button>
+          <button data-p="teruk">Jerebu teruk</button>
+          <button data-p="senja">Senja</button>
+          <button data-p="malam">Malam</button>
+          <button data-p="malamjerebu">Malam berjerebu</button>
+          <button data-p="hujan">Hujan</button>
+        </div>
+        <div class="ctl">
+          <label class="s"
+            >IPU <span class="v" id="vIpu"></span
+            ><input id="ipu" type="range" min="0" max="350" step="1"
+          /></label>
+          <label class="s"
+            >Jarak penglihatan <span class="v" id="vVis"></span
+            ><input id="vis" type="range" min="0.5" max="20" step="0.5"
+          /></label>
+          <label class="s"
+            >Litupan awan <span class="v" id="vCloud"></span
+            ><input id="cloud" type="range" min="0" max="100" step="1"
+          /></label>
+          <label class="s"
+            >Jam (waktu Malaysia) <span class="v" id="vHour"></span
+            ><input id="hour" type="range" min="0" max="23.9" step="0.1"
+          /></label>
+          <label class="s"
+            >Hujan <span class="v" id="vRain"></span
+            ><input id="rain" type="range" min="0" max="100" step="1"
+          /></label>
+          <label class="s"
+            >Fasa bulan <span class="v" id="vMoon"></span
+            ><input id="moon" type="range" min="0" max="1" step="0.01"
+          /></label>
+          <label class="s"
+            >Angin (dari arah) <span class="v" id="vWind"></span
+            ><input id="wind" type="range" min="0" max="359" step="1"
+          /></label>
+        </div>
+        <p class="note">
+          <b>Dalam aplikasi</b>, semua nilai ini datang daripada data sebenar:
+          IPU (APIMS/anggaran), jarak penglihatan, litupan awan, hujan, suhu dan
+          waktu matahari terbit/terbenam (Open-Meteo), arah angin 850 hPa, dan
+          fasa bulan dikira daripada tarikh.<br />
+          Animasi berhenti bila tab tidak aktif, dan imej statik digunakan untuk
+          pengguna yang mematikan animasi atau peranti tanpa WebGL.
+        </p>
+      </div>
+    </div>
+
+    <script>
+      (() => {
+        const VERT = `attribute vec2 a; void main(){ gl_Position = vec4(a, 0., 1.); }`;
+        const FRAG = `
+precision highp float;
+uniform vec2 uRes;
+uniform float uTime, uHaze, uCloud, uSunEl, uSunX, uRain, uPhase, uWindSpeed;
+uniform vec2 uWind;
+
+float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+float noise(vec2 p){
+  vec2 i = floor(p), f = fract(p);
+  f = f * f * (3. - 2. * f);
+  return mix(mix(hash(i), hash(i + vec2(1., 0.)), f.x),
+             mix(hash(i + vec2(0., 1.)), hash(i + vec2(1., 1.)), f.x), f.y);
+}
+float fbm(vec2 p){
+  float v = 0., a = .5;
+  for (int i = 0; i < 5; i++) { v += a * noise(p); p = p * 2.03 + 7.1; a *= .5; }
+  return v;
+}
+
+void main(){
+  vec2 uv = gl_FragCoord.xy / uRes;
+  float aspect = uRes.x / uRes.y;
+  vec2 p = vec2(uv.x * aspect, uv.y);
+  float y = uv.y;
+
+  float day = smoothstep(-.10, .12, uSunEl);
+  float dusk = 1. - smoothstep(0., .32, abs(uSunEl - .02));
+
+  // Kecerunan langit: malam ke siang, senja di ufuk.
+  vec3 zen = mix(vec3(.02, .035, .10), vec3(.20, .47, .86), day);
+  vec3 hor = mix(vec3(.07, .10, .22), vec3(.70, .85, .96), day);
+  zen = mix(zen, vec3(.30, .30, .58), dusk * .55);
+  hor = mix(hor, vec3(.99, .60, .40), dusk * .85);
+  vec3 col = mix(hor, zen, pow(y, .75));
+
+  // Warna jerebu: kelabu-kuning siang, perang gelap malam, jingga ketika senja.
+  vec3 hz = mix(vec3(.17, .15, .13), vec3(.80, .74, .58), day);
+  // Jerebu teruk: lebih perang dan gelap.
+  hz = mix(hz, hz * vec3(.86, .76, .6), smoothstep(.65, 1., uHaze));
+  hz = mix(hz, vec3(.88, .62, .42), dusk * .5);
+  col = mix(col, hz, min(uHaze * (.6 + .45 * (1. - y)), .97));
+
+  // Awan: dua lapisan bergerak ikut angin (dikira dahulu untuk menutup matahari/bulan/bintang).
+  vec2 drift = -uWind * uTime * (.006 + uWindSpeed * .0008);
+  float c1 = fbm(p * vec2(1.1, 2.8) + drift);
+  float c2 = fbm(p * vec2(2.4, 5.2) + drift * 1.7 + 11.);
+  float v = c1 * .68 + c2 * .32;
+  float lo = .60 - uCloud * .38;
+  float dens = smoothstep(lo, lo + .16, v) * smoothstep(.06, .42, y);
+  dens = max(dens, uRain * .55 * smoothstep(.1, .6, y));
+
+  // Bintang: berkelip, pudar dalam jerebu, awan dan dekat ufuk.
+  float night = 1. - day;
+  vec2 g = p * 60.;
+  vec2 id = floor(g);
+  float s = hash(id);
+  if (s > .965) {
+    vec2 o = (vec2(hash(id + 3.), hash(id + 7.)) - .5) * .6;
+    float d = length(fract(g) - .5 - o);
+    float tw = .5 + .5 * sin(uTime * (1.2 + s * 3.) + s * 80.);
+    float size = mix(.06, .14, hash(id + 13.));
+    col += vec3(.95, .97, 1.) * smoothstep(size, 0., d) * (.4 + .6 * tw) * night
+      * (1. - uHaze * .93) * smoothstep(.22, .6, y) * (1. - dens);
+  }
+
+  // Matahari: bergerak ikut jam; jingga pudar tanpa silau dalam jerebu; tersorok oleh awan tebal.
+  vec2 sp = vec2(aspect * uSunX, .34 + .42 * uSunEl);
+  float ds = length(p - sp);
+  vec3 sunCol = mix(vec3(1., .97, .86), vec3(1., .62, .36), clamp(uHaze * 1.2 + dusk * .7, 0., 1.));
+  float sunVis = smoothstep(-.06, .04, uSunEl) * (1. - uHaze * .5) * (1. - uCloud * uCloud * .7) * (1. - uRain * .9);
+  col = mix(col, sunCol, smoothstep(.062, .056, ds) * sunVis);
+  col += sunCol * exp(-ds * 6.) * .35 * sunVis * (1. - uHaze * .8);
+
+  // Bulan dengan fasa sebenar (bayang sfera), cahaya bumi pada bahagian gelap.
+  vec2 mp = vec2(aspect * .70, .72);
+  float R = .05;
+  vec2 m = (p - mp) / R;
+  float r2 = dot(m, m);
+  if (r2 < 1.) {
+    float th = uPhase * 6.2831853;
+    vec3 N = vec3(m, sqrt(1. - r2));
+    vec3 L = vec3(sin(th), 0., -cos(th));
+    float lit = smoothstep(-.05, .08, dot(N, L));
+    float edge = smoothstep(1., .9, r2);
+    vec3 moonCol = mix(vec3(.97, .96, .90), vec3(.96, .74, .52), uHaze);
+    float a = (lit * .95 + .14) * edge * night * (1. - uHaze * .45) * (1. - dens * .85);
+    col = mix(col, moonCol, a);
+  }
+  col += vec3(.9, .9, .85) * exp(-length(p - mp) * 10.) * .12 * night * (1. - uHaze * .6) * (.3 + .7 * abs(cos(uPhase * 3.14159)));
+
+  vec3 cloudLit = mix(vec3(.20, .22, .30), vec3(1.), day);
+  cloudLit = mix(cloudLit, vec3(1., .80, .66), dusk * .75);
+  cloudLit = mix(cloudLit, hz * 1.1, uHaze * .55);
+  float shade = smoothstep(.35, .75, fbm(p * vec2(1.1, 2.8) + drift + vec2(.03, .12)));
+  vec3 cloudCol = mix(cloudLit, cloudLit * mix(.55, .78, day), shade * .8);
+  cloudCol = mix(cloudCol, cloudCol * .62, uRain);
+  col = mix(col, cloudCol, dens * .94);
+
+  // Kabus jerebu dekat ufuk.
+  float fog = uHaze * smoothstep(.75, 0., y) * (.55 + .45 * fbm(p * 2.5 + vec2(uTime * .02, 0.)));
+  col = mix(col, hz * mix(.9, 1.05, day), fog * .75);
+
+  // Hujan.
+  if (uRain > 0.) {
+    col *= 1. - uRain * .22;
+    vec2 q = vec2(p.x * 140. + p.y * 14., p.y * 4. + uTime * 6.5);
+    float lane = smoothstep(.5, .1, abs(fract(q.x) - .5));
+    float drop = step(.93, hash(vec2(floor(q.x), floor(q.y)))) * lane
+      * smoothstep(0., .5, fract(q.y)) * smoothstep(1., .7, fract(q.y));
+    col = mix(col, vec3(.86, .90, .96), drop * uRain * .35);
+  }
+
+  gl_FragColor = vec4(col, 1.);
+}`;
+
+        const canvas = document.getElementById("sky");
+        const gl = canvas.getContext("webgl", {
+          antialias: false,
+          alpha: false,
+        });
+        if (!gl) {
+          canvas.style.background = "linear-gradient(#9ecdf3,#d9ecf8)";
+          return;
+        }
+        const sh = (type, src) => {
+          const s = gl.createShader(type);
+          gl.shaderSource(s, src);
+          gl.compileShader(s);
+          if (!gl.getShaderParameter(s, gl.COMPILE_STATUS))
+            throw new Error(gl.getShaderInfoLog(s));
+          return s;
+        };
+        const prog = gl.createProgram();
+        gl.attachShader(prog, sh(gl.VERTEX_SHADER, VERT));
+        gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FRAG));
+        gl.linkProgram(prog);
+        gl.useProgram(prog);
+        const buf = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+        gl.bufferData(
+          gl.ARRAY_BUFFER,
+          new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]),
+          gl.STATIC_DRAW,
+        );
+        const loc = gl.getAttribLocation(prog, "a");
+        gl.enableVertexAttribArray(loc);
+        gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+        const U = (n) => gl.getUniformLocation(prog, n);
+        const u = {
+          res: U("uRes"),
+          time: U("uTime"),
+          haze: U("uHaze"),
+          cloud: U("uCloud"),
+          sunEl: U("uSunEl"),
+          sunX: U("uSunX"),
+          rain: U("uRain"),
+          phase: U("uPhase"),
+          wind: U("uWind"),
+          windSpeed: U("uWindSpeed"),
+        };
+
+        const state = {
+          ipu: 156,
+          vis: 4,
+          cloud: 45,
+          hour: 15,
+          rain: 0,
+          wind: 140,
+          moon: 0.5,
+        };
+        const smooth = (a, b, x) => {
+          const t = Math.min(Math.max((x - a) / (b - a), 0), 1);
+          return t * t * (3 - 2 * t);
+        };
+        /** Tahap jerebu 0–1: IPU dan jarak penglihatan (yang lebih teruk diguna). */
+        const hazeOf = (ipu, vis) =>
+          Math.max(smooth(45, 260, ipu), 1 - smooth(1.5, 12, vis));
+        /** Malaysia: matahari terbit ~7:10, terbenam ~19:15. */
+        const sunOf = (h) => {
+          const rise = 7.15,
+            set = 19.25;
+          const f = (h - rise) / (set - rise);
+          const inDay = f >= 0 && f <= 1;
+          const el = inDay
+            ? Math.sin(Math.PI * f)
+            : -Math.min(Math.abs(f < 0 ? f : f - 1) * 3, 1);
+          return { el, x: 0.12 + 0.76 * Math.min(Math.max(f, 0), 1) };
+        };
+        /** Fasa bulan 0–1 (0 = anak bulan) daripada tarikh. */
+        const moonPhase = (d) => {
+          const syn = 29.530588853;
+          const ref = Date.UTC(2000, 0, 6, 18, 14);
+          return (((((d - ref) / 864e5) % syn) + syn) % syn) / syn;
+        };
+        const realPhase = moonPhase(Date.now());
+
+        function resize() {
+          const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+          const w = canvas.clientWidth,
+            h = canvas.clientHeight;
+          canvas.width = Math.round(w * dpr);
+          canvas.height = Math.round(h * dpr);
+          gl.viewport(0, 0, canvas.width, canvas.height);
+        }
+        window.addEventListener("resize", resize);
+        resize();
+
+        const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+        let start = performance.now(),
+          raf = 0;
+        function frame(now) {
+          const sun = sunOf(state.hour);
+          const rad = (state.wind * Math.PI) / 180;
+          gl.uniform2f(u.res, canvas.width, canvas.height);
+          gl.uniform1f(u.time, reduce ? 20 : (now - start) / 1000);
+          gl.uniform1f(u.haze, hazeOf(state.ipu, state.vis));
+          gl.uniform1f(u.cloud, state.cloud / 100);
+          gl.uniform1f(u.sunEl, sun.el);
+          gl.uniform1f(u.sunX, sun.x);
+          gl.uniform1f(u.rain, state.rain / 100);
+          gl.uniform1f(u.phase, state.moon);
+          // Angin DATANG dari arah ini: awan bergerak ke arah bertentangan (x ke kanan = timur).
+          gl.uniform2f(u.wind, Math.sin(rad), Math.cos(rad));
+          gl.uniform1f(u.windSpeed, 10);
+          gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+          if (!reduce && !document.hidden) raf = requestAnimationFrame(frame);
+        }
+        document.addEventListener("visibilitychange", () => {
+          if (!document.hidden && !reduce) {
+            cancelAnimationFrame(raf);
+            raf = requestAnimationFrame(frame);
+          }
+        });
+
+        // --- Kad bacaan dan cuaca ---
+        const CAT = [
+          [
+            50,
+            "Baik",
+            "#3a7bd5",
+            "#fff",
+            "Udara bersih. Aktiviti luar seperti biasa.",
+          ],
+          [
+            100,
+            "Sederhana",
+            "#2e9e5b",
+            "#fff",
+            "Aktiviti luar seperti biasa. Kumpulan sensitif perlu berwaspada.",
+          ],
+          [
+            200,
+            "Tidak Sihat",
+            "#e0a800",
+            "#1c1a16",
+            "Elak bersenam di luar hari ini.",
+          ],
+          [
+            300,
+            "Sangat Tidak Sihat",
+            "#e8731c",
+            "#1c1a16",
+            "Kekal di dalam dan kurangkan aktiviti fizikal.",
+          ],
+          [
+            9999,
+            "Berbahaya",
+            "#d23b3b",
+            "#fff",
+            "Jangan keluar. Ikut arahan pihak berkuasa.",
+          ],
+        ];
+        const ICON = {
+          cerah:
+            '<svg viewBox="0 0 24 24" fill="none" stroke="#e0a800" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></svg>',
+          berawan:
+            '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="3.2" stroke="#e0a800"/><path d="M8 2.6v1M2.6 8h1M4.2 4.2l.7.7M11.8 4.2l-.7.7" stroke="#e0a800"/><path d="M7.5 19h9a4 4 0 0 0 .5-7.97A5.5 5.5 0 0 0 6.6 12.6 3.3 3.3 0 0 0 7.5 19z" stroke="#6b665d"/></svg>',
+          kabur:
+            '<svg viewBox="0 0 24 24" fill="none" stroke="#a08850" stroke-width="1.8" stroke-linecap="round"><path d="M3 9h12M6 13h15M3 17h12"/><circle cx="18" cy="7" r="2.5" stroke="#e0a800"/></svg>',
+          hujan:
+            '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 15h9a4 4 0 0 0 .5-7.97A5.5 5.5 0 0 0 6.1 8.6 3.3 3.3 0 0 0 7 15z" stroke="#6b665d"/><path d="M9 18l-1 2.5M13 18l-1 2.5M17 18l-1 2.5" stroke="#3a7bd5"/></svg>',
+          malam:
+            '<svg viewBox="0 0 24 24" fill="none" stroke="#6b7bb5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>',
+        };
+        function updateCard() {
+          const c = CAT.find((x) => state.ipu <= x[0]);
+          document.getElementById("num").textContent = state.ipu;
+          const pill = document.getElementById("pill");
+          pill.textContent = c[1];
+          pill.style.background = c[2];
+          pill.style.color = c[3];
+          document.getElementById("advice").textContent = c[4];
+          const sun = sunOf(state.hour);
+          const isNight = sun.el < 0;
+          const hazy = hazeOf(state.ipu, state.vis) > 0.5;
+          const kind =
+            state.rain > 20
+              ? "hujan"
+              : isNight
+                ? "malam"
+                : hazy
+                  ? "kabur"
+                  : state.cloud > 40
+                    ? "berawan"
+                    : "cerah";
+          const label = {
+            hujan: "Hujan",
+            malam: state.cloud > 40 ? "Berawan" : "Cerah",
+            kabur: "Berjerebu",
+            berawan: "Berawan",
+            cerah: "Cerah",
+          }[kind];
+          document.getElementById("wicon").innerHTML = ICON[kind];
+          document.getElementById("cond").textContent = label;
+          const temp = Math.round(
+            26 + 7 * Math.max(0, sun.el) - state.rain / 30,
+          );
+          document.getElementById("temp").textContent = temp + "°";
+        }
+
+        // --- Kawalan ---
+        const fmt = {
+          ipu: (v) => v,
+          vis: (v) => `${v} km`,
+          cloud: (v) => `${v}%`,
+          hour: (v) => {
+            const h = Math.floor(v),
+              m = Math.round((v - h) * 60);
+            return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+          },
+          rain: (v) => (v > 0 ? `${v}%` : "tiada"),
+          moon: (v) =>
+            Math.abs(v - realPhase) < 0.011
+              ? "hari ini"
+              : v < 0.03 || v > 0.97
+                ? "anak bulan"
+                : Math.abs(v - 0.5) < 0.03
+                  ? "purnama"
+                  : v < 0.5
+                    ? "sabit/separa (bertambah)"
+                    : "separa/sabit (berkurang)",
+          wind: (v) =>
+            `${["U", "TL", "T", "TG", "S", "BD", "B", "BL"][Math.round(v / 45) % 8]} (${v}°)`,
+        };
+        const ids = {
+          ipu: "vIpu",
+          vis: "vVis",
+          cloud: "vCloud",
+          hour: "vHour",
+          rain: "vRain",
+          wind: "vWind",
+          moon: "vMoon",
+        };
+        function sync() {
+          for (const k of Object.keys(ids)) {
+            document.getElementById(k).value = state[k];
+            document.getElementById(ids[k]).textContent = fmt[k](state[k]);
+          }
+          updateCard();
+          if (reduce) requestAnimationFrame(frame);
+        }
+        for (const k of Object.keys(ids)) {
+          document.getElementById(k).addEventListener("input", (e) => {
+            state[k] = Number(e.target.value);
+            document
+              .querySelectorAll(".presets button")
+              .forEach((b) => b.setAttribute("aria-pressed", "false"));
+            sync();
+          });
+        }
+        const PRESETS = {
+          jernih: {
+            ipu: 32,
+            vis: 18,
+            cloud: 45,
+            hour: 10.5,
+            rain: 0,
+            wind: 220,
+          },
+          jerebu: { ipu: 156, vis: 4, cloud: 40, hour: 15, rain: 0, wind: 140 },
+          teruk: {
+            ipu: 280,
+            vis: 1.5,
+            cloud: 15,
+            hour: 13,
+            rain: 0,
+            wind: 225,
+          },
+          senja: {
+            ipu: 70,
+            vis: 10,
+            cloud: 45,
+            hour: 19.1,
+            rain: 0,
+            wind: 200,
+          },
+          malam: {
+            ipu: 45,
+            vis: 15,
+            cloud: 25,
+            hour: 22,
+            rain: 0,
+            wind: 200,
+            moon: 0.62,
+          },
+          malamjerebu: {
+            ipu: 190,
+            vis: 3,
+            cloud: 20,
+            hour: 22.5,
+            rain: 0,
+            wind: 140,
+            moon: 0.5,
+          },
+          hujan: { ipu: 60, vis: 6, cloud: 90, hour: 16, rain: 80, wind: 250 },
+        };
+        window.__preset = (name) =>
+          document.querySelector(`[data-p="${name}"]`).click();
+        document.querySelectorAll(".presets button").forEach((b) => {
+          b.setAttribute(
+            "aria-pressed",
+            b.dataset.p === "jerebu" ? "true" : "false",
+          );
+          b.addEventListener("click", () => {
+            Object.assign(state, PRESETS[b.dataset.p]);
+            document
+              .querySelectorAll(".presets button")
+              .forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+            sync();
+          });
+        });
+        sync();
+        raf = requestAnimationFrame(frame);
+      })();
+    </script>
+  </body>
+</html>
