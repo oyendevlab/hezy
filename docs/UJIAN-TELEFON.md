@@ -55,6 +55,18 @@ Buka **https://hezy.my** pada telefon.
 - [ ] Android: tekan lama ikon Hezy → pintasan Trend, Peta, Tetapan
 - [ ] Ikon Hezy yang dipasang menunjukkan nombor IPU (lencana) bila melebihi ambang amaran
 
+## Ciri baharu v0.5.0
+
+- [ ] Buka **https://hezy.my** (alamat lama hezy.vercel.app kini dialihkan); pasang semula Hezy dari hezy.my dan pilih lokasi serta hidupkan amaran semula
+- [ ] Utama: langit bergerak ikut keadaan sebenar (awan, hujan, jerebu); waktu malam ada bulan dan bintang
+- [ ] Utama: label "IPU", "● Rasmi · APIMS", ikon cuaca + suhu di kanan, ikon pada bento nasihat
+- [ ] Utama (iPhone, Safari): banner "Pasang Hezy di skrin utama" → Cara pasang; ✕ menutup banner
+- [ ] Trend: cip lokasi; tekan dan seret graf → lepas kembali ke jam semasa; garisan putus-putus
+- [ ] Lokasi: Peta dahulu, tab Senarai di kanan; kegemaran yang sama dengan lokasi semasa bertanda SEMASA
+- [ ] "Guna lokasi saya" → nama bandar terdekat (tanpa "Berhampiran")
+- [ ] Tetapan → Privasi dan data anda
+- [ ] Tetapan → Bahasa → English: halaman negeri dan kongsi juga dalam English
+
 ## Jika ada masalah
 
 Ambil tangkapan skrin dan catat model telefon serta versi OS, kemudian buka isu di
