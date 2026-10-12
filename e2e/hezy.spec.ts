@@ -49,14 +49,35 @@ test.describe("aliran utama", () => {
     expect([401, 503]).toContain(res.status());
   });
 
-  test("pengguna baharu memilih kawasan dan nampak IPU", async ({ page }) => {
+  test("pengguna baharu: pengenalan 3 skrin, pilih kawasan dan nampak IPU", async ({
+    page,
+  }) => {
     await page.goto("/");
+    const onboarding = page.getByTestId("onboarding");
     await expect(
-      page.getByRole("heading", { name: "Selamat datang ke Hezy" }),
+      page.getByRole("heading", { name: "Apa itu IPU?" }),
     ).toBeVisible();
+    await expect(onboarding.getByText("101–200")).toBeVisible();
+    const axe = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+      .analyze();
+    expect(axe.violations.map((v) => v.id)).toEqual([]);
+    await page.getByRole("button", { name: "Seterusnya" }).click();
 
+    await expect(
+      page.getByRole("heading", { name: "Di mana anda berada?" }),
+    ).toBeFocused();
+    // Seterusnya dilumpuhkan sehingga lokasi dipilih.
+    await expect(
+      page.getByRole("button", { name: "Seterusnya" }),
+    ).toBeDisabled();
     await page.getByLabel("Cari kawasan atau negeri").fill("shah");
     await page.getByRole("button", { name: /Shah Alam/ }).click();
+
+    await expect(
+      page.getByRole("heading", { name: "Dapatkan amaran jerebu" }),
+    ).toBeVisible();
+    await page.getByRole("button", { name: "Mula guna Hezy" }).click();
 
     await expect(
       page.getByRole("heading", { name: "IPU 156, Tidak Sihat" }),
@@ -69,6 +90,32 @@ test.describe("aliran utama", () => {
     await expect(
       page.getByText("Naik 12 dalam 3 jam").filter({ visible: true }),
     ).toBeVisible();
+  });
+
+  test("pengenalan boleh dilangkau dan tidak dipaparkan semula", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await page.getByRole("button", { name: "Langkau" }).click();
+    await expect(
+      page.getByRole("heading", { name: "Selamat datang ke Hezy" }),
+    ).toBeVisible();
+    await page.reload();
+    await expect(
+      page.getByRole("heading", { name: "Selamat datang ke Hezy" }),
+    ).toBeVisible();
+    await expect(page.getByTestId("onboarding")).toHaveCount(0);
+  });
+
+  test("pengguna sedia ada (ada lokasi) tidak nampak pengenalan", async ({
+    page,
+  }) => {
+    await seedLocation(page);
+    await page.goto("/");
+    await expect(
+      page.locator("h1[data-ipu-headline]").filter({ visible: true }),
+    ).toBeVisible();
+    await expect(page.getByTestId("onboarding")).toHaveCount(0);
   });
 
   test("trend memaparkan masa terbaik untuk keluar", async ({ page }) => {
