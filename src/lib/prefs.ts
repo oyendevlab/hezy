@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from "react";
 import type { HealthProfile } from "./advice";
+import { isLang, type Lang } from "./i18n";
 import { PREFS_KEY } from "./storage-keys";
 
 export { PREFS_KEY };
@@ -28,6 +29,8 @@ export type Prefs = {
   alertThreshold: 50 | 100 | 200 | null;
   /** Id lokasi kegemaran yang turut menerima amaran. */
   alertFavourites: string[];
+  /** Bahasa antara muka. */
+  lang: Lang;
 };
 
 export const MAX_FAVOURITES = 5;
@@ -40,6 +43,7 @@ export const DEFAULT_PREFS: Prefs = {
   showSchool: false,
   alertThreshold: null,
   alertFavourites: [],
+  lang: "ms",
 };
 
 const PROFILES: readonly HealthProfile[] = ["umum", "anak", "asma", "emas"];
@@ -81,6 +85,7 @@ export function parsePrefs(raw: string | null): Prefs {
             .filter((id): id is string => typeof id === "string")
             .slice(0, MAX_FAVOURITES)
         : [],
+      lang: isLang(v.lang) ? v.lang : "ms",
     };
   } catch {
     return DEFAULT_PREFS;
@@ -147,6 +152,7 @@ export function updatePrefs(change: (prefs: Prefs) => Prefs) {
     // Storan penuh atau disekat: tetapan kekal untuk sesi ini sahaja.
   }
   applyTheme(next.theme);
+  document.documentElement.lang = next.lang;
   listeners.forEach((listener) => listener());
 }
 

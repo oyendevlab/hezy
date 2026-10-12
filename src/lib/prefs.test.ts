@@ -33,6 +33,7 @@ describe("parsePrefs", () => {
         favourites: [loc("a"), { name: "tiada id" }],
         profile: "lain",
         theme: "dark",
+        lang: "jp",
       }),
     );
     expect(prefs).toEqual({
@@ -43,7 +44,9 @@ describe("parsePrefs", () => {
       showSchool: false,
       alertThreshold: null,
       alertFavourites: [],
+      lang: "ms",
     });
+    expect(parsePrefs(JSON.stringify({ lang: "en" })).lang).toBe("en");
   });
 });
 

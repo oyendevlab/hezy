@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { primaryReading } from "@/lib/official";
+import { useI18n } from "@/lib/use-i18n";
 import { useMediaQuery } from "@/lib/use-media-query";
 import { CompareLocations } from "../compare-locations";
 import { SchoolCard } from "../school-card";
@@ -13,6 +14,7 @@ import { TrendPanel } from "../trend-panel";
 import { useCurrent } from "../use-current";
 
 export function TrendScreen() {
+  const { t } = useI18n();
   const wide = useMediaQuery("(min-width: 1024px)");
   const { prefs, location, entry, refresh } = useCurrent();
   const reading = entry?.reading;
@@ -22,13 +24,13 @@ export function TrendScreen() {
     <div className="mx-auto flex max-w-[720px] flex-col gap-4 px-5 pt-13 md:pt-10">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h1 className="font-display text-[30px] font-bold">Trend</h1>
+          <h1 className="font-display text-[30px] font-bold">{t("Trend")}</h1>
           {location && (
             <Link
               href="/lokasi"
               className="text-muted text-sm font-semibold underline"
             >
-              {location.name}
+              {t(location.name)}
             </Link>
           )}
         </div>
@@ -37,7 +39,7 @@ export function TrendScreen() {
             <span className="font-display text-2xl font-bold">
               {current.ipu}
             </span>
-            <IpuPill category={current.category} label={current.label} />
+            <IpuPill category={current.category} label={t(current.label)} />
           </div>
         )}
       </div>
@@ -46,8 +48,8 @@ export function TrendScreen() {
       {prefs && !location && <ChooseLocation />}
       {entry && <ReadingNotices entry={entry} onRetry={refresh} />}
       {location && !reading && entry?.status === "error" && (
-        <Notice action={{ label: "Cuba lagi", onClick: refresh }}>
-          {entry.error}
+        <Notice action={{ label: t("Cuba lagi"), onClick: refresh }}>
+          {t(entry.error ?? "")}
         </Notice>
       )}
       {location && !reading && entry?.status !== "error" && (

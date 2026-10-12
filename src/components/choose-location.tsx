@@ -4,10 +4,12 @@ import { useState } from "react";
 import { GEO_ERROR_MESSAGE, requestPosition } from "@/lib/geolocation";
 import { areaToLocation, gpsToLocation } from "@/lib/locations";
 import { updatePrefs } from "@/lib/prefs";
+import { useI18n } from "@/lib/use-i18n";
 import { LocationSearch } from "./location-search";
 
 /** Butang GPS + carian kawasan untuk memilih lokasi semasa. */
 export function ChooseLocation({ onChosen }: { onChosen?: () => void }) {
+  const { t } = useI18n();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -17,7 +19,7 @@ export function ChooseLocation({ onChosen }: { onChosen?: () => void }) {
     const result = await requestPosition();
     setBusy(false);
     if (!result.ok) {
-      setError(GEO_ERROR_MESSAGE[result.reason]);
+      setError(t(GEO_ERROR_MESSAGE[result.reason]));
       return;
     }
     updatePrefs((p) => ({
@@ -47,7 +49,7 @@ export function ChooseLocation({ onChosen }: { onChosen?: () => void }) {
         >
           <polygon points="3 11 21 3 13 21 11 13 3 11" />
         </svg>
-        {busy ? "Mengesan lokasi…" : "Guna lokasi saya"}
+        {busy ? t("Mengesan lokasi…") : t("Guna lokasi saya")}
       </button>
       {error && (
         <p
@@ -58,7 +60,7 @@ export function ChooseLocation({ onChosen }: { onChosen?: () => void }) {
         </p>
       )}
       <p className="text-muted text-center text-xs font-semibold tracking-wide">
-        ATAU PILIH KAWASAN
+        {t("ATAU PILIH KAWASAN")}
       </p>
       <LocationSearch
         onPick={(area) => {

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { displayIpu, primaryReading } from "@/lib/official";
 import type { Prefs, SavedLocation } from "@/lib/prefs";
+import { useI18n } from "@/lib/use-i18n";
 import { useReading } from "@/lib/use-reading";
 
 const MAX_SELECTED = 3;
@@ -38,6 +39,7 @@ function candidates(prefs: Prefs): SavedLocation[] {
 
 /** Bandingkan graf IPU hari ini bagi 2–3 lokasi (desktop sahaja). */
 export function CompareLocations({ prefs }: { prefs: Prefs }) {
+  const { t } = useI18n();
   const options = candidates(prefs);
   const [selected, setSelected] = useState<string[]>(() =>
     options.slice(0, 2).map((l) => l.id),
@@ -53,11 +55,12 @@ export function CompareLocations({ prefs }: { prefs: Prefs }) {
         className="border-line rounded-3xl border p-5"
       >
         <h2 id="bandingkan" className="font-display text-xl font-bold">
-          Bandingkan lokasi
+          {t("Bandingkan lokasi")}
         </h2>
         <p className="text-muted mt-1 text-sm">
-          Simpan sekurang-kurangnya satu lokasi kegemaran untuk membandingkan
-          trend.
+          {t(
+            "Simpan sekurang-kurangnya satu lokasi kegemaran untuk membandingkan trend.",
+          )}
         </p>
       </section>
     );
@@ -79,16 +82,16 @@ export function CompareLocations({ prefs }: { prefs: Prefs }) {
     >
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h2 id="bandingkan" className="font-display text-xl font-bold">
-          Bandingkan lokasi
+          {t("Bandingkan lokasi")}
         </h2>
         <span className="text-muted text-xs font-semibold">
-          Pilih sehingga {MAX_SELECTED}
+          {t("Pilih sehingga {max}", { max: MAX_SELECTED })}
         </span>
       </div>
 
       <div
         role="group"
-        aria-label="Lokasi untuk dibandingkan"
+        aria-label={t("Lokasi untuk dibandingkan")}
         className="flex flex-wrap gap-2"
       >
         {options.map((l) => {
@@ -113,7 +116,7 @@ export function CompareLocations({ prefs }: { prefs: Prefs }) {
                     on && index >= 0 ? SERIES[index].color : "var(--line)",
                 }}
               />
-              {l.name}
+              {t(l.name)}
             </button>
           );
         })}
@@ -122,7 +125,7 @@ export function CompareLocations({ prefs }: { prefs: Prefs }) {
       <figure className="m-0">
         <svg
           role="img"
-          aria-label="Graf perbandingan IPU hari ini"
+          aria-label={t("Graf perbandingan IPU hari ini")}
           viewBox={`0 0 ${W} ${H}`}
           className="h-auto w-full"
         >
@@ -156,15 +159,17 @@ export function CompareLocations({ prefs }: { prefs: Prefs }) {
               fontSize="11"
               fill="var(--muted)"
             >
-              {h === 0
-                ? "12 pg"
-                : h === 6
-                  ? "6 pg"
-                  : h === 12
-                    ? "12 tgh"
-                    : h === 18
-                      ? "6 ptg"
-                      : "11 mlm"}
+              {t(
+                h === 0
+                  ? "12 pg"
+                  : h === 6
+                    ? "6 pg"
+                    : h === 12
+                      ? "12 tgh"
+                      : h === 18
+                        ? "6 ptg"
+                        : "11 mlm",
+              )}
             </text>
           ))}
           {chosen.map((l, i) => (
@@ -178,8 +183,9 @@ export function CompareLocations({ prefs }: { prefs: Prefs }) {
             ))}
           </ul>
           <p className="text-muted mt-2 text-xs">
-            Garis penuh: jam lepas (rasmi APIMS jika ada). Garis putus: ramalan
-            model.
+            {t(
+              "Garis penuh: jam lepas (rasmi APIMS jika ada). Garis putus: ramalan model.",
+            )}
           </p>
         </figcaption>
       </figure>
@@ -242,6 +248,7 @@ function SeriesLegend({
   location: SavedLocation;
   color: string;
 }) {
+  const { t } = useI18n();
   const { entry } = useReading(location);
   const current = primaryReading(entry?.reading);
   return (
@@ -251,9 +258,11 @@ function SeriesLegend({
         className="h-1 w-5 rounded-full"
         style={{ background: color }}
       />
-      <span className="font-semibold">{location.name}</span>
+      <span className="font-semibold">{t(location.name)}</span>
       <span className="text-muted">
-        {current ? `IPU ${current.ipu} · ${current.label}` : "memuatkan…"}
+        {current
+          ? `${t("IPU {threshold}", { threshold: current.ipu })} · ${t(current.label)}`
+          : t("memuatkan…")}
       </span>
     </li>
   );

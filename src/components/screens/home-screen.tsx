@@ -8,6 +8,7 @@ import { primaryReading } from "@/lib/official";
 import type { Prefs, SavedLocation } from "@/lib/prefs";
 import type { Reading } from "@/lib/reading";
 import { buildSharePath } from "@/lib/share";
+import { useI18n } from "@/lib/use-i18n";
 import { useReading, type ReadingEntry } from "@/lib/use-reading";
 import { ChooseLocation } from "../choose-location";
 import { IpuPill } from "../ipu-pill";
@@ -45,15 +46,17 @@ function HomeSkeleton() {
 }
 
 function Welcome() {
+  const { t } = useI18n();
   return (
     <div className="mx-auto max-w-md px-5 pt-13 md:pt-16">
       <Logo size={72} className="mb-4" />
       <h1 className="font-display text-[32px] leading-tight font-bold">
-        Selamat datang ke Hezy
+        {t("Selamat datang ke Hezy")}
       </h1>
       <p className="text-muted mt-2 text-[16px]">
-        Pilih lokasi untuk melihat Indeks Pencemar Udara (IPU) dan nasihat
-        kesihatan.
+        {t(
+          "Pilih lokasi untuk melihat Indeks Pencemar Udara (IPU) dan nasihat kesihatan.",
+        )}
       </p>
       <div className="mt-6">
         <ChooseLocation />
@@ -70,13 +73,18 @@ type ViewProps = {
 };
 
 function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
+  const { t } = useI18n();
   const reading = entry?.reading;
   const current = primaryReading(reading);
   const showSchool = prefs.profile === "anak" || prefs.showSchool;
   const palette = current ? CATEGORY_STYLE[current.category].sky : NEUTRAL_SKY;
   const shareText = current
-    ? `IPU ${location.name}: ${current.ipu} (${current.label}) · via Hezy`
-    : "Hezy — semak jerebu";
+    ? t("IPU {name}: {ipu} ({label}) · via Hezy", {
+        name: t(location.name),
+        ipu: current.ipu,
+        label: t(current.label),
+      })
+    : t("Hezy — semak jerebu");
   const sharePath = current
     ? buildSharePath({
         name: location.name,
@@ -157,8 +165,8 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
               <AdviceCard category={current.category} profile={prefs.profile} />
             )}
             {!reading && entry?.status === "error" && (
-              <Notice action={{ label: "Cuba lagi", onClick: onRetry }}>
-                {entry.error}
+              <Notice action={{ label: t("Cuba lagi"), onClick: onRetry }}>
+                {t(entry.error ?? "")}
               </Notice>
             )}
           </div>
@@ -178,6 +186,7 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
 }
 
 function LocationLink({ location }: { location: SavedLocation }) {
+  const { t } = useI18n();
   return (
     <Link
       href="/lokasi"
@@ -197,8 +206,8 @@ function LocationLink({ location }: { location: SavedLocation }) {
         <path d="M12 21s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12z" />
         <circle cx="12" cy="9" r="2.5" />
       </svg>
-      {location.name}
-      <span className="sr-only">— tukar lokasi</span>
+      {t(location.name)}
+      <span className="sr-only">{t("— tukar lokasi")}</span>
       <svg
         aria-hidden="true"
         width="15"
@@ -225,12 +234,13 @@ type SummaryProps = {
 };
 
 function Summary({ entry, reading, onRetry, size, profile }: SummaryProps) {
+  const { t } = useI18n();
   const current = primaryReading(reading);
 
   if (!reading && entry?.status === "error") {
     return (
-      <Notice action={{ label: "Cuba lagi", onClick: onRetry }}>
-        {entry.error}
+      <Notice action={{ label: t("Cuba lagi"), onClick: onRetry }}>
+        {t(entry.error ?? "")}
       </Notice>
     );
   }
@@ -252,7 +262,7 @@ function Summary({ entry, reading, onRetry, size, profile }: SummaryProps) {
                 className="size-2 rounded-full"
                 style={{ background: CATEGORY_STYLE[current!.category].accent }}
               />
-              {tip}
+              {t(tip)}
             </li>
           ))}
         </ul>
@@ -267,6 +277,7 @@ function Headline({
   size,
   profile,
 }: Omit<SummaryProps, "onRetry">) {
+  const { t, lang } = useI18n();
   const current = primaryReading(reading);
   if (!reading) {
     return (
@@ -279,59 +290,70 @@ function Headline({
   if (!current) {
     return (
       <p className="text-[15px] font-semibold">
-        Data kualiti udara belum tersedia untuk lokasi ini.
+        {t("Data kualiti udara belum tersedia untuk lokasi ini.")}
       </p>
     );
   }
 
   // Perubahan 3 jam dikira daripada model, jadi hanya dipaparkan bila nombor utama ialah anggaran model.
   const change =
-    current.source === "model" ? formatChange(reading.change3h) : null;
+    current.source === "model" ? formatChange(reading.change3h, lang) : null;
   const official = reading.official;
   const big = size === "desktop" ? "text-[112px]" : "text-[84px]";
   return (
     <>
       <div className="flex items-center gap-4">
         <h1
-          aria-label={`IPU ${current.ipu}, ${current.label}`}
+          aria-label={t("IPU {ipu}, {label}", {
+            ipu: current.ipu,
+            label: t(current.label),
+          })}
           className={`font-display ${big} leading-[0.9] font-bold tracking-[-0.04em] tabular-nums`}
         >
           {current.ipu}
         </h1>
         <div className="flex flex-col items-start gap-1.5">
-          <IpuPill category={current.category} label={current.label} />
+          <IpuPill category={current.category} label={t(current.label)} />
           {change && (
             <span className="text-muted text-[13px] font-semibold">
               {change}
             </span>
           )}
           {entry?.status === "loading" && (
-            <span className="text-muted text-xs">Mengemas kini…</span>
+            <span className="text-muted text-xs">{t("Mengemas kini…")}</span>
           )}
         </div>
       </div>
       {current.emergency && (
         <Notice tone="warning">
-          IPU melebihi 500: tahap Kecemasan. Ikut arahan Majlis Keselamatan
-          Negara.
+          {t(
+            "IPU melebihi 500: tahap Kecemasan. Ikut arahan Majlis Keselamatan Negara.",
+          )}
         </Notice>
       )}
       <p
         className={`font-display font-semibold ${size === "desktop" ? "text-[26px]" : "text-[22px]"} leading-snug`}
       >
-        {adviceFor(current.category, profile).headline}
+        {t(adviceFor(current.category, profile).headline)}
       </p>
       {official ? (
         <p className="text-muted text-xs font-medium">
-          Rasmi APIMS · Stesen {official.stationName} ({official.distanceKm} km)
+          {t("Rasmi APIMS · Stesen {station} ({km} km)", {
+            station: official.stationName,
+            km: official.distanceKm,
+          })}
           {official.pollutant ? ` · ${official.pollutant}` : ""} ·{" "}
-          {formatClock(official.time)}
-          {reading.current ? ` · Anggaran model: ${reading.current.ipu}` : ""}
+          {formatClock(official.time, lang)}
+          {reading.current
+            ? ` · ${t("Anggaran model: {ipu}", { ipu: reading.current.ipu })}`
+            : ""}
         </p>
       ) : (
         <p className="text-muted text-xs font-medium">
-          Dikemas kini {formatClock(current.time)} · Anggaran daripada PM2.5
-          (Open-Meteo); tiada stesen APIMS berdekatan
+          {t(
+            "Dikemas kini {time} · Anggaran daripada PM2.5 (Open-Meteo); tiada stesen APIMS berdekatan",
+            { time: formatClock(current.time, lang) },
+          )}
         </p>
       )}
     </>
@@ -349,10 +371,11 @@ function QuickAnswers({
 }: {
   category: Parameters<typeof adviceFor>[0];
 }) {
+  const { t } = useI18n();
   return (
     <section className="border-line bg-page rounded-3xl border-[1.5px] p-5.5">
       <h2 className="font-display text-[22px] font-bold">
-        Boleh keluar hari ini?
+        {t("Boleh keluar hari ini?")}
       </h2>
       <dl className="divide-line mt-2 divide-y">
         {adviceFor(category).quick.map((q) => (
@@ -360,11 +383,11 @@ function QuickAnswers({
             key={q.question}
             className="flex min-h-13 items-center justify-between gap-3"
           >
-            <dt className="text-[15px] font-medium">{q.question}</dt>
+            <dt className="text-[15px] font-medium">{t(q.question)}</dt>
             <dd
               className={`rounded-full px-3 py-1.5 text-[13px] font-bold whitespace-nowrap ${TONE_CLASS[q.tone]}`}
             >
-              {q.answer}
+              {t(q.answer)}
             </dd>
           </div>
         ))}
@@ -380,15 +403,18 @@ function AdviceCard({
   category: Parameters<typeof adviceFor>[0];
   profile: Prefs["profile"];
 }) {
-  const label = HEALTH_PROFILES.find((p) => p.key === profile)?.label ?? "Umum";
+  const { t } = useI18n();
+  const label = t(
+    HEALTH_PROFILES.find((p) => p.key === profile)?.label ?? "Umum",
+  );
   return (
     <section className="bg-surface rounded-3xl p-5.5">
       <div className="flex items-baseline justify-between gap-2">
         <h2 className="font-display text-[22px] font-bold">
-          Nasihat · {label}
+          {t("Nasihat · {profile}", { profile: label })}
         </h2>
         <Link href="/tetapan" className="text-sm font-semibold underline">
-          Tukar profil
+          {t("Tukar profil")}
         </Link>
       </div>
       <ul className="mt-3 flex flex-col gap-2.5">
@@ -414,7 +440,7 @@ function AdviceCard({
                 <polyline points="5 12 10 17 19 7" />
               </svg>
             </span>
-            {tip}
+            {t(tip)}
           </li>
         ))}
       </ul>
@@ -423,13 +449,16 @@ function AdviceCard({
 }
 
 function FavouriteStrip({ favourites }: { favourites: SavedLocation[] }) {
+  const { t } = useI18n();
   if (favourites.length === 0) return null;
   return (
     <section className="mx-auto mt-7 max-w-[1200px] px-10">
       <div className="flex items-baseline justify-between">
-        <h2 className="font-display text-[22px] font-bold">Lokasi kegemaran</h2>
+        <h2 className="font-display text-[22px] font-bold">
+          {t("Lokasi kegemaran")}
+        </h2>
         <Link href="/lokasi" className="text-sm font-semibold underline">
-          Urus lokasi
+          {t("Urus lokasi")}
         </Link>
       </div>
       <ul className="mt-3 flex flex-wrap gap-3">
@@ -442,11 +471,12 @@ function FavouriteStrip({ favourites }: { favourites: SavedLocation[] }) {
 }
 
 function FavouriteMini({ location }: { location: SavedLocation }) {
+  const { t } = useI18n();
   const { entry } = useReading(location);
   const current = primaryReading(entry?.reading);
   return (
     <li className="bg-surface min-h-24 flex-[1_1_170px] rounded-[18px] px-4 py-3.5">
-      <div className="text-muted text-xs font-semibold">{location.name}</div>
+      <div className="text-muted text-xs font-semibold">{t(location.name)}</div>
       {current ? (
         <div className="flex items-baseline justify-between gap-2">
           <span className="font-display text-[32px] font-bold">
@@ -454,7 +484,7 @@ function FavouriteMini({ location }: { location: SavedLocation }) {
           </span>
           <IpuPill
             category={current.category}
-            label={current.label}
+            label={t(current.label)}
             className="!px-2 !text-[11px]"
           />
         </div>

@@ -1,5 +1,6 @@
 import type { HealthProfile } from "./advice";
 import { isInMalaysia } from "./coords";
+import { isLang, type Lang } from "./i18n";
 
 /** Ambang IPU untuk amaran yang boleh dipilih. */
 export const ALERT_THRESHOLDS = [50, 100, 200] as const;
@@ -36,6 +37,7 @@ export type SubscribeInput = {
   subscription: PushSubscriptionData;
   threshold: AlertThreshold;
   locations: AlertLocation[];
+  lang: Lang;
 };
 
 const BASE64URL = /^[A-Za-z0-9_-]+={0,2}$/;
@@ -83,6 +85,7 @@ export function parseSubscribeBody(
     subscription?: Partial<PushSubscriptionData>;
     locations?: unknown;
     threshold?: unknown;
+    lang?: unknown;
   } | null;
   const sub = b?.subscription;
   const endpoint = sub?.endpoint;
@@ -128,6 +131,7 @@ export function parseSubscribeBody(
         ? threshold
         : DEFAULT_ALERT_THRESHOLD,
       locations,
+      lang: isLang(b?.lang) ? b.lang : "ms",
     },
   };
 }

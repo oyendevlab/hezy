@@ -3,12 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { NAV_ITEMS, isActive } from "@/lib/nav";
+import { useI18n } from "@/lib/use-i18n";
 import { NavIcon } from "./icons";
 import { Logo } from "./logo";
 
 /** Bar atas untuk tablet dan desktop (≥ 768 px). */
 export function TopNav() {
   const pathname = usePathname();
+  const { t } = useI18n();
 
   return (
     <header className="border-line hidden border-b md:block">
@@ -21,7 +23,7 @@ export function TopNav() {
           Hezy
         </Link>
         <nav
-          aria-label="Navigasi utama"
+          aria-label={t("Navigasi utama")}
           className="bg-surface ml-auto flex gap-1 rounded-full p-1"
         >
           {NAV_ITEMS.map((item) => {
@@ -35,7 +37,7 @@ export function TopNav() {
                   active ? "bg-ink text-page" : "text-ink hover:bg-line"
                 }`}
               >
-                {item.label}
+                {t(item.label)}
               </Link>
             );
           })}
@@ -48,10 +50,11 @@ export function TopNav() {
 /** Bar bawah untuk telefon (< 768 px). */
 export function BottomNav() {
   const pathname = usePathname();
+  const { t } = useI18n();
 
   return (
     <nav
-      aria-label="Navigasi utama"
+      aria-label={t("Navigasi utama")}
       className="border-line bg-page fixed inset-x-0 bottom-0 z-10 grid grid-cols-4 border-t px-3 pt-1.5 pb-[max(env(safe-area-inset-bottom),12px)] md:hidden"
     >
       {NAV_ITEMS.map((item) => {
@@ -66,7 +69,7 @@ export function BottomNav() {
             }`}
           >
             <NavIcon name={item.icon} />
-            {item.label}
+            {t(item.label)}
           </Link>
         );
       })}

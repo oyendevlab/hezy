@@ -1,6 +1,7 @@
 "use client";
 
 import { formatClock } from "@/lib/format";
+import { useI18n } from "@/lib/use-i18n";
 import type { ReadingEntry } from "@/lib/use-reading";
 import { Notice } from "./status";
 
@@ -12,21 +13,24 @@ export function ReadingNotices({
   entry: ReadingEntry;
   onRetry: () => void;
 }) {
+  const { t, lang } = useI18n();
   const reading = entry.reading;
   if (!reading) return null;
+  const error = t(entry.error ?? "");
   return (
     <>
       {entry.status === "error" && (
-        <Notice action={{ label: "Cuba lagi", onClick: onRetry }}>
-          {entry.error} Memaparkan bacaan
+        <Notice action={{ label: t("Cuba lagi"), onClick: onRetry }}>
           {reading.current
-            ? ` ${formatClock(reading.current.time)}`
-            : " terakhir"}
-          .
+            ? t("{error} Memaparkan bacaan {time}.", {
+                error,
+                time: formatClock(reading.current.time, lang),
+              })
+            : t("{error} Memaparkan bacaan terakhir.", { error })}
         </Notice>
       )}
       {entry.status !== "error" && reading.stale && (
-        <Notice tone="warning">Data mungkin tidak terkini.</Notice>
+        <Notice tone="warning">{t("Data mungkin tidak terkini.")}</Notice>
       )}
     </>
   );

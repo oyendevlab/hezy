@@ -1,29 +1,34 @@
-/** Format masa dan perubahan dalam Bahasa Melayu. Input masa: `YYYY-MM-DDTHH:mm` waktu Malaysia. */
+/** Format masa dan perubahan dalam BM (lalai) atau EN. Input masa: `YYYY-MM-DDTHH:mm` waktu Malaysia. */
+
+import type { Lang } from "./i18n";
 
 const hourOf = (time: string) => Number(time.slice(11, 13));
 
 type Period = "pagi" | "tengah hari" | "petang" | "malam" | "tengah malam";
 
-function period(hour: number): Period {
-  if (hour === 0) return "tengah malam";
-  if (hour < 12) return "pagi";
-  if (hour === 12) return "tengah hari";
-  if (hour < 19) return "petang";
-  return "malam";
+function period(hour: number, lang: Lang): string {
+  if (lang === "en") return hour < 12 ? "am" : "pm";
+  let p: Period;
+  if (hour === 0) p = "tengah malam";
+  else if (hour < 12) p = "pagi";
+  else if (hour === 12) p = "tengah hari";
+  else if (hour < 19) p = "petang";
+  else p = "malam";
+  return p;
 }
 
 const clockHour = (hour: number) => (hour % 12 === 0 ? 12 : hour % 12);
 
-/** "2026-10-11T22:00" → "10 malam" */
-export function formatHour(time: string): string {
+/** "2026-10-11T22:00" → "10 malam" / "10 pm" */
+export function formatHour(time: string, lang: Lang = "ms"): string {
   const hour = hourOf(time);
-  return `${clockHour(hour)} ${period(hour)}`;
+  return `${clockHour(hour)} ${period(hour, lang)}`;
 }
 
-/** "2026-10-11T22:00" → "10:00 malam" */
-export function formatClock(time: string): string {
+/** "2026-10-11T22:00" → "10:00 malam" / "10:00 pm" */
+export function formatClock(time: string, lang: Lang = "ms"): string {
   const hour = hourOf(time);
-  return `${clockHour(hour)}:${time.slice(14, 16)} ${period(hour)}`;
+  return `${clockHour(hour)}:${time.slice(14, 16)} ${period(hour, lang)}`;
 }
 
 /**
@@ -34,28 +39,45 @@ export function formatWindow(
   start: string,
   end: string,
   today: string,
+  lang: Lang = "ms",
 ): string {
   const a = hourOf(start);
   const b = hourOf(end);
   const range =
-    period(a) === period(b)
-      ? `${clockHour(a)} – ${clockHour(b)} ${period(b)}`
-      : `${formatHour(start)} – ${formatHour(end)}`;
-  return start.slice(0, 10) === today ? range : `Esok, ${range}`;
+    period(a, lang) === period(b, lang)
+      ? `${clockHour(a)} – ${clockHour(b)} ${period(b, lang)}`
+      : `${formatHour(start, lang)} – ${formatHour(end, lang)}`;
+  if (start.slice(0, 10) === today) return range;
+  return `${lang === "en" ? "Tomorrow" : "Esok"}, ${range}`;
 }
 
-export function formatChange(change: number | null): string | null {
+export function formatChange(
+  change: number | null,
+  lang: Lang = "ms",
+): string | null {
   if (change === null) return null;
+  if (lang === "en") {
+    if (change === 0) return "Steady over 3 hours";
+    return `${change > 0 ? "Up" : "Down"} ${Math.abs(change)} in 3 hours`;
+  }
   if (change === 0) return "Stabil dalam 3 jam";
   return `${change > 0 ? "Naik" : "Turun"} ${Math.abs(change)} dalam 3 jam`;
 }
 
-const DAY_NAMES = ["Ahd", "Isn", "Sel", "Rab", "Kha", "Jum", "Sab"];
+const DAY_NAMES: Record<Lang, string[]> = {
+  ms: ["Ahd", "Isn", "Sel", "Rab", "Kha", "Jum", "Sab"],
+  en: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+};
 
 /** "2026-10-13" → "Esok" (jika hari selepas `today`) atau "Sel 13/10". */
-export function formatDay(date: string, today: string): string {
+export function formatDay(
+  date: string,
+  today: string,
+  lang: Lang = "ms",
+): string {
   const d = new Date(`${date}T00:00:00Z`);
   const t = new Date(`${today}T00:00:00Z`);
-  if (d.getTime() - t.getTime() === 86_400_000) return "Esok";
-  return `${DAY_NAMES[d.getUTCDay()]} ${d.getUTCDate()}/${d.getUTCMonth() + 1}`;
+  if (d.getTime() - t.getTime() === 86_400_000)
+    return lang === "en" ? "Tomorrow" : "Esok";
+  return `${DAY_NAMES[lang][d.getUTCDay()]} ${d.getUTCDate()}/${d.getUTCMonth() + 1}`;
 }

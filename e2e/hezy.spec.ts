@@ -256,6 +256,46 @@ test.describe("status sekolah", () => {
   });
 });
 
+test.describe("Bahasa Inggeris", () => {
+  test("bahasa boleh ditukar ke English dan kekal selepas muat semula", async ({
+    page,
+  }) => {
+    await seedLocation(page);
+    await page.route("**/api/aqi?**", (route) =>
+      route.fulfill({ json: fakeReading(OFFICIAL_SHAH_ALAM) }),
+    );
+    await page.goto("/tetapan");
+    await page.getByText("English", { exact: true }).click();
+    await expect(page.getByRole("heading", { name: "Settings" })).toBeVisible();
+    await expect(page.locator("html")).toHaveAttribute("lang", "en");
+
+    await page.goto("/");
+    await expect(page.locator("html")).toHaveAttribute("lang", "en");
+    await expect(
+      page.getByRole("heading", { name: "API 172, Unhealthy" }),
+    ).toBeVisible();
+    await expect(
+      page
+        .getByText("Avoid exercising outdoors today.")
+        .filter({ visible: true }),
+    ).toBeVisible();
+    await expect(
+      page
+        .getByRole("navigation", { name: "Main navigation" })
+        .filter({ visible: true })
+        .getByRole("link", { name: "Trend" }),
+    ).toBeVisible();
+
+    await page.goto("/trend");
+    await expect(page.getByText("Today, hour by hour")).toBeVisible();
+
+    await page.goto("/tetapan");
+    await page.getByText("Bahasa Melayu", { exact: true }).click();
+    await expect(page.getByRole("heading", { name: "Tetapan" })).toBeVisible();
+    await expect(page.locator("html")).toHaveAttribute("lang", "ms");
+  });
+});
+
 test.describe("halaman negeri", () => {
   test("indeks menyenaraikan 16 negeri dan wilayah", async ({ page }) => {
     await page.goto("/negeri");

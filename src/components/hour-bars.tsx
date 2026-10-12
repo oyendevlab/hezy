@@ -1,8 +1,11 @@
+"use client";
+
 import { CATEGORY_STYLE } from "@/lib/category-style";
 import { formatHour } from "@/lib/format";
 import { ipuCategory } from "@/lib/ipu";
 import { displayIpu } from "@/lib/official";
 import type { HourPoint } from "@/lib/reading";
+import { useI18n } from "@/lib/use-i18n";
 
 const SCALE_MAX = 200;
 
@@ -17,6 +20,7 @@ export function HourBars({
   hours: HourPoint[];
   height?: number;
 }) {
+  const { t, lang } = useI18n();
   const points = hours.map((h) => ({ ...h, value: displayIpu(h) }));
   const known = points.filter(
     (p): p is (typeof points)[number] & { value: number } => p.value !== null,
@@ -33,8 +37,16 @@ export function HourBars({
   );
   const summary =
     peak && low
-      ? `Graf IPU hari ini. Tertinggi ${peak.value} pada ${formatHour(peak.time)}, terendah ${low.value} pada ${formatHour(low.time)}.`
-      : "Graf IPU hari ini. Data tidak mencukupi.";
+      ? t(
+          "Graf IPU hari ini. Tertinggi {max} pada {maxTime}, terendah {min} pada {minTime}.",
+          {
+            max: peak.value,
+            maxTime: formatHour(peak.time, lang),
+            min: low.value,
+            minTime: formatHour(low.time, lang),
+          },
+        )
+      : t("Graf IPU hari ini. Data tidak mencukupi.");
 
   return (
     <figure className="m-0">
@@ -56,7 +68,7 @@ export function HourBars({
               title={
                 p.value === null
                   ? undefined
-                  : `${formatHour(p.time)} · IPU ${p.value}${p.forecast ? " (ramalan)" : official ? " (rasmi)" : " (anggaran)"}`
+                  : `${formatHour(p.time, lang)} · ${t("IPU {threshold}", { threshold: p.value })} (${t(p.forecast ? "ramalan" : official ? "rasmi" : "anggaran")})`
               }
               className={`flex-1 rounded-[4px] ${p.forecast ? "opacity-45" : ""} ${
                 i === nowIndex ? "outline-ink outline-2 outline-offset-2" : ""
@@ -79,23 +91,27 @@ export function HourBars({
       </div>
       <figcaption>
         <div className="text-muted mt-1.5 flex justify-between text-[11px] font-semibold md:text-xs">
-          <span>12 pg</span>
-          <span>6 pg</span>
-          <span>12 tgh</span>
-          <span>6 ptg</span>
-          <span>11 mlm</span>
+          <span>{t("12 pg")}</span>
+          <span>{t("6 pg")}</span>
+          <span>{t("12 tgh")}</span>
+          <span>{t("6 ptg")}</span>
+          <span>{t("11 mlm")}</span>
         </div>
         <div className="text-muted mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs font-semibold">
           <span className="flex items-center gap-1.5">
             <span aria-hidden="true" className="bg-ink size-2.5 rounded-sm" />
-            Jam lepas: {officialPast ? "bacaan rasmi APIMS" : "anggaran model"}
+            {t(
+              officialPast
+                ? "Jam lepas: bacaan rasmi APIMS"
+                : "Jam lepas: anggaran model",
+            )}
           </span>
           <span className="flex items-center gap-1.5">
             <span
               aria-hidden="true"
               className="bg-ink size-2.5 rounded-sm opacity-45"
             />
-            Jam akan datang: ramalan model
+            {t("Jam akan datang: ramalan model")}
           </span>
         </div>
       </figcaption>

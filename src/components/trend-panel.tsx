@@ -1,8 +1,11 @@
+"use client";
+
 import { CATEGORY_STYLE } from "@/lib/category-style";
 import { formatDay, formatHour, formatWindow } from "@/lib/format";
 import { ipuCategory } from "@/lib/ipu";
 import { displayIpu } from "@/lib/official";
 import type { HourPoint, Reading } from "@/lib/reading";
+import { useI18n } from "@/lib/use-i18n";
 import { HourBars } from "./hour-bars";
 
 function average(hours: HourPoint[], from: number, to: number): number | null {
@@ -26,6 +29,7 @@ export function TrendPanel({
   reading: Reading;
   barHeight?: number;
 }) {
+  const { t, lang } = useI18n();
   const { today, bestWindow } = reading;
   // Bacaan lama dalam cache peranti mungkin belum mempunyai medan days.
   const days = reading.days ?? [];
@@ -33,9 +37,17 @@ export function TrendPanel({
   const lastPast = today.findLast((h) => !h.forecast);
   const bestCategory = bestWindow ? ipuCategory(bestWindow.averageIpu) : null;
   const blocks = [
-    { name: "Pagi", span: "6 pg – 12 tgh", value: average(today, 6, 12) },
-    { name: "Petang", span: "12 tgh – 6 ptg", value: average(today, 12, 18) },
-    { name: "Malam", span: "6 ptg – 12 mlm", value: average(today, 18, 24) },
+    { name: t("Pagi"), span: t("6 pg – 12 tgh"), value: average(today, 6, 12) },
+    {
+      name: t("Petang"),
+      span: t("12 tgh – 6 ptg"),
+      value: average(today, 12, 18),
+    },
+    {
+      name: t("Malam"),
+      span: t("6 ptg – 12 mlm"),
+      value: average(today, 18, 24),
+    },
   ];
 
   return (
@@ -45,13 +57,16 @@ export function TrendPanel({
           className={`rounded-[22px] p-4.5 ${CATEGORY_STYLE[bestCategory.key].tint}`}
         >
           <div className="text-[13px] font-bold tracking-wide">
-            MASA TERBAIK UNTUK KELUAR
+            {t("MASA TERBAIK UNTUK KELUAR")}
           </div>
           <div className="font-display mt-1 text-[34px] leading-tight font-bold">
-            {formatWindow(bestWindow.start, bestWindow.end, todayDate)}
+            {formatWindow(bestWindow.start, bestWindow.end, todayDate, lang)}
           </div>
           <div className="mt-1 text-sm font-semibold">
-            Anggaran IPU ~{bestWindow.averageIpu} · {bestCategory.label}
+            {t("Anggaran IPU ~{ipu} · {label}", {
+              ipu: bestWindow.averageIpu,
+              label: t(bestCategory.label),
+            })}
           </div>
         </div>
       )}
@@ -59,11 +74,13 @@ export function TrendPanel({
       <div>
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <h2 className="font-display text-xl font-bold">
-            Hari ini, jam demi jam
+            {t("Hari ini, jam demi jam")}
           </h2>
           {lastPast && (
             <span className="text-muted text-xs font-semibold">
-              Selepas {formatHour(lastPast.time)}: ramalan
+              {t("Selepas {time}: ramalan", {
+                time: formatHour(lastPast.time, lang),
+              })}
             </span>
           )}
         </div>
@@ -97,21 +114,23 @@ export function TrendPanel({
         <section aria-labelledby="ramalan-3-hari">
           <div className="flex items-baseline justify-between gap-2">
             <h2 id="ramalan-3-hari" className="font-display text-xl font-bold">
-              Ramalan 3 hari
+              {t("Ramalan 3 hari")}
             </h2>
-            <span className="text-muted text-xs font-semibold">Anggaran</span>
+            <span className="text-muted text-xs font-semibold">
+              {t("Anggaran")}
+            </span>
           </div>
           <ul className="mt-3 grid grid-cols-3 gap-2.5">
             {days.map((d) => (
               <li key={d.date} className="bg-surface rounded-2xl p-3">
                 <div className="text-sm font-bold">
-                  {formatDay(d.date, todayDate)}
+                  {formatDay(d.date, todayDate, lang)}
                 </div>
                 <div className="font-display text-2xl font-bold">
                   {d.averageIpu}
                 </div>
                 <div className="text-muted text-[11px] font-medium">
-                  Purata · maks {d.maxIpu}
+                  {t("Purata · maks {max}", { max: d.maxIpu })}
                 </div>
                 <div
                   className="mt-1 h-1.5 rounded-full"
@@ -127,9 +146,9 @@ export function TrendPanel({
       )}
 
       <p className="text-muted text-xs">
-        Jam lepas dan purata menggunakan bacaan rasmi APIMS stesen terdekat jika
-        ada. Ramalan dan masa terbaik menggunakan IPU sejam daripada PM2.5 model
-        (formula JAS).
+        {t(
+          "Jam lepas dan purata menggunakan bacaan rasmi APIMS stesen terdekat jika ada. Ramalan dan masa terbaik menggunakan IPU sejam daripada PM2.5 model (formula JAS).",
+        )}
       </p>
     </div>
   );

@@ -58,3 +58,22 @@ describe("formatDay", () => {
     expect(formatDay("2026-10-18", "2026-10-11")).toBe("Ahd 18/10");
   });
 });
+
+describe("format EN", () => {
+  it("menggunakan am/pm dan teks Inggeris", () => {
+    expect(formatHour("2026-10-11T22:00", "en")).toBe("10 pm");
+    expect(formatHour("2026-10-11T00:00", "en")).toBe("12 am");
+    expect(formatHour("2026-10-11T12:00", "en")).toBe("12 pm");
+    expect(formatClock("2026-10-11T09:30", "en")).toBe("9:30 am");
+    expect(
+      formatWindow("2026-10-12T05:00", "2026-10-12T07:00", "2026-10-11", "en"),
+    ).toBe("Tomorrow, 5 – 7 am");
+    expect(
+      formatWindow("2026-10-11T11:00", "2026-10-11T13:00", "2026-10-11", "en"),
+    ).toBe("11 am – 1 pm");
+    expect(formatChange(12, "en")).toBe("Up 12 in 3 hours");
+    expect(formatChange(0, "en")).toBe("Steady over 3 hours");
+    expect(formatDay("2026-10-14", "2026-10-11", "en")).toBe("Wed 14/10");
+    expect(formatDay("2026-10-12", "2026-10-11", "en")).toBe("Tomorrow");
+  });
+});

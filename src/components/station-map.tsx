@@ -16,6 +16,7 @@ import {
   usePrefs,
   type SavedLocation,
 } from "@/lib/prefs";
+import { useI18n } from "@/lib/use-i18n";
 import { IpuPill } from "./ipu-pill";
 import { Notice, Skeleton } from "./status";
 
@@ -43,6 +44,7 @@ const escapeHtml = (s: string) =>
 
 /** Peta stesen APIMS (Leaflet + OpenStreetMap) dengan pin berwarna ikut IPU rasmi. */
 export function StationMap() {
+  const { t, lang } = useI18n();
   const prefs = usePrefs();
   const router = useRouter();
   const container = useRef<HTMLDivElement>(null);
@@ -141,14 +143,14 @@ export function StationMap() {
     return (
       <Notice
         action={{
-          label: "Cuba lagi",
+          label: t("Cuba lagi"),
           onClick: () => {
             setState({ status: "loading" });
             setAttempt((n) => n + 1);
           },
         }}
       >
-        {state.message}
+        {t(state.message)}
       </Notice>
     );
   }
@@ -177,7 +179,7 @@ export function StationMap() {
         <div
           ref={container}
           role="region"
-          aria-label="Peta stesen APIMS"
+          aria-label={t("Peta stesen APIMS")}
           className="border-line h-[420px] overflow-hidden rounded-3xl border md:h-[520px]"
         />
       </div>
@@ -190,7 +192,7 @@ export function StationMap() {
           <div className="flex items-start justify-between gap-3">
             <div>
               <div className="text-muted text-xs font-semibold">
-                Stesen APIMS · {selected.state}
+                {t("Stesen APIMS · {state}", { state: selected.state })}
                 {current
                   ? ` · ${Math.round(distanceKm(current, selected))} km`
                   : ""}
@@ -200,7 +202,7 @@ export function StationMap() {
               </h2>
               {selected.time && (
                 <div className="text-muted text-xs">
-                  {formatClock(selected.time)}
+                  {formatClock(selected.time, lang)}
                   {selected.pollutant ? ` · ${selected.pollutant}` : ""}
                 </div>
               )}
@@ -212,12 +214,12 @@ export function StationMap() {
                 </span>
                 <IpuPill
                   category={ipuCategory(selected.ipu).key}
-                  label={ipuCategory(selected.ipu).label}
+                  label={t(ipuCategory(selected.ipu).label)}
                   className="!px-2 !text-[11px]"
                 />
               </div>
             ) : (
-              <span className="text-muted text-sm">Tiada bacaan</span>
+              <span className="text-muted text-sm">{t("Tiada bacaan")}</span>
             )}
           </div>
           <div className="grid grid-cols-2 gap-2">
@@ -226,7 +228,7 @@ export function StationMap() {
               onClick={() => choose(selected)}
               className="bg-ink text-page min-h-11 rounded-xl text-sm font-semibold"
             >
-              Jadikan lokasi semasa
+              {t("Jadikan lokasi semasa")}
             </button>
             {prefs &&
             !isFavourite(prefs, stationToLocation(selected).id) &&
@@ -240,13 +242,13 @@ export function StationMap() {
                 }
                 className="bg-surface min-h-11 rounded-xl text-sm font-semibold"
               >
-                Simpan
+                {t("Simpan")}
               </button>
             ) : (
               <span className="text-muted flex min-h-11 items-center justify-center text-sm">
                 {prefs && isFavourite(prefs, stationToLocation(selected).id)
-                  ? "Sudah disimpan"
-                  : "Kegemaran penuh"}
+                  ? t("Sudah disimpan")
+                  : t("Kegemaran penuh")}
               </span>
             )}
           </div>
@@ -259,7 +261,7 @@ export function StationMap() {
             id="stesen-terdekat"
             className="text-muted mb-2 text-sm font-bold tracking-wide"
           >
-            STESEN TERDEKAT
+            {t("STESEN TERDEKAT")}
           </h2>
           <ul className="divide-line bg-surface divide-y rounded-2xl">
             {nearby.map(({ station, km }) => (
@@ -285,7 +287,7 @@ export function StationMap() {
                   </span>
                   <IpuPill
                     category={ipuCategory(station.ipu!).key}
-                    label={ipuCategory(station.ipu!).label}
+                    label={t(ipuCategory(station.ipu!).label)}
                     className="!px-2 !text-[11px]"
                   />
                 </button>

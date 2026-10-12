@@ -114,6 +114,7 @@ describe("mergeRecord", () => {
       {
         subscription,
         threshold: 50,
+        lang: "en",
         locations: [
           { id: "area:shah-alam", name: "Shah Alam", lat: 3.07, lon: 101.52 },
           { id: "area:klang", name: "Klang", lat: 3.04, lon: 101.45 },
@@ -123,6 +124,7 @@ describe("mergeRecord", () => {
       NOW,
     );
     expect(merged.createdAt).toBe("2026-10-11T00:00:00Z");
+    expect(merged.lang).toBe("en");
     expect(merged.locations.map((l) => l.lastAlertKey)).toEqual([
       "tidak-sihat",
       null,

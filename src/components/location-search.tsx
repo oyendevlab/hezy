@@ -2,6 +2,7 @@
 
 import { useId, useState } from "react";
 import { searchAreas, type Area } from "@/lib/areas";
+import { useI18n } from "@/lib/use-i18n";
 
 type Result = Area & { state: string };
 
@@ -15,6 +16,7 @@ export function LocationSearch({
   renderAction?: (area: Result) => React.ReactNode;
   autoFocus?: boolean;
 }) {
+  const { t } = useI18n();
   const [query, setQuery] = useState("");
   const results = searchAreas(query);
   const inputId = useId();
@@ -22,7 +24,7 @@ export function LocationSearch({
   return (
     <div>
       <label htmlFor={inputId} className="sr-only">
-        Cari kawasan atau negeri
+        {t("Cari kawasan atau negeri")}
       </label>
       <div className="bg-surface flex min-h-12 items-center gap-2.5 rounded-2xl px-3.5">
         <svg
@@ -44,7 +46,7 @@ export function LocationSearch({
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Cari kawasan atau negeri"
+          placeholder={t("Cari kawasan atau negeri")}
           autoFocus={autoFocus}
           className="placeholder:text-muted min-w-0 flex-1 bg-transparent text-[15px] font-medium outline-none"
         />
@@ -53,7 +55,7 @@ export function LocationSearch({
         <ul className="divide-line border-line mt-2 divide-y overflow-hidden rounded-2xl border">
           {results.length === 0 && (
             <li className="text-muted px-4 py-3 text-sm">
-              Tiada kawasan sepadan.
+              {t("Tiada kawasan sepadan.")}
             </li>
           )}
           {results.map((area) => (
