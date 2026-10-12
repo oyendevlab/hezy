@@ -144,6 +144,6 @@ Setiap item dibuat dalam cabang `feat/*` dan PR sendiri; digabung selepas CI lul
 
 ### Selesai v0.3.0
 
-- [ ] 90+ ujian unit dan E2E lulus pada CI dan production; axe tanpa pelanggaran
-- [ ] Lighthouse ≥ 90 dikekalkan
-- [ ] Kemas kini `UJIAN-TELEFON.md`, versi 0.3.0, tag dan GitHub Release
+- [x] 90+ ujian unit dan E2E lulus pada CI dan production; axe tanpa pelanggaran (126 unit, 65 E2E)
+- [x] Lighthouse ≥ 90 dikekalkan (production 12 Okt 2026: telefon 99/100/100/100, desktop 100/100/100/100)
+- [x] Kemas kini `UJIAN-TELEFON.md`, versi 0.3.0, tag dan GitHub Release
