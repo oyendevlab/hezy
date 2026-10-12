@@ -333,15 +333,16 @@ Penambahbaikan sebelum ciri baharu. Cadangan v0.6.0 (notifikasi ujian, semalam v
 ### A. Pengepala tetap
 
 - [x] Cip lokasi dan butang kongsi (dan ⟳ di desktop) kekal di atas semasa menatal
-- [x] Latar kaca kabur yang semakin pekat bila menatal supaya kekal mudah dibaca di atas kad putih
-- [x] Bila nombor IPU besar keluar dari skrin, pengepala memaparkan versi ringkas: "Putrajaya · 152 Tidak Sihat"
+- [x] ~~Latar kaca kabur yang semakin pekat bila menatal~~ → dibuang atas maklum balas pengguna (jalur putih lutsinar); cip kekal terapung dengan latar pil sendiri (bayang halus di desktop)
+- [x] Bila nombor IPU besar keluar dari skrin, pengepala memaparkan versi ringkas dalam pil: "152 · Tidak Sihat"
 
-### B. Kad putih elastik (tarik untuk muat semula)
+### B. Langit tetap dan kad putih elastik (telefon)
 
-- [ ] Semasa ditarik: kad turun dengan rintangan seperti getah dan lebih banyak langit kelihatan
-- [ ] Semasa dilepaskan: kad melantun semula dengan sedikit lajakan (spring)
-- [ ] Penunjuk awan berputar di ruang langit di atas kad (menggantikan bulatan putih di Utama)
-- [ ] Tiada lantunan untuk `prefers-reduced-motion`; Trend dan Lokasi kekal dengan penunjuk sedia ada
+- [x] Langit tetap di belakang (`position: fixed`, ~560 px); hanya kad putih yang bergerak dan menutup langit bila ditatal; animasi diperlahankan bila langit hampir tertutup
+- [x] Tarik ke bawah di atas halaman: kad turun dengan rintangan seperti getah, dihadkan ~140 px
+- [x] Lepas sebelum ambang (~64 px): kad melantun semula (spring dengan sedikit lajakan); selepas ambang: kad berhenti ~64 px, awan berputar di ruang langit, dan melantun semula bila data siap
+- [x] Kad sentiasa memenuhi hingga bawah skrin (langit tidak kelihatan di bawah kad)
+- [x] Tiada lantunan untuk `prefers-reduced-motion`; desktop kekal panorama (⟳ dan kekunci R); Trend dan Lokasi kekal dengan penunjuk sedia ada
 
 ### C. Angin dan titik panas berikon
 
