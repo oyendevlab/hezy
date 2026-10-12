@@ -212,6 +212,11 @@ const EN: Record<string, string> = {
   "Sudah disimpan": "Already saved",
   "Kegemaran penuh": "Favourites full",
   "STESEN TERDEKAT": "NEAREST STATIONS",
+  "Sensor tambahan ({count}) · WAQI": "Extra sensors ({count}) · WAQI",
+  "Pin bergaris putus ialah sensor tambahan dalam skala AQI AS, yang biasanya lebih tinggi daripada IPU bagi udara yang sama. Nombor utama dan amaran Hezy kekal menggunakan IPU rasmi.":
+    "Dashed pins are extra sensors on the US AQI scale, which is usually higher than the API for the same air. Hezy's main number and alerts still use the official API.",
+  "Sensor tambahan WAQI · skala AQI AS": "WAQI extra sensor · US AQI scale",
+  "AQI AS": "US AQI",
 
   // Tetapan
   "PROFIL KESIHATAN": "HEALTH PROFILE",

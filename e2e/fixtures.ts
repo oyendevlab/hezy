@@ -118,6 +118,30 @@ export async function seedLocation(
   );
 }
 
+/** Respons WAQI `map/bounds`: satu sensor komuniti + satu pendua stesen APIMS Klang. */
+export const FAKE_WAQI = () => {
+  const time = new Date(Date.now() - 30 * 60_000).toISOString();
+  return {
+    status: "ok",
+    data: [
+      {
+        lat: 3.08,
+        lon: 101.6,
+        uid: -2871205,
+        aqi: "88",
+        station: { name: "Jalan Anggun 3P", time },
+      },
+      {
+        lat: 3.01,
+        lon: 101.408,
+        uid: 2619,
+        aqi: "120",
+        station: { name: "Klang, Selangor, Malaysia", time },
+      },
+    ],
+  };
+};
+
 export const test = base.extend<{ mockApi: void }>({
   mockApi: [
     async ({ page }, use) => {
@@ -126,6 +150,9 @@ export const test = base.extend<{ mockApi: void }>({
       );
       await page.route("**/api/stations", (route) =>
         route.fulfill({ json: { source: "apims", stations: FAKE_STATIONS } }),
+      );
+      await page.route("https://api.waqi.info/**", (route) =>
+        route.fulfill({ json: FAKE_WAQI() }),
       );
       // Jubin peta luaran tidak diperlukan dalam ujian.
       await page.route("https://tile.openstreetmap.org/**", (route) =>

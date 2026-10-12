@@ -17,6 +17,12 @@ import {
   type SavedLocation,
 } from "@/lib/prefs";
 import { useI18n } from "@/lib/use-i18n";
+import {
+  WAQI_TOKEN,
+  parseSensors,
+  waqiBoundsUrl,
+  type Sensor,
+} from "@/lib/waqi";
 import { IpuPill } from "./ipu-pill";
 import { Notice, Skeleton } from "./status";
 
@@ -52,6 +58,10 @@ export function StationMap() {
   const [state, setState] = useState<LoadState>({ status: "loading" });
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
+  const [mapReady, setMapReady] = useState(false);
+  const [sensors, setSensors] = useState<Sensor[] | null>(null);
+  const [showSensors, setShowSensors] = useState(true);
+  const [sensorUid, setSensorUid] = useState<number | null>(null);
 
   // Ambil senarai stesen.
   useEffect(() => {
@@ -125,19 +135,76 @@ export function StationMap() {
             iconAnchor: [22, 30],
           }),
         });
-        marker.on("click", () => setSelectedId(station.id));
+        marker.on("click", () => {
+          setSelectedId(station.id);
+          setSensorUid(null);
+        });
         marker.addTo(m);
       }
+      setMapReady(true);
     });
 
     return () => {
       disposed = true;
+      setMapReady(false);
       map.current?.remove();
       map.current = null;
     };
     // Peta hanya dibina semula bila senarai stesen berubah.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stations]);
+
+  // Sensor tambahan WAQI: diambil terus dari pelayar selepas stesen APIMS (untuk buang pendua).
+  useEffect(() => {
+    if (!stations || !WAQI_TOKEN) return;
+    let cancelled = false;
+    fetch(waqiBoundsUrl(WAQI_TOKEN))
+      .then((res) => res.json())
+      .then((body: unknown) => {
+        if (!cancelled) setSensors(parseSensors(body, stations, new Date()));
+      })
+      .catch(() => {
+        // Lapisan tambahan sahaja: peta APIMS kekal berfungsi.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [stations]);
+
+  useEffect(() => {
+    const m = map.current;
+    if (!mapReady || !m || !showSensors || !sensors?.length) return;
+    let layer: import("leaflet").LayerGroup | null = null;
+    let disposed = false;
+    const attribution =
+      'Sensor tambahan: <a href="https://waqi.info/">WAQI</a> &amp; EPA asal';
+    void import("leaflet").then((L) => {
+      if (disposed) return;
+      layer = L.layerGroup(
+        sensors.map((sensor) =>
+          L.marker([sensor.lat, sensor.lon], {
+            title: `${sensor.name}, AQI ${sensor.aqi}`,
+            keyboard: true,
+            icon: L.divIcon({
+              className: "hezy-pin-wrap",
+              html: `<span class="hezy-pin hezy-pin-sensor">${sensor.aqi}</span>`,
+              iconSize: [44, 30],
+              iconAnchor: [22, 30],
+            }),
+          }).on("click", () => {
+            setSensorUid(sensor.uid);
+            setSelectedId(null);
+          }),
+        ),
+      ).addTo(m);
+      m.attributionControl.addAttribution(attribution);
+    });
+    return () => {
+      disposed = true;
+      layer?.remove();
+      m.attributionControl.removeAttribution(attribution);
+    };
+  }, [mapReady, sensors, showSensors]);
 
   if (state.status === "error") {
     return (
@@ -156,6 +223,8 @@ export function StationMap() {
   }
 
   const selected = stations?.find((s) => s.id === selectedId) ?? null;
+  const sensor =
+    (showSensors && sensors?.find((s) => s.uid === sensorUid)) || null;
   const nearby =
     stations && current
       ? stations
@@ -183,6 +252,69 @@ export function StationMap() {
           className="border-line h-[420px] overflow-hidden rounded-3xl border md:h-[520px]"
         />
       </div>
+
+      {WAQI_TOKEN && sensors !== null && sensors.length > 0 && (
+        <div className="flex flex-col gap-1.5">
+          <label className="bg-surface flex min-h-12 cursor-pointer items-center gap-3 rounded-2xl px-3.5 text-sm font-semibold">
+            <input
+              type="checkbox"
+              checked={showSensors}
+              onChange={(e) => setShowSensors(e.target.checked)}
+              className="size-4 accent-[#1c1a16]"
+            />
+            <span
+              aria-hidden="true"
+              className="hezy-pin hezy-pin-sensor !h-6 !min-w-9 !text-xs"
+            >
+              AQI
+            </span>
+            {t("Sensor tambahan ({count}) · WAQI", { count: sensors.length })}
+          </label>
+          <p className="text-muted text-xs">
+            {t(
+              "Pin bergaris putus ialah sensor tambahan dalam skala AQI AS, yang biasanya lebih tinggi daripada IPU bagi udara yang sama. Nombor utama dan amaran Hezy kekal menggunakan IPU rasmi.",
+            )}
+          </p>
+        </div>
+      )}
+
+      {sensor && (
+        <section
+          aria-live="polite"
+          className="border-line flex items-start justify-between gap-3 rounded-[22px] border border-dashed p-4"
+        >
+          <div className="min-w-0">
+            <div className="text-muted text-xs font-semibold">
+              {t("Sensor tambahan WAQI · skala AQI AS")}
+              {current
+                ? ` · ${Math.round(distanceKm(current, sensor))} km`
+                : ""}
+            </div>
+            <h2 className="font-display text-[22px] font-bold break-words">
+              {sensor.name}
+            </h2>
+            <div className="text-muted text-xs">
+              {formatClock(sensor.time, lang)} ·{" "}
+              <a
+                href="https://waqi.info/"
+                target="_blank"
+                rel="noreferrer"
+                className="underline"
+              >
+                World Air Quality Index Project
+              </a>
+            </div>
+          </div>
+          <div className="flex flex-col items-end">
+            <span className="font-display text-[34px] leading-none font-bold">
+              {sensor.aqi}
+            </span>
+            <span className="text-muted text-xs font-semibold">
+              {t("AQI AS")}
+            </span>
+          </div>
+        </section>
+      )}
 
       {selected && (
         <section

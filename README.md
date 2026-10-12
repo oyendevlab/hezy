@@ -27,3 +27,9 @@ npm run dev
 ## Aliran kerja
 
 Buat cabang `feat/*`, buka PR ke `main`. Vercel akan menghasilkan preview untuk setiap PR, dan gabungan ke `main` akan deploy ke production.
+
+## Sumber data
+
+- **APIMS (Jabatan Alam Sekitar)**: IPU rasmi stesen, nombor utama dan amaran
+- **Open-Meteo (CAMS)**: anggaran dan ramalan PM2.5 bila tiada stesen APIMS berdekatan
+- **[World Air Quality Index Project](https://waqi.info/)**: lapisan sensor tambahan pada peta (skala AQI AS), diambil terus dari pelayar. Perlukan `NEXT_PUBLIC_WAQI_TOKEN`; tanpa token, lapisan ini tidak dipaparkan

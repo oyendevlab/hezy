@@ -35,5 +35,7 @@ export default defineConfig({
         url: `http://localhost:${PORT}`,
         reuseExistingServer: !process.env.CI,
         timeout: 240_000,
+        // Token palsu: permintaan WAQI ditiru dalam e2e/fixtures.ts.
+        env: { NEXT_PUBLIC_WAQI_TOKEN: "e2e" },
       },
 });
