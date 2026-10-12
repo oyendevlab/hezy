@@ -16,7 +16,7 @@ import {
   parseFirmsCsv,
   type HotspotCell,
 } from "./hotspots";
-import { parseWind, windUrl, type WindSeries } from "./wind";
+import { parseWeather, weatherUrl, type WeatherSeries } from "./weather";
 import { readAccuracy, readIndex } from "./history-store";
 import {
   airQualityUrl,
@@ -103,17 +103,20 @@ export async function getAccuracyIndex(): Promise<AccuracyIndex | null> {
   return readAccuracy();
 }
 
-/** Angin 850 hPa untuk koordinat (dibundarkan 0.1° supaya cache dikongsi), dicache 30 minit. */
-export async function getWind(lat: number, lon: number): Promise<WindSeries> {
+/** Cuaca dan angin 850 hPa untuk koordinat (dibundarkan 0.1° supaya cache dikongsi), dicache 30 minit. */
+export async function getWeather(
+  lat: number,
+  lon: number,
+): Promise<WeatherSeries> {
   "use cache";
   cacheLife({ stale: 600, revalidate: 1800, expire: 7200 });
   const res = await fetch(
-    windUrl(Math.round(lat * 10) / 10, Math.round(lon * 10) / 10),
+    weatherUrl(Math.round(lat * 10) / 10, Math.round(lon * 10) / 10),
     { signal: AbortSignal.timeout(8000) },
   );
   if (!res.ok)
-    throw new Error(`Open-Meteo (angin) memulangkan status ${res.status}`);
-  return parseWind(await res.json());
+    throw new Error(`Open-Meteo (cuaca) memulangkan status ${res.status}`);
+  return parseWeather(await res.json());
 }
 
 /** Titik panas FIRMS (2 hari, VIIRS SNPP + NOAA-20) digabung ikut sel ~5 km, dicache 1 jam. */

@@ -6,8 +6,6 @@
 
 import type { Coords } from "./coords";
 
-const ENDPOINT = "https://api.open-meteo.com/v1/forecast";
-
 export type WindSeries = {
   times: string[];
   speed: (number | null)[];
@@ -40,50 +38,6 @@ export type Wind = {
 
 /** Angin bawah 3 km/j dianggap tenang: arah tidak bermakna. */
 export const CALM_KMH = 3;
-
-export function windUrl(lat: number, lon: number): string {
-  const params = new URLSearchParams({
-    latitude: String(lat),
-    longitude: String(lon),
-    hourly: "wind_speed_850hPa,wind_direction_850hPa",
-    wind_speed_unit: "kmh",
-    timezone: "Asia/Kuala_Lumpur",
-    past_days: "1",
-    forecast_days: "2",
-  });
-  return `${ENDPOINT}?${params}`;
-}
-
-export function parseWind(json: unknown): WindSeries {
-  const h = (
-    json as {
-      hourly?: {
-        time?: unknown;
-        wind_speed_850hPa?: unknown;
-        wind_direction_850hPa?: unknown;
-      };
-    } | null
-  )?.hourly;
-  const times = h?.time;
-  const speed = h?.wind_speed_850hPa;
-  const direction = h?.wind_direction_850hPa;
-  if (
-    !Array.isArray(times) ||
-    !Array.isArray(speed) ||
-    !Array.isArray(direction) ||
-    speed.length !== times.length ||
-    direction.length !== times.length
-  ) {
-    throw new Error("Respons angin Open-Meteo tidak dijangka.");
-  }
-  const num = (v: unknown) =>
-    typeof v === "number" && Number.isFinite(v) ? v : null;
-  return {
-    times: times.map(String),
-    speed: speed.map(num),
-    direction: direction.map(num),
-  };
-}
 
 const rad = (d: number) => (d * Math.PI) / 180;
 const deg = (r: number) => (r * 180) / Math.PI;

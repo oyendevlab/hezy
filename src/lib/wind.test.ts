@@ -1,12 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  compassOf,
-  destination,
-  meanWind,
-  parseWind,
-  smokeSource,
-  windAt,
-} from "./wind";
+import { compassOf, destination, meanWind, smokeSource, windAt } from "./wind";
 
 const SHAH_ALAM = { lat: 3.07, lon: 101.52 };
 const KUCHING = { lat: 1.55, lon: 110.36 };
@@ -63,13 +56,11 @@ describe("smokeSource", () => {
 });
 
 describe("windAt", () => {
-  const series = parseWind({
-    hourly: {
-      time: ["2026-10-12T11:00", "2026-10-12T12:00", "2026-10-12T13:00"],
-      wind_speed_850hPa: [12, 14, 13],
-      wind_direction_850hPa: [140, 145, 150],
-    },
-  });
+  const series = {
+    times: ["2026-10-12T11:00", "2026-10-12T12:00", "2026-10-12T13:00"],
+    speed: [12, 14, 13],
+    direction: [140, 145, 150],
+  };
 
   it("angin semasa dengan arah dan sumber", () => {
     expect(windAt(series, SHAH_ALAM, "2026-10-12T12:00")).toEqual({
@@ -83,9 +74,5 @@ describe("windAt", () => {
   it("angin tenang tiada sumber", () => {
     const calm = { ...series, speed: [1, 2, 1] };
     expect(windAt(calm, SHAH_ALAM, "2026-10-12T12:00")?.source).toBeNull();
-  });
-
-  it("menolak respons rosak", () => {
-    expect(() => parseWind({ hourly: { time: ["a"] } })).toThrow();
   });
 });

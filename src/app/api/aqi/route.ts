@@ -5,9 +5,10 @@ import {
   getAccuracyIndex,
   getHotspots,
   getStations,
-  getWind,
+  getWeather,
 } from "@/lib/data";
 import { upwindHotspots } from "@/lib/hotspots";
+import { currentWeather } from "@/lib/weather";
 import { CALM_KMH, windAt } from "@/lib/wind";
 import { loadReading } from "@/lib/load-reading";
 import { localHourKey } from "@/lib/reading";
@@ -25,7 +26,7 @@ export async function GET(request: Request) {
 
   const [stations, wind] = await Promise.allSettled([
     getStations(),
-    getWind(coords.lat, coords.lon),
+    getWeather(coords.lat, coords.lon),
   ]);
   if (stations.status === "rejected") {
     // APIMS hanya tambahan; anggaran model masih dipulangkan.
@@ -52,7 +53,13 @@ export async function GET(request: Request) {
 
   reading.wind =
     wind.status === "fulfilled" ? windAt(wind.value, coords, nowKey) : null;
-  if (wind.status === "rejected") console.error("[api/aqi] angin", wind.reason);
+  if (wind.status === "fulfilled") {
+    reading.weather = currentWeather(wind.value, nowKey);
+    reading.weatherDays = wind.value.days.filter(
+      (d) => d.date > nowKey.slice(0, 10),
+    );
+  }
+  if (wind.status === "rejected") console.error("[api/aqi] cuaca", wind.reason);
   if (reading.wind && reading.wind.speed >= CALM_KMH) {
     try {
       const { cells } = await getHotspots();

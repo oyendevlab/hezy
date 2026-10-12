@@ -187,6 +187,36 @@ test.describe("aliran utama", () => {
   });
 });
 
+test.describe("langit hidup", () => {
+  test("Utama memaparkan langit WebGL (tiada menara KL)", async ({ page }) => {
+    await seedLocation(page);
+    await page.route("**/api/aqi?**", (route) =>
+      route.fulfill({
+        json: {
+          ...fakeReading(OFFICIAL_SHAH_ALAM),
+          weather: {
+            time: "2026-10-11T10:00",
+            temperature: 31,
+            code: 2,
+            cloud: 40,
+            visibilityKm: 6,
+            isDay: true,
+            precipitation: 0,
+            sunrise: "2026-10-11T06:57",
+            sunset: "2026-10-11T19:01",
+          },
+        },
+      }),
+    );
+    await page.goto("/");
+    const sky = page.getByTestId("sky").filter({ visible: true });
+    await expect(sky).toHaveCount(1);
+    // Satu konteks WebGL sahaja (telefon atau panorama desktop).
+    await expect(page.getByTestId("sky")).toHaveCount(1);
+    await expect(sky).toHaveClass(/opacity-100/);
+  });
+});
+
 test.describe("pintasan dan lencana", () => {
   test("pintasan #peta membuka tab Peta terus", async ({ page }) => {
     await seedLocation(page);
