@@ -392,9 +392,9 @@ Fokus: UI/UX yang lebih licin dan seperti aplikasi asli. Termasuk pembetulan ked
 
 ### Lokasi dan peta
 
-10. **Kad stesen terpilih sebagai bottom sheet di atas peta** (seperti Google Maps)
-11. **Suis lapisan sebagai cip terapung di atas peta** (Titik panas, Sensor, Angin)
-12. **Himpunan pin (clustering)** bila dizum keluar
+10. **Kad stesen terpilih sebagai bottom sheet di atas peta** (seperti Google Maps) — ✅ siap
+11. **Suis lapisan sebagai cip terapung di atas peta** (Titik panas, Sensor, Angin) — ✅ siap
+12. **Himpunan pin (clustering)** bila dizum keluar — ✅ siap
 13. **Kegemaran**: leret untuk buang, seret untuk susun semula (dengan alternatif butang untuk papan kekunci)
 
 ### Amaran

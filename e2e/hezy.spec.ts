@@ -569,9 +569,7 @@ test.describe("arah angin", () => {
     await expect(
       page.getByText("Angin dari barat daya (arah Sumatera) · 18 km/j"),
     ).toBeVisible();
-    const fires = page.getByRole("checkbox", {
-      name: /Titik panas \(3\) · NASA FIRMS, 2 hari/,
-    });
+    const fires = page.getByRole("checkbox", { name: "Titik panas (3)" });
     await expect(fires).toBeChecked();
     await expect(page.locator(".leaflet-container canvas")).toHaveCount(1);
     await fires.uncheck();
@@ -1013,18 +1011,65 @@ test.describe("peta stesen", () => {
     ).toBeVisible();
   });
 
+  test("pin dihimpunkan bila dizum keluar; klik himpunan menzum masuk", async ({
+    page,
+  }) => {
+    // Tanpa lokasi semasa: peta bermula pada zum 5 (seluruh Malaysia).
+    await page.goto("/lokasi");
+    await page.getByRole("tab", { name: "Peta" }).click();
+    // Zum 5: ketiga-tiga stesen satu himpunan, berwarna ikut IPU terburuk.
+    const all = page.locator('[title="3 stesen, IPU tertinggi 146"]');
+    await expect(all).toBeVisible();
+    await expect(page.locator('[title="Klang, IPU 146"]')).toHaveCount(0);
+    await all.click();
+    // Dizum masuk ke kawasan himpunan: setiap stesen kini pin sendiri.
+    await expect(page.locator('[title="Seri Manjung, IPU N/A"]')).toBeVisible();
+    await expect(page.locator('[title="Klang, IPU 146"]')).toBeVisible();
+    await expect(page.locator('[title^="3 stesen"]')).toHaveCount(0);
+    await expect(page.locator('[title="Shah Alam, IPU 72"]')).toBeVisible();
+  });
+
+  test("kad stesen sebagai helaian di atas peta; Tutup dan Escape", async ({
+    page,
+  }) => {
+    await seedLocation(page);
+    await page.goto("/lokasi");
+    await page.getByRole("tab", { name: "Peta" }).click();
+    const pin = page.locator('[title="Klang, IPU 146"]');
+    await pin.click();
+    const sheet = page.getByTestId("map-sheet");
+    await expect(sheet.getByRole("heading", { name: "Klang" })).toBeVisible();
+    // Helaian berada di dalam kawasan peta (bukan di bawahnya).
+    const mapBox = (await page
+      .getByRole("region", { name: "Peta stesen APIMS" })
+      .boundingBox())!;
+    // Tunggu animasi naik selesai sebelum mengukur.
+    await expect
+      .poll(async () => {
+        const box = (await sheet.boundingBox())!;
+        return box.y + box.height;
+      })
+      .toBeLessThanOrEqual(mapBox.y + mapBox.height + 1);
+    await page.keyboard.press("Escape");
+    await expect(sheet).toHaveCount(0);
+    await pin.click();
+    await page.getByRole("button", { name: "Tutup" }).click();
+    await expect(sheet).toHaveCount(0);
+  });
+
   test("lapisan sensor tambahan WAQI tanpa pendua APIMS", async ({ page }) => {
     await seedLocation(page);
     await page.goto("/lokasi");
     await page.getByRole("tab", { name: "Peta" }).click();
-    const toggle = page.getByRole("checkbox", {
-      name: /Sensor tambahan \(1\) · WAQI/,
-    });
+    const toggle = page.getByRole("checkbox", { name: "Sensor (1)" });
     await expect(toggle).toBeChecked();
     const pin = page.locator('[title="Jalan Anggun 3P, AQI 88"]');
     await expect(pin).toBeVisible();
     await expect(page.locator('[title^="Klang, Selangor"]')).toHaveCount(0);
 
+    // Sensor ini ~5 km dari stesen Shah Alam (pin rasmi di atas): zum masuk dahulu.
+    await page.getByRole("button", { name: "Zoom in" }).click();
+    await page.getByRole("button", { name: "Zoom in" }).click();
     await pin.click();
     await expect(
       page.getByRole("heading", { name: "Jalan Anggun 3P" }),

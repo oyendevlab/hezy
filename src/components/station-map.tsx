@@ -1,11 +1,18 @@
 "use client";
 
 import "leaflet/dist/leaflet.css";
+import type * as Leaflet from "leaflet";
 import type { Map as LeafletMap } from "leaflet";
+import { Broadcast, Fire, Wind, X } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { distanceKm, type Station } from "@/lib/apims";
 import { CATEGORY_STYLE } from "@/lib/category-style";
+import {
+  CLUSTER_RADIUS_PX,
+  CLUSTER_UNTIL_ZOOM,
+  clusterPoints,
+} from "@/lib/cluster";
 import { formatClock } from "@/lib/format";
 import { ipuCategory } from "@/lib/ipu";
 import {
@@ -52,6 +59,105 @@ function stationToLocation(station: Station): SavedLocation {
 const escapeHtml = (s: string) =>
   s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 
+type Translate = (
+  text: string,
+  vars?: Record<string, string | number>,
+) => string;
+
+/**
+ * Lapisan pin yang dihimpunkan bila dizum keluar (zum < CLUSTER_UNTIL_ZOOM). Himpunan berwarna
+ * ikut nilai terburuk dan dizum masuk bila diklik.
+ */
+function pinLayer<T extends { lat: number; lon: number }>(
+  L: typeof Leaflet,
+  m: LeafletMap,
+  zoom: number,
+  items: T[],
+  options: {
+    weight: (item: T) => number;
+    pin: (item: T) => Leaflet.Marker;
+    cluster: (items: T[]) => { html: string; title: string };
+    /** Lapisan rasmi (APIMS) di atas sensor tambahan. */
+    zIndexOffset?: number;
+  },
+): Leaflet.LayerGroup {
+  const groups =
+    zoom >= CLUSTER_UNTIL_ZOOM
+      ? items.map((item) => [item])
+      : clusterPoints(
+          items.map((item) => {
+            const point = m.project([item.lat, item.lon], zoom);
+            return { x: point.x, y: point.y, item };
+          }),
+          CLUSTER_RADIUS_PX,
+          options.weight,
+        ).map((c) => c.items);
+  return L.layerGroup(
+    groups.map((group) => {
+      if (group.length === 1) return options.pin(group[0]);
+      const lat = group.reduce((a, i) => a + i.lat, 0) / group.length;
+      const lon = group.reduce((a, i) => a + i.lon, 0) / group.length;
+      const { html, title } = options.cluster(group);
+      return L.marker([lat, lon], {
+        title,
+        keyboard: true,
+        zIndexOffset: options.zIndexOffset ?? 0,
+        icon: L.divIcon({
+          className: "hezy-pin-wrap",
+          html,
+          iconSize: [40, 40],
+          iconAnchor: [20, 20],
+        }),
+      }).on("click", () =>
+        m.fitBounds(
+          L.latLngBounds(group.map((i) => [i.lat, i.lon] as [number, number])),
+          { padding: [48, 48], maxZoom: CLUSTER_UNTIL_ZOOM + 1 },
+        ),
+      );
+    }),
+  );
+}
+
+function stationPin(
+  L: typeof Leaflet,
+  station: Station,
+  onSelect: (station: Station) => void,
+) {
+  const key = station.ipu === null ? null : ipuCategory(station.ipu).key;
+  const tintClass = key ? CATEGORY_STYLE[key].tint : "hezy-pin-na";
+  const border = key ? CATEGORY_STYLE[key].accent : "#9a9a9a";
+  const label = station.ipu === null ? "N/A" : String(station.ipu);
+  return L.marker([station.lat, station.lon], {
+    title: `${station.name}, IPU ${label}`,
+    keyboard: true,
+    // Stesen rasmi sentiasa di atas pin sensor tambahan.
+    zIndexOffset: 1000,
+    icon: L.divIcon({
+      className: "hezy-pin-wrap",
+      html: `<span class="hezy-pin ${tintClass}" style="border-color:${border}">${escapeHtml(label)}</span>`,
+      iconSize: [44, 30],
+      iconAnchor: [22, 30],
+    }),
+  }).on("click", () => onSelect(station));
+}
+
+function stationCluster(t: Translate, group: Station[]) {
+  const worst = Math.max(...group.map((s) => s.ipu ?? -1));
+  const key = worst < 0 ? null : ipuCategory(worst).key;
+  const tintClass = key ? CATEGORY_STYLE[key].tint : "hezy-pin-na";
+  const border = key ? CATEGORY_STYLE[key].accent : "#9a9a9a";
+  return {
+    html: `<span class="hezy-cluster ${tintClass}" style="border-color:${border}">${group.length}</span>`,
+    title:
+      worst < 0
+        ? t("{count} stesen", { count: group.length })
+        : t("{count} stesen, IPU tertinggi {ipu}", {
+            count: group.length,
+            ipu: worst,
+          }),
+  };
+}
+
 /** Peta stesen APIMS (Leaflet + OpenStreetMap) dengan pin berwarna ikut IPU rasmi. */
 export function StationMap() {
   const { t, lang } = useI18n();
@@ -68,6 +174,8 @@ export function StationMap() {
   const [sensorUid, setSensorUid] = useState<number | null>(null);
   const [fires, setFires] = useState<HotspotCell[] | null>(null);
   const [showFires, setShowFires] = useState(true);
+  const [showWind, setShowWind] = useState(true);
+  const [zoom, setZoom] = useState<number | null>(null);
 
   // Ambil senarai stesen.
   useEffect(() => {
@@ -118,9 +226,13 @@ export function StationMap() {
       const m = L.map(container.current, {
         center,
         zoom: current ? 9 : 5,
-        zoomControl: true,
+        zoomControl: false,
       });
       map.current = m;
+      // Cip lapisan di kiri atas; kawalan zum ke kanan atas.
+      L.control.zoom({ position: "topright" }).addTo(m);
+      setZoom(m.getZoom());
+      m.on("zoomend", () => setZoom(m.getZoom()));
 
       L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 18,
@@ -128,27 +240,6 @@ export function StationMap() {
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · Data IPU: APIMS (JAS)',
       }).addTo(m);
 
-      for (const station of stations) {
-        const key = station.ipu === null ? null : ipuCategory(station.ipu).key;
-        const tintClass = key ? CATEGORY_STYLE[key].tint : "hezy-pin-na";
-        const border = key ? CATEGORY_STYLE[key].accent : "#9a9a9a";
-        const label = station.ipu === null ? "N/A" : String(station.ipu);
-        const marker = L.marker([station.lat, station.lon], {
-          title: `${station.name}, IPU ${label}`,
-          keyboard: true,
-          icon: L.divIcon({
-            className: "hezy-pin-wrap",
-            html: `<span class="hezy-pin ${tintClass}" style="border-color:${border}">${escapeHtml(label)}</span>`,
-            iconSize: [44, 30],
-            iconAnchor: [22, 30],
-          }),
-        });
-        marker.on("click", () => {
-          setSelectedId(station.id);
-          setSensorUid(null);
-        });
-        marker.addTo(m);
-      }
       setMapReady(true);
     });
 
@@ -161,6 +252,43 @@ export function StationMap() {
     // Peta hanya dibina semula bila senarai stesen berubah.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stations]);
+
+  // Pin stesen APIMS: dibina semula bila zum berubah (himpunan).
+  useEffect(() => {
+    const m = map.current;
+    if (!mapReady || !m || !stations || zoom === null) return;
+    let layer: Leaflet.LayerGroup | null = null;
+    let disposed = false;
+    void import("leaflet").then((L) => {
+      if (disposed) return;
+      layer = pinLayer(L, m, zoom, stations, {
+        weight: (s) => s.ipu ?? -1,
+        pin: (s) =>
+          stationPin(L, s, (station) => {
+            setSelectedId(station.id);
+            setSensorUid(null);
+          }),
+        cluster: (group) => stationCluster(t, group),
+        zIndexOffset: 1000,
+      }).addTo(m);
+    });
+    return () => {
+      disposed = true;
+      layer?.remove();
+    };
+  }, [mapReady, stations, zoom, t]);
+
+  // Escape menutup kad stesen/sensor.
+  useEffect(() => {
+    if (!selectedId && sensorUid === null) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      setSelectedId(null);
+      setSensorUid(null);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [selectedId, sensorUid]);
 
   // Sensor tambahan WAQI: diambil terus dari pelayar selepas stesen APIMS (untuk buang pendua).
   useEffect(() => {
@@ -230,15 +358,17 @@ export function StationMap() {
 
   useEffect(() => {
     const m = map.current;
-    if (!mapReady || !m || !showSensors || !sensors?.length) return;
-    let layer: import("leaflet").LayerGroup | null = null;
+    if (!mapReady || !m || !showSensors || !sensors?.length || zoom === null)
+      return;
+    let layer: Leaflet.LayerGroup | null = null;
     let disposed = false;
     const attribution =
       'Sensor tambahan: <a href="https://waqi.info/">WAQI</a> &amp; EPA asal';
     void import("leaflet").then((L) => {
       if (disposed) return;
-      layer = L.layerGroup(
-        sensors.map((sensor) =>
+      layer = pinLayer(L, m, zoom, sensors, {
+        weight: (s) => s.aqi,
+        pin: (sensor) =>
           L.marker([sensor.lat, sensor.lon], {
             title: `${sensor.name}, AQI ${sensor.aqi}`,
             keyboard: true,
@@ -252,8 +382,14 @@ export function StationMap() {
             setSensorUid(sensor.uid);
             setSelectedId(null);
           }),
-        ),
-      ).addTo(m);
+        cluster: (group) => ({
+          html: `<span class="hezy-cluster hezy-pin-sensor">${group.length}</span>`,
+          title: t("{count} sensor, AQI tertinggi {aqi}", {
+            count: group.length,
+            aqi: Math.max(...group.map((s) => s.aqi)),
+          }),
+        }),
+      }).addTo(m);
       m.attributionControl.addAttribution(attribution);
     });
     return () => {
@@ -261,7 +397,7 @@ export function StationMap() {
       layer?.remove();
       m.attributionControl.removeAttribution(attribution);
     };
-  }, [mapReady, sensors, showSensors]);
+  }, [mapReady, sensors, showSensors, zoom, t]);
 
   if (state.status === "error") {
     return (
@@ -296,6 +432,18 @@ export function StationMap() {
     router.push("/");
   };
 
+  const chip = (on: boolean) =>
+    `relative flex min-h-9 cursor-pointer items-center gap-1.5 rounded-full px-3 text-xs font-bold shadow-[0_1px_6px_rgb(0_0_0/0.18)] has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 ${
+      on ? "bg-ink text-page" : "bg-page/95 text-ink"
+    }`;
+  const closeSheet = () => {
+    setSelectedId(null);
+    setSensorUid(null);
+  };
+  const firesOn = showFires && fires !== null && fires.length > 0;
+  const sensorsOn =
+    showSensors && !!WAQI_TOKEN && sensors !== null && sensors.length > 0;
+
   return (
     <div className="flex flex-col gap-4">
       <div className="relative">
@@ -308,171 +456,216 @@ export function StationMap() {
           aria-label={t("Peta stesen APIMS")}
           className="border-line h-[420px] overflow-hidden rounded-3xl border md:h-[520px]"
         />
-        {wind && (
-          <div className="bg-page/90 pointer-events-none absolute top-3 right-3 z-[500] flex max-w-[70%] items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold shadow">
-            {wind.speed >= CALM_KMH && <WindArrow direction={wind.direction} />}
-            {windText(wind)}
+
+        {/* Cip lapisan terapung (kiri atas). */}
+        <div className="pointer-events-none absolute top-3 left-3 z-[500] flex max-w-[calc(100%-64px)] flex-col items-start gap-2">
+          <fieldset className="pointer-events-auto flex flex-wrap gap-2">
+            <legend className="sr-only">{t("Lapisan peta")}</legend>
+            {fires !== null && fires.length > 0 && (
+              <label className={chip(showFires)}>
+                <input
+                  type="checkbox"
+                  checked={showFires}
+                  onChange={(e) => setShowFires(e.target.checked)}
+                  className="absolute inset-0 cursor-pointer appearance-none rounded-full"
+                />
+                <Fire
+                  aria-hidden="true"
+                  size={15}
+                  weight="fill"
+                  className={showFires ? "" : "text-[#d23b3b]"}
+                />
+                {t("Titik panas ({count})", {
+                  count: fires.length.toLocaleString("ms-MY"),
+                })}
+              </label>
+            )}
+            {WAQI_TOKEN && sensors !== null && sensors.length > 0 && (
+              <label className={chip(showSensors)}>
+                <input
+                  type="checkbox"
+                  checked={showSensors}
+                  onChange={(e) => setShowSensors(e.target.checked)}
+                  className="absolute inset-0 cursor-pointer appearance-none rounded-full"
+                />
+                <Broadcast aria-hidden="true" size={15} weight="bold" />
+                {t("Sensor ({count})", { count: sensors.length })}
+              </label>
+            )}
+            {wind && (
+              <label className={chip(showWind)}>
+                <input
+                  type="checkbox"
+                  checked={showWind}
+                  onChange={(e) => setShowWind(e.target.checked)}
+                  className="absolute inset-0 cursor-pointer appearance-none rounded-full"
+                />
+                <Wind aria-hidden="true" size={15} weight="bold" />
+                {t("Angin")}
+              </label>
+            )}
+          </fieldset>
+          {wind && showWind && (
+            <div className="bg-page/90 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold shadow">
+              {wind.speed >= CALM_KMH && (
+                <WindArrow direction={wind.direction} />
+              )}
+              {windText(wind)}
+            </div>
+          )}
+        </div>
+
+        {/* Kad stesen/sensor terpilih sebagai helaian di atas peta. */}
+        {(sensor || selected) && (
+          <div className="pointer-events-none absolute inset-x-2 bottom-2 z-[1100] md:right-auto md:bottom-3 md:left-3 md:w-[380px]">
+            <div className="relative">
+              {sensor && (
+                <section
+                  aria-live="polite"
+                  data-testid="map-sheet"
+                  className="bg-page sheet-up border-line pointer-events-auto flex items-start justify-between gap-3 rounded-[22px] border border-dashed p-4 pr-14 shadow-[0_8px_28px_rgb(0_0_0/0.22)]"
+                >
+                  <div className="min-w-0">
+                    <div className="text-muted text-xs font-semibold">
+                      {t("Sensor tambahan WAQI · skala AQI AS")}
+                      {current
+                        ? ` · ${Math.round(distanceKm(current, sensor))} km`
+                        : ""}
+                    </div>
+                    <h2 className="font-display text-[22px] font-bold break-words">
+                      {sensor.name}
+                    </h2>
+                    <div className="text-muted text-xs">
+                      {formatClock(sensor.time, lang)} ·{" "}
+                      <a
+                        href="https://waqi.info/"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="underline"
+                      >
+                        World Air Quality Index Project
+                      </a>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end">
+                    <span className="font-display text-[34px] leading-none font-bold">
+                      {sensor.aqi}
+                    </span>
+                    <span className="text-muted text-xs font-semibold">
+                      {t("AQI AS")}
+                    </span>
+                  </div>
+                </section>
+              )}
+              {selected && (
+                <section
+                  aria-live="polite"
+                  data-testid="map-sheet"
+                  className="bg-page sheet-up pointer-events-auto flex flex-col gap-3 rounded-[22px] p-4 shadow-[0_8px_28px_rgb(0_0_0/0.22)]"
+                >
+                  <div className="flex items-start justify-between gap-3 pr-11">
+                    <div>
+                      <div className="text-muted text-xs font-semibold">
+                        {t("Stesen APIMS · {state}", { state: selected.state })}
+                        {current
+                          ? ` · ${Math.round(distanceKm(current, selected))} km`
+                          : ""}
+                      </div>
+                      <h2 className="font-display text-[22px] font-bold">
+                        {selected.name}
+                      </h2>
+                      {selected.time && (
+                        <div className="text-muted text-xs">
+                          {formatClock(selected.time, lang)}
+                          {selected.pollutant ? ` · ${selected.pollutant}` : ""}
+                        </div>
+                      )}
+                    </div>
+                    {selected.ipu !== null ? (
+                      <div className="flex flex-col items-end gap-1">
+                        <span className="font-display text-[34px] leading-none font-bold">
+                          {selected.ipu}
+                        </span>
+                        <IpuPill
+                          category={ipuCategory(selected.ipu).key}
+                          label={t(ipuCategory(selected.ipu).label)}
+                          className="!px-2 !text-[11px]"
+                        />
+                      </div>
+                    ) : (
+                      <span className="text-muted text-sm">
+                        {t("Tiada bacaan")}
+                      </span>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => choose(selected)}
+                      className="bg-ink text-page min-h-11 rounded-xl text-sm font-semibold"
+                    >
+                      {t("Jadikan lokasi semasa")}
+                    </button>
+                    {prefs &&
+                    !isFavourite(prefs, stationToLocation(selected).id) &&
+                    prefs.favourites.length < MAX_FAVOURITES ? (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          updatePrefs((p) =>
+                            addFavourite(p, stationToLocation(selected)),
+                          )
+                        }
+                        className="bg-surface min-h-11 rounded-xl text-sm font-semibold"
+                      >
+                        {t("Simpan")}
+                      </button>
+                    ) : (
+                      <span className="text-muted flex min-h-11 items-center justify-center text-sm">
+                        {prefs &&
+                        isFavourite(prefs, stationToLocation(selected).id)
+                          ? t("Sudah disimpan")
+                          : t("Kegemaran penuh")}
+                      </span>
+                    )}
+                  </div>
+                </section>
+              )}
+              <button
+                type="button"
+                onClick={closeSheet}
+                aria-label={t("Tutup")}
+                className="bg-surface hover:bg-line pointer-events-auto absolute top-3 right-3 flex size-9 items-center justify-center rounded-full"
+              >
+                <X aria-hidden="true" size={16} weight="bold" />
+              </button>
+            </div>
           </div>
         )}
       </div>
 
-      {fires !== null && fires.length > 0 && (
-        <div className="flex flex-col gap-1.5">
-          <label className="bg-surface flex min-h-12 cursor-pointer items-center gap-3 rounded-2xl px-3.5 text-sm font-semibold">
-            <input
-              type="checkbox"
-              checked={showFires}
-              onChange={(e) => setShowFires(e.target.checked)}
-              className="size-4 accent-[#1c1a16]"
-            />
-            <span
-              aria-hidden="true"
-              className="size-3 shrink-0 rounded-full bg-[#d23b3b]"
-            />
-            {t("Titik panas ({count}) · NASA FIRMS, 2 hari", {
-              count: fires.length.toLocaleString("ms-MY"),
-            })}
-          </label>
-          <p className="text-muted text-xs">
-            {t(
-              "Titik merah ialah kebakaran yang dikesan satelit VIIRS dalam 2 hari terakhir (setiap titik ≈ kawasan 5 km). Satelit tidak mengesan semua kebakaran, terutama api gambut di bawah permukaan atau di bawah awan.",
-            )}
-          </p>
-        </div>
-      )}
-
-      {WAQI_TOKEN && sensors !== null && sensors.length > 0 && (
-        <div className="flex flex-col gap-1.5">
-          <label className="bg-surface flex min-h-12 cursor-pointer items-center gap-3 rounded-2xl px-3.5 text-sm font-semibold">
-            <input
-              type="checkbox"
-              checked={showSensors}
-              onChange={(e) => setShowSensors(e.target.checked)}
-              className="size-4 accent-[#1c1a16]"
-            />
-            <span
-              aria-hidden="true"
-              className="hezy-pin hezy-pin-sensor !h-6 !min-w-9 !text-xs"
-            >
-              AQI
-            </span>
-            {t("Sensor tambahan ({count}) · WAQI", { count: sensors.length })}
-          </label>
-          <p className="text-muted text-xs">
-            {t(
-              "Pin bergaris putus ialah sensor tambahan dalam skala AQI AS, yang biasanya lebih tinggi daripada IPU bagi udara yang sama. Nombor utama dan amaran Hezy kekal menggunakan IPU rasmi.",
-            )}
-          </p>
-        </div>
-      )}
-
-      {sensor && (
-        <section
-          aria-live="polite"
-          className="border-line flex items-start justify-between gap-3 rounded-[22px] border border-dashed p-4"
-        >
-          <div className="min-w-0">
-            <div className="text-muted text-xs font-semibold">
-              {t("Sensor tambahan WAQI · skala AQI AS")}
-              {current
-                ? ` · ${Math.round(distanceKm(current, sensor))} km`
-                : ""}
-            </div>
-            <h2 className="font-display text-[22px] font-bold break-words">
-              {sensor.name}
-            </h2>
-            <div className="text-muted text-xs">
-              {formatClock(sensor.time, lang)} ·{" "}
-              <a
-                href="https://waqi.info/"
-                target="_blank"
-                rel="noreferrer"
-                className="underline"
-              >
-                World Air Quality Index Project
-              </a>
-            </div>
-          </div>
-          <div className="flex flex-col items-end">
-            <span className="font-display text-[34px] leading-none font-bold">
-              {sensor.aqi}
-            </span>
-            <span className="text-muted text-xs font-semibold">
-              {t("AQI AS")}
-            </span>
-          </div>
-        </section>
-      )}
-
-      {selected && (
-        <section
-          aria-live="polite"
-          className="border-line flex flex-col gap-3 rounded-[22px] border p-4"
-        >
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <div className="text-muted text-xs font-semibold">
-                {t("Stesen APIMS · {state}", { state: selected.state })}
-                {current
-                  ? ` · ${Math.round(distanceKm(current, selected))} km`
-                  : ""}
-              </div>
-              <h2 className="font-display text-[22px] font-bold">
-                {selected.name}
-              </h2>
-              {selected.time && (
-                <div className="text-muted text-xs">
-                  {formatClock(selected.time, lang)}
-                  {selected.pollutant ? ` · ${selected.pollutant}` : ""}
-                </div>
+      {(firesOn || sensorsOn) && (
+        <div className="text-muted flex flex-col gap-1.5 text-xs">
+          {firesOn && (
+            <p>
+              <span
+                aria-hidden="true"
+                className="mr-1.5 inline-block size-2.5 rounded-full bg-[#d23b3b]"
+              />
+              {t(
+                "Titik merah ialah kebakaran yang dikesan satelit VIIRS dalam 2 hari terakhir (setiap titik ≈ kawasan 5 km). Satelit tidak mengesan semua kebakaran, terutama api gambut di bawah permukaan atau di bawah awan.",
+              )}{" "}
+              {t("Sumber: NASA FIRMS.")}
+            </p>
+          )}
+          {sensorsOn && (
+            <p>
+              {t(
+                "Pin bergaris putus ialah sensor tambahan dalam skala AQI AS, yang biasanya lebih tinggi daripada IPU bagi udara yang sama. Nombor utama dan amaran Hezy kekal menggunakan IPU rasmi.",
               )}
-            </div>
-            {selected.ipu !== null ? (
-              <div className="flex flex-col items-end gap-1">
-                <span className="font-display text-[34px] leading-none font-bold">
-                  {selected.ipu}
-                </span>
-                <IpuPill
-                  category={ipuCategory(selected.ipu).key}
-                  label={t(ipuCategory(selected.ipu).label)}
-                  className="!px-2 !text-[11px]"
-                />
-              </div>
-            ) : (
-              <span className="text-muted text-sm">{t("Tiada bacaan")}</span>
-            )}
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={() => choose(selected)}
-              className="bg-ink text-page min-h-11 rounded-xl text-sm font-semibold"
-            >
-              {t("Jadikan lokasi semasa")}
-            </button>
-            {prefs &&
-            !isFavourite(prefs, stationToLocation(selected).id) &&
-            prefs.favourites.length < MAX_FAVOURITES ? (
-              <button
-                type="button"
-                onClick={() =>
-                  updatePrefs((p) =>
-                    addFavourite(p, stationToLocation(selected)),
-                  )
-                }
-                className="bg-surface min-h-11 rounded-xl text-sm font-semibold"
-              >
-                {t("Simpan")}
-              </button>
-            ) : (
-              <span className="text-muted flex min-h-11 items-center justify-center text-sm">
-                {prefs && isFavourite(prefs, stationToLocation(selected).id)
-                  ? t("Sudah disimpan")
-                  : t("Kegemaran penuh")}
-              </span>
-            )}
-          </div>
-        </section>
+            </p>
+          )}
+        </div>
       )}
 
       {nearby.length > 0 && (

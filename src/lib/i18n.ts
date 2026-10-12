@@ -145,6 +145,15 @@ const EN: Record<string, string> = {
   "(semasa)": "(current)",
   "Tiada lokasi kegemaran lagi.": "No favourite locations yet.",
   "Tambah bandar": "Add a city",
+  // Peta: cip lapisan dan himpunan pin
+  "Lapisan peta": "Map layers",
+  "Titik panas ({count})": "Hotspots ({count})",
+  "Sensor ({count})": "Sensors ({count})",
+  "Sumber: NASA FIRMS.": "Source: NASA FIRMS.",
+  "{count} stesen": "{count} stations",
+  "{count} stesen, IPU tertinggi {ipu}": "{count} stations, highest API {ipu}",
+  "{count} sensor, AQI tertinggi {aqi}": "{count} sensors, highest AQI {aqi}",
+  Angin: "Wind",
   // Pengenalan pengguna baharu
   Langkau: "Skip",
   Kembali: "Back",
