@@ -193,12 +193,12 @@ Urutan: v0.3.1 → A, B, C → 15 → 3 → 4 → D → 1, 2 → 5, 6, 7 → 11�
 
 Masalah: model CAMS (Open-Meteo) kurang menganggar jerebu. Contoh Putrajaya 12 Okt 2026, 12 tgh: APIMS 153, model 70.
 
-- [ ] Nisbah pembetulan = bacaan APIMS ÷ model bagi 6 jam terakhir (dalam unit PM2.5), had 0.5–4×
-- [ ] Ramalan didarab nisbah itu, berkurang beransur-ansur ke 1× dalam 24–48 jam; graf berterusan dari jam semasa
-- [ ] 3–6 jam pertama mengikut aliran bacaan rasmi terkini
-- [ ] Masa terbaik, ramalan 3 hari dan amaran ramalan menggunakan nilai yang dibetulkan; label "ramalan dibetulkan dengan bacaan APIMS"
+- [x] Pembetulan = median (PM2.5 setara APIMS − PM2.5 model) bagi 6 jam terakhir (offset tambah; nisbah darab diuji tetapi membesarkan lonjakan model hingga IPU ~288), had ±200 µg/m³
+- [x] Offset berkurang secara linear ke 0 dalam 48 jam; jam semasa yang belum diterbitkan APIMS turut dibetulkan; graf berterusan
+- [x] 6 jam pertama dicampur dengan bacaan rasmi terakhir (persistence)
+- [x] Masa terbaik, purata pagi/petang/malam dan ramalan 3 hari menggunakan nilai yang dibetulkan; label "Ramalan dibetulkan" (amaran ramalan item 7 akan menggunakannya)
 - [ ] Kemudian: nisbah per stesen dan ikut waktu daripada sejarah item 3
-- [ ] Ujian unit dengan data sebenar 12 Okt sebagai kes ujian
+- [x] Ujian unit dengan data sebenar 12 Okt sebagai kes ujian
 
 ### Data dan ramalan
 

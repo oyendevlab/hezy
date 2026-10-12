@@ -1,4 +1,10 @@
+import type { HourlyOfficial } from "./apims";
 import { findBestWindow, type BestWindow } from "./best-time";
+import {
+  applyCorrection,
+  computeCorrection,
+  type Correction,
+} from "./forecast-correction";
 import {
   ipuCategory,
   isEmergency,
@@ -32,6 +38,8 @@ export type HourPoint = {
   /** IPU rasmi APIMS bagi jam ini (stesen terdekat); hanya untuk jam yang sudah lepas. */
   officialIpu?: number | null;
   forecast: boolean;
+  /** Nilai model jam ini dibetulkan dengan bacaan rasmi APIMS (jam selepas bacaan rasmi terakhir). */
+  corrected?: boolean;
 };
 
 export type Reading = {
@@ -58,6 +66,8 @@ export type Reading = {
   stale: boolean;
   /** Bacaan rasmi APIMS stesen terdekat (≤ 30 km, ≤ 3 jam); diisi oleh route API. */
   official: OfficialReading | null;
+  /** Pembetulan ramalan dengan bacaan APIMS; tiada dalam bacaan lama tersimpan. */
+  correction?: Correction | null;
 };
 
 /** Jam semasa dalam waktu Malaysia, format `YYYY-MM-DDTHH:00` (sama seperti Open-Meteo). */
@@ -78,8 +88,25 @@ export function localHourKey(now: Date): string {
 const hoursBetween = (a: string, b: string) =>
   (Date.parse(`${b}:00Z`) - Date.parse(`${a}:00Z`)) / 3_600_000;
 
-export function buildReading(series: AirQualitySeries, now: Date): Reading {
+/**
+ * Bina bacaan daripada siri model. `history` (IPU rasmi sejam stesen terdekat) digunakan
+ * untuk membetulkan ramalan; tanpanya ramalan ialah model mentah.
+ */
+export function buildReading(
+  series: AirQualitySeries,
+  now: Date,
+  history: readonly HourlyOfficial[] = [],
+): Reading {
   const nowKey = localHourKey(now);
+  const correction = computeCorrection(
+    series.times,
+    series.pm25,
+    history,
+    nowKey,
+  );
+  const forecastPm25 = correction
+    ? applyCorrection(series.times, series.pm25, correction)
+    : series.pm25;
   const averages = rolling24hAverage(series.pm25);
   const ipus = averages.map((avg) => (avg === null ? null : pm25ToIpu(avg)));
 
@@ -108,12 +135,16 @@ export function buildReading(series: AirQualitySeries, now: Date): Reading {
   }
 
   const hours: HourPoint[] = series.times.map((time, i) => {
-    const pm25 = series.pm25[i];
+    const forecast = time > nowKey;
+    // Jam selepas bacaan rasmi terakhir (termasuk jam semasa yang belum diterbitkan APIMS).
+    const corrected = correction !== null && time > correction.anchorTime;
+    const pm25 = corrected ? forecastPm25[i] : series.pm25[i];
     return {
       time,
       ipu: ipus[i],
       hourlyIpu: pm25 === null ? null : pm25ToIpu(pm25),
-      forecast: time > nowKey,
+      forecast,
+      ...(corrected ? { corrected: true } : {}),
     };
   });
 
@@ -151,6 +182,7 @@ export function buildReading(series: AirQualitySeries, now: Date): Reading {
     bestWindow,
     days,
     official: null,
+    correction,
     stale:
       current === null ||
       hoursBetween(current.time, nowKey) > STALE_AFTER_HOURS,

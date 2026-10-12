@@ -1,3 +1,4 @@
+import type { HourlyOfficial } from "@/lib/apims";
 import { parseCoords } from "@/lib/coords";
 import { getAirQuality, getStateHistory, getStations } from "@/lib/data";
 import { officialFor, withOfficialHistory } from "@/lib/official";
@@ -33,25 +34,29 @@ export async function GET(request: Request) {
 
   const now = new Date();
   const nowKey = localHourKey(now);
-  let reading = buildReading(series.value, now);
-  reading.official =
+  const official =
     stations.status === "fulfilled"
       ? officialFor(stations.value, coords, nowKey)
       : null;
 
-  // Sejarah rasmi setiap jam bagi stesen terdekat (untuk graf hari ini).
+  // Sejarah rasmi setiap jam bagi stesen terdekat: graf hari ini dan pembetulan ramalan.
   const station =
-    reading.official && stations.status === "fulfilled"
-      ? stations.value.find((s) => s.id === reading.official!.stationId)
+    official && stations.status === "fulfilled"
+      ? stations.value.find((s) => s.id === official.stationId)
       : undefined;
+  let history: HourlyOfficial[] = [];
   if (station?.stateId != null) {
     try {
-      const history = await getStateHistory(station.stateId, nowKey);
-      reading = withOfficialHistory(reading, history[station.id] ?? []);
+      history =
+        (await getStateHistory(station.stateId, nowKey))[station.id] ?? [];
     } catch (error) {
       console.error("[api/aqi] APIMS sejarah", error);
     }
   }
+
+  let reading = buildReading(series.value, now, history);
+  reading.official = official;
+  reading = withOfficialHistory(reading, history);
 
   return Response.json(reading, {
     headers: {

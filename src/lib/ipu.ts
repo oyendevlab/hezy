@@ -28,6 +28,19 @@ export function pm25ToIpu(pm25: number): number {
   return Math.max(0, Math.round(band.ipu(pm25)));
 }
 
+/** IPU sub-indeks PM2.5 → kepekatan PM2.5 setara (songsangan {@link pm25ToIpu}). */
+export function ipuToPm25(ipu: number): number {
+  if (!Number.isFinite(ipu) || ipu < 0) {
+    throw new RangeError(`IPU tidak sah: ${ipu}`);
+  }
+  if (ipu <= 50) return ipu / 4.1667;
+  if (ipu <= 100) return (Math.max(ipu, 51) - 51) / 0.7741 + 12.1;
+  if (ipu <= 200) return (Math.max(ipu, 101) - 101) / 1.3218 + 75.5;
+  if (ipu <= 300) return (Math.max(ipu, 201) - 201) / 0.9909 + 150.5;
+  if (ipu <= 400) return (Math.max(ipu, 301) - 301) / 0.9909 + 250.5;
+  return (ipu - 401) / 0.6604 + 350.5;
+}
+
 /** Bilangan minimum bacaan sejam dalam tetingkap 24 jam (75%) untuk purata yang sah. */
 export const MIN_HOURS_FOR_AVERAGE = 18;
 
