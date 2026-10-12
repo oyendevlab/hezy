@@ -900,6 +900,49 @@ test.describe("susun dan leret kegemaran", () => {
   });
 });
 
+test.describe("mod gelap", () => {
+  test.use({ colorScheme: "dark" });
+
+  test("komponen baharu v0.6.0 tanpa pelanggaran axe dalam mod gelap", async ({
+    page,
+  }) => {
+    const check = async () => {
+      const results = await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+        .analyze();
+      expect(results.violations.map((v) => v.id)).toEqual([]);
+    };
+    // Pengenalan (pengguna baharu).
+    await page.goto("/");
+    await expect(page.getByTestId("onboarding")).toBeVisible();
+    await check();
+
+    await seedLocation(page, [SHAH_ALAM, KLANG]);
+    await page.evaluate(() => localStorage.clear());
+    await page.goto("/");
+    await expect(
+      page.locator("h1[data-ipu-headline]").filter({ visible: true }),
+    ).toBeVisible();
+    await page
+      .getByTestId("location-menu-button")
+      .filter({ visible: true })
+      .click();
+    await expect(page.getByTestId("location-menu")).toBeVisible();
+    await check();
+    await page.keyboard.press("Escape");
+
+    await page.goto("/lokasi");
+    await page.locator('[title="Klang, IPU 146"]').click();
+    await expect(page.getByTestId("map-sheet")).toBeVisible();
+    await check();
+
+    await page.goto("/lokasi#senarai");
+    await page.reload();
+    await expect(page.getByTestId("favourite-list")).toBeVisible();
+    await check();
+  });
+});
+
 test.describe("navigasi", () => {
   test("ikon Phosphor terisi untuk halaman aktif sahaja", async ({ page }) => {
     await seedLocation(page);
