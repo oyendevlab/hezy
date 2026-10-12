@@ -104,9 +104,9 @@ Setiap item dibuat dalam cabang `feat/*` dan PR sendiri; digabung selepas CI lul
 
 ### 4. Amaran untuk lokasi kegemaran
 
-- [ ] Suis amaran pada setiap kad kegemaran (maks 5 lokasi + lokasi semasa)
-- [ ] Rekod langganan menyimpan senarai lokasi; semakan setiap jam menyemak semua lokasi
-- [ ] Notifikasi menyebut nama lokasi; amaran berasingan bagi setiap lokasi
+- [x] Suis amaran pada setiap kad kegemaran (maks 5 lokasi + lokasi semasa)
+- [x] Rekod langganan menyimpan senarai lokasi; semakan setiap jam menyemak semua lokasi
+- [x] Notifikasi menyebut nama lokasi; amaran berasingan bagi setiap lokasi
 
 ### 5. Pemantauan sumber data
 

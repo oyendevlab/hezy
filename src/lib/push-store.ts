@@ -1,15 +1,8 @@
 import { createHash } from "node:crypto";
 import { del, get, list, put } from "@vercel/blob";
-import type { AlertState } from "./alert";
-import type { SubscribeInput } from "./push-validate";
+import { normalizeRecord, type PushRecord } from "./push-record";
 
-/** Rekod langganan dalam Vercel Blob (private): satu fail JSON bagi setiap peranti. */
-/** `threshold` mungkin tiada pada rekod sebelum v0.3.0. */
-export type PushRecord = Omit<SubscribeInput, "threshold"> &
-  Partial<Pick<SubscribeInput, "threshold">> &
-  AlertState & {
-    createdAt: string;
-  };
+export type { PushRecord };
 
 const PREFIX = "push/";
 
@@ -31,7 +24,7 @@ export async function readRecord(endpoint: string): Promise<PushRecord | null> {
     useCache: false,
   });
   if (!result || result.statusCode !== 200) return null;
-  return (await new Response(result.stream).json()) as PushRecord;
+  return normalizeRecord(await new Response(result.stream).json());
 }
 
 export async function deleteRecord(endpoint: string) {
@@ -50,7 +43,7 @@ export async function allRecords(): Promise<PushRecord[]> {
         useCache: false,
       });
       if (result?.statusCode === 200)
-        records.push((await new Response(result.stream).json()) as PushRecord);
+        records.push(normalizeRecord(await new Response(result.stream).json()));
     }
     cursor = page.hasMore ? page.cursor : undefined;
   } while (cursor);

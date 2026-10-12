@@ -3,9 +3,12 @@ import {
   DEFAULT_PREFS,
   MAX_FAVOURITES,
   addFavourite,
+  alertLocations,
+  toggleAlertFavourite,
   effectiveThreshold,
   parsePrefs,
   removeFavourite,
+  type Prefs,
   type SavedLocation,
 } from "./prefs";
 
@@ -39,6 +42,7 @@ describe("parsePrefs", () => {
       theme: "dark",
       showSchool: false,
       alertThreshold: null,
+      alertFavourites: [],
     });
   });
 });
@@ -77,5 +81,30 @@ describe("effectiveThreshold", () => {
     expect(effectiveThreshold({ alertThreshold: 200, profile: "asma" })).toBe(
       200,
     );
+  });
+});
+
+describe("amaran kegemaran", () => {
+  it("menggabungkan lokasi semasa dan kegemaran yang dipilih tanpa pendua", () => {
+    const at = (id: string, lat: number): SavedLocation => ({
+      ...loc(id),
+      lat,
+    });
+    let prefs: Prefs = { ...DEFAULT_PREFS, current: at("a", 3.1) };
+    prefs = addFavourite(
+      addFavourite(addFavourite(prefs, at("a", 3.1)), at("b", 3.2)),
+      at("c", 3.3),
+    );
+    prefs = toggleAlertFavourite(toggleAlertFavourite(prefs, "a"), "c");
+    expect(alertLocations(prefs).map((l) => l.id)).toEqual(["a", "c"]);
+    expect(toggleAlertFavourite(prefs, "c").alertFavourites).toEqual(["a"]);
+  });
+
+  it("membuang tanda amaran bila kegemaran dibuang", () => {
+    const prefs = toggleAlertFavourite(
+      addFavourite(DEFAULT_PREFS, loc("b")),
+      "b",
+    );
+    expect(removeFavourite(prefs, "b").alertFavourites).toEqual([]);
   });
 });

@@ -1,7 +1,7 @@
 /* Service worker Hezy: cache aplikasi supaya boleh dibuka tanpa internet.
  * Bacaan IPU (/api/*) TIDAK dicache di sini — aplikasi menyimpannya sendiri dalam localStorage. */
 
-const VERSION = "v2";
+const VERSION = "v3";
 const SHELL = `hezy-shell-${VERSION}`;
 const STATIC = `hezy-static-${VERSION}`;
 const STATIC_LIMIT = 150;
@@ -116,7 +116,12 @@ async function networkFirst(request) {
 
 /* Notifikasi amaran IPU (dihantar oleh /api/push/check). */
 self.addEventListener("push", (event) => {
-  let data = { title: "Hezy", body: "Kemas kini kualiti udara", url: "/" };
+  let data = {
+    title: "Hezy",
+    body: "Kemas kini kualiti udara",
+    url: "/",
+    tag: "hezy-ipu",
+  };
   try {
     data = { ...data, ...event.data?.json() };
   } catch {
@@ -127,7 +132,7 @@ self.addEventListener("push", (event) => {
       body: data.body,
       icon: "/icons/icon-192.png",
       badge: "/icons/icon-192.png",
-      tag: "hezy-ipu",
+      tag: data.tag,
       renotify: true,
       lang: "ms",
       data: { url: data.url },

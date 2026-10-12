@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { areaToLocation } from "@/lib/locations";
 import { primaryReading } from "@/lib/official";
 import {
@@ -10,10 +10,12 @@ import {
   addFavourite,
   isFavourite,
   removeFavourite,
+  toggleAlertFavourite,
   updatePrefs,
   usePrefs,
   type SavedLocation,
 } from "@/lib/prefs";
+import { pushSupport } from "@/lib/push-client";
 import { useReading } from "@/lib/use-reading";
 import { ChooseLocation } from "../choose-location";
 import { IpuPill } from "../ipu-pill";
@@ -29,8 +31,15 @@ const StationMap = dynamic(
   },
 );
 
+const noopSubscribe = () => () => {};
+
 export function LokasiScreen() {
   const prefs = usePrefs();
+  const canAlert = useSyncExternalStore(
+    noopSubscribe,
+    () => pushSupport() === "supported",
+    () => false,
+  );
   const router = useRouter();
   const [view, setView] = useState<"list" | "map">("list");
   const [changing, setChanging] = useState(false);
@@ -122,6 +131,12 @@ export function LokasiScreen() {
             <h2 className="text-muted text-sm font-bold tracking-wide">
               KEGEMARAN ({prefs.favourites.length}/{MAX_FAVOURITES})
             </h2>
+            {canAlert && prefs.favourites.length > 0 && (
+              <p className="text-muted -mt-1 text-xs">
+                Ketik loceng untuk menerima amaran IPU bagi lokasi itu. Hidupkan
+                amaran di Tetapan dahulu.
+              </p>
+            )}
             <ul className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
               {prefs.favourites.map((f) => (
                 <li
@@ -129,6 +144,40 @@ export function LokasiScreen() {
                   className="bg-surface flex items-center gap-2 rounded-[18px] p-3.5"
                 >
                   <LocationReading location={f} onSelect={() => select(f)} />
+                  {canAlert && (
+                    <button
+                      type="button"
+                      aria-pressed={prefs.alertFavourites.includes(f.id)}
+                      aria-label={`Amaran IPU untuk ${f.name}`}
+                      onClick={() =>
+                        updatePrefs((p) => toggleAlertFavourite(p, f.id))
+                      }
+                      className={`flex size-11 shrink-0 items-center justify-center rounded-full ${
+                        prefs.alertFavourites.includes(f.id)
+                          ? "bg-ink text-page"
+                          : "text-muted hover:bg-line"
+                      }`}
+                    >
+                      <svg
+                        aria-hidden="true"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill={
+                          prefs.alertFavourites.includes(f.id)
+                            ? "currentColor"
+                            : "none"
+                        }
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+                        <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+                      </svg>
+                    </button>
+                  )}
                   <button
                     type="button"
                     aria-label={`Buang ${f.name} daripada kegemaran`}

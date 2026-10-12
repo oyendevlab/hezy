@@ -7,6 +7,7 @@ import {
   DEFAULT_PREFS,
   updatePrefs,
   usePrefs,
+  alertLocations,
   effectiveThreshold,
   type Prefs,
   type SavedLocation,
@@ -239,6 +240,7 @@ function AlertRow({ prefs }: { prefs: Prefs }) {
   const location: SavedLocation | null = prefs.current;
   const threshold = effectiveThreshold(prefs);
   const profileDefault = effectiveThreshold({ ...prefs, alertThreshold: null });
+  const extraCount = alertLocations(prefs).length - (location ? 1 : 0);
   const profileLabel =
     HEALTH_PROFILES.find((p) => p.key === prefs.profile)?.label ?? "Umum";
   const support = useSyncExternalStore(noopSubscribe, pushSupport, () => null);
@@ -259,7 +261,9 @@ function AlertRow({ prefs }: { prefs: Prefs }) {
       if (enabled) {
         await disablePush();
         setEnabled(false);
-      } else if ((await enablePush(location, threshold)) === "denied") {
+      } else if (
+        (await enablePush(alertLocations(prefs), threshold)) === "denied"
+      ) {
         setMessage(
           "Kebenaran notifikasi ditolak. Benarkan notifikasi untuk Hezy dalam tetapan pelayar.",
         );
@@ -294,7 +298,9 @@ function AlertRow({ prefs }: { prefs: Prefs }) {
             Amaran bila IPU melebihi {threshold}
           </div>
           <div className="text-muted mt-0.5 text-xs">
-            Untuk {location.name} · disemak setiap jam
+            Untuk {location.name}
+            {extraCount > 0 ? ` dan ${extraCount} lokasi kegemaran` : ""} ·
+            disemak setiap jam
           </div>
         </div>
         <button

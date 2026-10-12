@@ -2,10 +2,11 @@ import type { SavedLocation } from "./prefs";
 import type { AlertThreshold } from "./push-validate";
 
 const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? "";
-/** Lokasi terakhir yang dihantar ke pelayan untuk amaran (id lokasi). */
-const LOCATION_KEY = "hezy:push:location";
-/** Ambang terakhir yang dihantar ke pelayan. */
-const THRESHOLD_KEY = "hezy:push:threshold";
+/** Tandatangan tetapan terakhir yang dihantar ke pelayan (lokasi + ambang). */
+const SYNC_KEY = "hezy:push:sync";
+
+const signature = (locations: SavedLocation[], threshold: AlertThreshold) =>
+  `${threshold}|${locations.map((l) => `${l.id}@${l.lat},${l.lon}`).join(";")}`;
 
 export type PushSupport =
   "supported" | "unsupported" | "ios-install" | "unconfigured";
@@ -44,7 +45,7 @@ export async function currentSubscription(): Promise<PushSubscription | null> {
 
 async function sendSubscription(
   subscription: PushSubscription,
-  location: SavedLocation,
+  locations: SavedLocation[],
   threshold: AlertThreshold,
 ) {
   const res = await fetch("/api/push/subscribe", {
@@ -52,10 +53,13 @@ async function sendSubscription(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       subscription: subscription.toJSON(),
-      lat: location.lat,
-      lon: location.lon,
-      locationName: location.name,
       threshold,
+      locations: locations.map(({ id, name, lat, lon }) => ({
+        id,
+        name,
+        lat,
+        lon,
+      })),
     }),
   });
   if (!res.ok) {
@@ -65,8 +69,7 @@ async function sendSubscription(
     throw new Error(body?.error ?? "Langganan tidak dapat disimpan.");
   }
   try {
-    localStorage.setItem(LOCATION_KEY, location.id);
-    localStorage.setItem(THRESHOLD_KEY, String(threshold));
+    localStorage.setItem(SYNC_KEY, signature(locations, threshold));
   } catch {
     // Abaikan.
   }
@@ -74,7 +77,7 @@ async function sendSubscription(
 
 /** Minta kebenaran, langgan push dan daftar lokasi untuk amaran. */
 export async function enablePush(
-  location: SavedLocation,
+  locations: SavedLocation[],
   threshold: AlertThreshold,
 ): Promise<"enabled" | "denied"> {
   const permission = await Notification.requestPermission();
@@ -86,7 +89,7 @@ export async function enablePush(
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
     }));
-  await sendSubscription(subscription, location, threshold);
+  await sendSubscription(subscription, locations, threshold);
   return "enabled";
 }
 
@@ -100,8 +103,7 @@ export async function disablePush() {
   }).catch(() => undefined);
   await subscription.unsubscribe();
   try {
-    localStorage.removeItem(LOCATION_KEY);
-    localStorage.removeItem(THRESHOLD_KEY);
+    localStorage.removeItem(SYNC_KEY);
   } catch {
     // Abaikan.
   }
@@ -109,24 +111,21 @@ export async function disablePush() {
 
 /** Kemas kini lokasi dan ambang amaran di pelayan bila berubah (jika sudah melanggan). */
 export async function syncPushSettings(
-  location: SavedLocation,
+  locations: SavedLocation[],
   threshold: AlertThreshold,
 ) {
+  if (locations.length === 0) return;
   if (pushSupport() !== "supported" || Notification.permission !== "granted")
     return;
   try {
-    if (
-      localStorage.getItem(LOCATION_KEY) === location.id &&
-      localStorage.getItem(THRESHOLD_KEY) === String(threshold)
-    ) {
+    if (localStorage.getItem(SYNC_KEY) === signature(locations, threshold))
       return;
-    }
   } catch {
     return;
   }
   const subscription = await currentSubscription();
   if (subscription)
-    await sendSubscription(subscription, location, threshold).catch(
+    await sendSubscription(subscription, locations, threshold).catch(
       () => undefined,
     );
 }
