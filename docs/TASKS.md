@@ -136,11 +136,11 @@ Setiap item dibuat dalam cabang `feat/*` dan PR sendiri; digabung selepas CI lul
 - [x] Pilih 2–3 lokasi (semasa + kegemaran) untuk graf trend dalam satu paparan
 - [x] Hanya ≥ 1024 px; telefon kekal satu lokasi
 
-### 10. Lapisan sensor tambahan WAQI (menunggu token)
+### 10. Lapisan sensor tambahan WAQI
 
-- [ ] **Pengguna**: daftar token di aqicn.org/data-platform/token, maklumkan pasukan WAQI melalui e-mel, tambah `NEXT_PUBLIC_WAQI_TOKEN` di Vercel
-- [ ] Lapisan berasingan pada peta ("Sensor tambahan · skala AQI AS"), pin bergaris, diambil terus dari pelayar (tiada cache pelayan, ikut terma WAQI)
-- [ ] Atribusi WAQI dan EPA asal; nombor utama dan amaran kekal guna IPU rasmi
+- [x] **Pengguna**: daftar token di aqicn.org/data-platform/token, maklumkan pasukan WAQI melalui e-mel, tambah `NEXT_PUBLIC_WAQI_TOKEN` di Vercel
+- [x] Lapisan berasingan pada peta ("Sensor tambahan · skala AQI AS"), pin bergaris, diambil terus dari pelayar (tiada cache pelayan, ikut terma WAQI)
+- [x] Atribusi WAQI dan EPA asal; nombor utama dan amaran kekal guna IPU rasmi
 
 ### Selesai v0.3.0
 

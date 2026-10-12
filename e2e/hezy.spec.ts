@@ -164,6 +164,33 @@ test.describe("peta stesen", () => {
     ).toBeVisible();
   });
 
+  test("lapisan sensor tambahan WAQI tanpa pendua APIMS", async ({ page }) => {
+    await seedLocation(page);
+    await page.goto("/lokasi");
+    await page.getByRole("tab", { name: "Peta" }).click();
+    const toggle = page.getByRole("checkbox", {
+      name: /Sensor tambahan \(1\) · WAQI/,
+    });
+    await expect(toggle).toBeChecked();
+    const pin = page.locator('[title="Jalan Anggun 3P, AQI 88"]');
+    await expect(pin).toBeVisible();
+    await expect(page.locator('[title^="Klang, Selangor"]')).toHaveCount(0);
+
+    await pin.click();
+    await expect(
+      page.getByRole("heading", { name: "Jalan Anggun 3P" }),
+    ).toBeVisible();
+    await expect(
+      page.getByText("Sensor tambahan WAQI · skala AQI AS"),
+    ).toBeVisible();
+
+    await toggle.uncheck();
+    await expect(pin).toHaveCount(0);
+    await expect(
+      page.getByRole("heading", { name: "Jalan Anggun 3P" }),
+    ).toHaveCount(0);
+  });
+
   test("tiada pelanggaran kebolehcapaian pada tab Peta", async ({ page }) => {
     await seedLocation(page);
     await page.goto("/lokasi");

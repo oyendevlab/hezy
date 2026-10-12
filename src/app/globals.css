@@ -83,6 +83,12 @@ body {
     sans-serif;
   box-shadow: 0 2px 6px rgb(0 0 0 / 0.18);
 }
+.hezy-pin-sensor {
+  background: var(--page);
+  color: var(--ink);
+  border-color: var(--muted);
+  border-style: dashed;
+}
 .hezy-pin-na {
   background: #e5e5e5;
   color: #3a3a3a;
