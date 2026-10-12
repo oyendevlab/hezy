@@ -33,10 +33,11 @@ export function TopNav() {
                 key={item.href}
                 href={item.href}
                 aria-current={active ? "page" : undefined}
-                className={`flex min-h-10 items-center rounded-full px-4 text-sm font-semibold ${
+                className={`flex min-h-10 items-center gap-1.5 rounded-full px-4 text-sm font-semibold ${
                   active ? "bg-ink text-page" : "text-ink hover:bg-line"
                 }`}
               >
+                <NavIcon name={item.icon} active={active} size={18} />
                 {t(item.label)}
               </Link>
             );
@@ -69,7 +70,7 @@ export function BottomNav() {
               active ? "text-ink font-bold" : "text-muted font-medium"
             }`}
           >
-            <NavIcon name={item.icon} />
+            <NavIcon name={item.icon} active={active} />
             {t(item.label)}
           </Link>
         );
