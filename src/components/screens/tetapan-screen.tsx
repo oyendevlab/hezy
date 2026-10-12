@@ -7,6 +7,8 @@ import {
   DEFAULT_PREFS,
   updatePrefs,
   usePrefs,
+  effectiveThreshold,
+  type Prefs,
   type SavedLocation,
   type ThemePref,
 } from "@/lib/prefs";
@@ -136,7 +138,7 @@ export function TetapanScreen() {
             <h2 className="text-muted mb-2 text-sm font-bold tracking-wide">
               AMARAN
             </h2>
-            <AlertRow location={prefs.current} />
+            <AlertRow prefs={prefs} />
           </section>
 
           <section>
@@ -232,8 +234,13 @@ const SUPPORT_HELP = {
     "Di iPhone atau iPad, pasang Hezy di skrin utama dahulu, kemudian buka Hezy dari ikon untuk menghidupkan amaran.",
 } as const;
 
-/** Suis amaran IPU > 100 untuk lokasi semasa (Web Push). */
-function AlertRow({ location }: { location: SavedLocation | null }) {
+/** Suis amaran IPU untuk lokasi semasa (Web Push) dan pilihan ambang. */
+function AlertRow({ prefs }: { prefs: Prefs }) {
+  const location: SavedLocation | null = prefs.current;
+  const threshold = effectiveThreshold(prefs);
+  const profileDefault = effectiveThreshold({ ...prefs, alertThreshold: null });
+  const profileLabel =
+    HEALTH_PROFILES.find((p) => p.key === prefs.profile)?.label ?? "Umum";
   const support = useSyncExternalStore(noopSubscribe, pushSupport, () => null);
   const [enabled, setEnabled] = useState<boolean | null>(null);
   const [busy, setBusy] = useState(false);
@@ -252,7 +259,7 @@ function AlertRow({ location }: { location: SavedLocation | null }) {
       if (enabled) {
         await disablePush();
         setEnabled(false);
-      } else if ((await enablePush(location)) === "denied") {
+      } else if ((await enablePush(location, threshold)) === "denied") {
         setMessage(
           "Kebenaran notifikasi ditolak. Benarkan notifikasi untuk Hezy dalam tetapan pelayar.",
         );
@@ -284,7 +291,7 @@ function AlertRow({ location }: { location: SavedLocation | null }) {
       <div className="flex min-h-14 items-center gap-3 py-3">
         <div className="flex-1">
           <div id="amaran-label" className="font-semibold">
-            Amaran bila IPU melebihi 100
+            Amaran bila IPU melebihi {threshold}
           </div>
           <div className="text-muted mt-0.5 text-xs">
             Untuk {location.name} · disemak setiap jam
@@ -304,6 +311,48 @@ function AlertRow({ location }: { location: SavedLocation | null }) {
           <span className="size-[26px] rounded-full bg-white shadow" />
         </button>
       </div>
+    );
+    content = (
+      <>
+        {content}
+        <fieldset className="border-line border-t py-3">
+          <legend className="text-muted float-left mb-2 w-full text-xs font-semibold">
+            Ambang amaran
+            {prefs.alertThreshold === null
+              ? ` · lalai untuk profil ${profileLabel}`
+              : ""}
+          </legend>
+          <div className="bg-page grid grid-cols-3 gap-1 rounded-xl p-1">
+            {([50, 100, 200] as const).map((t) => (
+              <label
+                key={t}
+                className={`has-focus-visible:outline-ink flex min-h-11 cursor-pointer items-center justify-center rounded-lg text-sm has-focus-visible:outline-2 ${
+                  threshold === t ? "bg-ink text-page font-bold" : "font-medium"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="ambang-amaran"
+                  value={t}
+                  checked={threshold === t}
+                  onChange={() =>
+                    updatePrefs((x) => ({
+                      ...x,
+                      alertThreshold: t === profileDefault ? null : t,
+                    }))
+                  }
+                  className="sr-only"
+                />
+                IPU {t}
+              </label>
+            ))}
+          </div>
+          <p className="text-muted mt-2 text-xs">
+            50 = amaran awal (disyorkan untuk asma, kanak-kanak dan warga emas)
+            · 100 = Tidak Sihat · 200 = Sangat Tidak Sihat
+          </p>
+        </fieldset>
+      </>
     );
   }
 

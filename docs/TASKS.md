@@ -97,10 +97,10 @@ Setiap item dibuat dalam cabang `feat/*` dan PR sendiri; digabung selepas CI lul
 
 ### 3. Amaran ikut profil kesihatan
 
-- [ ] Ambang amaran boleh dipilih: 50 / 100 / 200
-- [ ] Lalai 50 untuk profil Asma, Kanak-kanak dan Warga emas; 100 untuk Umum
-- [ ] Ambang disimpan bersama langganan; `decideAlert` menggunakan ambang rekod
-- [ ] Migrasi: rekod sedia ada tanpa ambang dianggap 100
+- [x] Ambang amaran boleh dipilih: 50 / 100 / 200
+- [x] Lalai 50 untuk profil Asma, Kanak-kanak dan Warga emas; 100 untuk Umum
+- [x] Ambang disimpan bersama langganan; `decideAlert` menggunakan ambang rekod
+- [x] Migrasi: rekod sedia ada tanpa ambang dianggap 100
 
 ### 4. Amaran untuk lokasi kegemaran
 

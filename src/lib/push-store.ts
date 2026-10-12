@@ -4,7 +4,9 @@ import type { AlertState } from "./alert";
 import type { SubscribeInput } from "./push-validate";
 
 /** Rekod langganan dalam Vercel Blob (private): satu fail JSON bagi setiap peranti. */
-export type PushRecord = SubscribeInput &
+/** `threshold` mungkin tiada pada rekod sebelum v0.3.0. */
+export type PushRecord = Omit<SubscribeInput, "threshold"> &
+  Partial<Pick<SubscribeInput, "threshold">> &
   AlertState & {
     createdAt: string;
   };
