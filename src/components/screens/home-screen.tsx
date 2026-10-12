@@ -2,7 +2,14 @@
 
 import { Info } from "@phosphor-icons/react";
 import Link from "next/link";
-import { Fragment, useId, useLayoutEffect, useRef, useState } from "react";
+import {
+  Fragment,
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { shownError } from "@/lib/accuracy";
 import { HEALTH_PROFILES, adviceFor, type QuickTone } from "@/lib/advice";
 import { CATEGORY_STYLE } from "@/lib/category-style";
@@ -34,6 +41,7 @@ import { InstallBanner } from "../install-banner";
 import { HomeHeader } from "../home-header";
 import { ElasticCard } from "../elastic-card";
 import { TrendLink } from "../trend-link";
+import { LocationMenu } from "../location-menu";
 
 export function HomeScreen() {
   const { prefs, location, entry, refresh } = useCurrent();
@@ -128,6 +136,16 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
 
   // Satu konteks WebGL sahaja: langit telefon atau panorama desktop.
   const wide = useMediaQuery("(min-width: 768px)");
+  // Telefon: kad berhenti di dua kedudukan sahaja — rehat atau atas (CARD_TOP_MIN).
+  // Kandungan lebih panjang daripada skrin masih boleh ditatal bebas di dalam kad.
+  useEffect(() => {
+    if (wide) return;
+    const root = document.documentElement;
+    root.style.scrollSnapType = "y mandatory";
+    return () => {
+      root.style.scrollSnapType = "";
+    };
+  }, [wide]);
   const sky = {
     ipu: current?.ipu ?? null,
     weather: reading?.weather,
@@ -172,12 +190,19 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
       {wide && <PullToRefresh />}
       {/* Telefon: mockup C */}
       <section className="md:hidden">
+        {/* Titik snap kedudukan rehat (tatalan 0). */}
+        <div aria-hidden="true" className="absolute top-0 h-0 snap-start" />
         {/* Pengepala tetap menindih langit (margin negatif = tinggi pengepala). */}
         <HomeHeader
           current={current}
           className="-mb-[76px]"
           innerClassName="px-5 pt-[max(env(safe-area-inset-top),16px)] pb-3"
-          left={<LocationLink location={location} />}
+          left={
+            <LocationMenu
+              location={location}
+              className="bg-white/70 text-[#1c1a16] shadow-[0_1px_6px_rgb(0_0_0/0.12)] backdrop-blur"
+            />
+          }
           right={
             <ShareButton
               text={shareText}
@@ -204,7 +229,7 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
           style={{ height: CARD_TOP_MAX }}
         />
         {/* min-h: kad hanya boleh ditolak hingga bahagian atasnya ~124 px dari atas skrin. */}
-        <ElasticCard className="bg-page min-h-[calc(100svh-236px)] rounded-t-[28px] px-5.5 pt-6 pb-8">
+        <ElasticCard className="bg-page min-h-[calc(100svh-236px)] snap-start scroll-mt-[124px] rounded-t-[28px] px-5.5 pt-6 pb-8">
           <div ref={cardContentRef} className="flex flex-col gap-4">
             <Summary
               entry={entry}
@@ -226,7 +251,12 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
           current={current}
           className="-mb-[72px]"
           innerClassName="mx-auto max-w-[1200px] px-10 py-3.5"
-          left={<LocationLink location={location} />}
+          left={
+            <LocationMenu
+              location={location}
+              className="bg-white/70 text-[#1c1a16] shadow-[0_1px_6px_rgb(0_0_0/0.12)] backdrop-blur"
+            />
+          }
           right={
             <>
               <RefreshButton className="inline-flex border-transparent bg-white/70 text-[#1c1a16] shadow-[0_1px_6px_rgb(0_0_0/0.12)] backdrop-blur hover:bg-white" />
@@ -285,46 +315,6 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
         <FavouriteStrip favourites={prefs.favourites} />
       </section>
     </>
-  );
-}
-
-function LocationLink({ location }: { location: SavedLocation }) {
-  const { t } = useI18n();
-  return (
-    <Link
-      href="/lokasi"
-      className="flex min-h-11 items-center gap-1.5 rounded-full bg-white/70 px-3.5 text-base font-semibold text-[#1c1a16] shadow-[0_1px_6px_rgb(0_0_0/0.12)] backdrop-blur"
-    >
-      <svg
-        aria-hidden="true"
-        width="17"
-        height="17"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M12 21s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12z" />
-        <circle cx="12" cy="9" r="2.5" />
-      </svg>
-      {t(location.name)}
-      <span className="sr-only">{t("— tukar lokasi")}</span>
-      <svg
-        aria-hidden="true"
-        width="15"
-        height="15"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2.2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <polyline points="6 9 12 15 18 9" />
-      </svg>
-    </Link>
   );
 }
 

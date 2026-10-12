@@ -221,7 +221,9 @@ test.describe("pengepala tetap", () => {
     await expect(header).toHaveAttribute("data-compact", "true");
     const box = (await header.boundingBox())!;
     expect(box.y).toBeLessThanOrEqual(1);
-    await expect(header.getByRole("link", { name: /Shah Alam/ })).toBeVisible();
+    await expect(
+      header.getByRole("button", { name: /Shah Alam — tukar lokasi/ }),
+    ).toBeVisible();
   });
 });
 
@@ -337,6 +339,63 @@ test.describe("pintasan dan lencana", () => {
     );
     // Kegemaran yang sama dengan lokasi semasa ditanda "SEMASA".
     await expect(page.getByText("SEMASA", { exact: true })).toHaveCount(1);
+  });
+
+  test("menu lokasi: tukar ke kegemaran, Escape, dan Tambah bandar", async ({
+    page,
+  }) => {
+    await seedLocation(page, [SHAH_ALAM, KLANG]);
+    await page.goto("/");
+    const chip = page
+      .getByRole("button", { name: /Shah Alam — tukar lokasi/ })
+      .first();
+    await chip.click();
+    const menu = page.getByRole("dialog", { name: "TUKAR LOKASI" });
+    await expect(menu).toBeVisible();
+    // Lokasi semasa ditanda; kegemaran yang sama tidak diulang.
+    await expect(menu.getByRole("button", { name: /Shah Alam/ })).toHaveCount(
+      1,
+    );
+    await expect(menu.getByRole("button", { name: /Shah Alam/ })).toBeFocused();
+    const axe = await new AxeBuilder({ page })
+      .include("[data-testid=location-menu]")
+      .analyze();
+    expect(axe.violations).toEqual([]);
+
+    await page.keyboard.press("Escape");
+    await expect(menu).toBeHidden();
+    await expect(chip).toBeFocused();
+
+    await chip.click();
+    await menu.getByRole("button", { name: /Klang/ }).click();
+    await expect(menu).toBeHidden();
+    await expect(
+      page.getByRole("button", { name: /Klang — tukar lokasi/ }).first(),
+    ).toBeVisible();
+
+    await page
+      .getByRole("button", { name: /Klang — tukar lokasi/ })
+      .first()
+      .click();
+    await menu.getByRole("button", { name: "Tambah bandar" }).click();
+    await expect(page).toHaveURL(/\/lokasi#tambah$/);
+    await expect(page.getByRole("tab", { name: "Senarai" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+  });
+
+  test("Trend: cip lokasi membuka menu yang sama", async ({ page }) => {
+    await seedLocation(page);
+    await page.goto("/trend");
+    await page
+      .getByRole("button", { name: /Shah Alam — tukar lokasi/ })
+      .click();
+    const menu = page.getByRole("dialog", { name: "TUKAR LOKASI" });
+    await expect(menu.getByText("Tiada lokasi kegemaran lagi.")).toBeVisible();
+    await expect(
+      menu.getByRole("button", { name: "Guna lokasi saya" }),
+    ).toBeVisible();
   });
 
   test("lencana ikon menunjukkan IPU bila melebihi ambang", async ({
@@ -683,7 +742,7 @@ test.describe("peta stesen", () => {
     await expect(page).toHaveURL(/\/$/);
     await expect(
       page
-        .getByRole("link", { name: /Klang/ })
+        .getByRole("button", { name: /Klang — tukar lokasi/ })
         .filter({ visible: true })
         .first(),
     ).toBeVisible();

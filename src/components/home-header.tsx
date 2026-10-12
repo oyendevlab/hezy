@@ -60,14 +60,14 @@ export function HomeHeader({
         className={`relative flex items-center justify-between gap-3 ${innerClassName}`}
       >
         <div className="min-w-0">{left}</div>
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="relative flex shrink-0 items-center gap-2">
           {current && (
             <div
               aria-hidden="true"
               className={`flex items-center gap-1.5 rounded-full bg-white/70 py-1 pr-1.5 pl-3 text-[#1c1a16] shadow-[0_1px_6px_rgb(0_0_0/0.12)] backdrop-blur transition-all duration-200 motion-reduce:transition-none ${
                 compact
                   ? "translate-y-0 opacity-100"
-                  : "pointer-events-none translate-y-1 opacity-0"
+                  : "pointer-events-none absolute right-full mr-2 translate-y-1 opacity-0"
               }`}
             >
               <span className="font-display text-xl leading-none font-bold tabular-nums">
