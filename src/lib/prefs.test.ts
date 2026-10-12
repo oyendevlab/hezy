@@ -131,3 +131,20 @@ describe("amaran kegemaran", () => {
     expect(removeFavourite(prefs, "b").alertFavourites).toEqual([]);
   });
 });
+
+describe("migrasi nama lokasi GPS", () => {
+  it('membuang awalan "Berhampiran" bagi lokasi GPS sahaja', () => {
+    const prefs = parsePrefs(
+      JSON.stringify({
+        current: {
+          ...loc("gps"),
+          name: "Berhampiran Putrajaya",
+          source: "gps",
+        },
+        favourites: [{ ...loc("a"), name: "Berhampiran Laut" }],
+      }),
+    );
+    expect(prefs.current?.name).toBe("Putrajaya");
+    expect(prefs.favourites[0].name).toBe("Berhampiran Laut");
+  });
+});

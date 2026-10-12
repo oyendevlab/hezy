@@ -871,6 +871,28 @@ test.describe("pasang di iPhone", () => {
       "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1",
   });
 
+  test("Utama memaparkan banner pasang yang boleh ditutup", async ({
+    page,
+  }) => {
+    await seedLocation(page);
+    await page.goto("/");
+    const banner = page
+      .getByRole("region", { name: "Pasang Hezy di skrin utama" })
+      .filter({ visible: true });
+    await expect(banner).toBeVisible();
+    await banner.getByRole("button", { name: "Cara pasang" }).click();
+    await expect(banner.getByText("Tatal ke bawah dan pilih")).toBeVisible();
+    await banner.getByRole("button", { name: "Tutup banner pasang" }).click();
+    await expect(banner).toHaveCount(0);
+    await page.reload();
+    await expect(
+      page.getByRole("heading", { name: /^IPU \d+/ }).filter({ visible: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("region", { name: "Pasang Hezy di skrin utama" }),
+    ).toHaveCount(0);
+  });
+
   test("Tetapan memaparkan panduan langkah demi langkah", async ({ page }) => {
     await page.goto("/tetapan");
     const button = page.getByRole("button", { name: "Cara pasang" });
@@ -880,6 +902,27 @@ test.describe("pasang di iPhone", () => {
     await expect(
       page.getByRole("button", { name: "Tutup panduan" }),
     ).toHaveAttribute("aria-expanded", "true");
+  });
+});
+
+test.describe("privasi", () => {
+  test("halaman Privasi dari Tetapan, tanpa pelanggaran axe", async ({
+    page,
+  }) => {
+    await seedLocation(page);
+    await page.goto("/tetapan");
+    await page.getByRole("link", { name: "Privasi dan data anda" }).click();
+    await expect(page).toHaveURL(/\/privasi$/);
+    await expect(
+      page.getByRole("heading", { name: "Privasi dan data anda" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Log ralat" }),
+    ).toBeVisible();
+    const results = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+      .analyze();
+    expect(results.violations.map((v) => v.id)).toEqual([]);
   });
 });
 

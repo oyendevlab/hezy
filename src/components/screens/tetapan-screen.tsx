@@ -25,6 +25,9 @@ import {
   pushSupport,
 } from "@/lib/push-client";
 import { useI18n } from "@/lib/use-i18n";
+import Link from "next/link";
+import { Chevron } from "../chevron";
+import { IosInstallSteps } from "../install-guide";
 import { Skeleton } from "../status";
 
 const THEMES: { key: ThemePref; label: string }[] = [
@@ -44,6 +47,9 @@ export function TetapanScreen() {
       )
     )
       return;
+    // Amaran push juga dimatikan supaya langganan dipadam daripada pelayan.
+    if (pushSupport() === "supported")
+      void disablePush().catch(() => undefined);
     try {
       Object.keys(window.localStorage)
         .filter((key) => key.startsWith("hezy:"))
@@ -207,6 +213,13 @@ export function TetapanScreen() {
               />
               <AccuracyRows />
               <Row label={t("Versi")} value={APP_VERSION} />
+              <Link
+                href="/privasi"
+                className="flex min-h-12 items-center justify-between gap-3 font-semibold"
+              >
+                {t("Privasi dan data anda")}
+                <Chevron />
+              </Link>
             </div>
             <p className="text-muted mt-2 text-xs leading-relaxed">
               {t(
@@ -246,14 +259,6 @@ const INSTALL_HELP: Record<"installed" | "manual", string> = {
     "Buka menu pelayar dan pilih “Pasang aplikasi” atau “Tambah ke skrin utama”.",
 } as const;
 
-/** Langkah pasang di iPhone/iPad: Apple tidak membenarkan butang pasang dalam laman web. */
-const IOS_STEPS = [
-  "Ketik butang Kongsi di bar Safari (di iOS 26, ketik ⋯ dahulu, kemudian Kongsi).",
-  "Tatal ke bawah dan pilih “Tambah ke Skrin Utama”.",
-  "Pastikan “Buka sebagai Apl Web” dihidupkan, kemudian ketik Tambah.",
-  "Buka Hezy dari ikon di skrin utama.",
-];
-
 function InstallRow() {
   const { t } = useI18n();
   const status = useInstallStatus();
@@ -287,18 +292,7 @@ function InstallRow() {
           </span>
         )}
       </div>
-      {status === "ios" && guide && (
-        <ol id="panduan-pasang" className="mt-2 flex flex-col gap-2.5 pb-1">
-          {IOS_STEPS.map((step, i) => (
-            <li key={step} className="flex gap-3">
-              <span className="bg-ink text-page flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-bold">
-                {i + 1}
-              </span>
-              <span className="leading-snug">{t(step)}</span>
-            </li>
-          ))}
-        </ol>
-      )}
+      {status === "ios" && guide && <IosInstallSteps id="panduan-pasang" />}
     </div>
   );
 }

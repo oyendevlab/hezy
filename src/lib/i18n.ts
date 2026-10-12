@@ -317,6 +317,11 @@ const EN: Record<string, string> = {
   Pasang: "Install",
   "Hezy sudah dipasang di peranti ini.": "Hezy is installed on this device.",
   "Cara pasang": "How to install",
+  "Pasang Hezy di skrin utama": "Add Hezy to your Home Screen",
+  "Untuk amaran IPU, lencana ikon dan akses pantas":
+    "For API alerts, an icon badge and quick access",
+  "Tutup banner pasang": "Close install banner",
+  "Privasi dan data anda": "Privacy and your data",
   "Tutup panduan": "Close guide",
   "Ketik butang Kongsi di bar Safari (di iOS 26, ketik ⋯ dahulu, kemudian Kongsi).":
     "Tap the Share button in the Safari bar (on iOS 26, tap ⋯ first, then Share).",
@@ -396,6 +401,47 @@ const EN: Record<string, string> = {
   "Padam data di peranti ini": "Delete data on this device",
   "Padam lokasi, kegemaran dan tetapan yang disimpan di peranti ini?":
     "Delete the locations, favourites and settings saved on this device?",
+
+  // Privasi
+  Laluan: "Breadcrumb",
+  Privasi: "Privacy",
+  "Dikemas kini {date}": "Updated {date}",
+  Ringkasnya: "In short",
+  "Hezy tidak memerlukan akaun dan tidak menggunakan kuki pengiklanan.":
+    "Hezy needs no account and uses no advertising cookies.",
+  "Kami tidak menjual atau berkongsi data anda untuk pengiklanan.":
+    "We do not sell or share your data for advertising.",
+  "Lokasi dan tetapan": "Location and settings",
+  "Lokasi semasa, kegemaran, profil kesihatan, tema dan bahasa disimpan dalam peranti anda sahaja (storan pelayar).":
+    "Your current location, favourites, health profile, theme and language are stored on your device only (browser storage).",
+  "Untuk mengambil bacaan, koordinat dihantar ke pelayan Hezy selepas dibundarkan kepada kira-kira 1 km, dan tidak disimpan.":
+    "To fetch readings, coordinates are sent to Hezy's server rounded to about 1 km, and are not stored.",
+  "GPS hanya digunakan bila anda menekan “Guna lokasi saya”.":
+    "GPS is only used when you tap “Use my location”.",
+  "Amaran notifikasi": "Notification alerts",
+  "Bila anda menghidupkan amaran, pelayan menyimpan langganan notifikasi pelayar anda, lokasi amaran (dibundarkan kira-kira 1 km) dan namanya, ambang, bahasa serta pilihan rutin amaran.":
+    "When you turn on alerts, the server stores your browser's notification subscription, alert locations (rounded to about 1 km) and their names, threshold, language and alert routine options.",
+  "Data ini disimpan dalam Vercel Blob (Singapura) sehingga anda mematikan amaran atau langganan tamat, kemudian dipadam.":
+    "This data is stored in Vercel Blob (Singapore) until you turn off alerts or the subscription expires, and is then deleted.",
+  "Log ralat": "Error logs",
+  "Bila aplikasi mengalami ralat, Hezy merekod mesej ralat, halaman, versi aplikasi dan jenis pelayar untuk membaikinya.":
+    "When the app hits an error, Hezy records the error message, page, app version and browser type to fix it.",
+  "Tiada alamat IP, lokasi atau maklumat peribadi direkod. Log dipadam selepas 14 hari.":
+    "No IP address, location or personal information is recorded. Logs are deleted after 14 days.",
+  "Statistik penggunaan": "Usage statistics",
+  "Hezy menggunakan Vercel Web Analytics tanpa kuki untuk mengira paparan halaman, jenis peranti dan negara secara keseluruhan. Pengguna individu tidak dikenal pasti.":
+    "Hezy uses cookie-free Vercel Web Analytics to count page views, device types and countries in aggregate. Individual users are not identified.",
+  "Pihak ketiga": "Third parties",
+  "Bacaan IPU daripada APIMS (Jabatan Alam Sekitar), cuaca dan anggaran daripada Open-Meteo, dan titik panas daripada NASA FIRMS diambil oleh pelayan Hezy; maklumat peranti anda tidak dihantar kepada mereka.":
+    "API readings from APIMS (Department of Environment), weather and estimates from Open-Meteo, and fire hotspots from NASA FIRMS are fetched by Hezy's server; your device information is not sent to them.",
+  "Jubin peta (OpenStreetMap) dan sensor tambahan (WAQI) dimuat terus oleh pelayar anda bila anda membuka Peta, jadi mereka boleh melihat alamat IP anda seperti mana-mana laman web.":
+    "Map tiles (OpenStreetMap) and extra sensors (WAQI) are loaded directly by your browser when you open the Map, so they can see your IP address like any website.",
+  "Memadam data anda": "Deleting your data",
+  "Tetapan → “Padam data di peranti ini” memadam semua data Hezy dalam peranti dan mematikan amaran (langganan dipadam daripada pelayan).":
+    "Settings → “Delete data on this device” deletes all Hezy data on the device and turns off alerts (the subscription is deleted from the server).",
+  "Mematikan amaran sahaja juga memadam langganan daripada pelayan.":
+    "Turning off alerts alone also deletes the subscription from the server.",
+  "Soalan atau permintaan berkaitan data:": "Questions or data requests:",
 
   // GPS
   "Akses lokasi ditolak. Pilih kawasan secara manual di bawah.":

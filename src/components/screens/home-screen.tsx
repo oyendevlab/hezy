@@ -28,6 +28,7 @@ import { useCurrent } from "../use-current";
 import { WindLine } from "../wind-line";
 import { AdviceIcon } from "../advice-icon";
 import { WeatherNow } from "../weather-icon";
+import { InstallBanner } from "../install-banner";
 
 export function HomeScreen() {
   const { prefs, location, entry, refresh } = useCurrent();
@@ -154,6 +155,7 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
             profile={prefs.profile}
           />
           {current && showSchool && <SchoolCard reading={current} />}
+          <InstallBanner />
         </div>
       </section>
 
@@ -195,6 +197,7 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
         <div className="relative mx-auto -mt-9 flex max-w-[1200px] flex-wrap gap-5 px-10">
           <div className="flex min-w-0 flex-[1_1_340px] flex-col gap-5">
             {entry && <ReadingNotices entry={entry} onRetry={onRetry} />}
+            <InstallBanner />
             {current && showSchool && <SchoolCard reading={current} />}
             {current && <QuickAnswers category={current.category} />}
             {current && (
