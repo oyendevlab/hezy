@@ -53,3 +53,30 @@ export function TrendLink({ hours }: { hours: HourPoint[] }) {
     </Link>
   );
 }
+
+/** Ketinggian bar rangka (tetap, supaya tiada ketidakpadanan hidrasi). */
+const SKELETON_BARS = [
+  10, 12, 14, 13, 11, 10, 12, 16, 20, 24, 28, 30, 31, 32, 30, 28, 26, 24, 20,
+  16, 14, 12, 13, 14,
+];
+
+export function TrendLinkSkeleton() {
+  return (
+    <div
+      aria-hidden="true"
+      data-testid="trend-link-skeleton"
+      className="bg-surface flex flex-col gap-3 rounded-[22px] p-4"
+    >
+      <span className="bg-line h-4 w-40 animate-pulse rounded-md motion-reduce:animate-none" />
+      <span className="flex h-10 items-end gap-[2px]">
+        {SKELETON_BARS.map((h, i) => (
+          <span
+            key={i}
+            className="bg-line flex-1 animate-pulse rounded-[2px] motion-reduce:animate-none"
+            style={{ height: h }}
+          />
+        ))}
+      </span>
+    </div>
+  );
+}

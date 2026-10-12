@@ -381,7 +381,7 @@ Fokus: UI/UX yang lebih licin dan seperti aplikasi asli. Termasuk pembetulan ked
    - [x] Tiada kegemaran: teks ringkas + "+ Tambah bandar"; boleh diguna dengan papan kekunci dan pembaca skrin
 3. **Nombor IPU beranimasi** (kira naik/turun) bila bacaan berubah; tiada animasi untuk `prefers-reduced-motion` — ✅ siap (PR #66)
 4. **Getaran ringan** bila tarikan mencapai ambang muat semula (Android, `navigator.vibrate`) — ✅ siap
-5. **Rangka muat (skeleton)** mengikut bentuk baharu: langit, kad putih, baris angin, bento
+5. **Rangka muat (skeleton)** mengikut bentuk baharu: langit, kad putih, baris angin, bento — ✅ siap
 
 ### Seluruh aplikasi
 
