@@ -100,6 +100,7 @@ export function LokasiScreen() {
 
       <Link
         href="/negeri"
+        transitionTypes={["nav-forward"]}
         className="bg-surface hover:bg-line flex min-h-16 items-center gap-3 rounded-[18px] py-3 pr-3 pl-3.5 transition-colors"
       >
         <span className="bg-page flex size-10 shrink-0 items-center justify-center rounded-full">

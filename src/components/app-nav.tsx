@@ -13,7 +13,10 @@ export function TopNav() {
   const { t } = useI18n();
 
   return (
-    <header className="border-line hidden border-b md:block">
+    <header
+      className="border-line hidden border-b md:block"
+      style={{ viewTransitionName: "top-nav" }}
+    >
       <div className="mx-auto flex max-w-[1200px] items-center gap-3 px-10 py-5">
         <Link
           href="/"
@@ -32,6 +35,7 @@ export function TopNav() {
               <Link
                 key={item.href}
                 href={item.href}
+                transitionTypes={["nav-tab"]}
                 aria-current={active ? "page" : undefined}
                 className={`flex min-h-10 items-center gap-1.5 rounded-full px-4 text-sm font-semibold ${
                   active ? "bg-ink text-page" : "text-ink hover:bg-line"
@@ -56,6 +60,7 @@ export function BottomNav() {
   return (
     <nav
       data-bottom-nav
+      style={{ viewTransitionName: "bottom-nav" }}
       aria-label={t("Navigasi utama")}
       className="border-line bg-page fixed inset-x-0 bottom-0 z-10 grid grid-cols-4 border-t px-3 pt-1.5 pb-[max(env(safe-area-inset-bottom),12px)] md:hidden"
     >
@@ -65,6 +70,7 @@ export function BottomNav() {
           <Link
             key={item.href}
             href={item.href}
+            transitionTypes={["nav-tab"]}
             aria-current={active ? "page" : undefined}
             className={`flex min-h-[52px] flex-col items-center justify-center gap-1 text-xs ${
               active ? "text-ink font-bold" : "text-muted font-medium"

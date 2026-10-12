@@ -722,6 +722,52 @@ test.describe("navigasi", () => {
   });
 });
 
+test.describe("peralihan skrin", () => {
+  test("tab memudar, masuk lebih dalam menggelongsor; bar navigasi kekal", async ({
+    page,
+  }) => {
+    await seedLocation(page);
+    // Rekod jenis peralihan yang diminta React kepada pelayar.
+    await page.addInitScript(() => {
+      const w = window as unknown as { hezyVt: string[][] };
+      w.hezyVt = [];
+      const original = document.startViewTransition?.bind(document);
+      if (!original) return;
+      document.startViewTransition = ((arg: unknown) => {
+        const types =
+          arg && typeof arg === "object" && "types" in arg
+            ? [...((arg as { types: Iterable<string> }).types ?? [])]
+            : [];
+        w.hezyVt.push(types);
+        return original(arg as never);
+      }) as typeof document.startViewTransition;
+    });
+    const types = () =>
+      page.evaluate(() => (window as unknown as { hezyVt: string[][] }).hezyVt);
+    await page.goto("/tetapan");
+    const nav = page
+      .getByRole("navigation", { name: "Navigasi utama" })
+      .filter({ visible: true });
+    await nav.getByRole("link", { name: "Lokasi" }).click();
+    await expect(page).toHaveURL(/\/lokasi$/);
+    await expect.poll(types).toContainEqual(["nav-tab"]);
+    await page.getByRole("link", { name: /IPU mengikut negeri/ }).click();
+    await expect(page).toHaveURL(/\/negeri$/);
+    await expect.poll(types).toContainEqual(["nav-forward"]);
+    await page
+      .getByRole("navigation", { name: "Laluan" })
+      .getByRole("link", { name: "Lokasi" })
+      .click();
+    await expect(page).toHaveURL(/\/lokasi$/);
+    await expect.poll(types).toContainEqual(["nav-back"]);
+    expect(
+      await page
+        .locator("[data-bottom-nav]")
+        .evaluate((el) => getComputedStyle(el).viewTransitionName),
+    ).toBe("bottom-nav");
+  });
+});
+
 test.describe("rangka muat", () => {
   test("Utama memaparkan rangka bentuk baharu semasa bacaan dimuat", async ({
     page,
@@ -1233,6 +1279,8 @@ test.describe("privasi", () => {
     await expect(
       page.getByRole("heading", { name: "Log ralat" }),
     ).toBeVisible();
+    // Tajuk dokumen dikemas kini selepas peralihan skrin selesai.
+    await expect(page).toHaveTitle(/Privasi/);
     const results = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
       .analyze();

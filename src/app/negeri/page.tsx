@@ -8,6 +8,7 @@ import type { Station } from "@/lib/apims";
 import { statesInMapOrder, type State } from "@/lib/areas";
 import { getStations } from "@/lib/data";
 import { ipuCategory } from "@/lib/ipu";
+import { PageTransition } from "@/components/page-transition";
 
 export const metadata: Metadata = {
   title: "IPU mengikut negeri",
@@ -16,7 +17,15 @@ export const metadata: Metadata = {
   alternates: { canonical: "/negeri" },
 };
 
-export default async function NegeriIndexPage() {
+export default function NegeriIndexPage() {
+  return (
+    <PageTransition>
+      <NegeriIndex />
+    </PageTransition>
+  );
+}
+
+async function NegeriIndex() {
   let stations: Station[] | null;
   try {
     stations = await getStations();
@@ -28,7 +37,11 @@ export default async function NegeriIndexPage() {
   return (
     <div className="mx-auto flex max-w-[960px] flex-col gap-5 px-5 pt-13 md:px-10 md:pt-10">
       <nav aria-label="Laluan" className="text-muted text-sm font-semibold">
-        <Link href="/lokasi" className="underline">
+        <Link
+          href="/lokasi"
+          transitionTypes={["nav-back"]}
+          className="underline"
+        >
           <T>Lokasi</T>
         </Link>{" "}
         / <T>IPU mengikut negeri</T>
@@ -88,6 +101,7 @@ function StateList({
             <li key={state.id}>
               <Link
                 href={`/negeri/${state.id}`}
+                transitionTypes={["nav-forward"]}
                 className="bg-surface hover:bg-line flex min-h-16 items-center gap-3 rounded-[18px] py-3 pr-3 pl-4 transition-colors"
               >
                 <span className="min-w-0 flex-1">
