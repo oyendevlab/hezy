@@ -1,7 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { PULL_THRESHOLD, rubberBand } from "@/lib/rubber-band";
+import {
+  PULL_THRESHOLD,
+  crossedThreshold,
+  hapticTick,
+  rubberBand,
+} from "@/lib/rubber-band";
 import { useI18n } from "@/lib/use-i18n";
 import { refreshReadings } from "@/lib/use-reading";
 import { Logo } from "./logo";
@@ -67,7 +72,9 @@ export function ElasticCard({
       }
       if (e.cancelable) e.preventDefault();
       setDragging(true);
-      update(rubberBand(dy));
+      const next = rubberBand(dy);
+      if (crossedThreshold(s.pull, next)) hapticTick();
+      update(next);
     };
     const onEnd = async () => {
       if (!s.tracking) return;
