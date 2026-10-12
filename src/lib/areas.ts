@@ -2,7 +2,13 @@ import type { Coords } from "./coords";
 
 /** Kawasan untuk pemilih lokasi manual (bila GPS ditolak). Koordinat ialah anggaran pusat bandar. */
 export type Area = Coords & { id: string; name: string };
-export type State = { id: string; name: string; areas: Area[] };
+export type State = {
+  id: string;
+  name: string;
+  /** ID negeri dalam APIMS (STATE_ID). */
+  apimsStateId: number;
+  areas: Area[];
+};
 
 const area = (id: string, name: string, lat: number, lon: number): Area => ({
   id,
@@ -14,6 +20,7 @@ const area = (id: string, name: string, lat: number, lon: number): Area => ({
 export const STATES: readonly State[] = [
   {
     id: "johor",
+    apimsStateId: 1,
     name: "Johor",
     areas: [
       area("johor-bahru", "Johor Bahru", 1.49, 103.74),
@@ -25,6 +32,7 @@ export const STATES: readonly State[] = [
   },
   {
     id: "kedah",
+    apimsStateId: 2,
     name: "Kedah",
     areas: [
       area("alor-setar", "Alor Setar", 6.12, 100.37),
@@ -35,6 +43,7 @@ export const STATES: readonly State[] = [
   },
   {
     id: "kelantan",
+    apimsStateId: 3,
     name: "Kelantan",
     areas: [
       area("kota-bharu", "Kota Bharu", 6.13, 102.24),
@@ -44,6 +53,7 @@ export const STATES: readonly State[] = [
   },
   {
     id: "melaka",
+    apimsStateId: 4,
     name: "Melaka",
     areas: [
       area("bandaraya-melaka", "Bandaraya Melaka", 2.19, 102.25),
@@ -52,6 +62,7 @@ export const STATES: readonly State[] = [
   },
   {
     id: "negeri-sembilan",
+    apimsStateId: 5,
     name: "Negeri Sembilan",
     areas: [
       area("seremban", "Seremban", 2.73, 101.94),
@@ -61,6 +72,7 @@ export const STATES: readonly State[] = [
   },
   {
     id: "pahang",
+    apimsStateId: 6,
     name: "Pahang",
     areas: [
       area("kuantan", "Kuantan", 3.81, 103.33),
@@ -71,6 +83,7 @@ export const STATES: readonly State[] = [
   },
   {
     id: "perak",
+    apimsStateId: 8,
     name: "Perak",
     areas: [
       area("ipoh", "Ipoh", 4.6, 101.08),
@@ -81,11 +94,13 @@ export const STATES: readonly State[] = [
   },
   {
     id: "perlis",
+    apimsStateId: 9,
     name: "Perlis",
     areas: [area("kangar", "Kangar", 6.44, 100.2)],
   },
   {
     id: "pulau-pinang",
+    apimsStateId: 7,
     name: "Pulau Pinang",
     areas: [
       area("george-town", "George Town", 5.41, 100.33),
@@ -95,6 +110,7 @@ export const STATES: readonly State[] = [
   },
   {
     id: "sabah",
+    apimsStateId: 12,
     name: "Sabah",
     areas: [
       area("kota-kinabalu", "Kota Kinabalu", 5.98, 116.07),
@@ -105,6 +121,7 @@ export const STATES: readonly State[] = [
   },
   {
     id: "sarawak",
+    apimsStateId: 13,
     name: "Sarawak",
     areas: [
       area("kuching", "Kuching", 1.55, 110.36),
@@ -116,6 +133,7 @@ export const STATES: readonly State[] = [
   },
   {
     id: "selangor",
+    apimsStateId: 10,
     name: "Selangor",
     areas: [
       area("shah-alam", "Shah Alam", 3.07, 101.52),
@@ -128,6 +146,7 @@ export const STATES: readonly State[] = [
   },
   {
     id: "terengganu",
+    apimsStateId: 11,
     name: "Terengganu",
     areas: [
       area("kuala-terengganu", "Kuala Terengganu", 5.33, 103.14),
@@ -137,6 +156,7 @@ export const STATES: readonly State[] = [
   },
   {
     id: "kuala-lumpur",
+    apimsStateId: 14,
     name: "W.P. Kuala Lumpur",
     areas: [
       area("kuala-lumpur", "Kuala Lumpur", 3.14, 101.69),
@@ -146,11 +166,13 @@ export const STATES: readonly State[] = [
   },
   {
     id: "putrajaya",
+    apimsStateId: 16,
     name: "W.P. Putrajaya",
     areas: [area("putrajaya", "Putrajaya", 2.93, 101.69)],
   },
   {
     id: "labuan",
+    apimsStateId: 15,
     name: "W.P. Labuan",
     areas: [area("labuan", "Labuan", 5.28, 115.24)],
   },
@@ -200,4 +222,14 @@ export function searchAreas(
       )
       .map((a) => ({ ...a, state: s.name })),
   ).slice(0, limit);
+}
+
+export function findState(id: string): State | undefined {
+  return STATES.find((s) => s.id === id);
+}
+
+export function findStateByApimsId(
+  apimsStateId: number | null,
+): State | undefined {
+  return STATES.find((s) => s.apimsStateId === apimsStateId);
 }

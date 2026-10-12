@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Plus_Jakarta_Sans } from "next/font/google";
 import { BottomNav, TopNav } from "@/components/app-nav";
 import { OfflineBanner, PwaSetup } from "@/components/pwa";
+import { SITE_URL } from "@/lib/site";
 import { THEME_BOOT_SCRIPT } from "@/lib/storage-keys";
 import "./globals.css";
 
@@ -17,6 +18,7 @@ const bricolage = Bricolage_Grotesque({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "Hezy — Semak Jerebu",
     template: "%s · Hezy",

@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { STATES, findArea, nearestArea, searchAreas } from "./areas";
+import {
+  STATES,
+  findArea,
+  findState,
+  findStateByApimsId,
+  nearestArea,
+  searchAreas,
+} from "./areas";
 import { isInMalaysia } from "./coords";
 
 const allAreas = STATES.flatMap((s) => s.areas);
@@ -37,5 +44,18 @@ describe("searchAreas", () => {
     expect(searchAreas("klang").map((a) => a.id)).toContain("klang");
     expect(searchAreas("sabah").every((a) => a.state === "Sabah")).toBe(true);
     expect(searchAreas("  ")).toEqual([]);
+  });
+});
+
+describe("ID negeri APIMS", () => {
+  it("setiap negeri mempunyai ID APIMS unik 1–16", () => {
+    const ids = STATES.map((s) => s.apimsStateId).sort((a, b) => a - b);
+    expect(ids).toEqual(Array.from({ length: 16 }, (_, i) => i + 1));
+  });
+
+  it("mencari negeri ikut id dan ID APIMS", () => {
+    expect(findState("selangor")?.apimsStateId).toBe(10);
+    expect(findStateByApimsId(14)?.id).toBe("kuala-lumpur");
+    expect(findStateByApimsId(null)).toBeUndefined();
   });
 });

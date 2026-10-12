@@ -127,9 +127,9 @@ Setiap item dibuat dalam cabang `feat/*` dan PR sendiri; digabung selepas CI lul
 
 ### 8. Halaman negeri
 
-- [ ] Laluan statik `/negeri/[negeri]` untuk 16 negeri/wilayah: IPU semua stesen APIMS, dikemas kini setiap 15 minit
-- [ ] Metadata SEO, sitemap dan pautan dari peta/senarai
-- [ ] Ujian kebolehcapaian pada halaman negeri
+- [x] Laluan statik `/negeri/[negeri]` untuk 16 negeri/wilayah: IPU semua stesen APIMS, dikemas kini setiap 15 minit
+- [x] Metadata SEO, sitemap dan pautan dari peta/senarai
+- [x] Ujian kebolehcapaian pada halaman negeri
 
 ### 9. Bandingkan lokasi (desktop)
 
