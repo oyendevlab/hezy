@@ -36,6 +36,7 @@ describe("parsePrefs", () => {
       favourites: [loc("a")],
       profile: "umum",
       theme: "dark",
+      showSchool: false,
     });
   });
 });

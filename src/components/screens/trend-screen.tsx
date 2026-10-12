@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { primaryReading } from "@/lib/official";
+import { SchoolCard } from "../school-card";
 import { ChooseLocation } from "../choose-location";
 import { IpuPill } from "../ipu-pill";
 import { ReadingNotices } from "../reading-notices";
@@ -48,6 +49,9 @@ export function TrendScreen() {
       )}
       {location && !reading && entry?.status !== "error" && (
         <Skeleton className="h-[420px]" />
+      )}
+      {current && prefs && (prefs.profile === "anak" || prefs.showSchool) && (
+        <SchoolCard reading={current} />
       )}
       {reading && <TrendPanel reading={reading} />}
     </div>
