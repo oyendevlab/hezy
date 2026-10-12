@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useSyncExternalStore } from "react";
 import { areaToLocation } from "@/lib/locations";
@@ -74,6 +75,13 @@ export function LokasiScreen() {
       </div>
 
       {view === "map" && <StationMap />}
+
+      <Link
+        href="/negeri"
+        className="text-muted self-start text-sm font-semibold underline"
+      >
+        Lihat IPU semua stesen mengikut negeri
+      </Link>
 
       {view === "list" && prefs === null && <Skeleton className="h-64" />}
 

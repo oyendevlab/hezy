@@ -255,6 +255,41 @@ test.describe("status sekolah", () => {
   });
 });
 
+test.describe("halaman negeri", () => {
+  test("indeks menyenaraikan 16 negeri dan wilayah", async ({ page }) => {
+    await page.goto("/negeri");
+    await expect(
+      page.getByRole("heading", { name: "IPU mengikut negeri" }),
+    ).toBeVisible();
+    await expect(page.locator('a[href^="/negeri/"]')).toHaveCount(16);
+  });
+
+  test("halaman Selangor memaparkan jadual stesen atau notis", async ({
+    page,
+  }) => {
+    await page.goto("/negeri/selangor");
+    await expect(page).toHaveTitle("IPU Selangor hari ini · Hezy");
+    await expect(
+      page.getByRole("heading", { name: "IPU Selangor hari ini" }),
+    ).toBeVisible();
+    await expect(
+      page
+        .getByRole("table", { name: "IPU rasmi stesen APIMS di Selangor" })
+        .or(page.getByText("Data APIMS tidak dapat diambil", { exact: false })),
+    ).toBeVisible();
+    const results = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+      .analyze();
+    expect(results.violations.map((v) => v.id)).toEqual([]);
+  });
+
+  test("sitemap merangkumi halaman negeri", async ({ request }) => {
+    const xml = await (await request.get("/sitemap.xml")).text();
+    expect(xml).toContain("https://hezy.vercel.app/negeri/selangor");
+    expect(xml).toContain("https://hezy.vercel.app/negeri/labuan");
+  });
+});
+
 test.describe("API", () => {
   test("kongsi: halaman mempunyai kad Open Graph dan imej PNG", async ({
     page,
