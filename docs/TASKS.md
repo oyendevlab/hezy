@@ -260,6 +260,6 @@ Masalah: model CAMS (Open-Meteo) kurang menganggar jerebu. Contoh Putrajaya 12 O
 
 ### Selesai v0.4.0
 
-- [ ] Semua ujian unit dan E2E lulus pada CI dan production; axe tanpa pelanggaran
-- [ ] Lighthouse ≥ 90 dikekalkan
-- [ ] Kemas kini `UJIAN-TELEFON.md`, versi 0.4.0, tag dan GitHub Release
+- [x] Semua ujian unit dan E2E lulus pada CI dan production; axe tanpa pelanggaran (185 unit, 99 E2E tempatan / 97 production)
+- [x] Lighthouse ≥ 90 dikekalkan (production 12 Okt 2026: telefon 99/100/100/100, desktop 100/100/100/100)
+- [x] Kemas kini `UJIAN-TELEFON.md`, versi 0.4.0, tag dan GitHub Release
