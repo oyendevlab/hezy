@@ -17,6 +17,7 @@
     "monitor": "node scripts/monitor.mjs"
   },
   "dependencies": {
+    "@phosphor-icons/react": "^2.1.10",
     "@vercel/analytics": "^2.0.1",
     "@vercel/blob": "^2.8.1",
     "leaflet": "^1.9.4",

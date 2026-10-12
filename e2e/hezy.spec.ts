@@ -214,6 +214,16 @@ test.describe("langit hidup", () => {
     // Satu konteks WebGL sahaja (telefon atau panorama desktop).
     await expect(page.getByTestId("sky")).toHaveCount(1);
     await expect(sky).toHaveClass(/opacity-100/);
+
+    // Kad bacaan: label IPU, sumber, cuaca (jerebu diutamakan bila IPU > 100).
+    await expect(
+      page.getByText("Rasmi · APIMS").filter({ visible: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("img", { name: "Cuaca: 31°, Berjerebu" }).filter({
+        visible: true,
+      }),
+    ).toBeVisible();
   });
 });
 

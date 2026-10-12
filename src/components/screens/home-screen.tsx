@@ -26,6 +26,8 @@ import { Notice, Skeleton } from "../status";
 import { TrendPanel } from "../trend-panel";
 import { useCurrent } from "../use-current";
 import { WindLine } from "../wind-line";
+import { AdviceIcon } from "../advice-icon";
+import { WeatherNow } from "../weather-icon";
 
 export function HomeScreen() {
   const { prefs, location, entry, refresh } = useCurrent();
@@ -291,10 +293,9 @@ function Summary({ entry, reading, onRetry, size, profile }: SummaryProps) {
               key={tip}
               className="bg-surface flex min-h-[72px] flex-col justify-between gap-1.5 rounded-2xl p-3 text-[13px] leading-snug font-semibold"
             >
-              <span
-                aria-hidden="true"
-                className="size-2 rounded-full"
-                style={{ background: CATEGORY_STYLE[current!.category].accent }}
+              <AdviceIcon
+                tip={tip}
+                color={CATEGORY_STYLE[current!.category].accent}
               />
               {t(tip)}
             </li>
@@ -337,27 +338,55 @@ function Headline({
   const big = size === "desktop" ? "text-[112px]" : "text-[84px]";
   return (
     <>
-      <div className="flex items-center gap-4">
-        <h1
-          aria-label={t("IPU {ipu}, {label}", {
-            ipu: current.ipu,
-            label: t(current.label),
-          })}
-          className={`font-display ${big} leading-[0.9] font-bold tracking-[-0.04em] tabular-nums`}
-        >
-          {current.ipu}
-        </h1>
-        <div className="flex flex-col items-start gap-1.5">
-          <IpuPill category={current.category} label={t(current.label)} />
-          {change && (
-            <span className="text-muted text-[13px] font-semibold">
-              {change}
-            </span>
-          )}
-          {entry?.status === "loading" && (
-            <span className="text-muted text-xs">{t("Mengemas kini…")}</span>
-          )}
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <div
+            aria-hidden="true"
+            className="text-muted text-xs font-bold tracking-[0.14em]"
+          >
+            {t("IPU")}
+          </div>
+          <div className="flex items-center gap-3.5">
+            <h1
+              aria-label={t("IPU {ipu}, {label}", {
+                ipu: current.ipu,
+                label: t(current.label),
+              })}
+              className={`font-display ${big} leading-[0.9] font-bold tracking-[-0.04em] tabular-nums`}
+            >
+              {current.ipu}
+            </h1>
+            <div className="flex flex-col items-start gap-1.5">
+              <IpuPill category={current.category} label={t(current.label)} />
+              <span className="text-muted flex items-center gap-1.5 text-xs font-semibold whitespace-nowrap">
+                <span
+                  aria-hidden="true"
+                  className={`size-1.5 rounded-full ${current.source === "apims" ? "bg-[#2e9e5b]" : "bg-[#8a857c]"}`}
+                />
+                {current.source === "apims"
+                  ? t("Rasmi · APIMS")
+                  : t("Anggaran model")}
+              </span>
+              {change && (
+                <span className="text-muted text-[13px] font-semibold">
+                  {change}
+                </span>
+              )}
+              {entry?.status === "loading" && (
+                <span className="text-muted text-xs">
+                  {t("Mengemas kini…")}
+                </span>
+              )}
+            </div>
+          </div>
         </div>
+        {reading.weather && (
+          <WeatherNow
+            weather={reading.weather}
+            hazy={current.ipu > 100}
+            size={size}
+          />
+        )}
       </div>
       {current.emergency && (
         <Notice tone="warning">
@@ -462,21 +491,9 @@ function AdviceCard({
             className="flex items-center gap-2.5 text-[15px] font-semibold"
           >
             <span
-              className={`flex size-6 shrink-0 items-center justify-center rounded-full ${CATEGORY_STYLE[category].tint}`}
+              className={`flex size-8 shrink-0 items-center justify-center rounded-full ${CATEGORY_STYLE[category].tint}`}
             >
-              <svg
-                aria-hidden="true"
-                width="13"
-                height="13"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="3"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <polyline points="5 12 10 17 19 7" />
-              </svg>
+              <AdviceIcon tip={tip} color="currentColor" size={18} />
             </span>
             {t(tip)}
           </li>

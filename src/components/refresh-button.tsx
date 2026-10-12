@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useI18n } from "@/lib/use-i18n";
 import { refreshReadings } from "@/lib/use-reading";
 
@@ -16,16 +16,20 @@ const isTyping = (target: EventTarget | null) => {
 export function RefreshButton({ className = "" }: { className?: string }) {
   const { t } = useI18n();
   const [busy, setBusy] = useState(false);
+  // Ref (bukan state dalam closure) supaya kekunci R tidak diabaikan sejurus selepas muat semula.
+  const running = useRef(false);
 
   const run = useCallback(async () => {
-    if (busy) return;
+    if (running.current) return;
+    running.current = true;
     setBusy(true);
     try {
       await refreshReadings();
     } finally {
+      running.current = false;
       setBusy(false);
     }
-  }, [busy]);
+  }, []);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {

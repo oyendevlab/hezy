@@ -29,7 +29,7 @@ import { Skeleton } from "../status";
 
 const THEMES: { key: ThemePref; label: string }[] = [
   { key: "system", label: "Ikut peranti" },
-  { key: "light", label: "Cerah" },
+  { key: "light", label: "Terang" },
   { key: "dark", label: "Gelap" },
 ];
 
