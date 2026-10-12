@@ -2,7 +2,7 @@
 
 import { Info } from "@phosphor-icons/react";
 import Link from "next/link";
-import { Fragment, useId, useState } from "react";
+import { Fragment, useId, useLayoutEffect, useRef, useState } from "react";
 import { shownError } from "@/lib/accuracy";
 import { HEALTH_PROFILES, adviceFor, type QuickTone } from "@/lib/advice";
 import { CATEGORY_STYLE } from "@/lib/category-style";
@@ -79,6 +79,15 @@ function Welcome() {
   );
 }
 
+/** Had kedudukan bahagian atas kad putih (px dari atas skrin) di telefon. */
+const CARD_TOP_MIN = 124;
+const CARD_TOP_MAX = 408;
+/** pt-6 + pb-8 kad putih. */
+const CARD_PADDING_Y = 56;
+const CARD_PADDING_BOTTOM = 32;
+/** Jarak antara kandungan terakhir kad dan bar navigasi pada kedudukan rehat. */
+const REST_GAP = 16;
+
 type ViewProps = {
   prefs: Prefs;
   location: SavedLocation;
@@ -91,6 +100,32 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
   const reading = entry?.reading;
   const current = primaryReading(reading);
   const showSchool = prefs.profile === "anak" || prefs.showSchool;
+  // Kedudukan rehat kad putih (telefon): seluruh kandungan kelihatan di atas bar navigasi,
+  // dengan ruang langit antara CARD_TOP_MIN dan CARD_TOP_MAX.
+  const spacerRef = useRef<HTMLDivElement>(null);
+  const cardContentRef = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const place = () => {
+      const content = cardContentRef.current;
+      const spacer = spacerRef.current;
+      if (!content || !spacer) return;
+      const height = content.offsetHeight + CARD_PADDING_Y;
+      const nav = document.querySelector<HTMLElement>("[data-bottom-nav]");
+      const navTop = nav?.getBoundingClientRect().top ?? window.innerHeight;
+      // pb-8 kad sudah memberi jarak di atas bar navigasi.
+      spacer.style.height = `${Math.min(
+        Math.max(
+          navTop - height + CARD_PADDING_BOTTOM - REST_GAP,
+          CARD_TOP_MIN,
+        ),
+        CARD_TOP_MAX,
+      )}px`;
+    };
+    place();
+    window.addEventListener("resize", place);
+    return () => window.removeEventListener("resize", place);
+  }, [reading, showSchool]);
+
   // Satu konteks WebGL sahaja: langit telefon atau panorama desktop.
   const wide = useMediaQuery("(min-width: 768px)");
   const sky = {
@@ -161,18 +196,27 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
             className="fixed inset-x-0 top-0 h-[560px] w-full"
           />
         )}
-        <div aria-hidden="true" className="h-[408px]" />
-        <ElasticCard className="bg-page flex min-h-[calc(100svh-120px)] flex-col gap-4 rounded-t-[28px] px-5.5 pt-6 pb-8">
-          <Summary
-            entry={entry}
-            reading={reading}
-            onRetry={onRetry}
-            size="phone"
-            profile={prefs.profile}
-          />
-          {current && showSchool && <SchoolCard reading={current} />}
-          <InstallBanner />
-          {reading && <TrendLink hours={reading.today} />}
+        {/* Ruang langit: dikira supaya kandungan kad muat penuh di atas bar navigasi. */}
+        <div
+          ref={spacerRef}
+          aria-hidden="true"
+          data-testid="card-spacer"
+          style={{ height: CARD_TOP_MAX }}
+        />
+        {/* min-h: kad hanya boleh ditolak hingga bahagian atasnya ~124 px dari atas skrin. */}
+        <ElasticCard className="bg-page min-h-[calc(100svh-236px)] rounded-t-[28px] px-5.5 pt-6 pb-8">
+          <div ref={cardContentRef} className="flex flex-col gap-4">
+            <Summary
+              entry={entry}
+              reading={reading}
+              onRetry={onRetry}
+              size="phone"
+              profile={prefs.profile}
+            />
+            {current && showSchool && <SchoolCard reading={current} />}
+            <InstallBanner />
+            {reading && <TrendLink hours={reading.today} />}
+          </div>
         </ElasticCard>
       </section>
 

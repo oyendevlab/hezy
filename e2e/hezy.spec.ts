@@ -225,6 +225,36 @@ test.describe("pengepala tetap", () => {
   });
 });
 
+test.describe("kedudukan kad putih", () => {
+  test("rehat: kandungan muat di atas navigasi; ditolak ke atas berhenti ~124 px", async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(!isMobile, "Kad putih elastik untuk telefon");
+    await seedLocation(page);
+    await page.goto("/");
+    const link = page.getByRole("link", { name: "Lihat trend jam demi jam" });
+    await expect(link).toBeVisible();
+    const card = page.getByTestId("elastic-card");
+    const navTop = await page
+      .locator("[data-bottom-nav]")
+      .evaluate((el) => el.getBoundingClientRect().top);
+    const linkBottom = await link.evaluate(
+      (el) => el.getBoundingClientRect().bottom,
+    );
+    expect(linkBottom).toBeLessThanOrEqual(navTop);
+    expect(navTop - linkBottom).toBeLessThan(40);
+
+    await page.evaluate(() => window.scrollTo(0, 5000));
+    await expect
+      .poll(() => card.evaluate((el) => el.getBoundingClientRect().top))
+      .toBeGreaterThanOrEqual(123);
+    expect(
+      await card.evaluate((el) => el.getBoundingClientRect().top),
+    ).toBeLessThanOrEqual(126);
+  });
+});
+
 test.describe("butang lihat trend", () => {
   test("kad graf mini membawa ke Trend (telefon)", async ({
     page,
