@@ -529,107 +529,110 @@ function RoutineOptions({ prefs }: { prefs: Prefs }) {
       <legend className="text-muted float-left mb-1 w-full pt-1 text-xs font-semibold">
         {t("Rutin amaran")}
       </legend>
-      <label className={check}>
-        <input
-          type="checkbox"
-          checked={prefs.morningSummary}
-          onChange={(e) =>
-            updatePrefs((x) => ({ ...x, morningSummary: e.target.checked }))
-          }
-          className="mt-0.5 size-4 accent-[#1c1a16]"
-        />
-        <span>
-          {t("Ringkasan pagi (7 pagi)")}
-          <span className="text-muted block text-xs font-medium">
-            {t("IPU semasa dan masa terbaik untuk keluar hari ini")}
+      {/* clear-both: legend terapung tidak boleh menghimpit pilihan pertama. */}
+      <div className="clear-both">
+        <label className={check}>
+          <input
+            type="checkbox"
+            checked={prefs.morningSummary}
+            onChange={(e) =>
+              updatePrefs((x) => ({ ...x, morningSummary: e.target.checked }))
+            }
+            className="mt-0.5 size-4 shrink-0 accent-[#1c1a16]"
+          />
+          <span>
+            {t("Ringkasan pagi (7 pagi)")}
+            <span className="text-muted block text-xs font-medium">
+              {t("IPU semasa dan masa terbaik untuk keluar hari ini")}
+            </span>
           </span>
-        </span>
-      </label>
-      <label className={check}>
-        <input
-          type="checkbox"
-          checked={prefs.forecastAlert}
-          onChange={(e) =>
-            updatePrefs((x) => ({ ...x, forecastAlert: e.target.checked }))
-          }
-          className="mt-0.5 size-4 accent-[#1c1a16]"
-        />
-        <span>
-          {t("Amaran ramalan esok (8 malam)")}
-          <span className="text-muted block text-xs font-medium">
-            {t("Bila purata ramalan esok melebihi ambang anda")}
+        </label>
+        <label className={check}>
+          <input
+            type="checkbox"
+            checked={prefs.forecastAlert}
+            onChange={(e) =>
+              updatePrefs((x) => ({ ...x, forecastAlert: e.target.checked }))
+            }
+            className="mt-0.5 size-4 shrink-0 accent-[#1c1a16]"
+          />
+          <span>
+            {t("Amaran ramalan esok (8 malam)")}
+            <span className="text-muted block text-xs font-medium">
+              {t("Bila purata ramalan esok melebihi ambang anda")}
+            </span>
           </span>
-        </span>
-      </label>
-      <label className={check}>
-        <input
-          type="checkbox"
-          checked={quiet !== null}
-          onChange={(e) =>
-            updatePrefs((x) => ({
-              ...x,
-              quietHours: e.target.checked ? { start: 23, end: 6 } : null,
-            }))
-          }
-          className="mt-0.5 size-4 accent-[#1c1a16]"
-        />
-        <span>
-          {t("Waktu senyap")}
-          <span className="text-muted block text-xs font-medium">
-            {t(
-              "Amaran ditangguh hingga waktu senyap tamat, kecuali IPU melebihi 300",
-            )}
+        </label>
+        <label className={check}>
+          <input
+            type="checkbox"
+            checked={quiet !== null}
+            onChange={(e) =>
+              updatePrefs((x) => ({
+                ...x,
+                quietHours: e.target.checked ? { start: 23, end: 6 } : null,
+              }))
+            }
+            className="mt-0.5 size-4 shrink-0 accent-[#1c1a16]"
+          />
+          <span>
+            {t("Waktu senyap")}
+            <span className="text-muted block text-xs font-medium">
+              {t(
+                "Amaran ditangguh hingga waktu senyap tamat, kecuali IPU melebihi 300",
+              )}
+            </span>
           </span>
-        </span>
-      </label>
-      {quiet && (
-        <div className="flex flex-wrap items-center gap-2 pb-2 pl-7 text-sm">
-          <label className="flex items-center gap-2">
-            <span aria-hidden="true">{t("Dari")}</span>
-            <select
-              aria-label={t("Waktu senyap bermula")}
-              value={quiet.start}
-              onChange={(e) => {
-                const start = Number(e.target.value);
-                if (start === quiet.end) return;
-                updatePrefs((x) => ({
-                  ...x,
-                  quietHours: { start, end: quiet.end },
-                }));
-              }}
-              className={select}
-            >
-              {HOURS.map((h) => (
-                <option key={h} value={h} disabled={h === quiet.end}>
-                  {hourLabel(h)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="flex items-center gap-2">
-            <span aria-hidden="true">{t("hingga")}</span>
-            <select
-              aria-label={t("Waktu senyap tamat")}
-              value={quiet.end}
-              onChange={(e) => {
-                const end = Number(e.target.value);
-                if (end === quiet.start) return;
-                updatePrefs((x) => ({
-                  ...x,
-                  quietHours: { start: quiet.start, end },
-                }));
-              }}
-              className={select}
-            >
-              {HOURS.map((h) => (
-                <option key={h} value={h} disabled={h === quiet.start}>
-                  {hourLabel(h)}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-      )}
+        </label>
+        {quiet && (
+          <div className="flex flex-wrap items-center gap-2 pb-2 pl-7 text-sm">
+            <label className="flex items-center gap-2">
+              <span aria-hidden="true">{t("Dari")}</span>
+              <select
+                aria-label={t("Waktu senyap bermula")}
+                value={quiet.start}
+                onChange={(e) => {
+                  const start = Number(e.target.value);
+                  if (start === quiet.end) return;
+                  updatePrefs((x) => ({
+                    ...x,
+                    quietHours: { start, end: quiet.end },
+                  }));
+                }}
+                className={select}
+              >
+                {HOURS.map((h) => (
+                  <option key={h} value={h} disabled={h === quiet.end}>
+                    {hourLabel(h)}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="flex items-center gap-2">
+              <span aria-hidden="true">{t("hingga")}</span>
+              <select
+                aria-label={t("Waktu senyap tamat")}
+                value={quiet.end}
+                onChange={(e) => {
+                  const end = Number(e.target.value);
+                  if (end === quiet.start) return;
+                  updatePrefs((x) => ({
+                    ...x,
+                    quietHours: { start: quiet.start, end },
+                  }));
+                }}
+                className={select}
+              >
+                {HOURS.map((h) => (
+                  <option key={h} value={h} disabled={h === quiet.start}>
+                    {hourLabel(h)}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+        )}
+      </div>
     </fieldset>
   );
 }
