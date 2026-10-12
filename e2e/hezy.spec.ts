@@ -112,6 +112,76 @@ test.describe("aliran utama", () => {
   });
 });
 
+test.describe("muat semula", () => {
+  /** Kira permintaan /api/aqi (menggantikan tiruan lalai). */
+  async function countAqi(page: import("@playwright/test").Page) {
+    const counter = { n: 0 };
+    await page.route("**/api/aqi?**", (route) => {
+      counter.n++;
+      return route.fulfill({ json: fakeReading() });
+    });
+    return counter;
+  }
+
+  test("tarik ke bawah dan lepas memuat semula bacaan", async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(!isMobile, "Gerak isyarat sentuh untuk telefon");
+    await seedLocation(page);
+    const calls = await countAqi(page);
+    await page.goto("/");
+    await expect(
+      page.getByRole("heading", { name: /^IPU \d+/ }).filter({ visible: true }),
+    ).toBeVisible();
+    expect(calls.n).toBe(1);
+
+    const cdp = await page.context().newCDPSession(page);
+    const touch = (type: "touchStart" | "touchMove" | "touchEnd", y?: number) =>
+      cdp.send("Input.dispatchTouchEvent", {
+        type,
+        touchPoints: y === undefined ? [] : [{ x: 200, y }],
+      });
+    await touch("touchStart", 120);
+    for (let y = 140; y <= 320; y += 20) await touch("touchMove", y);
+    await expect(page.getByTestId("pull-indicator")).toHaveAttribute(
+      "data-state",
+      "pulling",
+    );
+    await touch("touchEnd");
+    await expect.poll(() => calls.n).toBe(2);
+    await expect(page.getByTestId("pull-indicator")).toHaveAttribute(
+      "data-state",
+      "idle",
+    );
+
+    // Tarikan pendek tidak memuat semula.
+    await touch("touchStart", 120);
+    await touch("touchMove", 160);
+    await touch("touchEnd");
+    await page.waitForTimeout(300);
+    expect(calls.n).toBe(2);
+  });
+
+  test("desktop: butang Muat semula dan pintasan R", async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, "Butang muat semula untuk desktop");
+    await seedLocation(page);
+    const calls = await countAqi(page);
+    await page.goto("/");
+    const button = page.getByRole("button", { name: "Muat semula" });
+    await expect(button).toBeVisible();
+    await expect.poll(() => calls.n).toBe(1);
+    await button.click();
+    await expect.poll(() => calls.n).toBe(2);
+    await expect(button).toBeEnabled();
+    await page.keyboard.press("r");
+    await expect.poll(() => calls.n).toBe(3);
+  });
+});
+
 test.describe("bacaan rasmi APIMS", () => {
   test("IPU rasmi stesen terdekat diutamakan berbanding anggaran", async ({
     page,

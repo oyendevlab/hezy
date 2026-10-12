@@ -8,7 +8,9 @@ import { CompareLocations } from "../compare-locations";
 import { SchoolCard } from "../school-card";
 import { ChooseLocation } from "../choose-location";
 import { IpuPill } from "../ipu-pill";
+import { PullToRefresh } from "../pull-to-refresh";
 import { ReadingNotices } from "../reading-notices";
+import { RefreshButton } from "../refresh-button";
 import { Notice, Skeleton } from "../status";
 import { TrendPanel } from "../trend-panel";
 import { useCurrent } from "../use-current";
@@ -22,6 +24,7 @@ export function TrendScreen() {
 
   return (
     <div className="mx-auto flex max-w-[720px] flex-col gap-4 px-5 pt-13 md:pt-10">
+      <PullToRefresh />
       <div className="flex items-center justify-between gap-3">
         <div>
           <h1 className="font-display text-[30px] font-bold">{t("Trend")}</h1>
@@ -36,6 +39,7 @@ export function TrendScreen() {
         </div>
         {current && (
           <div className="flex items-center gap-2">
+            <RefreshButton className="mr-1 hidden md:inline-flex" />
             <span className="font-display text-2xl font-bold">
               {current.ipu}
             </span>

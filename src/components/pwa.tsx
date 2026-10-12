@@ -6,6 +6,7 @@ import { alertLocations, effectiveThreshold, usePrefs } from "@/lib/prefs";
 import { syncPushSettings } from "@/lib/push-client";
 import { useI18n } from "@/lib/use-i18n";
 import { useOnline } from "@/lib/online";
+import { refreshStaleReadings } from "@/lib/use-reading";
 
 /** Daftar service worker (production sahaja) dan dengar peristiwa pemasangan. */
 export function PwaSetup() {
@@ -31,6 +32,19 @@ export function PwaSetup() {
       .catch(() => {
         // Tanpa SW, aplikasi masih berfungsi dalam talian.
       });
+  }, []);
+
+  // Bila kembali ke aplikasi/tab atau sambungan pulih: ambil semula bacaan yang > 10 minit.
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState === "visible") refreshStaleReadings();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("online", refreshStaleReadings);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("online", refreshStaleReadings);
+    };
   }, []);
 
   // Amaran push ikut lokasi (semasa + kegemaran) dan ambang: kemas kini pelayan bila berubah.

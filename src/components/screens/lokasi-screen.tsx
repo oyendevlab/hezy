@@ -22,6 +22,8 @@ import { useReading } from "@/lib/use-reading";
 import { ChooseLocation } from "../choose-location";
 import { IpuPill } from "../ipu-pill";
 import { LocationSearch } from "../location-search";
+import { PullToRefresh } from "../pull-to-refresh";
+import { RefreshButton } from "../refresh-button";
 import { Skeleton } from "../status";
 
 // Leaflet hanya dimuatkan bila tab Peta dibuka.
@@ -55,7 +57,11 @@ export function LokasiScreen() {
 
   return (
     <div className="mx-auto flex max-w-[960px] flex-col gap-5 px-5 pt-13 md:px-10 md:pt-10">
-      <h1 className="font-display text-[30px] font-bold">{t("Lokasi")}</h1>
+      <PullToRefresh />
+      <div className="flex items-center justify-between gap-3">
+        <h1 className="font-display text-[30px] font-bold">{t("Lokasi")}</h1>
+        <RefreshButton className="hidden md:inline-flex" />
+      </div>
 
       <div
         role="tablist"

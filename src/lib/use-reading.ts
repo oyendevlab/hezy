@@ -15,7 +15,7 @@ export type ReadingEntry = {
 
 const entries = new Map<string, ReadingEntry>();
 const listeners = new Set<() => void>();
-const inFlight = new Set<string>();
+const inFlight = new Map<string, Promise<void>>();
 
 const keyOf = (lat: number, lon: number) =>
   `${lat.toFixed(2)},${lon.toFixed(2)}`;
@@ -39,15 +39,21 @@ function restore(key: string): ReadingEntry | undefined {
   }
 }
 
-async function load(key: string, force = false) {
-  if (inFlight.has(key)) return;
+function load(key: string, force = false): Promise<void> {
+  const running = inFlight.get(key);
+  if (running) return running;
+  const promise = fetchEntry(key, force).finally(() => inFlight.delete(key));
+  inFlight.set(key, promise);
+  return promise;
+}
+
+async function fetchEntry(key: string, force: boolean) {
   let entry = entries.get(key) ?? restore(key);
   if (!force && entry?.fetchedAt && Date.now() - entry.fetchedAt < FRESH_MS) {
     if (!entries.has(key)) setEntry(key, entry);
     return;
   }
 
-  inFlight.add(key);
   entry = { ...entry, status: "loading", error: undefined };
   setEntry(key, entry);
   const [lat, lon] = key.split(",");
@@ -76,9 +82,19 @@ async function load(key: string, force = false) {
           : "Ralat tidak diketahui.";
     // Kekalkan bacaan lama (jika ada) supaya skrin tidak kosong.
     setEntry(key, { ...entry, status: "error", error: message });
-  } finally {
-    inFlight.delete(key);
   }
+}
+
+/** Muat semula semua bacaan yang sedang dipaparkan (tarik untuk muat semula, butang ⟳). */
+export function refreshReadings(): Promise<void> {
+  return Promise.all([...entries.keys()].map((key) => load(key, true))).then(
+    () => undefined,
+  );
+}
+
+/** Ambil semula bacaan yang sudah lebih 10 minit (cth. bila tab kembali aktif). */
+export function refreshStaleReadings() {
+  for (const key of entries.keys()) void load(key);
 }
 
 function subscribe(listener: () => void) {
