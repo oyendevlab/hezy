@@ -235,15 +235,15 @@ Masalah: model CAMS (Open-Meteo) kurang menganggar jerebu. Contoh Putrajaya 12 O
    - [ ] Teks makluman sedia dikongsi kepada ibu bapa (WhatsApp/Telegram)
 9. **Senarai semak jerebu** — KIV
    - [ ] Senarai persediaan (topeng N95, penapis udara, ubat asma, dll.) ikut profil; tanda siap disimpan di peranti
-10. **Bahasa Cina dan Tamil** — KIV
+10. **Bahasa Cina dan Tamil** — KIV — ✅ siap
     - [ ] Kamus 中文 dan தமிழ் dalam `i18n.ts`, pilihan di Tetapan
     - [ ] **Pengguna**: semakan terjemahan oleh penutur asli sebelum dikeluarkan
 
 ### Aplikasi dan kualiti
 
-11. **Pintasan Android**
+11. **Pintasan Android** — ✅ siap
     - [x] `shortcuts` dalam manifest: Trend, Peta, Tetapan
-12. **Lencana ikon**
+12. **Lencana ikon** — ✅ siap
     - [x] Badging API: nombor IPU pada ikon aplikasi bila melebihi ambang (Android/desktop; iOS 16.4+ bila dipasang)
 13. **Pemantauan ralat klien**
     - [x] Endpoint `/api/log` (had kadar, tiada data peribadi) + ralat disimpan dalam Blob; ringkasan dalam semakan harian `pantau.yml`
@@ -392,9 +392,9 @@ Fokus: UI/UX yang lebih licin dan seperti aplikasi asli. Termasuk pembetulan ked
 
 ### Lokasi dan peta
 
-10. **Kad stesen terpilih sebagai bottom sheet di atas peta** (seperti Google Maps)
-11. **Suis lapisan sebagai cip terapung di atas peta** (Titik panas, Sensor, Angin)
-12. **Himpunan pin (clustering)** bila dizum keluar
+10. **Kad stesen terpilih sebagai bottom sheet di atas peta** (seperti Google Maps) — ✅ siap
+11. **Suis lapisan sebagai cip terapung di atas peta** (Titik panas, Sensor, Angin) — ✅ siap
+12. **Himpunan pin (clustering)** bila dizum keluar — ✅ siap
 13. **Kegemaran**: leret untuk buang, seret untuk susun semula (dengan alternatif butang untuk papan kekunci)
 
 ### Amaran
