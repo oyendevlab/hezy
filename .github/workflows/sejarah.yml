@@ -25,7 +25,7 @@ jobs:
           for BACK in $(seq $((DAYS - 1)) -1 0); do
             if RESULT=$(curl -fsS --max-time 120 \
                 -H "Authorization: Bearer $CRON_SECRET" \
-                "https://hezy.vercel.app/api/history/collect?back=$BACK"); then
+                "https://hezy.my/api/history/collect?back=$BACK"); then
               echo "$RESULT"
               echo "- \`$RESULT\`" >> "$GITHUB_STEP_SUMMARY"
               # Negeri yang gagal bagi hari yang berjaya hanya dilaporkan.

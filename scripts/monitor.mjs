@@ -1,7 +1,7 @@
 // Semak sumber data Hezy pada production. Jalankan: npm run monitor
 // Keluar dengan kod 1 (dan cetak ringkasan) jika ada semakan gagal.
 
-const BASE = process.env.HEZY_URL ?? "https://hezy.vercel.app";
+const BASE = process.env.HEZY_URL ?? "https://hezy.my";
 const MAX_AGE_HOURS = 6;
 
 /** Jam semasa waktu Malaysia, `YYYY-MM-DDTHH:00`. */

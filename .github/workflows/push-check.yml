@@ -17,7 +17,7 @@ jobs:
         run: |
           RESULT=$(curl -fsS --max-time 120 \
             -H "Authorization: Bearer $CRON_SECRET" \
-            https://hezy.vercel.app/api/push/check)
+            https://hezy.my/api/push/check)
           echo "$RESULT"
           echo "### Semakan amaran: \`$RESULT\`" >> "$GITHUB_STEP_SUMMARY"
           # Gagalkan job jika ada notifikasi yang gagal dihantar (bukan langganan tamat).

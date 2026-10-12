@@ -17,6 +17,6 @@ jobs:
         run: |
           RESULT=$(curl -fsS --max-time 280 \
             -H "Authorization: Bearer $CRON_SECRET" \
-            https://hezy.vercel.app/api/accuracy/run)
+            https://hezy.my/api/accuracy/run)
           echo "$RESULT" | jq .
           echo "### Ketepatan: \`$(echo "$RESULT" | jq -c .)\`" >> "$GITHUB_STEP_SUMMARY"

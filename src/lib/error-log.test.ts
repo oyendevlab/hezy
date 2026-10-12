@@ -10,7 +10,7 @@ import {
 } from "./error-log";
 import { APP_VERSION } from "./version";
 
-const ORIGIN = "https://hezy.vercel.app";
+const ORIGIN = "https://hezy.my";
 
 describe("APP_VERSION", () => {
   it("sama seperti package.json", () => {
@@ -23,13 +23,13 @@ describe("parseReport", () => {
   it("membuang query string, memotong teks dan menolak laporan kosong", () => {
     const r = parseReport({
       kind: "rejection",
-      message: "x is undefined at https://hezy.vercel.app/?lat=3.07&lon=101.5",
+      message: "x is undefined at https://hezy.my/?lat=3.07&lon=101.5",
       stack: `at f (${ORIGIN}/_next/static/chunks/a.js?v=1:10:5)`,
       path: "/trend?lat=3.07#x",
       version: "0.4.0<script>",
       browser: "Chrome 126 · Android",
     })!;
-    expect(r.message).toBe("x is undefined at https://hezy.vercel.app/");
+    expect(r.message).toBe("x is undefined at https://hezy.my/");
     expect(r.stack).toBe(`at f (${ORIGIN}/_next/static/chunks/a.js:10:5)`);
     expect(r.path).toBe("/trend");
     expect(r.version).toBe("0.4.0script");

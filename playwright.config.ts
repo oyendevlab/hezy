@@ -1,7 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
 const PORT = 3100;
-/** Tetapkan E2E_BASE_URL (cth. https://hezy.vercel.app) untuk menguji deployment sedia ada. */
+/** Tetapkan E2E_BASE_URL (cth. https://hezy.my) untuk menguji deployment sedia ada. */
 const REMOTE = process.env.E2E_BASE_URL;
 
 export default defineConfig({

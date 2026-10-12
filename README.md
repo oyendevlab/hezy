@@ -2,7 +2,7 @@
 
 PWA untuk menyemak Indeks Pencemar Udara (IPU) di Malaysia dengan pantas.
 
-- Production: https://hezy.vercel.app
+- Production: https://hezy.my
 - Keperluan produk: [docs/PRD.md](docs/PRD.md)
 - Senarai task: [docs/TASKS.md](docs/TASKS.md)
 

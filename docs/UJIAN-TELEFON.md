@@ -2,7 +2,7 @@
 
 Ujian automatik (Playwright) sudah meliputi aliran utama, mod luar talian dan kebolehcapaian. Perkara di bawah hanya boleh disahkan pada peranti sebenar.
 
-Buka **https://hezy.vercel.app** pada telefon.
+Buka **https://hezy.my** pada telefon.
 
 ## Android (Chrome)
 
