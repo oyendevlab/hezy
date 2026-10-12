@@ -288,8 +288,14 @@ const EN: Record<string, string> = {
   "Kaedah anggaran": "Estimation method",
   "Formula JAS, PM2.5 sahaja": "DOE formula, PM2.5 only",
   Versi: "Version",
-  "Bila ada stesen APIMS dalam 30 km dengan bacaan 3 jam terakhir, Hezy memaparkan IPU rasmi stesen itu. Jika tidak, Hezy memaparkan anggaran daripada PM2.5 model, yang mungkin berbeza daripada bacaan rasmi. Graf dan masa terbaik sentiasa menggunakan model.":
-    "When an APIMS station within 30 km has a reading from the last 3 hours, Hezy shows that station's official API. Otherwise Hezy shows an estimate from model PM2.5, which may differ from official readings. Forecasts and the best time always use the model.",
+  "Bila ada stesen APIMS dalam 30 km dengan bacaan 3 jam terakhir, Hezy memaparkan IPU rasmi stesen itu dan membetulkan ramalan model dengan bacaan tersebut. Jika tidak, Hezy memaparkan anggaran dan ramalan daripada PM2.5 model, yang mungkin berbeza daripada bacaan rasmi.":
+    "When an APIMS station within 30 km has a reading from the last 3 hours, Hezy shows that station's official API and corrects the model forecast with it. Otherwise Hezy shows an estimate and forecast from model PM2.5, which may differ from official readings.",
+  "Ramalan dibetulkan": "Corrected forecast",
+  "Anggaran dibetulkan": "Corrected estimate",
+  "Jam akan datang: ramalan dibetulkan dengan APIMS":
+    "Coming hours: forecast corrected with APIMS",
+  "Jam lepas menggunakan bacaan rasmi APIMS stesen {station}. Ramalan model (PM2.5, formula JAS) dibetulkan dengan bacaan itu: {offset} µg/m³ pada jam semasa, berkurang ke model dalam 48 jam.":
+    "Past hours use official APIMS readings from the {station} station. The model forecast (PM2.5, DOE formula) is corrected with those readings: {offset} µg/m³ at the current hour, fading back to the model over 48 hours.",
   "Padam data di peranti ini": "Delete data on this device",
   "Padam lokasi, kegemaran dan tetapan yang disimpan di peranti ini?":
     "Delete the locations, favourites and settings saved on this device?",

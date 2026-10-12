@@ -30,6 +30,7 @@ export function HourBars({
   );
   const nowIndex = hours.findLastIndex((h) => !h.forecast);
   const officialPast = hours.some((h) => !h.forecast && h.officialIpu != null);
+  const correctedFuture = hours.some((h) => h.forecast && h.corrected);
   const scrub = useHourScrub(points.length, nowIndex);
   const summaryId = useId();
   const selected = scrub.index >= 0 ? points[scrub.index] : null;
@@ -57,10 +58,14 @@ export function HourBars({
 
   const sourceOf = (p: (typeof points)[number]) =>
     p.forecast
-      ? t("Ramalan model")
+      ? p.corrected
+        ? t("Ramalan dibetulkan")
+        : t("Ramalan model")
       : p.officialIpu != null
         ? t("Bacaan rasmi APIMS")
-        : t("Anggaran model");
+        : p.corrected
+          ? t("Anggaran dibetulkan")
+          : t("Anggaran model");
   const valueText = selected
     ? selected.value === null
       ? `${formatHour(selected.time, lang)}: ${t("Tiada data")}`
@@ -181,7 +186,11 @@ export function HourBars({
               aria-hidden="true"
               className="bg-ink size-2.5 rounded-sm opacity-45"
             />
-            {t("Jam akan datang: ramalan model")}
+            {t(
+              correctedFuture
+                ? "Jam akan datang: ramalan dibetulkan dengan APIMS"
+                : "Jam akan datang: ramalan model",
+            )}
           </span>
           {scrub.moved ? (
             <button

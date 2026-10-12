@@ -337,6 +337,41 @@ test.describe("trend rasmi APIMS", () => {
     ).toHaveAccessibleDescription(/Tertinggi 172/);
   });
 
+  test("ramalan yang dibetulkan dilabel dengan jelas", async ({ page }) => {
+    const reading = fakeReading(OFFICIAL_SHAH_ALAM) as ReturnType<
+      typeof fakeReading
+    > & { correction: unknown };
+    reading.correction = {
+      offsetPm25: 80.3,
+      matchedHours: 6,
+      anchorTime: "2026-10-11T10:00",
+      anchorIpu: 172,
+    };
+    reading.today = reading.today.map((h) =>
+      h.forecast ? { ...h, corrected: true } : h,
+    );
+    await seedLocation(page);
+    await page.route("**/api/aqi?**", (route) =>
+      route.fulfill({ json: reading }),
+    );
+    await page.goto("/trend");
+    await expect(
+      page.getByText("Jam akan datang: ramalan dibetulkan dengan APIMS"),
+    ).toBeVisible();
+    await expect(
+      page.getByText(/dibetulkan dengan bacaan itu: \+80/),
+    ).toBeVisible();
+    const chart = page.getByRole("slider", {
+      name: "Graf IPU hari ini, jam demi jam",
+    });
+    await chart.focus();
+    await page.keyboard.press("End");
+    await expect(chart).toHaveAttribute(
+      "aria-valuetext",
+      /· Ramalan dibetulkan$/,
+    );
+  });
+
   test("kembali ke anggaran model bila tiada sejarah rasmi", async ({
     page,
   }) => {

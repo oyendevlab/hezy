@@ -205,7 +205,7 @@ export function TetapanScreen() {
             </div>
             <p className="text-muted mt-2 text-xs leading-relaxed">
               {t(
-                "Bila ada stesen APIMS dalam 30 km dengan bacaan 3 jam terakhir, Hezy memaparkan IPU rasmi stesen itu. Jika tidak, Hezy memaparkan anggaran daripada PM2.5 model, yang mungkin berbeza daripada bacaan rasmi. Graf dan masa terbaik sentiasa menggunakan model.",
+                "Bila ada stesen APIMS dalam 30 km dengan bacaan 3 jam terakhir, Hezy memaparkan IPU rasmi stesen itu dan membetulkan ramalan model dengan bacaan tersebut. Jika tidak, Hezy memaparkan anggaran dan ramalan daripada PM2.5 model, yang mungkin berbeza daripada bacaan rasmi.",
               )}
             </p>
           </section>

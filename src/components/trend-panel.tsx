@@ -146,9 +146,17 @@ export function TrendPanel({
       )}
 
       <p className="text-muted text-xs">
-        {t(
-          "Jam lepas dan purata menggunakan bacaan rasmi APIMS stesen terdekat jika ada. Ramalan dan masa terbaik menggunakan IPU sejam daripada PM2.5 model (formula JAS).",
-        )}
+        {reading.correction
+          ? t(
+              "Jam lepas menggunakan bacaan rasmi APIMS stesen {station}. Ramalan model (PM2.5, formula JAS) dibetulkan dengan bacaan itu: {offset} µg/m³ pada jam semasa, berkurang ke model dalam 48 jam.",
+              {
+                station: reading.official?.stationName ?? "terdekat",
+                offset: `${reading.correction.offsetPm25 >= 0 ? "+" : ""}${Math.round(reading.correction.offsetPm25)}`,
+              },
+            )
+          : t(
+              "Jam lepas dan purata menggunakan bacaan rasmi APIMS stesen terdekat jika ada. Ramalan dan masa terbaik menggunakan IPU sejam daripada PM2.5 model (formula JAS).",
+            )}
       </p>
     </div>
   );
