@@ -747,6 +747,97 @@ test.describe("muat semula", () => {
   });
 });
 
+test.describe("susun dan leret kegemaran", () => {
+  const order = (page: import("@playwright/test").Page) =>
+    page
+      .getByTestId("favourite-list")
+      .locator(":scope > li")
+      .evaluateAll((els) =>
+        els.map((el) =>
+          el
+            .querySelector("button[aria-label^='Susun semula']")
+            ?.getAttribute("aria-label")
+            ?.split(",")[0]
+            .replace("Susun semula ", ""),
+        ),
+      );
+
+  test("papan kekunci: anak panah memindah kegemaran dan diumumkan", async ({
+    page,
+  }) => {
+    await seedLocation(page, [SHAH_ALAM, KLANG]);
+    await page.goto("/lokasi#senarai");
+    await expect.poll(() => order(page)).toEqual(["Shah Alam", "Klang"]);
+    const handle = page.getByRole("button", {
+      name: /^Susun semula Shah Alam/,
+    });
+    await handle.focus();
+    await page.keyboard.press("ArrowDown");
+    await expect.poll(() => order(page)).toEqual(["Klang", "Shah Alam"]);
+    await expect(
+      page
+        .getByRole("status")
+        .filter({ hasText: "Shah Alam dipindah ke kedudukan 2 daripada 2" }),
+    ).toHaveCount(1);
+    await expect(
+      page.getByRole("button", { name: /^Susun semula Shah Alam/ }),
+    ).toBeFocused();
+    // Kekal selepas muat semula.
+    await page.reload();
+    await expect.poll(() => order(page)).toEqual(["Klang", "Shah Alam"]);
+  });
+
+  test("seret pemegang untuk susun semula (tetikus)", async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, "Seret tetikus untuk desktop");
+    await seedLocation(page, [SHAH_ALAM, KLANG]);
+    await page.goto("/lokasi#senarai");
+    const handles = page.getByTestId("reorder-handle");
+    await expect(handles).toHaveCount(2);
+    const from = (await handles.nth(0).boundingBox())!;
+    const to = (await handles.nth(1).boundingBox())!;
+    await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(to.x + to.width / 2, to.y + to.height / 2, {
+      steps: 8,
+    });
+    await page.mouse.up();
+    await expect.poll(() => order(page)).toEqual(["Klang", "Shah Alam"]);
+  });
+
+  test("leret ke kiri untuk buang (sentuh)", async ({ page, isMobile }) => {
+    test.skip(!isMobile, "Gerak isyarat sentuh untuk telefon");
+    await seedLocation(page, [SHAH_ALAM, KLANG]);
+    await page.goto("/lokasi#senarai");
+    const row = page.getByTestId("swipe-row").nth(1);
+    await expect(row).toContainText("Klang");
+    const box = (await row.boundingBox())!;
+    const y = box.y + box.height / 2;
+    const cdp = await page.context().newCDPSession(page);
+    const touch = (type: "touchStart" | "touchMove" | "touchEnd", x?: number) =>
+      cdp.send("Input.dispatchTouchEvent", {
+        type,
+        touchPoints: x === undefined ? [] : [{ x, y }],
+      });
+    // Leretan pendek: kembali ke tempat asal.
+    await touch("touchStart", box.x + box.width - 30);
+    await touch("touchMove", box.x + box.width - 70);
+    await touch("touchEnd");
+    await expect(page.getByTestId("swipe-row")).toHaveCount(2);
+    // Biar baris melantun semula dahulu (seperti jari pengguna diangkat).
+    await page.waitForTimeout(300);
+    // Leretan panjang: dibuang.
+    await touch("touchStart", box.x + box.width - 20);
+    for (let x = box.x + box.width - 40; x > box.x + 60; x -= 30)
+      await touch("touchMove", x);
+    await touch("touchEnd");
+    await expect(page.getByTestId("swipe-row")).toHaveCount(1);
+    await expect(page.getByTestId("swipe-row")).toContainText("Shah Alam");
+  });
+});
+
 test.describe("navigasi", () => {
   test("ikon Phosphor terisi untuk halaman aktif sahaja", async ({ page }) => {
     await seedLocation(page);
