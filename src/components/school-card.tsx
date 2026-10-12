@@ -1,5 +1,8 @@
+"use client";
+
 import type { PrimaryReading } from "@/lib/official";
 import { schoolStatus, type SchoolLevel } from "@/lib/school";
+import { useI18n } from "@/lib/use-i18n";
 
 const LEVEL_CLASS: Record<SchoolLevel, string> = {
   normal: "bg-ipu-sederhana-tint text-ipu-sederhana-ink",
@@ -9,6 +12,7 @@ const LEVEL_CLASS: Record<SchoolLevel, string> = {
 
 /** Kad panduan status sekolah (KPM) berdasarkan nombor IPU utama. */
 export function SchoolCard({ reading }: { reading: PrimaryReading }) {
+  const { t } = useI18n();
   const status = schoolStatus(reading.ipu);
   return (
     <section
@@ -30,21 +34,24 @@ export function SchoolCard({ reading }: { reading: PrimaryReading }) {
           <path d="M3 10 12 5l9 5-9 5z" />
           <path d="M7 12v5c0 1 2.2 2.5 5 2.5s5-1.5 5-2.5v-5" />
         </svg>
-        STATUS SEKOLAH
+        {t("STATUS SEKOLAH")}
       </div>
       <h2
         id="status-sekolah"
         className="font-display mt-1 text-2xl leading-tight font-bold"
       >
-        {status.title}
+        {t(status.title)}
       </h2>
       <p className="mt-1.5 text-sm leading-relaxed font-medium">
-        {status.detail}
+        {t(status.detail)}
       </p>
       <p className="mt-2 text-xs font-semibold">
-        Panduan sahaja (
-        {reading.source === "apims" ? "IPU rasmi" : "anggaran IPU"}{" "}
-        {reading.ipu}). Keputusan rasmi dibuat oleh sekolah, PPD dan JPN.
+        {t(
+          reading.source === "apims"
+            ? "Panduan sahaja (IPU rasmi {ipu}). Keputusan rasmi dibuat oleh sekolah, PPD dan JPN."
+            : "Panduan sahaja (anggaran IPU {ipu}). Keputusan rasmi dibuat oleh sekolah, PPD dan JPN.",
+          { ipu: reading.ipu },
+        )}
       </p>
     </section>
   );

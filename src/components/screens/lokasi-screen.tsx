@@ -17,6 +17,7 @@ import {
   type SavedLocation,
 } from "@/lib/prefs";
 import { pushSupport } from "@/lib/push-client";
+import { useI18n } from "@/lib/use-i18n";
 import { useReading } from "@/lib/use-reading";
 import { ChooseLocation } from "../choose-location";
 import { IpuPill } from "../ipu-pill";
@@ -35,6 +36,7 @@ const StationMap = dynamic(
 const noopSubscribe = () => () => {};
 
 export function LokasiScreen() {
+  const { t } = useI18n();
   const prefs = usePrefs();
   const canAlert = useSyncExternalStore(
     noopSubscribe,
@@ -53,11 +55,11 @@ export function LokasiScreen() {
 
   return (
     <div className="mx-auto flex max-w-[960px] flex-col gap-5 px-5 pt-13 md:px-10 md:pt-10">
-      <h1 className="font-display text-[30px] font-bold">Lokasi</h1>
+      <h1 className="font-display text-[30px] font-bold">{t("Lokasi")}</h1>
 
       <div
         role="tablist"
-        aria-label="Paparan lokasi"
+        aria-label={t("Paparan lokasi")}
         className="bg-surface grid grid-cols-2 gap-1 rounded-2xl p-1"
       >
         {(["list", "map"] as const).map((v) => (
@@ -69,7 +71,7 @@ export function LokasiScreen() {
             onClick={() => setView(v)}
             className={`min-h-10 rounded-xl text-sm ${view === v ? "bg-page font-bold" : "text-muted font-medium"}`}
           >
-            {v === "list" ? "Senarai" : "Peta"}
+            {v === "list" ? t("Senarai") : t("Peta")}
           </button>
         ))}
       </div>
@@ -80,7 +82,7 @@ export function LokasiScreen() {
         href="/negeri"
         className="text-muted self-start text-sm font-semibold underline"
       >
-        Lihat IPU semua stesen mengikut negeri
+        {t("Lihat IPU semua stesen mengikut negeri")}
       </Link>
 
       {view === "list" && prefs === null && <Skeleton className="h-64" />}
@@ -89,7 +91,7 @@ export function LokasiScreen() {
         <>
           <section className="flex flex-col gap-3">
             <h2 className="text-muted text-sm font-bold tracking-wide">
-              LOKASI SEMASA
+              {t("LOKASI SEMASA")}
             </h2>
             {prefs.current && !changing ? (
               <div className="border-line flex flex-col gap-3 rounded-[18px] border-[1.5px] p-3.5 sm:flex-row sm:items-center">
@@ -107,7 +109,7 @@ export function LokasiScreen() {
                         }
                         className="bg-surface min-h-11 rounded-xl px-3.5 text-sm font-semibold"
                       >
-                        Simpan
+                        {t("Simpan")}
                       </button>
                     )}
                   <button
@@ -115,7 +117,7 @@ export function LokasiScreen() {
                     onClick={() => setChanging(true)}
                     className="bg-ink text-page min-h-11 rounded-xl px-3.5 text-sm font-semibold"
                   >
-                    Tukar
+                    {t("Tukar")}
                   </button>
                 </div>
               </div>
@@ -128,7 +130,7 @@ export function LokasiScreen() {
                     onClick={() => setChanging(false)}
                     className="mt-3 min-h-11 text-sm font-semibold underline"
                   >
-                    Batal
+                    {t("Batal")}
                   </button>
                 )}
               </div>
@@ -137,12 +139,16 @@ export function LokasiScreen() {
 
           <section className="flex flex-col gap-3">
             <h2 className="text-muted text-sm font-bold tracking-wide">
-              KEGEMARAN ({prefs.favourites.length}/{MAX_FAVOURITES})
+              {t("KEGEMARAN ({count}/{max})", {
+                count: prefs.favourites.length,
+                max: MAX_FAVOURITES,
+              })}
             </h2>
             {canAlert && prefs.favourites.length > 0 && (
               <p className="text-muted -mt-1 text-xs">
-                Ketik loceng untuk menerima amaran IPU bagi lokasi itu. Hidupkan
-                amaran di Tetapan dahulu.
+                {t(
+                  "Ketik loceng untuk menerima amaran IPU bagi lokasi itu. Hidupkan amaran di Tetapan dahulu.",
+                )}
               </p>
             )}
             <ul className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
@@ -156,7 +162,9 @@ export function LokasiScreen() {
                     <button
                       type="button"
                       aria-pressed={prefs.alertFavourites.includes(f.id)}
-                      aria-label={`Amaran IPU untuk ${f.name}`}
+                      aria-label={t("Amaran IPU untuk {name}", {
+                        name: f.name,
+                      })}
                       onClick={() =>
                         updatePrefs((p) => toggleAlertFavourite(p, f.id))
                       }
@@ -188,7 +196,9 @@ export function LokasiScreen() {
                   )}
                   <button
                     type="button"
-                    aria-label={`Buang ${f.name} daripada kegemaran`}
+                    aria-label={t("Buang {name} daripada kegemaran", {
+                      name: f.name,
+                    })}
                     onClick={() => updatePrefs((p) => removeFavourite(p, f.id))}
                     className="text-muted hover:bg-line flex size-11 shrink-0 items-center justify-center rounded-full"
                   >
@@ -225,7 +235,7 @@ export function LokasiScreen() {
                     onClick={() => setAdding(false)}
                     className="mt-3 min-h-11 text-sm font-semibold underline"
                   >
-                    Batal
+                    {t("Batal")}
                   </button>
                 </div>
               ) : (
@@ -234,7 +244,7 @@ export function LokasiScreen() {
                   onClick={() => setAdding(true)}
                   className="border-line text-muted min-h-14 rounded-[18px] border-2 border-dashed font-semibold"
                 >
-                  + Tambah lokasi kegemaran
+                  {t("+ Tambah lokasi kegemaran")}
                 </button>
               ))}
           </section>
@@ -252,6 +262,7 @@ function LocationReading({
   location: SavedLocation;
   onSelect: () => void;
 }) {
+  const { t } = useI18n();
   const { entry } = useReading(location);
   const current = primaryReading(entry?.reading);
   return (
@@ -262,10 +273,10 @@ function LocationReading({
     >
       <span className="min-w-0 flex-1">
         <span className="block truncate text-[15px] font-bold">
-          {location.name}
+          {t(location.name)}
         </span>
         <span className="text-muted block text-xs font-medium">
-          {location.detail}
+          {location.detail && t(location.detail)}
         </span>
       </span>
       {current ? (
@@ -273,12 +284,12 @@ function LocationReading({
           <span className="font-display text-2xl font-bold">{current.ipu}</span>
           <IpuPill
             category={current.category}
-            label={current.label}
+            label={t(current.label)}
             className="!px-2 !text-[11px]"
           />
         </span>
       ) : entry?.status === "error" ? (
-        <span className="text-muted text-xs">Tiada data</span>
+        <span className="text-muted text-xs">{t("Tiada data")}</span>
       ) : (
         <Skeleton className="h-7 w-16" />
       )}

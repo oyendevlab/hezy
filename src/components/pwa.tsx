@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { listenForInstall } from "@/lib/install";
 import { alertLocations, effectiveThreshold, usePrefs } from "@/lib/prefs";
 import { syncPushSettings } from "@/lib/push-client";
+import { useI18n } from "@/lib/use-i18n";
 import { useOnline } from "@/lib/online";
 
 /** Daftar service worker (production sahaja) dan dengar peristiwa pemasangan. */
@@ -36,7 +37,11 @@ export function PwaSetup() {
   const prefs = usePrefs();
   useEffect(() => {
     if (!prefs || process.env.NODE_ENV !== "production") return;
-    void syncPushSettings(alertLocations(prefs), effectiveThreshold(prefs));
+    void syncPushSettings(
+      alertLocations(prefs),
+      effectiveThreshold(prefs),
+      prefs.lang,
+    );
   }, [prefs]);
 
   return null;
@@ -44,13 +49,14 @@ export function PwaSetup() {
 
 export function OfflineBanner() {
   const online = useOnline();
+  const { t } = useI18n();
   if (online) return null;
   return (
     <div
       role="status"
       className="bg-ink text-page sticky top-0 z-20 px-5 py-2.5 text-center text-sm font-semibold"
     >
-      Luar talian · Memaparkan bacaan terakhir yang disimpan
+      {t("Luar talian · Memaparkan bacaan terakhir yang disimpan")}
     </div>
   );
 }

@@ -1,12 +1,17 @@
+import type { Lang } from "./i18n";
 import type { SavedLocation } from "./prefs";
 import type { AlertThreshold } from "./push-validate";
 
 const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? "";
-/** Tandatangan tetapan terakhir yang dihantar ke pelayan (lokasi + ambang). */
+/** Tandatangan tetapan terakhir yang dihantar ke pelayan (lokasi + ambang + bahasa). */
 const SYNC_KEY = "hezy:push:sync";
 
-const signature = (locations: SavedLocation[], threshold: AlertThreshold) =>
-  `${threshold}|${locations.map((l) => `${l.id}@${l.lat},${l.lon}`).join(";")}`;
+const signature = (
+  locations: SavedLocation[],
+  threshold: AlertThreshold,
+  lang: Lang,
+) =>
+  `${lang}|${threshold}|${locations.map((l) => `${l.id}@${l.lat},${l.lon}`).join(";")}`;
 
 export type PushSupport =
   "supported" | "unsupported" | "ios-install" | "unconfigured";
@@ -47,6 +52,7 @@ async function sendSubscription(
   subscription: PushSubscription,
   locations: SavedLocation[],
   threshold: AlertThreshold,
+  lang: Lang,
 ) {
   const res = await fetch("/api/push/subscribe", {
     method: "POST",
@@ -54,6 +60,7 @@ async function sendSubscription(
     body: JSON.stringify({
       subscription: subscription.toJSON(),
       threshold,
+      lang,
       locations: locations.map(({ id, name, lat, lon }) => ({
         id,
         name,
@@ -69,7 +76,7 @@ async function sendSubscription(
     throw new Error(body?.error ?? "Langganan tidak dapat disimpan.");
   }
   try {
-    localStorage.setItem(SYNC_KEY, signature(locations, threshold));
+    localStorage.setItem(SYNC_KEY, signature(locations, threshold, lang));
   } catch {
     // Abaikan.
   }
@@ -79,6 +86,7 @@ async function sendSubscription(
 export async function enablePush(
   locations: SavedLocation[],
   threshold: AlertThreshold,
+  lang: Lang,
 ): Promise<"enabled" | "denied"> {
   const permission = await Notification.requestPermission();
   if (permission !== "granted") return "denied";
@@ -89,7 +97,7 @@ export async function enablePush(
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
     }));
-  await sendSubscription(subscription, locations, threshold);
+  await sendSubscription(subscription, locations, threshold, lang);
   return "enabled";
 }
 
@@ -109,23 +117,26 @@ export async function disablePush() {
   }
 }
 
-/** Kemas kini lokasi dan ambang amaran di pelayan bila berubah (jika sudah melanggan). */
+/** Kemas kini lokasi, ambang dan bahasa amaran di pelayan bila berubah (jika sudah melanggan). */
 export async function syncPushSettings(
   locations: SavedLocation[],
   threshold: AlertThreshold,
+  lang: Lang,
 ) {
   if (locations.length === 0) return;
   if (pushSupport() !== "supported" || Notification.permission !== "granted")
     return;
   try {
-    if (localStorage.getItem(SYNC_KEY) === signature(locations, threshold))
+    if (
+      localStorage.getItem(SYNC_KEY) === signature(locations, threshold, lang)
+    )
       return;
   } catch {
     return;
   }
   const subscription = await currentSubscription();
   if (subscription)
-    await sendSubscription(subscription, locations, threshold).catch(
+    await sendSubscription(subscription, locations, threshold, lang).catch(
       () => undefined,
     );
 }

@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { HEALTH_PROFILES } from "@/lib/advice";
+import { LANGUAGES } from "@/lib/i18n";
 import { promptInstall, useInstallStatus } from "@/lib/install";
 import {
   DEFAULT_PREFS,
@@ -19,6 +20,7 @@ import {
   enablePush,
   pushSupport,
 } from "@/lib/push-client";
+import { useI18n } from "@/lib/use-i18n";
 import { Skeleton } from "../status";
 
 const THEMES: { key: ThemePref; label: string }[] = [
@@ -29,11 +31,12 @@ const THEMES: { key: ThemePref; label: string }[] = [
 
 export function TetapanScreen() {
   const prefs = usePrefs();
+  const { t } = useI18n();
 
   function clearData() {
     if (
       !window.confirm(
-        "Padam lokasi, kegemaran dan tetapan yang disimpan di peranti ini?",
+        t("Padam lokasi, kegemaran dan tetapan yang disimpan di peranti ini?"),
       )
     )
       return;
@@ -49,7 +52,7 @@ export function TetapanScreen() {
 
   return (
     <div className="mx-auto flex max-w-[720px] flex-col gap-6 px-5 pt-13 md:px-10 md:pt-10">
-      <h1 className="font-display text-[30px] font-bold">Tetapan</h1>
+      <h1 className="font-display text-[30px] font-bold">{t("Tetapan")}</h1>
 
       {prefs === null ? (
         <Skeleton className="h-96" />
@@ -57,7 +60,7 @@ export function TetapanScreen() {
         <>
           <fieldset>
             <legend className="text-muted mb-2 text-sm font-bold tracking-wide">
-              PROFIL KESIHATAN
+              {t("PROFIL KESIHATAN")}
             </legend>
             <div className="grid grid-cols-2 gap-2">
               {HEALTH_PROFILES.map((p) => (
@@ -79,12 +82,12 @@ export function TetapanScreen() {
                     }
                     className="size-4 accent-[#1c1a16]"
                   />
-                  {p.label}
+                  {t(p.label)}
                 </label>
               ))}
             </div>
             <p className="text-muted mt-2 text-xs">
-              Nasihat di skrin Utama disesuaikan mengikut profil ini.
+              {t("Nasihat di skrin Utama disesuaikan mengikut profil ini.")}
             </p>
             <label className="bg-surface mt-3 flex min-h-12 cursor-pointer items-center gap-3 rounded-2xl px-3.5 text-sm font-semibold">
               <input
@@ -97,9 +100,9 @@ export function TetapanScreen() {
                 className="size-4 accent-[#1c1a16]"
               />
               <span>
-                Papar status sekolah (panduan KPM)
+                {t("Papar status sekolah (panduan KPM)")}
                 <span className="text-muted block text-xs font-medium">
-                  Sentiasa dipaparkan untuk profil Kanak-kanak
+                  {t("Sentiasa dipaparkan untuk profil Kanak-kanak")}
                 </span>
               </span>
             </label>
@@ -107,14 +110,14 @@ export function TetapanScreen() {
 
           <fieldset>
             <legend className="text-muted mb-2 text-sm font-bold tracking-wide">
-              TEMA
+              {t("TEMA")}
             </legend>
             <div className="bg-surface grid grid-cols-3 gap-1 rounded-2xl p-1">
-              {THEMES.map((t) => (
+              {THEMES.map((theme) => (
                 <label
-                  key={t.key}
+                  key={theme.key}
                   className={`has-focus-visible:outline-ink flex min-h-11 cursor-pointer items-center justify-center rounded-xl text-sm has-focus-visible:outline-2 ${
-                    prefs.theme === t.key
+                    prefs.theme === theme.key
                       ? "bg-page font-bold"
                       : "text-muted font-medium"
                   }`}
@@ -122,14 +125,43 @@ export function TetapanScreen() {
                   <input
                     type="radio"
                     name="theme"
-                    value={t.key}
-                    checked={prefs.theme === t.key}
+                    value={theme.key}
+                    checked={prefs.theme === theme.key}
                     onChange={() =>
-                      updatePrefs((x) => ({ ...x, theme: t.key }))
+                      updatePrefs((x) => ({ ...x, theme: theme.key }))
                     }
                     className="sr-only"
                   />
-                  {t.label}
+                  {t(theme.label)}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend className="text-muted mb-2 text-sm font-bold tracking-wide">
+              {t("BAHASA")}
+            </legend>
+            <div className="bg-surface grid grid-cols-2 gap-1 rounded-2xl p-1">
+              {LANGUAGES.map((l) => (
+                <label
+                  key={l.key}
+                  lang={l.key}
+                  className={`has-focus-visible:outline-ink flex min-h-11 cursor-pointer items-center justify-center rounded-xl text-sm has-focus-visible:outline-2 ${
+                    prefs.lang === l.key
+                      ? "bg-page font-bold"
+                      : "text-muted font-medium"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="lang"
+                    value={l.key}
+                    checked={prefs.lang === l.key}
+                    onChange={() => updatePrefs((x) => ({ ...x, lang: l.key }))}
+                    className="sr-only"
+                  />
+                  {l.label}
                 </label>
               ))}
             </div>
@@ -137,40 +169,44 @@ export function TetapanScreen() {
 
           <section>
             <h2 className="text-muted mb-2 text-sm font-bold tracking-wide">
-              AMARAN
+              {t("AMARAN")}
             </h2>
             <AlertRow prefs={prefs} />
           </section>
 
           <section>
             <h2 className="text-muted mb-2 text-sm font-bold tracking-wide">
-              APLIKASI
+              {t("APLIKASI")}
             </h2>
             <div className="divide-line bg-surface divide-y rounded-2xl px-4 text-sm">
               <InstallRow />
               <Row
-                label="Luar talian"
-                value="Bacaan terakhir disimpan di peranti"
+                label={t("Luar talian")}
+                value={t("Bacaan terakhir disimpan di peranti")}
               />
             </div>
           </section>
 
           <section>
             <h2 className="text-muted mb-2 text-sm font-bold tracking-wide">
-              TENTANG DATA
+              {t("TENTANG DATA")}
             </h2>
             <div className="divide-line bg-surface divide-y rounded-2xl px-4 text-sm">
-              <Row label="Bahasa" value="Bahasa Melayu" />
-              <Row label="Bacaan rasmi" value="APIMS (JAS), stesen ≤ 30 km" />
-              <Row label="Anggaran & ramalan" value="Open-Meteo (model CAMS)" />
-              <Row label="Kaedah anggaran" value="Formula JAS, PM2.5 sahaja" />
-              <Row label="Versi" value="0.2.0" />
+              <Row
+                label={t("Bacaan rasmi")}
+                value={t("APIMS (JAS), stesen ≤ 30 km")}
+              />
+              <Row label={t("Anggaran & ramalan")} value="Open-Meteo (CAMS)" />
+              <Row
+                label={t("Kaedah anggaran")}
+                value={t("Formula JAS, PM2.5 sahaja")}
+              />
+              <Row label={t("Versi")} value="0.2.0" />
             </div>
             <p className="text-muted mt-2 text-xs leading-relaxed">
-              Bila ada stesen APIMS dalam 30 km dengan bacaan 3 jam terakhir,
-              Hezy memaparkan IPU rasmi stesen itu. Jika tidak, Hezy memaparkan
-              anggaran daripada PM2.5 model, yang mungkin berbeza daripada
-              bacaan rasmi. Graf dan masa terbaik sentiasa menggunakan model.
+              {t(
+                "Bila ada stesen APIMS dalam 30 km dengan bacaan 3 jam terakhir, Hezy memaparkan IPU rasmi stesen itu. Jika tidak, Hezy memaparkan anggaran daripada PM2.5 model, yang mungkin berbeza daripada bacaan rasmi. Graf dan masa terbaik sentiasa menggunakan model.",
+              )}
             </p>
           </section>
 
@@ -179,7 +215,7 @@ export function TetapanScreen() {
             onClick={clearData}
             className="border-line min-h-12 self-start rounded-2xl border-[1.5px] px-4 text-sm font-semibold"
           >
-            Padam data di peranti ini
+            {t("Padam data di peranti ini")}
           </button>
         </>
       )}
@@ -204,22 +240,23 @@ const INSTALL_HELP = {
 } as const;
 
 function InstallRow() {
+  const { t } = useI18n();
   const status = useInstallStatus();
   if (status === null) return <div className="min-h-12" />;
   return (
     <div className="flex min-h-12 flex-wrap items-center justify-between gap-3 py-3">
-      <span className="font-semibold">Pasang Hezy</span>
+      <span className="font-semibold">{t("Pasang Hezy")}</span>
       {status === "available" ? (
         <button
           type="button"
           onClick={() => void promptInstall()}
           className="bg-ink text-page min-h-11 rounded-xl px-4 text-sm font-semibold"
         >
-          Pasang
+          {t("Pasang")}
         </button>
       ) : (
         <span className="text-muted max-w-[60%] text-right">
-          {INSTALL_HELP[status]}
+          {t(INSTALL_HELP[status])}
         </span>
       )}
     </div>
@@ -237,12 +274,14 @@ const SUPPORT_HELP = {
 
 /** Suis amaran IPU untuk lokasi semasa (Web Push) dan pilihan ambang. */
 function AlertRow({ prefs }: { prefs: Prefs }) {
+  const { t } = useI18n();
   const location: SavedLocation | null = prefs.current;
   const threshold = effectiveThreshold(prefs);
   const profileDefault = effectiveThreshold({ ...prefs, alertThreshold: null });
   const extraCount = alertLocations(prefs).length - (location ? 1 : 0);
-  const profileLabel =
-    HEALTH_PROFILES.find((p) => p.key === prefs.profile)?.label ?? "Umum";
+  const profileLabel = t(
+    HEALTH_PROFILES.find((p) => p.key === prefs.profile)?.label ?? "Umum",
+  );
   const support = useSyncExternalStore(noopSubscribe, pushSupport, () => null);
   const [enabled, setEnabled] = useState<boolean | null>(null);
   const [busy, setBusy] = useState(false);
@@ -262,17 +301,20 @@ function AlertRow({ prefs }: { prefs: Prefs }) {
         await disablePush();
         setEnabled(false);
       } else if (
-        (await enablePush(alertLocations(prefs), threshold)) === "denied"
+        (await enablePush(alertLocations(prefs), threshold, prefs.lang)) ===
+        "denied"
       ) {
         setMessage(
-          "Kebenaran notifikasi ditolak. Benarkan notifikasi untuk Hezy dalam tetapan pelayar.",
+          t(
+            "Kebenaran notifikasi ditolak. Benarkan notifikasi untuk Hezy dalam tetapan pelayar.",
+          ),
         );
       } else {
         setEnabled(true);
       }
     } catch (error) {
       setMessage(
-        error instanceof Error ? error.message : "Ralat tidak diketahui.",
+        t(error instanceof Error ? error.message : "Ralat tidak diketahui."),
       );
     } finally {
       setBusy(false);
@@ -283,11 +325,11 @@ function AlertRow({ prefs }: { prefs: Prefs }) {
   if (support === null) {
     content = <div className="min-h-12" />;
   } else if (support !== "supported") {
-    content = <p className="text-muted py-3">{SUPPORT_HELP[support]}</p>;
+    content = <p className="text-muted py-3">{t(SUPPORT_HELP[support])}</p>;
   } else if (!location) {
     content = (
       <p className="text-muted py-3">
-        Pilih lokasi dahulu untuk menerima amaran.
+        {t("Pilih lokasi dahulu untuk menerima amaran.")}
       </p>
     );
   } else {
@@ -295,12 +337,14 @@ function AlertRow({ prefs }: { prefs: Prefs }) {
       <div className="flex min-h-14 items-center gap-3 py-3">
         <div className="flex-1">
           <div id="amaran-label" className="font-semibold">
-            Amaran bila IPU melebihi {threshold}
+            {t("Amaran bila IPU melebihi {threshold}", { threshold })}
           </div>
           <div className="text-muted mt-0.5 text-xs">
-            Untuk {location.name}
-            {extraCount > 0 ? ` dan ${extraCount} lokasi kegemaran` : ""} ·
-            disemak setiap jam
+            {t("Untuk {name}", { name: t(location.name) })}
+            {extraCount > 0
+              ? t(" dan {count} lokasi kegemaran", { count: extraCount })
+              : ""}{" "}
+            · {t("disemak setiap jam")}
           </div>
         </div>
         <button
@@ -323,39 +367,42 @@ function AlertRow({ prefs }: { prefs: Prefs }) {
         {content}
         <fieldset className="border-line border-t py-3">
           <legend className="text-muted float-left mb-2 w-full text-xs font-semibold">
-            Ambang amaran
+            {t("Ambang amaran")}
             {prefs.alertThreshold === null
-              ? ` · lalai untuk profil ${profileLabel}`
+              ? t(" · lalai untuk profil {profile}", { profile: profileLabel })
               : ""}
           </legend>
           <div className="bg-page grid grid-cols-3 gap-1 rounded-xl p-1">
-            {([50, 100, 200] as const).map((t) => (
+            {([50, 100, 200] as const).map((value) => (
               <label
-                key={t}
+                key={value}
                 className={`has-focus-visible:outline-ink flex min-h-11 cursor-pointer items-center justify-center rounded-lg text-sm has-focus-visible:outline-2 ${
-                  threshold === t ? "bg-ink text-page font-bold" : "font-medium"
+                  threshold === value
+                    ? "bg-ink text-page font-bold"
+                    : "font-medium"
                 }`}
               >
                 <input
                   type="radio"
                   name="ambang-amaran"
-                  value={t}
-                  checked={threshold === t}
+                  value={value}
+                  checked={threshold === value}
                   onChange={() =>
                     updatePrefs((x) => ({
                       ...x,
-                      alertThreshold: t === profileDefault ? null : t,
+                      alertThreshold: value === profileDefault ? null : value,
                     }))
                   }
                   className="sr-only"
                 />
-                IPU {t}
+                {t("IPU {threshold}", { threshold: value })}
               </label>
             ))}
           </div>
           <p className="text-muted mt-2 text-xs">
-            50 = amaran awal (disyorkan untuk asma, kanak-kanak dan warga emas)
-            · 100 = Tidak Sihat · 200 = Sangat Tidak Sihat
+            {t(
+              "50 = amaran awal (disyorkan untuk asma, kanak-kanak dan warga emas) · 100 = Tidak Sihat · 200 = Sangat Tidak Sihat",
+            )}
           </p>
         </fieldset>
       </>

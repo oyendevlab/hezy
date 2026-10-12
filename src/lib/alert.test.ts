@@ -30,6 +30,27 @@ describe("decideAlert", () => {
     expect(d.next.lastAlertKey).toBe("tidak-sihat");
   });
 
+  it("menghantar notifikasi dalam bahasa Inggeris", () => {
+    const d = decideAlert(
+      { lastAlertKey: null, lastAlertAt: null },
+      unhealthy,
+      "Berhampiran Shah Alam",
+      NOW,
+      100,
+      "en",
+    );
+    expect(d).toMatchObject({
+      send: true,
+      title: "Haze in Near Shah Alam: API 156 (Unhealthy)",
+      body: "Avoid exercising outdoors today.",
+    });
+    const recovered = decideAlert(d.next, moderate, "Klang", NOW, 100, "en");
+    expect(recovered).toMatchObject({
+      title: "Air has improved in Klang: API 80",
+      body: "Moderate. Outdoor activities as usual. Sensitive groups should be careful.",
+    });
+  });
+
   it("tidak mengulang amaran kategori sama dalam 12 jam", () => {
     const state = {
       lastAlertKey: "tidak-sihat" as const,
@@ -96,8 +117,16 @@ describe("parseSubscribeBody", () => {
         locations: [
           { id: "semasa", name: "Shah Alam", lat: 3.07, lon: 101.52 },
         ],
+        lang: "ms",
       },
     });
+  });
+
+  it("menerima bahasa notifikasi yang sah sahaja", () => {
+    const en = parseSubscribeBody({ ...valid, lang: "en" });
+    expect(en.ok && en.value.lang).toBe("en");
+    const bad = parseSubscribeBody({ ...valid, lang: "fr" });
+    expect(bad.ok && bad.value.lang).toBe("ms");
   });
 
   it("menolak endpoint bukan https, kunci rosak atau lokasi luar Malaysia", () => {

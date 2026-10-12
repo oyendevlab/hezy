@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useI18n } from "@/lib/use-i18n";
 
 /** Kongsi status melalui Web Share, atau salin ke papan keratan. `path` = halaman kongsi (kad bergambar). */
 export function ShareButton({
@@ -12,6 +13,7 @@ export function ShareButton({
   path?: string;
   className?: string;
 }) {
+  const { t } = useI18n();
   const [copied, setCopied] = useState(false);
 
   async function share() {
@@ -37,7 +39,7 @@ export function ShareButton({
     <button
       type="button"
       onClick={share}
-      aria-label={copied ? "Status disalin" : "Kongsi status"}
+      aria-label={copied ? t("Status disalin") : t("Kongsi status")}
       className={`flex size-11 items-center justify-center rounded-full ${className}`}
     >
       {copied ? (

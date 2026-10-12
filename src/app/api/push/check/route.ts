@@ -70,6 +70,7 @@ export async function GET(request: Request) {
         location.name,
         now,
         record.threshold,
+        record.lang ?? "ms",
       );
       if (!decision.send) continue;
       try {

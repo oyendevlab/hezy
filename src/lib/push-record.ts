@@ -1,4 +1,5 @@
 import type { AlertState } from "./alert";
+import type { Lang } from "./i18n";
 import {
   DEFAULT_ALERT_THRESHOLD,
   type AlertLocation,
@@ -14,6 +15,8 @@ export type RecordLocation = AlertLocation & AlertState;
 export type PushRecord = {
   subscription: PushSubscriptionData;
   threshold: AlertThreshold;
+  /** Bahasa notifikasi; rekod sebelum v0.3.0 tiada medan ini (BM). */
+  lang?: Lang;
   locations: RecordLocation[];
   createdAt: string;
 };
@@ -63,6 +66,7 @@ export function mergeRecord(
   return {
     subscription: input.subscription,
     threshold: input.threshold,
+    lang: input.lang,
     createdAt: existing?.createdAt ?? now.toISOString(),
     locations: input.locations.map((location) => {
       const previous = existing?.locations.find(

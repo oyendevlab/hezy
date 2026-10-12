@@ -116,9 +116,9 @@ Setiap item dibuat dalam cabang `feat/*` dan PR sendiri; digabung selepas CI lul
 
 ### 6. Bahasa Inggeris
 
-- [ ] Kamus teks BM/EN (tanpa pustaka besar); pilihan Bahasa di Tetapan berfungsi
-- [ ] `<html lang>`, metadata, nasihat kesihatan dan notifikasi push ikut bahasa
-- [ ] Ujian E2E dalam kedua-dua bahasa
+- [x] Kamus teks BM/EN (tanpa pustaka besar); pilihan Bahasa di Tetapan berfungsi
+- [x] `<html lang>`, nasihat kesihatan dan notifikasi push ikut bahasa. Metadata, halaman `/negeri` dan `/kongsi` kekal BM kerana dijana di pelayan untuk semua pengguna
+- [x] Ujian E2E dalam kedua-dua bahasa
 
 ### 7. Imej kongsi automatik
 

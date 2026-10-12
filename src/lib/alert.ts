@@ -1,4 +1,5 @@
 import { adviceFor } from "./advice";
+import { translate, type Lang } from "./i18n";
 import type { IpuCategoryKey } from "./ipu";
 import { DEFAULT_ALERT_THRESHOLD } from "./push-validate";
 
@@ -25,7 +26,11 @@ export function decideAlert(
   locationName: string,
   now: Date,
   threshold: number = DEFAULT_ALERT_THRESHOLD,
+  lang: Lang = "ms",
 ): AlertDecision {
+  const label = translate(lang, reading.label);
+  const name = translate(lang, locationName);
+  const headline = translate(lang, adviceFor(reading.category).headline);
   if (reading.ipu > threshold) {
     const hoursSince = state.lastAlertAt
       ? (now.getTime() - Date.parse(state.lastAlertAt)) / 3_600_000
@@ -39,16 +44,23 @@ export function decideAlert(
     return {
       send: true,
       next: { lastAlertKey: reading.category, lastAlertAt: now.toISOString() },
-      title: `Jerebu di ${locationName}: IPU ${reading.ipu} (${reading.label})`,
-      body: adviceFor(reading.category).headline,
+      title: translate(lang, "Jerebu di {name}: IPU {ipu} ({label})", {
+        name,
+        ipu: reading.ipu,
+        label,
+      }),
+      body: headline,
     };
   }
   if (state.lastAlertKey !== null) {
     return {
       send: true,
       next: { lastAlertKey: null, lastAlertAt: now.toISOString() },
-      title: `Udara pulih di ${locationName}: IPU ${reading.ipu}`,
-      body: `${reading.label}. ${adviceFor(reading.category).headline}`,
+      title: translate(lang, "Udara pulih di {name}: IPU {ipu}", {
+        name,
+        ipu: reading.ipu,
+      }),
+      body: `${label}. ${headline}`,
     };
   }
   return { send: false, next: state };
