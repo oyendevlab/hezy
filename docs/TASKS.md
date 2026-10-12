@@ -287,9 +287,9 @@ Urutan: 10 → A → B → C → D → 1 → 8 → 9.
 
 ### B. Bacaan utama dan cuaca (Utama)
 
-- [ ] Label "IPU" di atas nombor; penanda sumber ("Rasmi · APIMS" / "Anggaran")
-- [ ] Ikon cuaca semasa + suhu di sebelah kanan (cth. "31° Berawan"); siang/malam
-- [ ] Ikon garisan pada bento nasihat (topeng, tingkap, air, dll.) — dilukis sendiri dahulu; tukar ke set ikon sedia ada jika kurang sesuai
+- [x] Label "IPU" di atas nombor; penanda sumber ("Rasmi · APIMS" / "Anggaran")
+- [x] Ikon cuaca semasa + suhu di sebelah kanan (cth. "31° Berawan"); siang/malam
+- [x] Ikon garisan pada bento nasihat (topeng, tingkap, air, dll.) — Phosphor (duotone), pilihan pengguna
 
 ### C. Trend
 

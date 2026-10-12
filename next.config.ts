@@ -4,6 +4,10 @@ const nextConfig: NextConfig = {
   /* config options here */
   cacheComponents: true,
   partialPrefetching: true,
+  experimental: {
+    // Muat hanya ikon Phosphor yang digunakan (tidak dalam senarai lalai Next).
+    optimizePackageImports: ["@phosphor-icons/react"],
+  },
   turbopack: {
     rules: {
       "*.css": {
