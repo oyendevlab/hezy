@@ -41,6 +41,7 @@ import { InstallBanner } from "../install-banner";
 import { HomeHeader } from "../home-header";
 import { ElasticCard } from "../elastic-card";
 import { TrendLink } from "../trend-link";
+import { AnimatedNumber } from "../animated-number";
 import { LocationMenu } from "../location-menu";
 
 export function HomeScreen() {
@@ -411,7 +412,7 @@ function Headline({
               })}
               className={`font-display ${big} leading-[0.9] font-bold tracking-[-0.04em] tabular-nums`}
             >
-              {current.ipu}
+              <AnimatedNumber value={current.ipu} />
             </h1>
             <div className="flex flex-col items-start gap-1.5">
               <IpuPill category={current.category} label={t(current.label)} />

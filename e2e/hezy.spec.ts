@@ -686,6 +686,94 @@ test.describe("muat semula", () => {
   });
 });
 
+test.describe("nombor IPU beranimasi", () => {
+  test("dikira dari nilai lama ke nilai baharu bila bacaan berubah", async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, "Muat semula melalui pintasan R (desktop)");
+    await seedLocation(page);
+    let n = 0;
+    await page.route("**/api/aqi?**", (route) => {
+      n++;
+      const reading = fakeReading();
+      if (n > 1)
+        reading.current = {
+          ...reading.current,
+          ipu: 60,
+          category: "sederhana",
+          label: "Sederhana",
+        };
+      return route.fulfill({ json: reading });
+    });
+    await page.goto("/");
+    const headline = page
+      .locator("h1[data-ipu-headline]")
+      .filter({ visible: true });
+    // Paparan pertama: terus nilai sebenar, tiada kiraan dari 0.
+    await expect(headline).toHaveText("156");
+    await expect(
+      page.getByRole("button", { name: "Muat semula" }),
+    ).toBeEnabled();
+    const seen = new Set<string>();
+    await page.exposeFunction("hezySeen", (v: string) => seen.add(v));
+    await headline.evaluate((el) => {
+      new MutationObserver(() =>
+        (window as unknown as { hezySeen: (v: string) => void }).hezySeen(
+          el.textContent ?? "",
+        ),
+      ).observe(el, { subtree: true, characterData: true, childList: true });
+    });
+    await page.keyboard.press("r");
+    await expect(headline).toHaveText("60");
+    await expect(headline).toHaveAttribute("aria-label", /IPU 60/);
+    // Nilai pertengahan dipaparkan semasa kiraan.
+    expect([...seen].some((v) => +v > 60 && +v < 156)).toBe(true);
+  });
+
+  test("prefers-reduced-motion: terus ke nilai baharu", async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, "Muat semula melalui pintasan R (desktop)");
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await seedLocation(page);
+    let n = 0;
+    await page.route("**/api/aqi?**", (route) => {
+      n++;
+      const reading = fakeReading();
+      if (n > 1)
+        reading.current = {
+          ...reading.current,
+          ipu: 60,
+          category: "sederhana",
+          label: "Sederhana",
+        };
+      return route.fulfill({ json: reading });
+    });
+    await page.goto("/");
+    const headline = page
+      .locator("h1[data-ipu-headline]")
+      .filter({ visible: true });
+    await expect(headline).toHaveText("156");
+    await expect(
+      page.getByRole("button", { name: "Muat semula" }),
+    ).toBeEnabled();
+    const seen = new Set<string>();
+    await page.exposeFunction("hezySeen", (v: string) => seen.add(v));
+    await headline.evaluate((el) => {
+      new MutationObserver(() =>
+        (window as unknown as { hezySeen: (v: string) => void }).hezySeen(
+          el.textContent ?? "",
+        ),
+      ).observe(el, { subtree: true, characterData: true, childList: true });
+    });
+    await page.keyboard.press("r");
+    await expect(headline).toHaveText("60");
+    expect([...seen].filter((v) => v !== "60")).toEqual([]);
+  });
+});
+
 test.describe("bacaan rasmi APIMS", () => {
   test("IPU rasmi stesen terdekat diutamakan berbanding anggaran", async ({
     page,
