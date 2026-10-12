@@ -322,6 +322,6 @@ Urutan: 10 → A → B → C → D → 1 → 8 → 9.
 
 ### Selesai v0.5.0
 
-- [ ] Semua ujian unit dan E2E lulus pada CI dan production (`hezy.my`); axe tanpa pelanggaran
-- [ ] Lighthouse ≥ 90 dikekalkan dengan langit WebGL
-- [ ] Kemas kini `UJIAN-TELEFON.md`, versi 0.5.0, tag dan GitHub Release
+- [x] Semua ujian unit dan E2E lulus pada CI dan production (`hezy.my`); axe tanpa pelanggaran (197 unit, 107 E2E; ralat rangkaian tempatan ERR_TIMED_OUT diulang dan lulus)
+- [x] Lighthouse ≥ 90 dikekalkan dengan langit WebGL (production 12 Okt 2026: telefon 98/100/100/100, desktop 100/100/100/100, /trend 99/100/100/100)
+- [x] Kemas kini `UJIAN-TELEFON.md`, versi 0.5.0, tag dan GitHub Release
