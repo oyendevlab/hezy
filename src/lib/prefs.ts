@@ -87,15 +87,25 @@ export function pushOptions(prefs: Prefs): PushOptions {
   };
 }
 
+/** Lokasi GPS lama disimpan sebagai "Berhampiran X"; kini nama bandar terdekat sahaja. */
+function migrateLocation(l: SavedLocation): SavedLocation {
+  return l.source === "gps" && l.name.startsWith("Berhampiran ")
+    ? { ...l, name: l.name.slice("Berhampiran ".length) }
+    : l;
+}
+
 /** Baca prefs daripada JSON tersimpan, buang medan yang rosak. */
 export function parsePrefs(raw: string | null): Prefs {
   if (!raw) return DEFAULT_PREFS;
   try {
     const v = JSON.parse(raw) as Partial<Prefs>;
     return {
-      current: isLocation(v.current) ? v.current : null,
+      current: isLocation(v.current) ? migrateLocation(v.current) : null,
       favourites: Array.isArray(v.favourites)
-        ? v.favourites.filter(isLocation).slice(0, MAX_FAVOURITES)
+        ? v.favourites
+            .filter(isLocation)
+            .map(migrateLocation)
+            .slice(0, MAX_FAVOURITES)
         : [],
       profile: PROFILES.includes(v.profile as HealthProfile)
         ? (v.profile as HealthProfile)

@@ -38,7 +38,7 @@ const StationMap = dynamic(
 
 const noopSubscribe = () => () => {};
 
-/** Lokasi sama: id sama atau dalam 2 km (cth. GPS "Berhampiran Putrajaya" dan kawasan Putrajaya). */
+/** Lokasi sama: id sama atau dalam 2 km (cth. lokasi GPS dan kawasan Putrajaya). */
 const samePlace = (a: SavedLocation, b: SavedLocation) =>
   a.id === b.id || distanceKm(a, b) < 2;
 const subscribeHash = (listener: () => void) => {

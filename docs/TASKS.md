@@ -303,14 +303,18 @@ Urutan: 10 → A → B → C → D → 1 → 8 → 9.
 - [x] Tab **Peta | Senarai**; Peta dipaparkan dahulu
 - [x] Kegemaran yang sama dengan lokasi semasa ditanda "semasa" (tidak diulang)
 
+### E. Nama lokasi GPS
+
+- [x] Lokasi GPS dinamakan ikut bandar terdekat tanpa "Berhampiran" (cth. "Putrajaya"); lokasi tersimpan dimigrasi secara automatik
+
 ### 1. Banner pasang Hezy (iPhone/iPad)
 
-- [ ] Di Utama untuk Safari yang belum memasang Hezy: "Pasang Hezy untuk amaran dan akses pantas" → panduan 4 langkah; boleh ditutup (tidak muncul semula 14 hari)
+- [x] Di Utama untuk Safari yang belum memasang Hezy: "Pasang Hezy untuk amaran dan akses pantas" → panduan 4 langkah; boleh ditutup (tidak muncul semula 14 hari)
 
 ### 8. Halaman Privasi
 
-- [ ] `/privasi` (BM/EN): lokasi dan tetapan hanya di peranti; langganan notifikasi (lokasi dibundarkan ~1 km) sehingga amaran dimatikan; log ralat tanpa data peribadi 14 hari; Vercel Web Analytics tanpa kuki; sumber data pihak ketiga (APIMS, Open-Meteo, NASA FIRMS, WAQI); cara padam data
-- [ ] Pautan dari Tetapan dan kaki halaman
+- [x] `/privasi` (BM/EN): lokasi dan tetapan hanya di peranti; langganan notifikasi (lokasi dibundarkan ~1 km) sehingga amaran dimatikan; log ralat tanpa data peribadi 14 hari; Vercel Web Analytics tanpa kuki; sumber data pihak ketiga (APIMS, Open-Meteo, NASA FIRMS, WAQI); cara padam data
+- [x] Pautan dari Tetapan dan kaki halaman
 
 ### 9. Halaman negeri dan kongsi dalam English
 

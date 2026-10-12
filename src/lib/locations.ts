@@ -16,7 +16,7 @@ export function gpsToLocation(lat: number, lon: number): SavedLocation {
   const near = nearestArea(lat, lon);
   return {
     id: "gps",
-    name: `Berhampiran ${near.name}`,
+    name: near.name,
     detail: "Lokasi semasa",
     lat: Math.round(lat * 100) / 100,
     lon: Math.round(lon * 100) / 100,
