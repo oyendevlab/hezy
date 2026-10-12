@@ -9,6 +9,7 @@ import type { Station } from "@/lib/apims";
 import { STATES, findState } from "@/lib/areas";
 import { getStations } from "@/lib/data";
 import { ipuCategory } from "@/lib/ipu";
+import { PageTransition } from "@/components/page-transition";
 
 export function generateStaticParams() {
   return STATES.map((s) => ({ negeri: s.id }));
@@ -56,7 +57,11 @@ async function StateContent({
   return (
     <div className="mx-auto flex max-w-[960px] flex-col gap-5 px-5 pt-13 md:px-10 md:pt-10">
       <nav aria-label="Laluan" className="text-muted text-sm font-semibold">
-        <Link href="/negeri" className="underline">
+        <Link
+          href="/negeri"
+          transitionTypes={["nav-back"]}
+          className="underline"
+        >
           <T>Semua negeri</T>
         </Link>{" "}
         / {state.name}
@@ -118,14 +123,16 @@ async function StateContent({
 
 export default function NegeriPage({ params }: PageProps<"/negeri/[negeri]">) {
   return (
-    <Suspense
-      fallback={
-        <div className="mx-auto max-w-[960px] px-5 pt-13 md:px-10 md:pt-10">
-          <Skeleton className="h-96" />
-        </div>
-      }
-    >
-      <StateContent params={params} />
-    </Suspense>
+    <PageTransition>
+      <Suspense
+        fallback={
+          <div className="mx-auto max-w-[960px] px-5 pt-13 md:px-10 md:pt-10">
+            <Skeleton className="h-96" />
+          </div>
+        }
+      >
+        <StateContent params={params} />
+      </Suspense>
+    </PageTransition>
   );
 }

@@ -215,6 +215,7 @@ export function TetapanScreen() {
               <Row label={t("Versi")} value={APP_VERSION} />
               <Link
                 href="/privasi"
+                transitionTypes={["nav-forward"]}
                 className="flex min-h-12 items-center justify-between gap-3 font-semibold"
               >
                 {t("Privasi dan data anda")}

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { PrivacyContent } from "@/components/privacy-content";
+import { PageTransition } from "@/components/page-transition";
 
 export const metadata: Metadata = {
   title: "Privasi",
@@ -9,5 +10,9 @@ export const metadata: Metadata = {
 };
 
 export default function PrivasiPage() {
-  return <PrivacyContent />;
+  return (
+    <PageTransition>
+      <PrivacyContent />
+    </PageTransition>
+  );
 }

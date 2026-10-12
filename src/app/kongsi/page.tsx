@@ -6,6 +6,7 @@ import { Logo } from "@/components/logo";
 import { Skeleton } from "@/components/status";
 import { T } from "@/components/t";
 import { parseShare } from "@/lib/share";
+import { PageTransition } from "@/components/page-transition";
 
 export async function generateMetadata({
   searchParams,
@@ -69,20 +70,22 @@ async function SharedCard({
 
 export default function KongsiPage({ searchParams }: PageProps<"/kongsi">) {
   return (
-    <div className="mx-auto flex max-w-md flex-col gap-5 px-5 pt-13 md:pt-16">
-      <Logo size={64} />
-      <h1 className="font-display text-[30px] leading-tight font-bold">
-        <T>Status jerebu yang dikongsi</T>
-      </h1>
-      <Suspense fallback={<Skeleton className="h-40" />}>
-        <SharedCard searchParams={searchParams} />
-      </Suspense>
-      <Link
-        href="/"
-        className="bg-ink text-page flex min-h-13 items-center justify-center rounded-2xl font-semibold"
-      >
-        <T>Semak lokasi saya dengan Hezy</T>
-      </Link>
-    </div>
+    <PageTransition>
+      <div className="mx-auto flex max-w-md flex-col gap-5 px-5 pt-13 md:pt-16">
+        <Logo size={64} />
+        <h1 className="font-display text-[30px] leading-tight font-bold">
+          <T>Status jerebu yang dikongsi</T>
+        </h1>
+        <Suspense fallback={<Skeleton className="h-40" />}>
+          <SharedCard searchParams={searchParams} />
+        </Suspense>
+        <Link
+          href="/"
+          className="bg-ink text-page flex min-h-13 items-center justify-center rounded-2xl font-semibold"
+        >
+          <T>Semak lokasi saya dengan Hezy</T>
+        </Link>
+      </div>
+    </PageTransition>
   );
 }
