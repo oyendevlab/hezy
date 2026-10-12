@@ -16,7 +16,6 @@ export function TrendLink({ hours }: { hours: HourPoint[] }) {
   return (
     <Link
       href="/trend"
-      transitionTypes={["nav-tab"]}
       className="bg-surface hover:bg-line flex flex-col gap-3 rounded-[22px] p-4 transition-colors"
     >
       <span className="flex items-center justify-between gap-2">

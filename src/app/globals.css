@@ -155,15 +155,6 @@ body {
 ::view-transition-new(bottom-nav) {
   animation: none;
 }
-/* Skrin lama hilang sepenuhnya dahulu, baru skrin baharu muncul (tiada tindihan). */
-::view-transition-old(.nav-tab) {
-  animation: 90ms ease-in both vt-fade reverse;
-}
-::view-transition-new(.nav-tab) {
-  animation:
-    180ms ease-out 90ms both vt-fade,
-    240ms ease-out 90ms both vt-rise;
-}
 ::view-transition-old(.nav-forward) {
   --vt-offset: -48px;
   animation:
@@ -191,11 +182,6 @@ body {
 @keyframes vt-fade {
   from {
     opacity: 0;
-  }
-}
-@keyframes vt-rise {
-  from {
-    translate: 0 8px;
   }
 }
 @keyframes vt-slide {

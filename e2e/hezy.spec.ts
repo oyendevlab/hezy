@@ -982,7 +982,7 @@ test.describe("skrin pembuka iOS", () => {
 });
 
 test.describe("peralihan skrin", () => {
-  test("tab memudar, masuk lebih dalam menggelongsor; bar navigasi kekal", async ({
+  test("tab bertukar terus, masuk lebih dalam menggelongsor; bar navigasi kekal", async ({
     page,
   }) => {
     await seedLocation(page);
@@ -1009,7 +1009,8 @@ test.describe("peralihan skrin", () => {
       .filter({ visible: true });
     await nav.getByRole("link", { name: "Lokasi" }).click();
     await expect(page).toHaveURL(/\/lokasi$/);
-    await expect.poll(types).toContainEqual(["nav-tab"]);
+    // Tukar tab: tiada animasi (tiada jenis peralihan).
+    expect((await types()).flat()).not.toContain("nav-tab");
     await page.getByRole("link", { name: /IPU mengikut negeri/ }).click();
     await expect(page).toHaveURL(/\/negeri$/);
     await expect.poll(types).toContainEqual(["nav-forward"]);

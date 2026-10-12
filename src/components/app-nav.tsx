@@ -35,7 +35,6 @@ export function TopNav() {
               <Link
                 key={item.href}
                 href={item.href}
-                transitionTypes={["nav-tab"]}
                 aria-current={active ? "page" : undefined}
                 className={`flex min-h-10 items-center gap-1.5 rounded-full px-4 text-sm font-semibold ${
                   active ? "bg-ink text-page" : "text-ink hover:bg-line"
@@ -70,7 +69,6 @@ export function BottomNav() {
           <Link
             key={item.href}
             href={item.href}
-            transitionTypes={["nav-tab"]}
             aria-current={active ? "page" : undefined}
             className={`flex min-h-[52px] flex-col items-center justify-center gap-1 text-xs ${
               active ? "text-ink font-bold" : "text-muted font-medium"
