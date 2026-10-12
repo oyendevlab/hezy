@@ -13,7 +13,7 @@
     "format:check": "prettier --check .",
     "icons": "node scripts/generate-icons.mjs",
     "test:e2e": "playwright test",
-    "test:e2e:prod": "E2E_BASE_URL=https://hezy.vercel.app playwright test",
+    "test:e2e:prod": "E2E_BASE_URL=https://hezy.my playwright test",
     "monitor": "node scripts/monitor.mjs"
   },
   "dependencies": {

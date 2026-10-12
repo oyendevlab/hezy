@@ -880,8 +880,8 @@ test.describe("halaman negeri", () => {
 
   test("sitemap merangkumi halaman negeri", async ({ request }) => {
     const xml = await (await request.get("/sitemap.xml")).text();
-    expect(xml).toContain("https://hezy.vercel.app/negeri/selangor");
-    expect(xml).toContain("https://hezy.vercel.app/negeri/labuan");
+    expect(xml).toContain("https://hezy.my/negeri/selangor");
+    expect(xml).toContain("https://hezy.my/negeri/labuan");
   });
 });
 

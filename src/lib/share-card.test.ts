@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { buildCardPath, parseCard } from "./share-card";
 
 const params = (path: string) =>
-  Object.fromEntries(new URL(path, "https://hezy.vercel.app").searchParams);
+  Object.fromEntries(new URL(path, "https://hezy.my").searchParams);
 
 describe("kad kongsi", () => {
   it("membina dan membaca semula parameter kad", () => {

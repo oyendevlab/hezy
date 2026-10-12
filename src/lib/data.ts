@@ -45,7 +45,7 @@ export async function getStations(): Promise<Station[]> {
   cacheLife({ stale: 300, revalidate: 900, expire: 3600 });
 
   const res = await fetch(APIMS_STATIONS_URL, {
-    headers: { "User-Agent": "Hezy/0.1 (+https://hezy.vercel.app)" },
+    headers: { "User-Agent": "Hezy (+https://hezy.my)" },
     signal: AbortSignal.timeout(8000),
   });
   if (!res.ok) {
@@ -63,7 +63,7 @@ export async function getStateHistory(
   cacheLife({ stale: 300, revalidate: 900, expire: 3600 });
 
   const res = await fetch(apimsHourlyUrl(stateId, hourKey), {
-    headers: { "User-Agent": "Hezy/0.3 (+https://hezy.vercel.app)" },
+    headers: { "User-Agent": "Hezy (+https://hezy.my)" },
     signal: AbortSignal.timeout(8000),
   });
   if (!res.ok) {
@@ -86,7 +86,7 @@ export async function fetchStateHourly(
   hourKey: string,
 ): Promise<Map<string, HourlyOfficial[]>> {
   const res = await fetch(apimsHourlyUrl(stateId, hourKey), {
-    headers: { "User-Agent": "Hezy/0.4 (+https://hezy.vercel.app)" },
+    headers: { "User-Agent": "Hezy (+https://hezy.my)" },
     signal: AbortSignal.timeout(10_000),
     cache: "no-store",
   });

@@ -24,7 +24,7 @@ export async function GET(request: Request) {
     return Response.json({ error: "Tidak dibenarkan." }, { status: 401 });
   }
   webpush.setVapidDetails(
-    process.env.VAPID_SUBJECT ?? "https://hezy.vercel.app",
+    process.env.VAPID_SUBJECT ?? "https://hezy.my",
     publicKey,
     privateKey,
   );

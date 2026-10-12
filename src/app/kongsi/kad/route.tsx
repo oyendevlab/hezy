@@ -215,7 +215,7 @@ export async function GET(request: Request) {
         <div style={{ display: "flex" }}>
           {t("Semak jerebu di lokasi anda")}
         </div>
-        <div style={{ display: "flex", fontWeight: 800 }}>hezy.vercel.app</div>
+        <div style={{ display: "flex", fontWeight: 800 }}>hezy.my</div>
       </div>
     </div>,
     {

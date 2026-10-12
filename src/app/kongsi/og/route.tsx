@@ -110,7 +110,7 @@ export async function GET(request: Request) {
       )}
 
       <div style={{ display: "flex", fontSize: 30, fontWeight: 600 }}>
-        hezy.vercel.app
+        hezy.my
       </div>
     </div>,
     {
