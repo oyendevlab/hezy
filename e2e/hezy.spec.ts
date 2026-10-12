@@ -926,6 +926,32 @@ test.describe("privasi", () => {
   });
 });
 
+test.describe("halaman negeri dan kongsi dalam English", () => {
+  test("ikut bahasa pengguna selepas hidrasi", async ({ page }) => {
+    await page.addInitScript(() =>
+      localStorage.setItem(
+        "hezy:prefs:v1",
+        JSON.stringify({ lang: "en", theme: "system", profile: "umum" }),
+      ),
+    );
+    await page.goto("/negeri");
+    await expect(
+      page.getByRole("heading", { name: "API by state", level: 1 }),
+    ).toBeVisible();
+    await expect(page.getByText("FEDERAL TERRITORIES")).toBeVisible();
+    await page.goto("/negeri/selangor");
+    await expect(
+      page.getByRole("heading", { name: "Selangor API today" }),
+    ).toBeVisible();
+    await expect(page.getByRole("link", { name: "All states" })).toBeVisible();
+    await page.goto("/kongsi?n=Klang&i=146&s=apims");
+    await expect(
+      page.getByRole("heading", { name: "Shared haze status" }),
+    ).toBeVisible();
+    await expect(page.getByText("Unhealthy", { exact: true })).toBeVisible();
+  });
+});
+
 test.describe("halaman negeri", () => {
   test("indeks menyenaraikan 16 negeri dan wilayah", async ({ page }) => {
     await page.goto("/negeri");

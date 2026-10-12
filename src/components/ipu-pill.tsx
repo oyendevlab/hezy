@@ -7,7 +7,7 @@ export function IpuPill({
   className = "",
 }: {
   category: IpuCategoryKey;
-  label: string;
+  label: React.ReactNode;
   className?: string;
 }) {
   return (

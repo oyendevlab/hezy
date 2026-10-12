@@ -318,7 +318,7 @@ Urutan: 10 → A → B → C → D → 1 → 8 → 9.
 
 ### 9. Halaman negeri dan kongsi dalam English
 
-- [ ] Halaman `/negeri`, `/negeri/[negeri]` dan `/kongsi` mengikut bahasa pengguna (BM/EN); metadata kekal BM untuk SEO
+- [x] Halaman `/negeri`, `/negeri/[negeri]` dan `/kongsi` mengikut bahasa pengguna (BM/EN); metadata kekal BM untuk SEO
 
 ### Selesai v0.5.0
 

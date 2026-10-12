@@ -1,16 +1,21 @@
+"use client";
+
 import type { Station } from "@/lib/apims";
 import { formatClock } from "@/lib/format";
 import { ipuCategory } from "@/lib/ipu";
+import { useI18n } from "@/lib/use-i18n";
 import { IpuPill } from "./ipu-pill";
 
 /** Jadual IPU rasmi stesen APIMS, disusun dari IPU tertinggi. */
 export function StationTable({
   stations,
-  caption,
+  stateName,
 }: {
   stations: Station[];
-  caption: string;
+  stateName: string;
 }) {
+  const { t, lang } = useI18n();
+  const caption = t("IPU rasmi stesen APIMS di {state}", { state: stateName });
   const sorted = [...stations].sort((a, b) => (b.ipu ?? -1) - (a.ipu ?? -1));
   return (
     <div
@@ -25,19 +30,19 @@ export function StationTable({
         <thead className="bg-surface text-muted text-xs font-bold tracking-wide">
           <tr>
             <th scope="col" className="px-4 py-3">
-              KAWASAN
+              {t("KAWASAN")}
             </th>
             <th scope="col" className="px-4 py-3">
-              IPU
+              {t("IPU")}
             </th>
             <th scope="col" className="px-4 py-3">
-              STATUS
+              {t("STATUS")}
             </th>
             <th scope="col" className="px-4 py-3">
-              PENCEMAR
+              {t("PENCEMAR")}
             </th>
             <th scope="col" className="px-4 py-3">
-              MASA
+              {t("MASA")}
             </th>
           </tr>
         </thead>
@@ -52,18 +57,18 @@ export function StationTable({
               </td>
               <td className="px-4 py-3">
                 {s.ipu === null ? (
-                  <span className="text-muted">Tiada bacaan</span>
+                  <span className="text-muted">{t("Tiada bacaan")}</span>
                 ) : (
                   <IpuPill
                     category={ipuCategory(s.ipu).key}
-                    label={ipuCategory(s.ipu).label}
+                    label={t(ipuCategory(s.ipu).label)}
                     className="!text-xs"
                   />
                 )}
               </td>
               <td className="text-muted px-4 py-3">{s.pollutant ?? "–"}</td>
               <td className="text-muted px-4 py-3">
-                {s.time ? formatClock(s.time) : "–"}
+                {s.time ? formatClock(s.time, lang) : "–"}
               </td>
             </tr>
           ))}

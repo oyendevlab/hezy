@@ -443,6 +443,42 @@ const EN: Record<string, string> = {
     "Turning off alerts alone also deletes the subscription from the server.",
   "Soalan atau permintaan berkaitan data:": "Questions or data requests:",
 
+  // Negeri dan kongsi
+  "Tekan negeri untuk melihat IPU setiap kawasan dan stesen.":
+    "Tap a state to see the API for each area and station.",
+  "Data APIMS tidak dapat diambil buat masa ini.":
+    "APIMS data cannot be fetched right now.",
+  "Data APIMS tidak dapat diambil buat masa ini. Cuba lagi sebentar.":
+    "APIMS data cannot be fetched right now. Please try again shortly.",
+  NEGERI: "STATES",
+  "WILAYAH PERSEKUTUAN": "FEDERAL TERRITORIES",
+  "{n} stesen": "{n} stations",
+  maks: "max",
+  "Sumber: APIMS, Jabatan Alam Sekitar. Dikemas kini setiap 15 minit.":
+    "Source: APIMS, Department of Environment. Updated every 15 minutes.",
+  "Semua negeri": "All states",
+  "IPU {state} hari ini": "{state} API today",
+  "{n} stesen dengan bacaan": "{n} stations with readings",
+  tertinggi: "highest",
+  "{n} stesen melebihi IPU 100": "{n} stations above API 100",
+  "tiada stesen melebihi IPU 100": "no station above API 100",
+  "Sumber: APIMS, Jabatan Alam Sekitar":
+    "Source: APIMS, Department of Environment",
+  "bacaan terkini {time}": "latest reading {time}",
+  "Dikemas kini setiap 15 minit.": "Updated every 15 minutes.",
+  "Semak lokasi saya dengan Hezy": "Check my location with Hezy",
+  "IPU rasmi stesen APIMS di {state}": "Official APIMS station API in {state}",
+  KAWASAN: "AREA",
+  STATUS: "STATUS",
+  PENCEMAR: "POLLUTANT",
+  MASA: "TIME",
+  "Status jerebu yang dikongsi": "Shared haze status",
+  "Pautan kongsi ini tidak sah.": "This share link is not valid.",
+  "IPU rasmi APIMS (JAS) semasa dikongsi. Bacaan terkini mungkin berbeza.":
+    "Official APIMS (DOE) API when shared. The latest reading may differ.",
+  "Anggaran IPU daripada PM2.5 semasa dikongsi. Bacaan terkini mungkin berbeza.":
+    "API estimated from PM2.5 when shared. The latest reading may differ.",
+
   // GPS
   "Akses lokasi ditolak. Pilih kawasan secara manual di bawah.":
     "Location access denied. Choose an area manually below.",
