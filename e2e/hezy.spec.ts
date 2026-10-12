@@ -722,6 +722,24 @@ test.describe("navigasi", () => {
   });
 });
 
+test.describe("skrin pembuka iOS", () => {
+  test("pautan apple-touch-startup-image untuk setiap saiz dan tema", async ({
+    page,
+    request,
+  }) => {
+    await page.goto("/");
+    const links = page.locator('link[rel="apple-touch-startup-image"]');
+    await expect(links).toHaveCount(32);
+    const dark = page.locator(
+      'link[rel="apple-touch-startup-image"][href="/splash/splash-1179x2556-dark.png"]',
+    );
+    await expect(dark).toHaveAttribute("media", /prefers-color-scheme: dark/);
+    const res = await request.get("/splash/splash-1179x2556-dark.png");
+    expect(res.status()).toBe(200);
+    expect(res.headers()["content-type"]).toContain("image/png");
+  });
+});
+
 test.describe("peralihan skrin", () => {
   test("tab memudar, masuk lebih dalam menggelongsor; bar navigasi kekal", async ({
     page,

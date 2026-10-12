@@ -6,6 +6,7 @@ import { OfflineBanner, PwaSetup } from "@/components/pwa";
 import { SITE_URL } from "@/lib/site";
 import { THEME_BOOT_SCRIPT } from "@/lib/storage-keys";
 import "./globals.css";
+import { startupImages } from "@/lib/splash";
 
 const jakarta = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
@@ -26,7 +27,12 @@ export const metadata: Metadata = {
   description:
     "Semak Indeks Pencemar Udara (IPU) di lokasi anda dengan pantas.",
   applicationName: "Hezy",
-  appleWebApp: { capable: true, title: "Hezy", statusBarStyle: "default" },
+  appleWebApp: {
+    capable: true,
+    title: "Hezy",
+    statusBarStyle: "default",
+    startupImage: startupImages(),
+  },
   icons: { apple: "/icons/apple-touch-icon.png" },
 };
 
