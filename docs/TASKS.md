@@ -399,7 +399,7 @@ Fokus: UI/UX yang lebih licin dan seperti aplikasi asli. Termasuk pembetulan ked
 
 ### Amaran
 
-14. **Butang "Hantar notifikasi ujian"** di Tetapan → Amaran (had kadar; tidak mengubah status amaran)
+14. **Butang "Hantar notifikasi ujian"** di Tetapan → Amaran (had kadar; tidak mengubah status amaran) — ✅ siap
 
 ### Selesai v0.6.0
 
