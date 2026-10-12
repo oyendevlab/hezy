@@ -1,18 +1,16 @@
 import { summarizeAccuracy } from "@/lib/accuracy";
-import { nearestStation, type HourlyOfficial } from "@/lib/apims";
+import { nearestStation } from "@/lib/apims";
 import { parseCoords } from "@/lib/coords";
 import {
   getAccuracyIndex,
-  getAirQuality,
   getHotspots,
-  getStateHistory,
   getStations,
   getWind,
 } from "@/lib/data";
 import { upwindHotspots } from "@/lib/hotspots";
 import { CALM_KMH, windAt } from "@/lib/wind";
-import { officialFor, withOfficialHistory } from "@/lib/official";
-import { buildReading, localHourKey } from "@/lib/reading";
+import { loadReading } from "@/lib/load-reading";
+import { localHourKey } from "@/lib/reading";
 
 /**
  * GET /api/aqi?lat=3.07&lon=101.52
@@ -25,19 +23,10 @@ export async function GET(request: Request) {
     return Response.json({ error: coords.error }, { status: 400 });
   }
 
-  const [series, stations, wind] = await Promise.allSettled([
-    getAirQuality(coords.lat, coords.lon),
+  const [stations, wind] = await Promise.allSettled([
     getStations(),
     getWind(coords.lat, coords.lon),
   ]);
-
-  if (series.status === "rejected") {
-    console.error("[api/aqi] Open-Meteo", series.reason);
-    return Response.json(
-      { error: "Data kualiti udara tidak dapat diambil. Cuba lagi sebentar." },
-      { status: 502 },
-    );
-  }
   if (stations.status === "rejected") {
     // APIMS hanya tambahan; anggaran model masih dipulangkan.
     console.error("[api/aqi] APIMS", stations.reason);
@@ -45,29 +34,21 @@ export async function GET(request: Request) {
 
   const now = new Date();
   const nowKey = localHourKey(now);
-  const official =
-    stations.status === "fulfilled"
-      ? officialFor(stations.value, coords, nowKey)
-      : null;
-
-  // Sejarah rasmi setiap jam bagi stesen terdekat: graf hari ini dan pembetulan ramalan.
-  const station =
-    official && stations.status === "fulfilled"
-      ? stations.value.find((s) => s.id === official.stationId)
-      : undefined;
-  let history: HourlyOfficial[] = [];
-  if (station?.stateId != null) {
-    try {
-      history =
-        (await getStateHistory(station.stateId, nowKey))[station.id] ?? [];
-    } catch (error) {
-      console.error("[api/aqi] APIMS sejarah", error);
-    }
+  let loaded;
+  try {
+    loaded = await loadReading(
+      coords,
+      now,
+      stations.status === "fulfilled" ? stations.value : null,
+    );
+  } catch (error) {
+    console.error("[api/aqi] Open-Meteo", error);
+    return Response.json(
+      { error: "Data kualiti udara tidak dapat diambil. Cuba lagi sebentar." },
+      { status: 502 },
+    );
   }
-
-  let reading = buildReading(series.value, now, history);
-  reading.official = official;
-  reading = withOfficialHistory(reading, history);
+  const { reading, station } = loaded;
 
   reading.wind =
     wind.status === "fulfilled" ? windAt(wind.value, coords, nowKey) : null;

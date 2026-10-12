@@ -36,6 +36,11 @@ export default defineConfig({
         reuseExistingServer: !process.env.CI,
         timeout: 240_000,
         // Token palsu: permintaan WAQI ditiru dalam e2e/fixtures.ts.
-        env: { NEXT_PUBLIC_WAQI_TOKEN: "e2e" },
+        env: {
+          NEXT_PUBLIC_WAQI_TOKEN: "e2e",
+          // Kunci awam VAPID khusus ujian (bukan production): memaparkan tetapan amaran.
+          NEXT_PUBLIC_VAPID_PUBLIC_KEY:
+            "BAdYlNVa0Y76UaXbniJ5FvX3qrIu7lcYgQRyjkmlo9kyfnY0_1uNIBT4hUuOwmn2ABLVCUpzh9hWpnPB8YphbQw",
+        },
       },
 });

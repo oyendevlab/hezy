@@ -222,11 +222,11 @@ Masalah: model CAMS (Open-Meteo) kurang menganggar jerebu. Contoh Putrajaya 12 O
 ### Amaran dan rutin harian
 
 5. **Ringkasan pagi**
-   - [ ] Pilihan di Tetapan; notifikasi jam 7 pagi dengan IPU dan masa terbaik untuk keluar (workflow sedia ada, semakan jam 7 pagi)
+   - [x] Pilihan di Tetapan; notifikasi jam 7 pagi dengan IPU dan masa terbaik untuk keluar (workflow sedia ada, semakan jam 7 pagi)
 6. **Waktu senyap**
-   - [ ] Pilih julat (lalai 11 mlm – 6 pg); amaran ditangguh ke hujung waktu senyap kecuali IPU > 300
+   - [x] Pilih julat (lalai 11 mlm – 6 pg); amaran ditangguh ke hujung waktu senyap kecuali IPU > 300
 7. **Amaran ramalan**
-   - [ ] Jam 8 malam: maklumkan jika purata ramalan esok melebihi ambang pengguna
+   - [x] Jam 8 malam: maklumkan jika purata ramalan esok melebihi ambang pengguna
 
 ### Ibu bapa, sekolah dan komuniti
 

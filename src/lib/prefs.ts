@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from "react";
 import type { HealthProfile } from "./advice";
 import { isLang, type Lang } from "./i18n";
+import type { PushOptions } from "./push-validate";
 import { PREFS_KEY } from "./storage-keys";
 
 export { PREFS_KEY };
@@ -31,6 +32,12 @@ export type Prefs = {
   alertFavourites: string[];
   /** Bahasa antara muka. */
   lang: Lang;
+  /** Ringkasan pagi jam 7 (item 5). */
+  morningSummary: boolean;
+  /** Amaran ramalan esok jam 8 malam (item 7). */
+  forecastAlert: boolean;
+  /** Waktu senyap (jam waktu Malaysia); `null` = mati (item 6). */
+  quietHours: { start: number; end: number } | null;
 };
 
 export const MAX_FAVOURITES = 5;
@@ -44,6 +51,9 @@ export const DEFAULT_PREFS: Prefs = {
   alertThreshold: null,
   alertFavourites: [],
   lang: "ms",
+  morningSummary: false,
+  forecastAlert: true,
+  quietHours: { start: 23, end: 6 },
 };
 
 const PROFILES: readonly HealthProfile[] = ["umum", "anak", "asma", "emas"];
@@ -58,6 +68,23 @@ function isLocation(value: unknown): value is SavedLocation {
     Number.isFinite(v.lon) &&
     (v.source === "gps" || v.source === "area")
   );
+}
+
+const isHour = (v: unknown): v is number =>
+  Number.isInteger(v) && (v as number) >= 0 && (v as number) <= 23;
+
+function isHourRange(v: unknown): v is { start: number; end: number } {
+  const r = v as { start?: unknown; end?: unknown } | null;
+  return isHour(r?.start) && isHour(r?.end) && r.start !== r.end;
+}
+
+/** Pilihan rutin amaran untuk dihantar bersama langganan push. */
+export function pushOptions(prefs: Prefs): PushOptions {
+  return {
+    morning: prefs.morningSummary,
+    forecast: prefs.forecastAlert,
+    quiet: prefs.quietHours,
+  };
 }
 
 /** Baca prefs daripada JSON tersimpan, buang medan yang rosak. */
@@ -86,6 +113,14 @@ export function parsePrefs(raw: string | null): Prefs {
             .slice(0, MAX_FAVOURITES)
         : [],
       lang: isLang(v.lang) ? v.lang : "ms",
+      morningSummary: v.morningSummary === true,
+      forecastAlert: v.forecastAlert !== false,
+      quietHours:
+        v.quietHours === null
+          ? null
+          : isHourRange(v.quietHours)
+            ? { start: v.quietHours.start, end: v.quietHours.end }
+            : DEFAULT_PREFS.quietHours,
     };
   } catch {
     return DEFAULT_PREFS;

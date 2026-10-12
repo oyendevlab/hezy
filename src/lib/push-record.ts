@@ -4,12 +4,17 @@ import {
   DEFAULT_ALERT_THRESHOLD,
   type AlertLocation,
   type AlertThreshold,
+  type PushOptions,
   type PushSubscriptionData,
   type SubscribeInput,
 } from "./push-validate";
 
 /** Lokasi dalam rekod langganan bersama status amarannya sendiri. */
-export type RecordLocation = AlertLocation & AlertState;
+export type RecordLocation = AlertLocation &
+  AlertState & {
+    /** Tarikh (waktu Malaysia) amaran ramalan terakhir dihantar. */
+    lastForecast?: string | null;
+  };
 
 /** Rekod langganan dalam Vercel Blob (private): satu fail JSON bagi setiap peranti. */
 export type PushRecord = {
@@ -19,6 +24,10 @@ export type PushRecord = {
   lang?: Lang;
   locations: RecordLocation[];
   createdAt: string;
+  /** Pilihan rutin; tiada dalam rekod sebelum v0.4.0. */
+  options?: PushOptions;
+  /** Tarikh (waktu Malaysia) ringkasan pagi terakhir dihantar. */
+  lastMorning?: string | null;
 };
 
 /** Bentuk rekod sebelum v0.3.0: satu lokasi di aras atas, tanpa ambang. */
@@ -67,6 +76,8 @@ export function mergeRecord(
     subscription: input.subscription,
     threshold: input.threshold,
     lang: input.lang,
+    options: input.options,
+    lastMorning: existing?.lastMorning ?? null,
     createdAt: existing?.createdAt ?? now.toISOString(),
     locations: input.locations.map((location) => {
       const previous = existing?.locations.find(
@@ -78,6 +89,7 @@ export function mergeRecord(
         ...location,
         lastAlertKey: previous?.lastAlertKey ?? null,
         lastAlertAt: previous?.lastAlertAt ?? null,
+        lastForecast: previous?.lastForecast ?? null,
       };
     }),
   };

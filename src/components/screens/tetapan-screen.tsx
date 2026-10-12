@@ -3,6 +3,7 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { MIN_DISPLAY_DAYS, type AccuracySummary } from "@/lib/accuracy";
 import { HEALTH_PROFILES } from "@/lib/advice";
+import { formatHour } from "@/lib/format";
 import { LANGUAGES } from "@/lib/i18n";
 import { promptInstall, useInstallStatus } from "@/lib/install";
 import {
@@ -11,6 +12,7 @@ import {
   usePrefs,
   alertLocations,
   effectiveThreshold,
+  pushOptions,
   type Prefs,
   type SavedLocation,
   type ThemePref,
@@ -338,8 +340,12 @@ function AlertRow({ prefs }: { prefs: Prefs }) {
         await disablePush();
         setEnabled(false);
       } else if (
-        (await enablePush(alertLocations(prefs), threshold, prefs.lang)) ===
-        "denied"
+        (await enablePush(
+          alertLocations(prefs),
+          threshold,
+          prefs.lang,
+          pushOptions(prefs),
+        )) === "denied"
       ) {
         setMessage(
           t(
@@ -442,6 +448,7 @@ function AlertRow({ prefs }: { prefs: Prefs }) {
             )}
           </p>
         </fieldset>
+        <RoutineOptions prefs={prefs} />
       </>
     );
   }
@@ -501,5 +508,128 @@ function AccuracyRows() {
         }
       />
     </>
+  );
+}
+
+const HOURS = Array.from({ length: 24 }, (_, h) => h);
+
+/** Ringkasan pagi, amaran ramalan esok dan waktu senyap (v0.4.0). */
+function RoutineOptions({ prefs }: { prefs: Prefs }) {
+  const { t, lang } = useI18n();
+  const quiet = prefs.quietHours;
+  const hourLabel = (h: number) =>
+    formatHour(`2026-01-01T${String(h).padStart(2, "0")}:00`, lang);
+  const check =
+    "flex min-h-12 cursor-pointer items-start gap-3 py-2.5 text-sm font-semibold";
+  const select =
+    "border-line bg-page min-h-10 rounded-lg border px-2 text-sm font-semibold";
+
+  return (
+    <fieldset className="border-line border-t py-2">
+      <legend className="text-muted float-left mb-1 w-full pt-1 text-xs font-semibold">
+        {t("Rutin amaran")}
+      </legend>
+      <label className={check}>
+        <input
+          type="checkbox"
+          checked={prefs.morningSummary}
+          onChange={(e) =>
+            updatePrefs((x) => ({ ...x, morningSummary: e.target.checked }))
+          }
+          className="mt-0.5 size-4 accent-[#1c1a16]"
+        />
+        <span>
+          {t("Ringkasan pagi (7 pagi)")}
+          <span className="text-muted block text-xs font-medium">
+            {t("IPU semasa dan masa terbaik untuk keluar hari ini")}
+          </span>
+        </span>
+      </label>
+      <label className={check}>
+        <input
+          type="checkbox"
+          checked={prefs.forecastAlert}
+          onChange={(e) =>
+            updatePrefs((x) => ({ ...x, forecastAlert: e.target.checked }))
+          }
+          className="mt-0.5 size-4 accent-[#1c1a16]"
+        />
+        <span>
+          {t("Amaran ramalan esok (8 malam)")}
+          <span className="text-muted block text-xs font-medium">
+            {t("Bila purata ramalan esok melebihi ambang anda")}
+          </span>
+        </span>
+      </label>
+      <label className={check}>
+        <input
+          type="checkbox"
+          checked={quiet !== null}
+          onChange={(e) =>
+            updatePrefs((x) => ({
+              ...x,
+              quietHours: e.target.checked ? { start: 23, end: 6 } : null,
+            }))
+          }
+          className="mt-0.5 size-4 accent-[#1c1a16]"
+        />
+        <span>
+          {t("Waktu senyap")}
+          <span className="text-muted block text-xs font-medium">
+            {t(
+              "Amaran ditangguh hingga waktu senyap tamat, kecuali IPU melebihi 300",
+            )}
+          </span>
+        </span>
+      </label>
+      {quiet && (
+        <div className="flex flex-wrap items-center gap-2 pb-2 pl-7 text-sm">
+          <label className="flex items-center gap-2">
+            <span aria-hidden="true">{t("Dari")}</span>
+            <select
+              aria-label={t("Waktu senyap bermula")}
+              value={quiet.start}
+              onChange={(e) => {
+                const start = Number(e.target.value);
+                if (start === quiet.end) return;
+                updatePrefs((x) => ({
+                  ...x,
+                  quietHours: { start, end: quiet.end },
+                }));
+              }}
+              className={select}
+            >
+              {HOURS.map((h) => (
+                <option key={h} value={h} disabled={h === quiet.end}>
+                  {hourLabel(h)}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="flex items-center gap-2">
+            <span aria-hidden="true">{t("hingga")}</span>
+            <select
+              aria-label={t("Waktu senyap tamat")}
+              value={quiet.end}
+              onChange={(e) => {
+                const end = Number(e.target.value);
+                if (end === quiet.start) return;
+                updatePrefs((x) => ({
+                  ...x,
+                  quietHours: { start: quiet.start, end },
+                }));
+              }}
+              className={select}
+            >
+              {HOURS.map((h) => (
+                <option key={h} value={h} disabled={h === quiet.start}>
+                  {hourLabel(h)}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+      )}
+    </fieldset>
   );
 }

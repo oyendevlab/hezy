@@ -45,7 +45,27 @@ describe("parsePrefs", () => {
       alertThreshold: null,
       alertFavourites: [],
       lang: "ms",
+      morningSummary: false,
+      forecastAlert: true,
+      quietHours: { start: 23, end: 6 },
     });
+    expect(
+      parsePrefs(
+        JSON.stringify({
+          quietHours: null,
+          morningSummary: true,
+          forecastAlert: false,
+        }),
+      ),
+    ).toMatchObject({
+      quietHours: null,
+      morningSummary: true,
+      forecastAlert: false,
+    });
+    expect(
+      parsePrefs(JSON.stringify({ quietHours: { start: 5, end: 5 } }))
+        .quietHours,
+    ).toEqual({ start: 23, end: 6 });
     expect(parsePrefs(JSON.stringify({ lang: "en" })).lang).toBe("en");
   });
 });
