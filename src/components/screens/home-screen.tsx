@@ -11,6 +11,7 @@ import { useReading, type ReadingEntry } from "@/lib/use-reading";
 import { ChooseLocation } from "../choose-location";
 import { IpuPill } from "../ipu-pill";
 import { Logo } from "../logo";
+import { SchoolCard } from "../school-card";
 import { ReadingNotices } from "../reading-notices";
 import { ShareButton } from "../share-button";
 import { Skyline } from "../skyline";
@@ -70,6 +71,7 @@ type ViewProps = {
 function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
   const reading = entry?.reading;
   const current = primaryReading(reading);
+  const showSchool = prefs.profile === "anak" || prefs.showSchool;
   const palette = current ? CATEGORY_STYLE[current.category].sky : NEUTRAL_SKY;
   const shareText = current
     ? `IPU ${location.name}: ${current.ipu} (${current.label}) · via Hezy`
@@ -101,6 +103,7 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
             size="phone"
             profile={prefs.profile}
           />
+          {current && showSchool && <SchoolCard reading={current} />}
         </div>
       </section>
 
@@ -138,6 +141,7 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
         <div className="relative mx-auto -mt-9 flex max-w-[1200px] flex-wrap gap-5 px-10">
           <div className="flex min-w-0 flex-[1_1_340px] flex-col gap-5">
             {entry && <ReadingNotices entry={entry} onRetry={onRetry} />}
+            {current && showSchool && <SchoolCard reading={current} />}
             {current && <QuickAnswers category={current.category} />}
             {current && (
               <AdviceCard category={current.category} profile={prefs.profile} />

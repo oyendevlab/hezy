@@ -22,6 +22,8 @@ export type Prefs = {
   favourites: SavedLocation[];
   profile: HealthProfile;
   theme: ThemePref;
+  /** Papar kad status sekolah walaupun profil bukan Kanak-kanak. */
+  showSchool: boolean;
 };
 
 export const MAX_FAVOURITES = 5;
@@ -31,6 +33,7 @@ export const DEFAULT_PREFS: Prefs = {
   favourites: [],
   profile: "umum",
   theme: "system",
+  showSchool: false,
 };
 
 const PROFILES: readonly HealthProfile[] = ["umum", "anak", "asma", "emas"];
@@ -63,6 +66,7 @@ export function parsePrefs(raw: string | null): Prefs {
       theme: THEMES.includes(v.theme as ThemePref)
         ? (v.theme as ThemePref)
         : "system",
+      showSchool: v.showSchool === true,
     };
   } catch {
     return DEFAULT_PREFS;

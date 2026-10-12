@@ -83,6 +83,23 @@ export function TetapanScreen() {
             <p className="text-muted mt-2 text-xs">
               Nasihat di skrin Utama disesuaikan mengikut profil ini.
             </p>
+            <label className="bg-surface mt-3 flex min-h-12 cursor-pointer items-center gap-3 rounded-2xl px-3.5 text-sm font-semibold">
+              <input
+                type="checkbox"
+                checked={prefs.profile === "anak" || prefs.showSchool}
+                disabled={prefs.profile === "anak"}
+                onChange={(e) =>
+                  updatePrefs((x) => ({ ...x, showSchool: e.target.checked }))
+                }
+                className="size-4 accent-[#1c1a16]"
+              />
+              <span>
+                Papar status sekolah (panduan KPM)
+                <span className="text-muted block text-xs font-medium">
+                  Sentiasa dipaparkan untuk profil Kanak-kanak
+                </span>
+              </span>
+            </label>
           </fieldset>
 
           <fieldset>

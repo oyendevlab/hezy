@@ -181,6 +181,49 @@ test.describe("peta stesen", () => {
   });
 });
 
+test.describe("status sekolah", () => {
+  test.beforeEach(async ({ page }) => {
+    await seedLocation(page);
+    await page.route("**/api/aqi?**", (route) =>
+      route.fulfill({ json: fakeReading(OFFICIAL_SHAH_ALAM) }),
+    );
+  });
+
+  test("dipaparkan untuk profil Kanak-kanak ikut panduan KPM", async ({
+    page,
+  }) => {
+    await page.goto("/tetapan");
+    await page.getByRole("radio", { name: "Kanak-kanak" }).check();
+    await page.goto("/");
+    const card = page
+      .getByRole("region", { name: "Aktiviti luar dihentikan" })
+      .filter({ visible: true });
+    await expect(card).toBeVisible();
+    await expect(card).toContainText("IPU rasmi 172");
+    await page.goto("/trend");
+    await expect(
+      page.getByRole("heading", { name: "Aktiviti luar dihentikan" }),
+    ).toBeVisible();
+  });
+
+  test("tersembunyi untuk profil Umum kecuali dipilih di Tetapan", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await expect(
+      page.getByRole("heading", { name: "IPU 172, Tidak Sihat" }),
+    ).toBeVisible();
+    await expect(page.getByText("STATUS SEKOLAH")).toHaveCount(0);
+
+    await page.goto("/tetapan");
+    await page.getByLabel(/Papar status sekolah/).check();
+    await page.goto("/");
+    await expect(
+      page.getByText("STATUS SEKOLAH").filter({ visible: true }),
+    ).toBeVisible();
+  });
+});
+
 test.describe("API", () => {
   test("push: menolak langganan tidak sah", async ({ request }) => {
     const res = await request.post("/api/push/subscribe", {
