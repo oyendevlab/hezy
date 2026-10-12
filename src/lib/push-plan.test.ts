@@ -89,6 +89,24 @@ describe("planNotifications", () => {
     expect(later[0].title).toBe("Jerebu di Shah Alam: IPU 150 (Tidak Sihat)");
   });
 
+  it("lencana ikon: IPU semasa amaran, padam bila udara pulih", () => {
+    const r = record({ options: undefined });
+    const [alert] = planNotifications(
+      r,
+      [reading(150)],
+      at("2026-10-12T09:12"),
+    );
+    expect(alert.badge).toBe(150);
+    const after = applySent(r, alert.update, at("2026-10-12T09:12"));
+    const [recovered] = planNotifications(
+      after,
+      [reading(60)],
+      at("2026-10-12T10:12"),
+    );
+    expect(recovered.title).toBe("Udara pulih di Shah Alam: IPU 60");
+    expect(recovered.badge).toBeNull();
+  });
+
   it("IPU > 300 dihantar walaupun dalam waktu senyap", () => {
     const notes = planNotifications(
       record(),

@@ -11,7 +11,8 @@ import {
 import { syncPushSettings } from "@/lib/push-client";
 import { useI18n } from "@/lib/use-i18n";
 import { useOnline } from "@/lib/online";
-import { refreshStaleReadings } from "@/lib/use-reading";
+import { primaryReading } from "@/lib/official";
+import { refreshStaleReadings, useReading } from "@/lib/use-reading";
 
 /** Daftar service worker (production sahaja) dan dengar peristiwa pemasangan. */
 export function PwaSetup() {
@@ -63,6 +64,23 @@ export function PwaSetup() {
       pushOptions(prefs),
     );
   }, [prefs]);
+
+  // Lencana ikon aplikasi (item 12): IPU lokasi semasa bila melebihi ambang amaran.
+  const { entry } = useReading(prefs?.current ?? null);
+  const badgeIpu = primaryReading(entry?.reading)?.ipu ?? null;
+  const threshold = prefs ? effectiveThreshold(prefs) : null;
+  useEffect(() => {
+    if (badgeIpu === null || threshold === null) return;
+    const nav = navigator as Navigator & {
+      setAppBadge?: (n: number) => Promise<void>;
+      clearAppBadge?: () => Promise<void>;
+    };
+    const task =
+      badgeIpu > threshold
+        ? nav.setAppBadge?.(badgeIpu)
+        : nav.clearAppBadge?.();
+    task?.catch(() => undefined);
+  }, [badgeIpu, threshold]);
 
   return null;
 }
