@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { distanceKm, nearestStation, parseStations } from "./apims";
+import {
+  distanceKm,
+  nearestStation,
+  parseHourly,
+  parseStations,
+} from "./apims";
 
 const raw = {
   data: [
@@ -45,6 +50,7 @@ describe("parseStations", () => {
       id: "CA20B",
       name: "Shah Alam",
       state: "Selangor",
+      stateId: null,
       lat: 3.104,
       lon: 101.556,
       ipu: 72,
@@ -84,5 +90,29 @@ describe("nearestStation", () => {
     expect(
       distanceKm({ lat: 3.14, lon: 101.69 }, { lat: 1.49, lon: 103.74 }),
     ).toBeCloseTo(292, -1);
+  });
+});
+
+describe("parseHourly", () => {
+  it("mengumpul bacaan setiap jam mengikut stesen dan menyusun dari awal", () => {
+    const history = parseHourly({
+      api_table_hourly: [
+        { STATION_ID: "CA20B", DATETIME: "2026-10-12T08:00:00", API: 75 },
+        { STATION_ID: "CA20B", DATETIME: "2026-10-12T07:00:00", API: 74 },
+        { STATION_ID: "CA21B", DATETIME: "2026-10-12T08:00:00", API: null },
+        { STATION_ID: "CA20B", DATETIME: "rosak", API: 1 },
+      ],
+    });
+    expect(history.get("CA20B")).toEqual([
+      { time: "2026-10-12T07:00", ipu: 74 },
+      { time: "2026-10-12T08:00", ipu: 75 },
+    ]);
+    expect(history.get("CA21B")).toEqual([
+      { time: "2026-10-12T08:00", ipu: null },
+    ]);
+  });
+
+  it("menolak respons yang tidak dijangka", () => {
+    expect(() => parseHourly({ data: [] })).toThrow();
   });
 });

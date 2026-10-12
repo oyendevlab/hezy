@@ -91,9 +91,9 @@ Setiap item dibuat dalam cabang `feat/*` dan PR sendiri; digabung selepas CI lul
 
 ### 2. Graf trend rasmi APIMS
 
-- [ ] Ambil sejarah IPU sejam stesen terdekat daripada endpoint APIMS `apitablehourly` (cache 15 minit)
-- [ ] Graf 24 jam: jam lepas = bacaan rasmi APIMS, jam akan datang = ramalan model; legenda membezakan kedua-duanya
-- [ ] Sandaran ke data model jika APIMS gagal atau stesen tiada bacaan
+- [x] Ambil sejarah IPU sejam stesen terdekat daripada endpoint APIMS `apitablehourly` (cache 15 minit)
+- [x] Graf 24 jam: jam lepas = bacaan rasmi APIMS, jam akan datang = ramalan model; legenda membezakan kedua-duanya
+- [x] Sandaran ke data model jika APIMS gagal atau stesen tiada bacaan
 
 ### 3. Amaran ikut profil kesihatan
 

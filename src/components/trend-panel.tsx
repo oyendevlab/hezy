@@ -1,6 +1,7 @@
 import { CATEGORY_STYLE } from "@/lib/category-style";
 import { formatDay, formatHour, formatWindow } from "@/lib/format";
 import { ipuCategory } from "@/lib/ipu";
+import { displayIpu } from "@/lib/official";
 import type { HourPoint, Reading } from "@/lib/reading";
 import { HourBars } from "./hour-bars";
 
@@ -10,7 +11,7 @@ function average(hours: HourPoint[], from: number, to: number): number | null {
       const hour = Number(h.time.slice(11, 13));
       return hour >= from && hour < to;
     })
-    .map((h) => h.hourlyIpu)
+    .map(displayIpu)
     .filter((v): v is number => v !== null);
   return values.length
     ? Math.round(values.reduce((a, b) => a + b, 0) / values.length)
@@ -126,8 +127,9 @@ export function TrendPanel({
       )}
 
       <p className="text-muted text-xs">
-        Graf, masa terbaik dan ramalan menggunakan IPU sejam, iaitu formula JAS
-        pada PM2.5 model setiap jam.
+        Jam lepas dan purata menggunakan bacaan rasmi APIMS stesen terdekat jika
+        ada. Ramalan dan masa terbaik menggunakan IPU sejam daripada PM2.5 model
+        (formula JAS).
       </p>
     </div>
   );
