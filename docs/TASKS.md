@@ -207,8 +207,8 @@ Masalah: model CAMS (Open-Meteo) kurang menganggar jerebu. Contoh Putrajaya 12 O
    - [x] Ayat ringkas di Utama, cth. "Angin dari barat daya (arah Sumatera)", dan anak panah angin pada peta; asal ditentukan dengan menyemak Sumatera/Kalimantan dalam 600 km ke hulu angin
 2. **Titik panas kebakaran (NASA FIRMS)**
    - [x] **Pengguna**: daftar MAP_KEY percuma di firms.modaps.eosdis.nasa.gov/api/map_key; `FIRMS_MAP_KEY` ditambah di Vercel (sensitif)
-   - [ ] API `/api/hotspots` (cache 1 jam): titik VIIRS 24 jam terakhir bagi Malaysia, Sumatera dan Kalimantan
-   - [ ] Lapisan "Titik panas" pada peta + bilangan titik panas di Utama bila angin dari arah itu
+   - [x] API `/api/hotspots` (cache 1 jam): titik VIIRS SNPP + NOAA-20 2 hari terakhir (data terkini ialah laluan satelit terakhir) bagi Malaysia, Sumatera dan Kalimantan, digabung ikut sel ~5 km
+   - [x] Lapisan "Titik panas" pada peta (kanvas, boleh dimatikan) + bilangan titik panas di hulu angin (±30°, 600 km) pada baris angin di Utama
 3. **Sejarah IPU: heatmap gaya GitHub** (sumber: APIMS sahaja; data WAQI tidak boleh disimpan mengikut terma mereka)
    - [x] Tugas harian GitHub Actions menyimpan IPU sejam semua stesen APIMS dalam Vercel Blob; isi awal 7 hari lepas (had sejarah endpoint APIMS)
    - [x] Heatmap 12 minggu di Trend: satu kotak sehari, warna ikut IPU maksimum harian; ketik kotak → tarikh, maksimum dan purata

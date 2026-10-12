@@ -87,6 +87,17 @@ const checks = [
     },
   },
   {
+    name: "Titik panas: /api/hotspots (NASA FIRMS)",
+    async run() {
+      const { status, body } = await getJson("/api/hotspots");
+      if (status !== 200)
+        return `status ${status}: ${body?.error ?? "tiada mesej"}`;
+      if (!Array.isArray(body?.cells)) return "tiada senarai sel titik panas";
+      console.log(`   ${body.cells.length} sel titik panas (2 hari)`);
+      return null;
+    },
+  },
+  {
     name: "Open-Meteo: /api/aqi (Kuching)",
     async run() {
       const { status, body } = await getJson("/api/aqi?lat=1.55&lon=110.36");

@@ -4,11 +4,13 @@ import { parseCoords } from "@/lib/coords";
 import {
   getAccuracyIndex,
   getAirQuality,
+  getHotspots,
   getStateHistory,
   getStations,
   getWind,
 } from "@/lib/data";
-import { windAt } from "@/lib/wind";
+import { upwindHotspots } from "@/lib/hotspots";
+import { CALM_KMH, windAt } from "@/lib/wind";
 import { officialFor, withOfficialHistory } from "@/lib/official";
 import { buildReading, localHourKey } from "@/lib/reading";
 
@@ -70,6 +72,18 @@ export async function GET(request: Request) {
   reading.wind =
     wind.status === "fulfilled" ? windAt(wind.value, coords, nowKey) : null;
   if (wind.status === "rejected") console.error("[api/aqi] angin", wind.reason);
+  if (reading.wind && reading.wind.speed >= CALM_KMH) {
+    try {
+      const { cells } = await getHotspots();
+      reading.wind.hotspots = upwindHotspots(
+        cells,
+        coords,
+        reading.wind.direction,
+      );
+    } catch (error) {
+      console.error("[api/aqi] titik panas", error);
+    }
+  }
 
   // Ketepatan 14 hari: stesen rasmi, atau stesen terdekat dalam 100 km, atau kebangsaan.
   try {

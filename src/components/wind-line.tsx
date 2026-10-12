@@ -64,14 +64,22 @@ export function useWindText() {
 export function WindLine({ wind }: { wind: Wind }) {
   const { t } = useI18n();
   const text = useWindText()(wind);
+  const hotspotNote =
+    wind.hotspots != null && wind.speed >= CALM_KMH
+      ? wind.hotspots > 0
+        ? t("· {n} titik panas di hulu angin (2 hari, NASA FIRMS)", {
+            n: wind.hotspots.toLocaleString("ms-MY"),
+          })
+        : t("· tiada titik panas dikesan di hulu angin (2 hari)")
+      : wind.source
+        ? t("· kawasan kebakaran biasa di hulu angin")
+        : null;
   return (
     <p className="flex flex-wrap items-center gap-x-1.5 text-sm font-semibold">
       {wind.speed >= CALM_KMH && <WindArrow direction={wind.direction} />}
       <span>{text}</span>
-      {wind.source && (
-        <span className="text-muted text-xs font-medium">
-          {t("· kawasan kebakaran biasa di hulu angin")}
-        </span>
+      {hotspotNote && (
+        <span className="text-muted text-xs font-medium">{hotspotNote}</span>
       )}
     </p>
   );

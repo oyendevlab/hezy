@@ -34,6 +34,8 @@ export type Wind = {
   compass: Compass;
   /** Kawasan kebakaran biasa di hulu angin, jika ada. */
   source: SmokeSource | null;
+  /** Bilangan titik panas FIRMS (sel ~5 km, 2 hari) di hulu angin; diisi oleh route API. */
+  hotspots?: number | null;
 };
 
 /** Angin bawah 3 km/j dianggap tenang: arah tidak bermakna. */

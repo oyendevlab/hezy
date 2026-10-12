@@ -328,6 +328,14 @@ const EN: Record<string, string> = {
   "Angin dari {compass} · {speed} km/j":
     "Wind from the {compass} · {speed} km/h",
   "· kawasan kebakaran biasa di hulu angin": "· a common fire area upwind",
+  "· {n} titik panas di hulu angin (2 hari, NASA FIRMS)":
+    "· {n} fire hotspots upwind (2 days, NASA FIRMS)",
+  "· tiada titik panas dikesan di hulu angin (2 hari)":
+    "· no fire hotspots detected upwind (2 days)",
+  "Titik panas ({count}) · NASA FIRMS, 2 hari":
+    "Fire hotspots ({count}) · NASA FIRMS, 2 days",
+  "Titik merah ialah kebakaran yang dikesan satelit VIIRS dalam 2 hari terakhir (setiap titik ≈ kawasan 5 km). Satelit tidak mengesan semua kebakaran, terutama api gambut di bawah permukaan atau di bawah awan.":
+    "Red dots are fires detected by VIIRS satellites in the last 2 days (each dot ≈ a 5 km area). Satellites do not detect every fire, especially smouldering peat fires or fires under cloud.",
   Sumatera: "Sumatra",
   utara: "north",
   "timur laut": "north-east",

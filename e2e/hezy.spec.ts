@@ -167,6 +167,7 @@ test.describe("arah angin", () => {
         speed: 18,
         compass: "barat-daya",
         source: "sumatera",
+        hotspots: 1234,
       },
     };
     await seedLocation(page);
@@ -180,11 +181,24 @@ test.describe("arah angin", () => {
         .filter({ visible: true })
         .first(),
     ).toBeVisible();
+    await expect(
+      page
+        .getByText("· 1,234 titik panas di hulu angin (2 hari, NASA FIRMS)")
+        .filter({ visible: true })
+        .first(),
+    ).toBeVisible();
     await page.goto("/lokasi");
     await page.getByRole("tab", { name: "Peta" }).click();
     await expect(
       page.getByText("Angin dari barat daya (arah Sumatera) · 18 km/j"),
     ).toBeVisible();
+    const fires = page.getByRole("checkbox", {
+      name: /Titik panas \(3\) · NASA FIRMS, 2 hari/,
+    });
+    await expect(fires).toBeChecked();
+    await expect(page.locator(".leaflet-container canvas")).toHaveCount(1);
+    await fires.uncheck();
+    await expect(page.locator(".leaflet-container canvas")).toHaveCount(0);
   });
 });
 
