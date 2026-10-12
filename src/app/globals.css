@@ -129,6 +129,19 @@ body {
 ::view-transition {
   pointer-events: none;
 }
+/* Akar (latar, bahagian tanpa nama) bertukar serta-merta: tiada imej lama bertindih. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+/* Sandaran (pelayar tanpa view-transition-class): pudar berturutan, bukan serentak. */
+::view-transition-old(*) {
+  animation-duration: 90ms;
+}
+::view-transition-new(*) {
+  animation-duration: 180ms;
+  animation-delay: 90ms;
+}
 ::view-transition-group(top-nav),
 ::view-transition-group(bottom-nav) {
   animation: none;
@@ -142,13 +155,14 @@ body {
 ::view-transition-new(bottom-nav) {
   animation: none;
 }
+/* Skrin lama hilang sepenuhnya dahulu, baru skrin baharu muncul (tiada tindihan). */
 ::view-transition-old(.nav-tab) {
-  animation: 120ms ease-in both vt-fade reverse;
+  animation: 90ms ease-in both vt-fade reverse;
 }
 ::view-transition-new(.nav-tab) {
   animation:
-    200ms ease-out 80ms both vt-fade,
-    260ms ease-out both vt-rise;
+    180ms ease-out 90ms both vt-fade,
+    240ms ease-out 90ms both vt-rise;
 }
 ::view-transition-old(.nav-forward) {
   --vt-offset: -48px;
@@ -159,7 +173,7 @@ body {
 ::view-transition-new(.nav-forward) {
   --vt-offset: 48px;
   animation:
-    210ms ease-out 120ms both vt-fade,
+    210ms ease-out 150ms both vt-fade,
     360ms ease-in-out both vt-slide;
 }
 ::view-transition-old(.nav-back) {
@@ -171,7 +185,7 @@ body {
 ::view-transition-new(.nav-back) {
   --vt-offset: -48px;
   animation:
-    210ms ease-out 120ms both vt-fade,
+    210ms ease-out 150ms both vt-fade,
     360ms ease-in-out both vt-slide;
 }
 @keyframes vt-fade {
