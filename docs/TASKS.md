@@ -158,32 +158,80 @@ Perubahan yang digabung selepas tag `v0.3.0`, dikeluarkan sebagai versi tampalan
 - [ ] `UJIAN-TELEFON.md`: semakan panduan pasang iPhone dan lapisan sensor WAQI
 - [ ] Ujian E2E pada production, tag `v0.3.1` dan GitHub Release
 
-## Fasa 11 — v0.4.0 (cadangan, menunggu pilihan)
+## Fasa 11 — v0.4.0 (menunggu pengesahan)
 
-Pilih item yang mahu dibuat; pelan terperinci ditulis selepas pilihan disahkan.
+Semua cadangan diterima, ditambah 3 permintaan pengguna (A–C). Setiap kumpulan dibuat dalam cabang dan PR sendiri, digabung selepas CI lulus. Urutan: A–C dahulu (pembaikan UI), kemudian 1–14.
+
+### A. Tarik untuk muat semula (telefon) + muat semula di desktop
+
+- [ ] Telefon: tarik ke bawah di bahagian atas skrin Utama, Trend dan Lokasi → penunjuk awan berpusing → lepas untuk ambil data baharu (tanpa pustaka; `overscroll-behavior` supaya tidak bertembung dengan tarik-muat-semula pelayar)
+- [ ] Berfungsi dalam aplikasi yang dipasang (iOS tiada tarik-muat-semula asli dalam mod apl web)
+- [ ] Desktop (cadangan): butang ⟳ "Muat semula" di sebelah masa "Dikemas kini", pintasan `R`, dan muat semula automatik bila tab kembali aktif jika data > 10 minit
+- [ ] Hormati `prefers-reduced-motion`; ujian E2E (gerak isyarat sentuh dan butang)
+
+### B. Graf trend interaktif
+
+- [ ] Nilai jam semasa dipaparkan secara lalai di atas graf (jam, IPU, kategori, rasmi/anggaran/ramalan)
+- [ ] Sentuh dan leret di atas graf untuk melihat nilai setiap jam; penanda menegak mengikut jari/tetikus
+- [ ] Papan kekunci: graf boleh difokus, anak panah ←/→ menukar jam (`role="slider"` dengan `aria-valuetext`)
+- [ ] Sama untuk graf Bandingkan lokasi (desktop): satu penanda, nilai semua lokasi
+
+### C. Halaman negeri lebih jelas
+
+- [ ] Lokasi: pautan teks diganti dengan butang/kad penuh "IPU mengikut negeri" (ikon peta + ›)
+- [ ] Senarai negeri: simbol › pada setiap baris; baris dibawah nama menunjukkan "N stesen" supaya jelas boleh ditekan
+- [ ] Susunan ikut peta: Perlis, Kedah, Kelantan, Pulau Pinang, Terengganu, Perak, Pahang, Selangor, Negeri Sembilan, Melaka, Johor, kemudian Sarawak dan Sabah; Wilayah Persekutuan (Kuala Lumpur, Putrajaya, Labuan) di bawah dengan tajuk sendiri
+- [ ] Halaman negeri memaparkan stesen ikut kawasan/daerah (APIMS tiada medan daerah rasmi; nama stesen digunakan sebagai kawasan)
 
 ### Data dan ramalan
 
-1. **Arah angin & asal jerebu**: anak panah angin di peta dan ayat ringkas "Angin dari barat daya (Sumatera)" (Open-Meteo, tanpa token)
-2. **Titik panas kebakaran (NASA FIRMS)**: lapisan titik api Sumatera/Kalimantan dalam 24–48 jam (**pengguna** daftar kunci API percuma)
-3. **Sejarah 7 dan 30 hari**: graf IPU harian daripada APIMS untuk melihat trend jangka panjang
-4. **Ketepatan anggaran**: bandingkan anggaran model dengan bacaan APIMS dan paparkan "biasanya ±N" bila nombor utama ialah anggaran
+1. **Arah angin & asal jerebu**
+   - [ ] Angin 10 m daripada Open-Meteo bersama data sedia ada (tiada token)
+   - [ ] Ayat ringkas di Utama, cth. "Angin dari barat daya (arah Sumatera)", dan anak panah angin pada peta
+2. **Titik panas kebakaran (NASA FIRMS)**
+   - [ ] **Pengguna**: daftar MAP_KEY percuma di firms.modaps.eosdis.nasa.gov/api/map_key dan tambah `FIRMS_MAP_KEY` di Vercel (bukan dalam chat)
+   - [ ] API `/api/hotspots` (cache 1 jam): titik VIIRS 24 jam terakhir bagi Malaysia, Sumatera dan Kalimantan
+   - [ ] Lapisan "Titik panas" pada peta + bilangan titik panas di Utama bila angin dari arah itu
+3. **Sejarah 7 dan 30 hari**
+   - [ ] Simpan purata IPU harian stesen APIMS dalam Vercel Blob (tugas harian GitHub Actions) kerana APIMS hanya menyediakan 24 jam
+   - [ ] Graf 7/30 hari di Trend (data terkumpul mula dari tarikh dilancarkan)
+4. **Ketepatan anggaran**
+   - [ ] Bandingkan anggaran model dengan bacaan APIMS bagi stesen yang sama (data sejarah item 3)
+   - [ ] Paparkan "biasanya ±N" bila nombor utama ialah anggaran
 
 ### Amaran dan rutin harian
 
-5. **Ringkasan pagi**: notifikasi pilihan jam 7 pagi dengan IPU dan masa terbaik untuk keluar
-6. **Waktu senyap**: tiada amaran antara jam pilihan (cth. 11 mlm – 6 pg) kecuali IPU > 300
-7. **Amaran ramalan**: maklumkan petang sebelumnya jika ramalan esok melebihi ambang
+5. **Ringkasan pagi**
+   - [ ] Pilihan di Tetapan; notifikasi jam 7 pagi dengan IPU dan masa terbaik untuk keluar (workflow sedia ada, semakan jam 7 pagi)
+6. **Waktu senyap**
+   - [ ] Pilih julat (lalai 11 mlm – 6 pg); amaran ditangguh ke hujung waktu senyap kecuali IPU > 300
+7. **Amaran ramalan**
+   - [ ] Jam 8 malam: maklumkan jika purata ramalan esok melebihi ambang pengguna
 
 ### Ibu bapa, sekolah dan komuniti
 
-8. **Mod guru / sekolah**: halaman ikut daerah dengan status aktiviti luar dan teks makluman sedia dikongsi kepada ibu bapa
-9. **Senarai semak jerebu**: topeng N95, penapis udara, ubat asma; tanda siap disimpan di peranti
-10. **Bahasa Cina dan Tamil**: menggunakan kamus i18n sedia ada; perlu semakan penutur asli
+8. **Mod guru / sekolah**
+   - [ ] Halaman `/sekolah/[negeri]`: status aktiviti luar bagi setiap kawasan stesen
+   - [ ] Teks makluman sedia dikongsi kepada ibu bapa (WhatsApp/Telegram)
+9. **Senarai semak jerebu**
+   - [ ] Senarai persediaan (topeng N95, penapis udara, ubat asma, dll.) ikut profil; tanda siap disimpan di peranti
+10. **Bahasa Cina dan Tamil**
+    - [ ] Kamus 中文 dan தமிழ் dalam `i18n.ts`, pilihan di Tetapan
+    - [ ] **Pengguna**: semakan terjemahan oleh penutur asli sebelum dikeluarkan
 
 ### Aplikasi dan kualiti
 
-11. **Pintasan Android**: tekan lama ikon untuk terus ke Trend atau Peta (manifest shortcuts)
-12. **Lencana ikon** (Badging API): nombor IPU pada ikon aplikasi bila amaran aktif (Android/desktop; iOS 16.4+ dipasang)
-13. **Pemantauan ralat klien**: log ralat JavaScript ke endpoint sendiri + ringkasan dalam semakan harian (tanpa akaun pihak ketiga)
-14. **Keputusan berasaskan data**: semak Vercel Analytics (halaman, peranti, kadar pasang) sebelum memilih item seterusnya
+11. **Pintasan Android**
+    - [ ] `shortcuts` dalam manifest: Trend, Peta, Tetapan
+12. **Lencana ikon**
+    - [ ] Badging API: nombor IPU pada ikon aplikasi bila melebihi ambang (Android/desktop; iOS 16.4+ bila dipasang)
+13. **Pemantauan ralat klien**
+    - [ ] Endpoint `/api/log` (had kadar, tiada data peribadi) + ralat disimpan dalam Blob; ringkasan dalam semakan harian `pantau.yml`
+14. **Keputusan berasaskan data**
+    - [ ] Semak Vercel Analytics (halaman popular, peranti, kadar pasang) dan laporkan sebelum item 8–10
+
+### Selesai v0.4.0
+
+- [ ] Semua ujian unit dan E2E lulus pada CI dan production; axe tanpa pelanggaran
+- [ ] Lighthouse ≥ 90 dikekalkan
+- [ ] Kemas kini `UJIAN-TELEFON.md`, versi 0.4.0, tag dan GitHub Release
