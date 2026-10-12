@@ -326,15 +326,15 @@ Urutan: 10 → A → B → C → D → 1 → 8 → 9.
 - [x] Lighthouse ≥ 90 dikekalkan dengan langit WebGL (production 12 Okt 2026: telefon 98/100/100/100, desktop 100/100/100/100, /trend 99/100/100/100)
 - [x] Kemas kini `UJIAN-TELEFON.md`, versi 0.5.0, tag dan GitHub Release
 
-## Fasa 13 — v0.5.1 (penambahbaikan Utama, menunggu pengesahan)
+## Fasa 13 — v0.5.1 (penambahbaikan Utama)
 
 Penambahbaikan sebelum ciri baharu. Cadangan v0.6.0 (notifikasi ujian, semalam vs sebenar, pembetulan ikut stesen, pencemar utama, amaran lonjakan, amaran jerebu dijangka, peta haba, aliran angin, mod gambar negeri) **KIV**.
 
 ### A. Pengepala tetap
 
-- [ ] Cip lokasi dan butang kongsi (dan ⟳ di desktop) kekal di atas semasa menatal
-- [ ] Latar kaca kabur yang semakin pekat bila menatal supaya kekal mudah dibaca di atas kad putih
-- [ ] Bila nombor IPU besar keluar dari skrin, pengepala memaparkan versi ringkas: "Putrajaya · 152 Tidak Sihat"
+- [x] Cip lokasi dan butang kongsi (dan ⟳ di desktop) kekal di atas semasa menatal
+- [x] Latar kaca kabur yang semakin pekat bila menatal supaya kekal mudah dibaca di atas kad putih
+- [x] Bila nombor IPU besar keluar dari skrin, pengepala memaparkan versi ringkas: "Putrajaya · 152 Tidak Sihat"
 
 ### B. Kad putih elastik (tarik untuk muat semula)
 
