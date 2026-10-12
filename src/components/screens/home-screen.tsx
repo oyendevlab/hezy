@@ -14,7 +14,9 @@ import { ChooseLocation } from "../choose-location";
 import { IpuPill } from "../ipu-pill";
 import { Logo } from "../logo";
 import { SchoolCard } from "../school-card";
+import { PullToRefresh } from "../pull-to-refresh";
 import { ReadingNotices } from "../reading-notices";
+import { RefreshButton } from "../refresh-button";
 import { ShareButton } from "../share-button";
 import { Skyline } from "../skyline";
 import { Notice, Skeleton } from "../status";
@@ -95,6 +97,7 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
 
   return (
     <>
+      <PullToRefresh />
       {/* Telefon: mockup C */}
       <section className="md:hidden">
         <div className="relative h-[440px]">
@@ -135,11 +138,14 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
           <div className="absolute inset-x-0 top-6">
             <div className="mx-auto flex max-w-[1200px] items-center justify-between px-10">
               <LocationLink location={location} />
-              <ShareButton
-                text={shareText}
-                path={sharePath}
-                className="bg-white/70 text-[#1c1a16]"
-              />
+              <div className="flex items-center gap-2">
+                <RefreshButton className="inline-flex border-transparent bg-white/70 text-[#1c1a16] hover:bg-white" />
+                <ShareButton
+                  text={shareText}
+                  path={sharePath}
+                  className="bg-white/70 text-[#1c1a16]"
+                />
+              </div>
             </div>
           </div>
           <div className="absolute inset-x-0 bottom-16">

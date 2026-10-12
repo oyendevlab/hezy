@@ -30,6 +30,9 @@ const EN: Record<string, string> = {
   "Luar talian · Memaparkan bacaan terakhir yang disimpan":
     "Offline · Showing the last saved reading",
   "Kongsi status": "Share status",
+  "Muat semula": "Refresh",
+  "Memuat semula…": "Refreshing…",
+  "Muat semula (R)": "Refresh (R)",
   "Status disalin": "Status copied",
   "Hezy — semak jerebu": "Hezy — check the haze",
   "IPU {name}: {ipu} ({label}) · via Hezy":
