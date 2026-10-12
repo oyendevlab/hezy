@@ -6,7 +6,9 @@ import {
   getAirQuality,
   getStateHistory,
   getStations,
+  getWind,
 } from "@/lib/data";
+import { windAt } from "@/lib/wind";
 import { officialFor, withOfficialHistory } from "@/lib/official";
 import { buildReading, localHourKey } from "@/lib/reading";
 
@@ -21,9 +23,10 @@ export async function GET(request: Request) {
     return Response.json({ error: coords.error }, { status: 400 });
   }
 
-  const [series, stations] = await Promise.allSettled([
+  const [series, stations, wind] = await Promise.allSettled([
     getAirQuality(coords.lat, coords.lon),
     getStations(),
+    getWind(coords.lat, coords.lon),
   ]);
 
   if (series.status === "rejected") {
@@ -63,6 +66,10 @@ export async function GET(request: Request) {
   let reading = buildReading(series.value, now, history);
   reading.official = official;
   reading = withOfficialHistory(reading, history);
+
+  reading.wind =
+    wind.status === "fulfilled" ? windAt(wind.value, coords, nowKey) : null;
+  if (wind.status === "rejected") console.error("[api/aqi] angin", wind.reason);
 
   // Ketepatan 14 hari: stesen rasmi, atau stesen terdekat dalam 100 km, atau kebangsaan.
   try {

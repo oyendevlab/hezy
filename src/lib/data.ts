@@ -9,6 +9,7 @@ import {
 } from "./apims";
 import type { DailyIndex } from "./history";
 import type { AccuracyIndex } from "./accuracy";
+import { parseWind, windUrl, type WindSeries } from "./wind";
 import { readAccuracy, readIndex } from "./history-store";
 import {
   airQualityUrl,
@@ -93,4 +94,17 @@ export async function getAccuracyIndex(): Promise<AccuracyIndex | null> {
   "use cache";
   cacheLife({ stale: 1800, revalidate: 3600, expire: 14400 });
   return readAccuracy();
+}
+
+/** Angin 850 hPa untuk koordinat (dibundarkan 0.1° supaya cache dikongsi), dicache 30 minit. */
+export async function getWind(lat: number, lon: number): Promise<WindSeries> {
+  "use cache";
+  cacheLife({ stale: 600, revalidate: 1800, expire: 7200 });
+  const res = await fetch(
+    windUrl(Math.round(lat * 10) / 10, Math.round(lon * 10) / 10),
+    { signal: AbortSignal.timeout(8000) },
+  );
+  if (!res.ok)
+    throw new Error(`Open-Meteo (angin) memulangkan status ${res.status}`);
+  return parseWind(await res.json());
 }

@@ -322,6 +322,21 @@ const EN: Record<string, string> = {
     "When an APIMS station within 30 km has a reading from the last 3 hours, Hezy shows that station's official API and corrects the model forecast with it. Otherwise Hezy shows an estimate and forecast from model PM2.5, which may differ from official readings.",
   "Ramalan dibetulkan": "Corrected forecast",
   "Anggaran dibetulkan": "Corrected estimate",
+  "Angin tenang": "Calm winds",
+  "Angin dari {compass} (arah {source}) · {speed} km/j":
+    "Wind from the {compass} (from {source}) · {speed} km/h",
+  "Angin dari {compass} · {speed} km/j":
+    "Wind from the {compass} · {speed} km/h",
+  "· kawasan kebakaran biasa di hulu angin": "· a common fire area upwind",
+  Sumatera: "Sumatra",
+  utara: "north",
+  "timur laut": "north-east",
+  timur: "east",
+  tenggara: "south-east",
+  selatan: "south",
+  "barat daya": "south-west",
+  barat: "west",
+  "barat laut": "north-west",
   "biasanya ±{n} berbanding bacaan rasmi":
     "usually ±{n} from official readings",
   "biasanya ±{n}": "usually ±{n}",
