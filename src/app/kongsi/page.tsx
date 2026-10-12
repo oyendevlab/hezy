@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { IpuPill } from "@/components/ipu-pill";
 import { Logo } from "@/components/logo";
 import { Skeleton } from "@/components/status";
+import { T } from "@/components/t";
 import { parseShare } from "@/lib/share";
 
 export async function generateMetadata({
@@ -42,20 +43,25 @@ async function SharedCard({
     <div className="bg-surface rounded-3xl p-6">
       {data ? (
         <>
-          <div className="text-muted text-sm font-semibold">{data.name}</div>
+          <div className="text-muted text-sm font-semibold">
+            <T>{data.name}</T>
+          </div>
           <div className="mt-1 flex items-center gap-4">
             <span className="font-display text-7xl font-bold">{data.ipu}</span>
-            <IpuPill category={data.category} label={data.label} />
+            <IpuPill category={data.category} label={<T>{data.label}</T>} />
           </div>
           <p className="text-muted mt-2 text-xs">
-            {data.source === "apims"
-              ? "IPU rasmi APIMS (JAS)"
-              : "Anggaran IPU daripada PM2.5"}{" "}
-            semasa dikongsi. Bacaan terkini mungkin berbeza.
+            <T>
+              {data.source === "apims"
+                ? "IPU rasmi APIMS (JAS) semasa dikongsi. Bacaan terkini mungkin berbeza."
+                : "Anggaran IPU daripada PM2.5 semasa dikongsi. Bacaan terkini mungkin berbeza."}
+            </T>
           </p>
         </>
       ) : (
-        <p className="font-semibold">Pautan kongsi ini tidak sah.</p>
+        <p className="font-semibold">
+          <T>Pautan kongsi ini tidak sah.</T>
+        </p>
       )}
     </div>
   );
@@ -66,7 +72,7 @@ export default function KongsiPage({ searchParams }: PageProps<"/kongsi">) {
     <div className="mx-auto flex max-w-md flex-col gap-5 px-5 pt-13 md:pt-16">
       <Logo size={64} />
       <h1 className="font-display text-[30px] leading-tight font-bold">
-        Status jerebu yang dikongsi
+        <T>Status jerebu yang dikongsi</T>
       </h1>
       <Suspense fallback={<Skeleton className="h-40" />}>
         <SharedCard searchParams={searchParams} />
@@ -75,7 +81,7 @@ export default function KongsiPage({ searchParams }: PageProps<"/kongsi">) {
         href="/"
         className="bg-ink text-page flex min-h-13 items-center justify-center rounded-2xl font-semibold"
       >
-        Semak lokasi saya dengan Hezy
+        <T>Semak lokasi saya dengan Hezy</T>
       </Link>
     </div>
   );

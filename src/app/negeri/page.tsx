@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Chevron } from "@/components/chevron";
 import { IpuPill } from "@/components/ipu-pill";
 import { Notice } from "@/components/status";
+import { T } from "@/components/t";
 import type { Station } from "@/lib/apims";
 import { statesInMapOrder, type State } from "@/lib/areas";
 import { getStations } from "@/lib/data";
@@ -28,18 +29,20 @@ export default async function NegeriIndexPage() {
     <div className="mx-auto flex max-w-[960px] flex-col gap-5 px-5 pt-13 md:px-10 md:pt-10">
       <nav aria-label="Laluan" className="text-muted text-sm font-semibold">
         <Link href="/lokasi" className="underline">
-          Lokasi
+          <T>Lokasi</T>
         </Link>{" "}
-        / IPU mengikut negeri
+        / <T>IPU mengikut negeri</T>
       </nav>
       <h1 className="font-display text-[32px] leading-tight font-bold">
-        IPU mengikut negeri
+        <T>IPU mengikut negeri</T>
       </h1>
       <p className="text-muted -mt-2 text-sm">
-        Tekan negeri untuk melihat IPU setiap kawasan dan stesen.
+        <T>Tekan negeri untuk melihat IPU setiap kawasan dan stesen.</T>
       </p>
       {stations === null && (
-        <Notice>Data APIMS tidak dapat diambil buat masa ini.</Notice>
+        <Notice>
+          <T>Data APIMS tidak dapat diambil buat masa ini.</T>
+        </Notice>
       )}
       <StateList title="Negeri" states={states} stations={stations} />
       <StateList
@@ -48,7 +51,9 @@ export default async function NegeriIndexPage() {
         stations={stations}
       />
       <p className="text-muted text-xs">
-        Sumber: APIMS, Jabatan Alam Sekitar. Dikemas kini setiap 15 minit.
+        <T>
+          Sumber: APIMS, Jabatan Alam Sekitar. Dikemas kini setiap 15 minit.
+        </T>
       </p>
     </div>
   );
@@ -67,7 +72,7 @@ function StateList({
   return (
     <section aria-labelledby={id} className="flex flex-col gap-2.5">
       <h2 id={id} className="text-muted text-sm font-bold tracking-wide">
-        {title.toUpperCase()}
+        <T>{title.toUpperCase()}</T>
       </h2>
       <ul className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
         {states.map((state) => {
@@ -90,18 +95,20 @@ function StateList({
                     {state.name}
                   </span>
                   <span className="text-muted block text-xs">
-                    {list.length} stesen
+                    <T vars={{ n: list.length }}>{"{n} stesen"}</T>
                   </span>
                 </span>
                 {max !== null && (
                   <span className="flex items-center gap-2">
-                    <span className="text-muted text-xs">maks</span>
+                    <span className="text-muted text-xs">
+                      <T>maks</T>
+                    </span>
                     <span className="font-display text-xl font-bold">
                       {max}
                     </span>
                     <IpuPill
                       category={ipuCategory(max).key}
-                      label={ipuCategory(max).label}
+                      label={<T>{ipuCategory(max).label}</T>}
                       className="!px-2 !text-[11px]"
                     />
                   </span>

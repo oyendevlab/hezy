@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { StationTable } from "@/components/station-table";
 import { Notice, Skeleton } from "@/components/status";
+import { T } from "@/components/t";
 import type { Station } from "@/lib/apims";
 import { STATES, findState } from "@/lib/areas";
 import { getStations } from "@/lib/data";
@@ -56,43 +57,51 @@ async function StateContent({
     <div className="mx-auto flex max-w-[960px] flex-col gap-5 px-5 pt-13 md:px-10 md:pt-10">
       <nav aria-label="Laluan" className="text-muted text-sm font-semibold">
         <Link href="/negeri" className="underline">
-          Semua negeri
+          <T>Semua negeri</T>
         </Link>{" "}
         / {state.name}
       </nav>
       <h1 className="font-display text-[32px] leading-tight font-bold">
-        IPU {state.name} hari ini
+        <T vars={{ state: state.name }}>{"IPU {state} hari ini"}</T>
       </h1>
 
       {stations === null ? (
         <Notice>
-          Data APIMS tidak dapat diambil buat masa ini. Cuba lagi sebentar.
+          <T>
+            Data APIMS tidak dapat diambil buat masa ini. Cuba lagi sebentar.
+          </T>
         </Notice>
       ) : (
         <>
           <p className="text-[16px]">
-            {withReading.length} stesen dengan bacaan
+            <T vars={{ n: withReading.length }}>{"{n} stesen dengan bacaan"}</T>
             {highest?.ipu != null && (
               <>
-                {" "}
-                · tertinggi <strong>{highest.name}</strong> ({highest.ipu},{" "}
-                {ipuCategory(highest.ipu).label})
+                {" · "}
+                <T>tertinggi</T> <strong>{highest.name}</strong> ({highest.ipu},{" "}
+                <T>{ipuCategory(highest.ipu).label}</T>)
               </>
-            )}{" "}
-            ·{" "}
-            {unhealthy > 0
-              ? `${unhealthy} stesen melebihi IPU 100`
-              : "tiada stesen melebihi IPU 100"}
+            )}
+            {" · "}
+            {unhealthy > 0 ? (
+              <T vars={{ n: unhealthy }}>{"{n} stesen melebihi IPU 100"}</T>
+            ) : (
+              <T>tiada stesen melebihi IPU 100</T>
+            )}
             .
           </p>
-          <StationTable
-            stations={stations}
-            caption={`IPU rasmi stesen APIMS di ${state.name}`}
-          />
+          <StationTable stations={stations} stateName={state.name} />
           <p className="text-muted text-xs">
-            Sumber: APIMS, Jabatan Alam Sekitar
-            {latest ? ` · bacaan terkini ${latest.replace("T", " ")}` : ""}.
-            Dikemas kini setiap 15 minit.
+            <T>Sumber: APIMS, Jabatan Alam Sekitar</T>
+            {latest ? (
+              <>
+                {" · "}
+                <T vars={{ time: latest.replace("T", " ") }}>
+                  {"bacaan terkini {time}"}
+                </T>
+              </>
+            ) : null}
+            . <T>Dikemas kini setiap 15 minit.</T>
           </p>
         </>
       )}
@@ -101,7 +110,7 @@ async function StateContent({
         href="/"
         className="bg-ink text-page flex min-h-13 items-center justify-center rounded-2xl font-semibold"
       >
-        Semak lokasi saya dengan Hezy
+        <T>Semak lokasi saya dengan Hezy</T>
       </Link>
     </div>
   );
