@@ -160,7 +160,7 @@ export function FavouriteList({
                   }}
                   onPointerCancel={() => setDrag(null)}
                   data-testid="reorder-handle"
-                  className="text-muted hover:bg-line flex size-11 shrink-0 cursor-grab touch-none items-center justify-center rounded-full active:cursor-grabbing"
+                  className="text-muted hover:bg-line -ml-1.5 flex h-11 w-7 shrink-0 cursor-grab touch-none items-center justify-center rounded-lg active:cursor-grabbing"
                 >
                   <DotsSixVertical aria-hidden="true" size={20} weight="bold" />
                 </button>

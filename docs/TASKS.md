@@ -403,7 +403,7 @@ Fokus: UI/UX yang lebih licin dan seperti aplikasi asli. Termasuk pembetulan ked
 
 ### Selesai v0.6.0
 
-- [ ] Semakan mod gelap untuk semua komponen baharu (selepas item 1–14)
+- [x] Semakan mod gelap untuk semua komponen baharu (selepas item 1–14)
 - [ ] Ujian unit dan E2E lulus pada CI dan production; axe tanpa pelanggaran
 - [ ] Lighthouse ≥ 90 dikekalkan
 - [ ] Kemas kini `UJIAN-TELEFON.md`, versi 0.6.0, tag dan GitHub Release
