@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { primaryReading } from "@/lib/official";
+import { useMediaQuery } from "@/lib/use-media-query";
+import { CompareLocations } from "../compare-locations";
 import { SchoolCard } from "../school-card";
 import { ChooseLocation } from "../choose-location";
 import { IpuPill } from "../ipu-pill";
@@ -11,6 +13,7 @@ import { TrendPanel } from "../trend-panel";
 import { useCurrent } from "../use-current";
 
 export function TrendScreen() {
+  const wide = useMediaQuery("(min-width: 1024px)");
   const { prefs, location, entry, refresh } = useCurrent();
   const reading = entry?.reading;
   const current = primaryReading(reading);
@@ -54,6 +57,7 @@ export function TrendScreen() {
         <SchoolCard reading={current} />
       )}
       {reading && <TrendPanel reading={reading} />}
+      {wide && prefs?.current && <CompareLocations prefs={prefs} />}
     </div>
   );
 }

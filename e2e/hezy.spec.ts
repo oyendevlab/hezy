@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import {
+  KLANG,
   OFFICIAL_SHAH_ALAM,
   expect,
   fakeReading,
@@ -287,6 +288,41 @@ test.describe("halaman negeri", () => {
     const xml = await (await request.get("/sitemap.xml")).text();
     expect(xml).toContain("https://hezy.vercel.app/negeri/selangor");
     expect(xml).toContain("https://hezy.vercel.app/negeri/labuan");
+  });
+});
+
+test.describe("bandingkan lokasi", () => {
+  test("desktop membandingkan lokasi semasa dan kegemaran", async ({
+    page,
+    isMobile,
+  }) => {
+    await seedLocation(page, [KLANG]);
+    await page.goto("/trend");
+    if (isMobile) {
+      await expect(
+        page.getByRole("heading", { name: "Ramalan 3 hari" }),
+      ).toBeVisible();
+      await expect(
+        page.getByRole("heading", { name: "Bandingkan lokasi" }),
+      ).toHaveCount(0);
+      return;
+    }
+    await expect(
+      page.getByRole("heading", { name: "Bandingkan lokasi" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Shah Alam", pressed: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Klang", pressed: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("img", { name: "Graf perbandingan IPU hari ini" }),
+    ).toBeVisible();
+    await page.getByRole("button", { name: "Klang", pressed: true }).click();
+    await expect(
+      page.getByRole("button", { name: "Klang", pressed: false }),
+    ).toBeVisible();
   });
 });
 
