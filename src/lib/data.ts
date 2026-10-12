@@ -8,7 +8,8 @@ import {
   type Station,
 } from "./apims";
 import type { DailyIndex } from "./history";
-import { readIndex } from "./history-store";
+import type { AccuracyIndex } from "./accuracy";
+import { readAccuracy, readIndex } from "./history-store";
 import {
   airQualityUrl,
   parseAirQuality,
@@ -85,4 +86,11 @@ export async function fetchStateHourly(
     throw new Error(`APIMS (sejarah) memulangkan status ${res.status}`);
   }
   return parseHourly(await res.json());
+}
+
+/** Indeks ketepatan (Vercel Blob), dicache 1 jam; dikemas kini sekali sehari. */
+export async function getAccuracyIndex(): Promise<AccuracyIndex | null> {
+  "use cache";
+  cacheLife({ stale: 1800, revalidate: 3600, expire: 14400 });
+  return readAccuracy();
 }

@@ -19,9 +19,12 @@ const SCALE_MAX = 200;
 export function HourBars({
   hours,
   height = 150,
+  forecastError = null,
 }: {
   hours: HourPoint[];
   height?: number;
+  /** Ralat purata ramalan 14 hari (IPU), jika ada. */
+  forecastError?: number | null;
 }) {
   const { t, lang } = useI18n();
   const points = hours.map((h) => ({ ...h, value: displayIpu(h) }));
@@ -191,6 +194,8 @@ export function HourBars({
                 ? "Jam akan datang: ramalan dibetulkan dengan APIMS"
                 : "Jam akan datang: ramalan model",
             )}
+            {forecastError !== null &&
+              ` (${t("biasanya ±{n}", { n: forecastError })})`}
           </span>
           {scrub.moved ? (
             <button

@@ -1,5 +1,6 @@
 "use client";
 
+import { shownError } from "@/lib/accuracy";
 import { CATEGORY_STYLE } from "@/lib/category-style";
 import { formatDay, formatHour, formatWindow } from "@/lib/format";
 import { ipuCategory } from "@/lib/ipu";
@@ -85,7 +86,11 @@ export function TrendPanel({
           )}
         </div>
         <div className="mt-3">
-          <HourBars hours={today} height={barHeight} />
+          <HourBars
+            hours={today}
+            height={barHeight}
+            forecastError={shownError(reading.accuracy, "forecast")}
+          />
         </div>
       </div>
 

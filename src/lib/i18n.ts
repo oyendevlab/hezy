@@ -309,6 +309,16 @@ const EN: Record<string, string> = {
     "When an APIMS station within 30 km has a reading from the last 3 hours, Hezy shows that station's official API and corrects the model forecast with it. Otherwise Hezy shows an estimate and forecast from model PM2.5, which may differ from official readings.",
   "Ramalan dibetulkan": "Corrected forecast",
   "Anggaran dibetulkan": "Corrected estimate",
+  "biasanya ±{n} berbanding bacaan rasmi":
+    "usually ±{n} from official readings",
+  "biasanya ±{n}": "usually ±{n}",
+  "Ketepatan anggaran": "Estimate accuracy",
+  "Ketepatan ramalan esok": "Next-day forecast accuracy",
+  "±{n} IPU": "±{n} API",
+  "±{n} IPU (model asal ±{raw})": "±{n} API (raw model ±{raw})",
+  "Sedang dikumpul": "Being collected",
+  "Ralat purata 14 hari berbanding bacaan rasmi APIMS (semua stesen). Ramalan dinilai setiap malam: ramalan esok disimpan, kemudian dibandingkan dengan bacaan sebenar.":
+    "Average 14-day error against official APIMS readings (all stations). Forecasts are checked nightly: tomorrow's forecast is saved, then compared with actual readings.",
   "Jam akan datang: ramalan dibetulkan dengan APIMS":
     "Coming hours: forecast corrected with APIMS",
   "Jam lepas menggunakan bacaan rasmi APIMS stesen {station}. Ramalan model (PM2.5, formula JAS) dibetulkan dengan bacaan itu: {offset} µg/m³ pada jam semasa, berkurang ke model dalam 48 jam.":

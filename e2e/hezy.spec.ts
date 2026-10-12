@@ -9,6 +9,11 @@ import {
 } from "./fixtures";
 
 test.describe("aliran utama", () => {
+  test("penilaian ketepatan memerlukan rahsia", async ({ request }) => {
+    const res = await request.get("/api/accuracy/run");
+    expect([401, 503]).toContain(res.status());
+  });
+
   test("pengumpul sejarah memerlukan rahsia", async ({ request }) => {
     const res = await request.get("/api/history/collect?back=0");
     expect([401, 503]).toContain(res.status());
@@ -419,6 +424,41 @@ test.describe("trend rasmi APIMS", () => {
       .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
       .analyze();
     expect(results.violations.map((v) => v.id)).toEqual([]);
+  });
+
+  test("ketepatan ±N dipaparkan di Utama, graf dan Tetapan", async ({
+    page,
+  }) => {
+    const reading = {
+      ...fakeReading(),
+      accuracy: {
+        estimate: 24,
+        forecast: 19,
+        forecastRaw: 50,
+        days: 4,
+        scope: "station",
+      },
+    };
+    await seedLocation(page);
+    await page.route("**/api/aqi?**", (route) =>
+      route.fulfill({ json: reading }),
+    );
+    await page.goto("/");
+    await expect(
+      page
+        .getByText(/biasanya ±24 berbanding bacaan rasmi/)
+        .filter({ visible: true })
+        .first(),
+    ).toBeVisible();
+    await page.goto("/trend");
+    await expect(
+      page.getByText(/ramalan model \(biasanya ±19\)/),
+    ).toBeVisible();
+    await page.goto("/tetapan");
+    await expect(page.getByText("±22 IPU", { exact: true })).toBeVisible();
+    await expect(
+      page.getByText("±18 IPU (model asal ±47)", { exact: true }),
+    ).toBeVisible();
   });
 
   test("kembali ke anggaran model bila tiada sejarah rasmi", async ({

@@ -41,3 +41,24 @@ export function parseAirQuality(json: unknown): AirQualitySeries {
     ),
   };
 }
+
+/** URL untuk banyak lokasi sekali gus (respons ialah tatasusunan ikut susunan koordinat). */
+export function airQualityMultiUrl(
+  points: readonly { lat: number; lon: number }[],
+  pastDays: number,
+  forecastDays: number,
+): string {
+  const params = new URLSearchParams({
+    latitude: points.map((p) => p.lat.toFixed(3)).join(","),
+    longitude: points.map((p) => p.lon.toFixed(3)).join(","),
+    hourly: "pm2_5",
+    timezone: "Asia/Kuala_Lumpur",
+    past_days: String(pastDays),
+    forecast_days: String(forecastDays),
+  });
+  return `${ENDPOINT}?${params}`;
+}
+
+export function parseAirQualityMulti(json: unknown): AirQualitySeries[] {
+  return (Array.isArray(json) ? json : [json]).map(parseAirQuality);
+}

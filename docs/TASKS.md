@@ -215,9 +215,9 @@ Masalah: model CAMS (Open-Meteo) kurang menganggar jerebu. Contoh Putrajaya 12 O
    - [x] Legenda warna ikut kategori APIMS: Baik 0–50 (biru), Sederhana 51–100 (hijau), Tidak Sihat 101–200 (kuning), Sangat Tidak Sihat 201–300 (jingga), Berbahaya > 300 (merah), Kecemasan > 500; kotak kelabu = tiada data
    - [x] Semakan harian `pantau.yml`: data sejarah semalam/hari ini wujud
 4. **Ketepatan anggaran**
-   - [ ] Bandingkan anggaran model dengan bacaan APIMS bagi stesen yang sama (data sejarah item 3)
-   - [ ] Paparkan "biasanya ±N" bila nombor utama ialah anggaran, dan "ramalan ±N" pada graf
-   - [ ] Semakan harian ketepatan ramalan semalam (MAE sebelum/selepas pembetulan item 15) dalam `pantau.yml`
+   - [x] Bandingkan anggaran model dengan bacaan APIMS bagi stesen yang sama (data sejarah item 3)
+   - [x] Paparkan "biasanya ±N" bila nombor utama ialah anggaran, dan "ramalan ±N" pada graf
+   - [x] Semakan harian ketepatan ramalan semalam (MAE sebelum/selepas pembetulan item 15) dalam `pantau.yml`
 
 ### Amaran dan rutin harian
 

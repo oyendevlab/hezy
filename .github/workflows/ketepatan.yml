@@ -1,0 +1,22 @@
+name: Ketepatan ramalan
+
+on:
+  schedule:
+    # 20:50 waktu Malaysia: nilai anggaran 7 hari lepas dan ramalan semalam, simpan ramalan esok.
+    - cron: "50 12 * * *"
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Panggil /api/accuracy/run
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          RESULT=$(curl -fsS --max-time 280 \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            https://hezy.vercel.app/api/accuracy/run)
+          echo "$RESULT" | jq .
+          echo "### Ketepatan: \`$(echo "$RESULT" | jq -c .)\`" >> "$GITHUB_STEP_SUMMARY"
