@@ -1,0 +1,80 @@
+import type { AlertState } from "./alert";
+import {
+  DEFAULT_ALERT_THRESHOLD,
+  type AlertLocation,
+  type AlertThreshold,
+  type PushSubscriptionData,
+  type SubscribeInput,
+} from "./push-validate";
+
+/** Lokasi dalam rekod langganan bersama status amarannya sendiri. */
+export type RecordLocation = AlertLocation & AlertState;
+
+/** Rekod langganan dalam Vercel Blob (private): satu fail JSON bagi setiap peranti. */
+export type PushRecord = {
+  subscription: PushSubscriptionData;
+  threshold: AlertThreshold;
+  locations: RecordLocation[];
+  createdAt: string;
+};
+
+/** Bentuk rekod sebelum v0.3.0: satu lokasi di aras atas, tanpa ambang. */
+type LegacyRecord = {
+  subscription: PushSubscriptionData;
+  lat: number;
+  lon: number;
+  locationName: string;
+  threshold?: AlertThreshold;
+  createdAt: string;
+} & AlertState;
+
+/** Tukar rekod lama kepada bentuk semasa. */
+export function normalizeRecord(raw: PushRecord | LegacyRecord): PushRecord {
+  if ("locations" in raw && Array.isArray(raw.locations)) {
+    return { ...raw, threshold: raw.threshold ?? DEFAULT_ALERT_THRESHOLD };
+  }
+  const legacy = raw as LegacyRecord;
+  return {
+    subscription: legacy.subscription,
+    threshold: legacy.threshold ?? DEFAULT_ALERT_THRESHOLD,
+    createdAt: legacy.createdAt,
+    locations: [
+      {
+        id: "semasa",
+        name: legacy.locationName,
+        lat: legacy.lat,
+        lon: legacy.lon,
+        lastAlertKey: legacy.lastAlertKey ?? null,
+        lastAlertAt: legacy.lastAlertAt ?? null,
+      },
+    ],
+  };
+}
+
+/**
+ * Gabung langganan baharu dengan rekod sedia ada. Status amaran dikekalkan bagi lokasi
+ * yang sama (ikut id, atau koordinat yang sama) supaya amaran tidak berganda.
+ */
+export function mergeRecord(
+  input: SubscribeInput,
+  existing: PushRecord | null,
+  now: Date,
+): PushRecord {
+  return {
+    subscription: input.subscription,
+    threshold: input.threshold,
+    createdAt: existing?.createdAt ?? now.toISOString(),
+    locations: input.locations.map((location) => {
+      const previous = existing?.locations.find(
+        (l) =>
+          l.id === location.id ||
+          (l.lat === location.lat && l.lon === location.lon),
+      );
+      return {
+        ...location,
+        lastAlertKey: previous?.lastAlertKey ?? null,
+        lastAlertAt: previous?.lastAlertAt ?? null,
+      };
+    }),
+  };
+}

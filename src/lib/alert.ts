@@ -39,16 +39,16 @@ export function decideAlert(
     return {
       send: true,
       next: { lastAlertKey: reading.category, lastAlertAt: now.toISOString() },
-      title: `Jerebu: IPU ${reading.ipu} (${reading.label})`,
-      body: `${locationName}: ${adviceFor(reading.category).headline}`,
+      title: `Jerebu di ${locationName}: IPU ${reading.ipu} (${reading.label})`,
+      body: adviceFor(reading.category).headline,
     };
   }
   if (state.lastAlertKey !== null) {
     return {
       send: true,
       next: { lastAlertKey: null, lastAlertAt: now.toISOString() },
-      title: `Udara kembali pulih: IPU ${reading.ipu}`,
-      body: `${locationName}: ${reading.label}. ${adviceFor(reading.category).headline}`,
+      title: `Udara pulih di ${locationName}: IPU ${reading.ipu}`,
+      body: `${reading.label}. ${adviceFor(reading.category).headline}`,
     };
   }
   return { send: false, next: state };

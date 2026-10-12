@@ -26,6 +26,8 @@ export type Prefs = {
   showSchool: boolean;
   /** Ambang amaran pilihan pengguna; `null` = ikut profil kesihatan. */
   alertThreshold: 50 | 100 | 200 | null;
+  /** Id lokasi kegemaran yang turut menerima amaran. */
+  alertFavourites: string[];
 };
 
 export const MAX_FAVOURITES = 5;
@@ -37,6 +39,7 @@ export const DEFAULT_PREFS: Prefs = {
   theme: "system",
   showSchool: false,
   alertThreshold: null,
+  alertFavourites: [],
 };
 
 const PROFILES: readonly HealthProfile[] = ["umum", "anak", "asma", "emas"];
@@ -73,6 +76,11 @@ export function parsePrefs(raw: string | null): Prefs {
       alertThreshold: [50, 100, 200].includes(v.alertThreshold as number)
         ? (v.alertThreshold as 50 | 100 | 200)
         : null,
+      alertFavourites: Array.isArray(v.alertFavourites)
+        ? v.alertFavourites
+            .filter((id): id is string => typeof id === "string")
+            .slice(0, MAX_FAVOURITES)
+        : [],
     };
   } catch {
     return DEFAULT_PREFS;
@@ -86,7 +94,11 @@ export function addFavourite(prefs: Prefs, location: SavedLocation): Prefs {
 }
 
 export function removeFavourite(prefs: Prefs, id: string): Prefs {
-  return { ...prefs, favourites: prefs.favourites.filter((f) => f.id !== id) };
+  return {
+    ...prefs,
+    favourites: prefs.favourites.filter((f) => f.id !== id),
+    alertFavourites: prefs.alertFavourites.filter((x) => x !== id),
+  };
 }
 
 export function isFavourite(prefs: Prefs, id: string): boolean {
@@ -154,4 +166,28 @@ export function effectiveThreshold(
   prefs: Pick<Prefs, "alertThreshold" | "profile">,
 ): 50 | 100 | 200 {
   return prefs.alertThreshold ?? (prefs.profile === "umum" ? 100 : 50);
+}
+
+export function toggleAlertFavourite(prefs: Prefs, id: string): Prefs {
+  const on = prefs.alertFavourites.includes(id);
+  return {
+    ...prefs,
+    alertFavourites: on
+      ? prefs.alertFavourites.filter((x) => x !== id)
+      : [...prefs.alertFavourites, id],
+  };
+}
+
+/** Lokasi yang menerima amaran: lokasi semasa + kegemaran yang dipilih (tanpa pendua). */
+export function alertLocations(
+  prefs: Pick<Prefs, "current" | "favourites" | "alertFavourites">,
+): SavedLocation[] {
+  const list: SavedLocation[] = prefs.current ? [prefs.current] : [];
+  for (const f of prefs.favourites) {
+    if (!prefs.alertFavourites.includes(f.id)) continue;
+    if (list.some((l) => l.id === f.id || (l.lat === f.lat && l.lon === f.lon)))
+      continue;
+    list.push(f);
+  }
+  return list;
 }

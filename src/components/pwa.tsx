@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { listenForInstall } from "@/lib/install";
-import { effectiveThreshold, usePrefs } from "@/lib/prefs";
+import { alertLocations, effectiveThreshold, usePrefs } from "@/lib/prefs";
 import { syncPushSettings } from "@/lib/push-client";
 import { useOnline } from "@/lib/online";
 
@@ -32,15 +32,12 @@ export function PwaSetup() {
       });
   }, []);
 
-  // Amaran push ikut lokasi semasa dan ambang: kemas kini pelayan bila berubah.
+  // Amaran push ikut lokasi (semasa + kegemaran) dan ambang: kemas kini pelayan bila berubah.
   const prefs = usePrefs();
-  const current = prefs?.current ?? null;
-  const threshold = prefs ? effectiveThreshold(prefs) : null;
   useEffect(() => {
-    if (current && threshold && process.env.NODE_ENV === "production") {
-      void syncPushSettings(current, threshold);
-    }
-  }, [current, threshold]);
+    if (!prefs || process.env.NODE_ENV !== "production") return;
+    void syncPushSettings(alertLocations(prefs), effectiveThreshold(prefs));
+  }, [prefs]);
 
   return null;
 }

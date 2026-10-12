@@ -7,7 +7,6 @@ import {
   type PrimaryReading,
 } from "@/lib/official";
 import { allRecords, deleteRecord, saveRecord } from "@/lib/push-store";
-import { DEFAULT_ALERT_THRESHOLD } from "@/lib/push-validate";
 import { buildReading, localHourKey } from "@/lib/reading";
 
 /**
@@ -58,44 +57,51 @@ export async function GET(request: Request) {
   };
 
   const summary = { checked: 0, sent: 0, removed: 0, failed: 0 };
-  for (const record of await allRecords()) {
+  records: for (const record of await allRecords()) {
     summary.checked++;
-    const primary = await readingFor(record.lat, record.lon);
-    if (!primary) continue;
-    // Rekod sebelum v0.3.0 tiada ambang: anggap 100.
-    const decision = decideAlert(
-      record,
-      primary,
-      record.locationName,
-      now,
-      record.threshold ?? DEFAULT_ALERT_THRESHOLD,
-    );
-    if (!decision.send) continue;
-    try {
-      await webpush.sendNotification(
-        record.subscription,
-        JSON.stringify({
-          title: decision.title,
-          body: decision.body,
-          url: "/",
-        }),
-        { TTL: 3600, urgency: primary.ipu > 200 ? "high" : "normal" },
+    let changed = false;
+    const locations = [...record.locations];
+    for (const [i, location] of locations.entries()) {
+      const primary = await readingFor(location.lat, location.lon);
+      if (!primary) continue;
+      const decision = decideAlert(
+        location,
+        primary,
+        location.name,
+        now,
+        record.threshold,
       );
-      await saveRecord({ ...record, ...decision.next });
-      summary.sent++;
-    } catch (error) {
-      if (
-        error instanceof WebPushError &&
-        (error.statusCode === 404 || error.statusCode === 410)
-      ) {
-        // Langganan sudah tamat atau dibatalkan di peranti.
-        await deleteRecord(record.subscription.endpoint);
-        summary.removed++;
-      } else {
+      if (!decision.send) continue;
+      try {
+        await webpush.sendNotification(
+          record.subscription,
+          JSON.stringify({
+            title: decision.title,
+            body: decision.body,
+            url: "/",
+            // Tag berasingan supaya amaran satu lokasi tidak menggantikan lokasi lain.
+            tag: `hezy-ipu-${location.id}`,
+          }),
+          { TTL: 3600, urgency: primary.ipu > 200 ? "high" : "normal" },
+        );
+        locations[i] = { ...location, ...decision.next };
+        changed = true;
+        summary.sent++;
+      } catch (error) {
+        if (
+          error instanceof WebPushError &&
+          (error.statusCode === 404 || error.statusCode === 410)
+        ) {
+          // Langganan sudah tamat atau dibatalkan di peranti.
+          await deleteRecord(record.subscription.endpoint);
+          summary.removed++;
+          continue records;
+        }
         console.error("[api/push/check]", error);
         summary.failed++;
       }
     }
+    if (changed) await saveRecord({ ...record, locations });
   }
   return Response.json(summary);
 }

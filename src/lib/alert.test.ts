@@ -24,9 +24,9 @@ describe("decideAlert", () => {
     );
     expect(d).toMatchObject({
       send: true,
-      title: "Jerebu: IPU 156 (Tidak Sihat)",
+      title: "Jerebu di Shah Alam: IPU 156 (Tidak Sihat)",
     });
-    expect(d.send && d.body).toMatch(/^Shah Alam: /);
+    expect(d.send && d.body).toBe("Elak bersenam di luar hari ini.");
     expect(d.next.lastAlertKey).toBe("tidak-sihat");
   });
 
@@ -70,7 +70,7 @@ describe("decideAlert", () => {
     );
     expect(d).toMatchObject({
       send: true,
-      title: "Udara kembali pulih: IPU 80",
+      title: "Udara pulih di X: IPU 80",
     });
     expect(decideAlert(d.next, moderate, "X", NOW).send).toBe(false);
   });
@@ -90,7 +90,13 @@ describe("parseSubscribeBody", () => {
   it("menerima langganan sah dan membundarkan koordinat", () => {
     expect(parseSubscribeBody(valid)).toEqual({
       ok: true,
-      value: { ...valid, lat: 3.07, lon: 101.52, threshold: 100 },
+      value: {
+        subscription: valid.subscription,
+        threshold: 100,
+        locations: [
+          { id: "semasa", name: "Shah Alam", lat: 3.07, lon: 101.52 },
+        ],
+      },
     });
   });
 
@@ -122,7 +128,7 @@ describe("ambang amaran", () => {
     const state = { lastAlertKey: null, lastAlertAt: null };
     expect(decideAlert(state, moderate, "X", NOW, 50)).toMatchObject({
       send: true,
-      title: "Jerebu: IPU 80 (Sederhana)",
+      title: "Jerebu di X: IPU 80 (Sederhana)",
     });
     expect(decideAlert(state, moderate, "X", NOW, 100).send).toBe(false);
     expect(decideAlert(state, unhealthy, "X", NOW, 200).send).toBe(false);
@@ -138,7 +144,7 @@ describe("ambang amaran", () => {
     );
     expect(d).toMatchObject({
       send: true,
-      title: "Udara kembali pulih: IPU 45",
+      title: "Udara pulih di X: IPU 45",
     });
   });
 
