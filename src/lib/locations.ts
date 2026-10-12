@@ -1,3 +1,4 @@
+import { distanceKm } from "./apims";
 import { nearestArea, type Area } from "./areas";
 import type { SavedLocation } from "./prefs";
 
@@ -23,3 +24,7 @@ export function gpsToLocation(lat: number, lon: number): SavedLocation {
     source: "gps",
   };
 }
+
+/** Lokasi sama: id sama atau dalam 2 km (cth. lokasi GPS dan kawasan Putrajaya). */
+export const samePlace = (a: SavedLocation, b: SavedLocation) =>
+  a.id === b.id || distanceKm(a, b) < 2;

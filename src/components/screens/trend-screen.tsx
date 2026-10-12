@@ -1,12 +1,11 @@
 "use client";
 
-import { CaretDown, MapPin } from "@phosphor-icons/react";
-import Link from "next/link";
 import { primaryReading } from "@/lib/official";
 import { useI18n } from "@/lib/use-i18n";
 import { useMediaQuery } from "@/lib/use-media-query";
 import { CompareLocations } from "../compare-locations";
 import { HistoryHeatmap } from "../history-heatmap";
+import { LocationMenu } from "../location-menu";
 import { SchoolCard } from "../school-card";
 import { ChooseLocation } from "../choose-location";
 import { PullToRefresh } from "../pull-to-refresh";
@@ -32,15 +31,10 @@ export function TrendScreen() {
             {t("Trend")}
           </h1>
           {location && (
-            <Link
-              href="/lokasi"
-              className="bg-surface hover:bg-line inline-flex min-h-9 max-w-full items-center gap-1.5 rounded-full py-1.5 pr-2.5 pl-2 text-sm font-semibold transition-colors"
-            >
-              <MapPin aria-hidden="true" size={16} weight="fill" />
-              <span className="truncate">{t(location.name)}</span>
-              <CaretDown aria-hidden="true" size={14} weight="bold" />
-              <span className="sr-only">{t("— tukar lokasi")}</span>
-            </Link>
+            <LocationMenu
+              location={location}
+              className="bg-surface hover:bg-line !min-h-9 !px-3 !text-sm transition-colors"
+            />
           )}
         </div>
         <RefreshButton className="hidden md:inline-flex" />

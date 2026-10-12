@@ -141,6 +141,10 @@ const EN: Record<string, string> = {
   "Tukar profil": "Change profile",
   "Lokasi kegemaran": "Favourite locations",
   "Urus lokasi": "Manage locations",
+  "TUKAR LOKASI": "CHANGE LOCATION",
+  "(semasa)": "(current)",
+  "Tiada lokasi kegemaran lagi.": "No favourite locations yet.",
+  "Tambah bandar": "Add a city",
   "IPU {ipu}, {label}": "API {ipu}, {label}",
   "Data mungkin tidak terkini.": "Data may be out of date.",
   "{error} Memaparkan bacaan {time}.":

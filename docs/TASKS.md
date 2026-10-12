@@ -373,12 +373,12 @@ Fokus: UI/UX yang lebih licin dan seperti aplikasi asli. Termasuk pembetulan ked
 ### Utama
 
 1. **Kad putih sebagai bottom sheet** (menyelesaikan isu "tolak ke atas" yang KIV)
-   - [ ] Dua kedudukan snap: rehat (kandungan muat di atas navigasi) dan atas (~124 px); kad melekat pada kedudukan terdekat bila dilepaskan
-   - [ ] Kandungan panjang ditatal di dalam kad; tarik ke bawah untuk muat semula kekal
+   - [x] Dua kedudukan snap: rehat (kandungan muat di atas navigasi) dan atas (~124 px); kad melekat pada kedudukan terdekat bila dilepaskan
+   - [x] Kandungan panjang ditatal di dalam kad; tarik ke bawah untuk muat semula kekal
 2. **Menu lokasi pada cip lokasi** (Utama dan Trend)
-   - [ ] Telefon: helaian bawah; desktop: dropdown di bawah cip
-   - [ ] Lokasi semasa (✓), kegemaran dengan IPU mini dan warna kategori, "Guna lokasi saya", "+ Tambah bandar" → Lokasi › Senarai dengan carian kegemaran terbuka
-   - [ ] Tiada kegemaran: teks ringkas + "+ Tambah bandar"; boleh diguna dengan papan kekunci dan pembaca skrin
+   - [x] Telefon: helaian bawah; desktop: dropdown di bawah cip
+   - [x] Lokasi semasa (✓), kegemaran dengan IPU mini dan warna kategori, "Guna lokasi saya", "+ Tambah bandar" → Lokasi › Senarai dengan carian kegemaran terbuka
+   - [x] Tiada kegemaran: teks ringkas + "+ Tambah bandar"; boleh diguna dengan papan kekunci dan pembaca skrin
 3. **Nombor IPU beranimasi** (kira naik/turun) bila bacaan berubah; tiada animasi untuk `prefers-reduced-motion`
 4. **Getaran ringan** bila tarikan mencapai ambang muat semula (Android, `navigator.vibrate`)
 5. **Rangka muat (skeleton)** mengikut bentuk baharu: langit, kad putih, baris angin, bento

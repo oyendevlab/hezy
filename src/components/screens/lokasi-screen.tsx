@@ -4,8 +4,7 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useSyncExternalStore } from "react";
-import { distanceKm } from "@/lib/apims";
-import { areaToLocation } from "@/lib/locations";
+import { areaToLocation, samePlace } from "@/lib/locations";
 import { primaryReading } from "@/lib/official";
 import {
   MAX_FAVOURITES,
@@ -38,9 +37,6 @@ const StationMap = dynamic(
 
 const noopSubscribe = () => () => {};
 
-/** Lokasi sama: id sama atau dalam 2 km (cth. lokasi GPS dan kawasan Putrajaya). */
-const samePlace = (a: SavedLocation, b: SavedLocation) =>
-  a.id === b.id || distanceKm(a, b) < 2;
 const subscribeHash = (listener: () => void) => {
   window.addEventListener("hashchange", listener);
   return () => window.removeEventListener("hashchange", listener);
@@ -55,16 +51,18 @@ export function LokasiScreen() {
     () => false,
   );
   const router = useRouter();
-  // Peta dipaparkan dahulu; `/lokasi#senarai` membuka tab Senarai terus.
-  const listHash = useSyncExternalStore(
+  // Peta dipaparkan dahulu; `#senarai` membuka tab Senarai, `#tambah` membuka carian kegemaran.
+  const hash = useSyncExternalStore(
     subscribeHash,
-    () => window.location.hash === "#senarai",
-    () => false,
+    () => window.location.hash,
+    () => "",
   );
   const [chosenView, setView] = useState<"list" | "map" | null>(null);
-  const view = chosenView ?? (listHash ? "list" : "map");
+  const view =
+    chosenView ?? (hash === "#senarai" || hash === "#tambah" ? "list" : "map");
   const [changing, setChanging] = useState(false);
-  const [adding, setAdding] = useState(false);
+  const [chosenAdding, setAdding] = useState<boolean | null>(null);
+  const adding = chosenAdding ?? hash === "#tambah";
 
   const select = (location: SavedLocation) => {
     updatePrefs((p) => ({ ...p, current: location }));

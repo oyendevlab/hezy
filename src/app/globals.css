@@ -100,3 +100,27 @@ body {
 .leaflet-container .leaflet-control-attribution a {
   text-decoration: underline;
 }
+
+/* Helaian bawah (menu lokasi). */
+@keyframes sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+}
+@keyframes sheet-fade {
+  from {
+    opacity: 0;
+  }
+}
+.sheet-up {
+  animation: sheet-up 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.sheet-backdrop {
+  animation: sheet-fade 0.2s ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sheet-up,
+  .sheet-backdrop {
+    animation: none;
+  }
+}
