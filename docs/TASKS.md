@@ -44,7 +44,7 @@ Legenda: 🐙 = guna GitHub · ▲ = guna Vercel · ✅ = siap
 - [x] Banner panorama + kad IPU
 - [x] Dua lajur: "Boleh keluar hari ini?" + Nasihat | Trend 24 jam
 - [x] Baris lokasi kegemaran (footer sumber data dipaparkan dalam kad IPU)
-- [ ] Pintasan papan kekunci (`/`, `1`–`5`, `T`)
+- [ ] ~~Pintasan papan kekunci (`/`, `1`–`5`, `T`)~~ — tidak diperlukan (keputusan 12 Okt 2026)
 
 ## Fasa 5 — PWA (F6–F8)
 
@@ -64,15 +64,86 @@ Legenda: 🐙 = guna GitHub · ▲ = guna Vercel · ✅ = siap
 ## Fasa 7 — Deploy
 
 - [x] ▲ Pembolehubah persekitaran: tiada diperlukan untuk v0.1
-- [ ] 🐙 Gabung ke `main` → ▲ production `hezy.vercel.app`
+- [x] 🐙 Gabung ke `main` → ▲ production `hezy.vercel.app`
 - [x] Ujian asap pada production: curl + 33 ujian E2E (`npm run test:e2e:prod`). Telefon sebenar: lihat [UJIAN-TELEFON.md](UJIAN-TELEFON.md)
 - [x] ▲ Vercel Web Analytics aktif (Speed Insights melalui CLI perlukan pelan Pro; versi percuma boleh diaktifkan di dashboard)
-- [ ] Tag versi `v0.1.0` 🐙
+- [x] Tag versi `v0.1.0` 🐙 (diikuti `v0.2.0` untuk Fasa 8)
 
 ## Fasa 8 — Selepas MVP (P1)
 
 - [x] Proksi APIMS (bacaan rasmi): endpoint awam portal eqms.doe.gov.my, cache 15 minit, stesen ≤ 30 km & ≤ 3 jam; `/api/stations` untuk peta
 - [x] Peta stesen (Leaflet + OpenStreetMap): 68 stesen APIMS, pin ikut IPU rasmi, senarai stesen terdekat
 - [x] Ramalan 3 hari (purata + maks IPU sejam) dan kongsi status (Web Share)
-- [ ] Panduan status sekolah (sahkan ambang KPM)
+- [ ] Panduan status sekolah → dipindahkan ke Fasa 9 (v0.3.0)
 - [x] Notifikasi Web Push (IPU > 100): langganan dalam Vercel Blob (private), semakan setiap jam oleh GitHub Actions, amaran ulang bila kategori berubah / 12 jam, notifikasi pulih
+
+## Fasa 9 — v0.3.0 (menunggu pengesahan)
+
+Fokus: kumpulan sasaran utama (ibu bapa dan pesakit asma), kebolehpercayaan data, dan capaian.
+Setiap item dibuat dalam cabang `feat/*` dan PR sendiri; digabung selepas CI lulus.
+
+### 1. Panduan status sekolah (KPM)
+
+- [ ] Siasat dan sahkan garis panduan KPM terkini (ambang IPU untuk aktiviti luar dan penutupan sekolah); simpan sumber rasmi dalam kod
+- [ ] Kad "Status sekolah" di Utama dan Trend, dipaparkan untuk profil **Kanak-kanak** (dan pilihan untuk semua profil)
+- [ ] Mesej berperingkat ikut IPU rasmi, cth. aktiviti luar dihadkan / sekolah mungkin ditutup — sentiasa dengan nota "ikut makluman rasmi sekolah dan KPM"
+- [ ] Ujian unit untuk setiap ambang + ujian E2E
+
+### 2. Graf trend rasmi APIMS
+
+- [ ] Ambil sejarah IPU sejam stesen terdekat daripada endpoint APIMS `apitablehourly` (cache 15 minit)
+- [ ] Graf 24 jam: jam lepas = bacaan rasmi APIMS, jam akan datang = ramalan model; legenda membezakan kedua-duanya
+- [ ] Sandaran ke data model jika APIMS gagal atau stesen tiada bacaan
+
+### 3. Amaran ikut profil kesihatan
+
+- [ ] Ambang amaran boleh dipilih: 50 / 100 / 200
+- [ ] Lalai 50 untuk profil Asma, Kanak-kanak dan Warga emas; 100 untuk Umum
+- [ ] Ambang disimpan bersama langganan; `decideAlert` menggunakan ambang rekod
+- [ ] Migrasi: rekod sedia ada tanpa ambang dianggap 100
+
+### 4. Amaran untuk lokasi kegemaran
+
+- [ ] Suis amaran pada setiap kad kegemaran (maks 5 lokasi + lokasi semasa)
+- [ ] Rekod langganan menyimpan senarai lokasi; semakan setiap jam menyemak semua lokasi
+- [ ] Notifikasi menyebut nama lokasi; amaran berasingan bagi setiap lokasi
+
+### 5. Pemantauan sumber data
+
+- [ ] Workflow GitHub harian: semak `/api/stations` (APIMS) dan `/api/aqi` (Open-Meteo) pada production
+- [ ] Buka _issue_ GitHub secara automatik bila semakan gagal (tanpa pendua jika issue masih terbuka)
+- [ ] Ringkasan `/api/push/check` (bilangan gagal) turut dipantau
+
+### 6. Bahasa Inggeris
+
+- [ ] Kamus teks BM/EN (tanpa pustaka besar); pilihan Bahasa di Tetapan berfungsi
+- [ ] `<html lang>`, metadata, nasihat kesihatan dan notifikasi push ikut bahasa
+- [ ] Ujian E2E dalam kedua-dua bahasa
+
+### 7. Imej kongsi automatik
+
+- [ ] Imej Open Graph dinamik (`next/og`) untuk status lokasi: IPU, kategori, warna dan logo awan
+- [ ] Butang Kongsi menghantar pautan yang memaparkan kad bergambar di WhatsApp/Telegram
+
+### 8. Halaman negeri
+
+- [ ] Laluan statik `/negeri/[negeri]` untuk 16 negeri/wilayah: IPU semua stesen APIMS, dikemas kini setiap 15 minit
+- [ ] Metadata SEO, sitemap dan pautan dari peta/senarai
+- [ ] Ujian kebolehcapaian pada halaman negeri
+
+### 9. Bandingkan lokasi (desktop)
+
+- [ ] Pilih 2–3 lokasi (semasa + kegemaran) untuk graf trend dalam satu paparan
+- [ ] Hanya ≥ 1024 px; telefon kekal satu lokasi
+
+### 10. Lapisan sensor tambahan WAQI (menunggu token)
+
+- [ ] **Pengguna**: daftar token di aqicn.org/data-platform/token, maklumkan pasukan WAQI melalui e-mel, tambah `NEXT_PUBLIC_WAQI_TOKEN` di Vercel
+- [ ] Lapisan berasingan pada peta ("Sensor tambahan · skala AQI AS"), pin bergaris, diambil terus dari pelayar (tiada cache pelayan, ikut terma WAQI)
+- [ ] Atribusi WAQI dan EPA asal; nombor utama dan amaran kekal guna IPU rasmi
+
+### Selesai v0.3.0
+
+- [ ] 90+ ujian unit dan E2E lulus pada CI dan production; axe tanpa pelanggaran
+- [ ] Lighthouse ≥ 90 dikekalkan
+- [ ] Kemas kini `UJIAN-TELEFON.md`, versi 0.3.0, tag dan GitHub Release
