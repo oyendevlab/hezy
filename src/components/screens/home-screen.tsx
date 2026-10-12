@@ -40,7 +40,7 @@ import { WeatherNow } from "../weather-icon";
 import { InstallBanner } from "../install-banner";
 import { HomeHeader } from "../home-header";
 import { ElasticCard } from "../elastic-card";
-import { TrendLink } from "../trend-link";
+import { TrendLink, TrendLinkSkeleton } from "../trend-link";
 import { AnimatedNumber } from "../animated-number";
 import { LocationMenu } from "../location-menu";
 
@@ -61,9 +61,83 @@ export function HomeScreen() {
 
 function HomeSkeleton() {
   return (
-    <div className="mx-auto max-w-[1200px] px-5 pt-13 md:px-10 md:pt-10">
-      <Skeleton className="h-[320px] md:h-[380px]" />
-      <Skeleton className="mt-4 h-24" />
+    <div aria-busy="true">
+      {/* Telefon: bentuk sama seperti Utama — langit, kad putih, ringkasan, kad trend. */}
+      <div className="md:hidden">
+        <div
+          className="fixed inset-x-0 top-0 h-[560px]"
+          style={{
+            background:
+              "linear-gradient(to bottom, var(--line), var(--surface))",
+          }}
+        />
+        <div className="relative flex justify-between px-5 pt-[max(env(safe-area-inset-top),16px)]">
+          <Skeleton className="h-11 w-36 rounded-full !bg-white/50" />
+          <Skeleton className="size-11 rounded-full !bg-white/50" />
+        </div>
+        <div className="bg-page relative mt-[150px] flex min-h-[calc(100svh-210px)] flex-col gap-4 rounded-t-[28px] px-5.5 pt-6 pb-8">
+          <SummarySkeleton />
+          <TrendLinkSkeleton />
+        </div>
+      </div>
+      <div className="mx-auto hidden max-w-[1200px] px-10 pt-10 md:block">
+        <Skeleton className="h-[380px]" />
+        <Skeleton className="mt-4 h-24" />
+      </div>
+    </div>
+  );
+}
+
+/** Rangka tajuk: label IPU, nombor + pil, cuaca, nasihat dan baris angin. */
+function HeadlineSkeleton({ size }: { size: "phone" | "desktop" }) {
+  const desktop = size === "desktop";
+  return (
+    <div
+      aria-busy="true"
+      data-testid="headline-skeleton"
+      className="flex flex-col gap-4"
+    >
+      <div className="flex items-start justify-between gap-6">
+        <div className="flex flex-col gap-2">
+          <Skeleton className="h-3 w-8 rounded-md" />
+          <div className="flex items-center gap-3.5">
+            <Skeleton
+              className={desktop ? "h-[100px] w-[160px]" : "h-[76px] w-[118px]"}
+            />
+            <div className="flex flex-col gap-2">
+              <Skeleton className="h-7 w-24 rounded-full" />
+              <Skeleton className="h-3 w-28 rounded-md" />
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-col items-end gap-1.5">
+          <Skeleton className="size-11 rounded-full" />
+          <Skeleton className="h-5 w-10 rounded-md" />
+        </div>
+      </div>
+      <div className="flex flex-col gap-2">
+        <Skeleton className="h-6 w-full rounded-lg" />
+        <Skeleton className="h-6 w-3/4 rounded-lg" />
+      </div>
+      <Skeleton className="h-4 w-56 rounded-md" />
+    </div>
+  );
+}
+
+/** Rangka ringkasan: label IPU, nombor + pil, cuaca, nasihat, baris angin, tiga petak. */
+function SummarySkeleton() {
+  return (
+    <div
+      aria-busy="true"
+      data-testid="summary-skeleton"
+      className="flex flex-col gap-4"
+    >
+      <HeadlineSkeleton size="phone" />
+      <div className="grid grid-cols-3 gap-2">
+        {[0, 1, 2].map((i) => (
+          <Skeleton key={i} className="h-[72px]" />
+        ))}
+      </div>
     </div>
   );
 }
@@ -241,7 +315,11 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
             />
             {current && showSchool && <SchoolCard reading={current} />}
             <InstallBanner />
-            {reading && <TrendLink hours={reading.today} />}
+            {reading ? (
+              <TrendLink hours={reading.today} />
+            ) : (
+              entry?.status !== "error" && <TrendLinkSkeleton />
+            )}
           </div>
         </ElasticCard>
       </section>
@@ -339,6 +417,8 @@ function Summary({ entry, reading, onRetry, size, profile }: SummaryProps) {
     );
   }
 
+  if (!reading) return <SummarySkeleton />;
+
   const advice = current ? adviceFor(current.category, profile) : null;
   return (
     <>
@@ -373,12 +453,8 @@ function Headline({
   const { t, lang } = useI18n();
   const current = primaryReading(reading);
   if (!reading) {
-    return (
-      <div aria-busy="true" className="flex flex-col gap-3">
-        <Skeleton className="h-20 w-48" />
-        <Skeleton className="h-6 w-64" />
-      </div>
-    );
+    if (entry?.status === "error") return null;
+    return <HeadlineSkeleton size={size} />;
   }
   if (!current) {
     return (

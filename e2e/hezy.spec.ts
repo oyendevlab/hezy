@@ -702,6 +702,36 @@ test.describe("muat semula", () => {
   });
 });
 
+test.describe("rangka muat", () => {
+  test("Utama memaparkan rangka bentuk baharu semasa bacaan dimuat", async ({
+    page,
+    isMobile,
+  }) => {
+    await seedLocation(page);
+    let release!: () => void;
+    const gate = new Promise<void>((r) => (release = r));
+    await page.route("**/api/aqi?**", async (route) => {
+      await gate;
+      await route.fulfill({ json: fakeReading() });
+    });
+    await page.goto("/");
+    const skeleton = page
+      .getByTestId("headline-skeleton")
+      .filter({ visible: true });
+    await expect(skeleton).toBeVisible();
+    if (isMobile) {
+      await expect(page.getByTestId("trend-link-skeleton")).toBeVisible();
+      await page.screenshot({ path: "test-results/rangka-telefon.png" });
+    }
+    release();
+    await expect(skeleton).toBeHidden();
+    await expect(
+      page.locator("h1[data-ipu-headline]").filter({ visible: true }),
+    ).toHaveText("156");
+    await expect(page.getByTestId("trend-link-skeleton")).toHaveCount(0);
+  });
+});
+
 test.describe("nombor IPU beranimasi", () => {
   test("dikira dari nilai lama ke nilai baharu bila bacaan berubah", async ({
     page,
