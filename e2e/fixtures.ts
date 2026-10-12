@@ -85,23 +85,36 @@ export const SHAH_ALAM = {
   source: "area",
 };
 
-/** Tetapkan lokasi semasa sekali sahaja (tidak ditulis semula selepas navigasi). */
-export async function seedLocation(page: Page) {
+/** Kegemaran rekaan untuk ujian perbandingan. */
+export const KLANG = {
+  id: "area:klang",
+  name: "Klang",
+  detail: "Selangor",
+  lat: 3.04,
+  lon: 101.45,
+  source: "area",
+};
+
+/** Tetapkan lokasi semasa (dan kegemaran) sekali sahaja; tidak ditulis semula selepas navigasi. */
+export async function seedLocation(
+  page: Page,
+  favourites: (typeof KLANG)[] = [],
+) {
   await page.addInitScript(
-    ([key, location]) => {
+    ([key, location, favs]) => {
       if (!localStorage.getItem(key)) {
         localStorage.setItem(
           key,
           JSON.stringify({
             current: location,
-            favourites: [],
+            favourites: favs,
             profile: "umum",
             theme: "system",
           }),
         );
       }
     },
-    [PREFS_KEY, SHAH_ALAM] as const,
+    [PREFS_KEY, SHAH_ALAM, favourites] as const,
   );
 }
 

@@ -1,0 +1,260 @@
+"use client";
+
+import { useState } from "react";
+import { displayIpu, primaryReading } from "@/lib/official";
+import type { Prefs, SavedLocation } from "@/lib/prefs";
+import { useReading } from "@/lib/use-reading";
+
+const MAX_SELECTED = 3;
+/** Warna garis: berbeza hue dan kecerahan supaya boleh dibezakan tanpa bergantung pada warna sahaja. */
+const SERIES = [
+  { color: "#1d4ed8", dash: "" },
+  { color: "#c2410c", dash: "" },
+  { color: "#6d28d9", dash: "" },
+] as const;
+
+const W = 720;
+const H = 240;
+const LEFT = 40;
+const RIGHT = 12;
+const TOP = 12;
+const BOTTOM = 28;
+const SCALE_MAX = 200;
+const x = (i: number) => LEFT + (i / 23) * (W - LEFT - RIGHT);
+const y = (v: number) =>
+  TOP + (1 - Math.min(v, SCALE_MAX) / SCALE_MAX) * (H - TOP - BOTTOM);
+
+/** Calon lokasi: semasa + kegemaran, tanpa pendua. */
+function candidates(prefs: Prefs): SavedLocation[] {
+  const list: SavedLocation[] = prefs.current ? [prefs.current] : [];
+  for (const f of prefs.favourites) {
+    if (
+      !list.some((l) => l.id === f.id || (l.lat === f.lat && l.lon === f.lon))
+    )
+      list.push(f);
+  }
+  return list.slice(0, 6);
+}
+
+/** Bandingkan graf IPU hari ini bagi 2–3 lokasi (desktop sahaja). */
+export function CompareLocations({ prefs }: { prefs: Prefs }) {
+  const options = candidates(prefs);
+  const [selected, setSelected] = useState<string[]>(() =>
+    options.slice(0, 2).map((l) => l.id),
+  );
+  const chosen = options
+    .filter((l) => selected.includes(l.id))
+    .slice(0, MAX_SELECTED);
+
+  if (options.length < 2) {
+    return (
+      <section
+        aria-labelledby="bandingkan"
+        className="border-line rounded-3xl border p-5"
+      >
+        <h2 id="bandingkan" className="font-display text-xl font-bold">
+          Bandingkan lokasi
+        </h2>
+        <p className="text-muted mt-1 text-sm">
+          Simpan sekurang-kurangnya satu lokasi kegemaran untuk membandingkan
+          trend.
+        </p>
+      </section>
+    );
+  }
+
+  const toggle = (id: string) =>
+    setSelected((s) =>
+      s.includes(id)
+        ? s.filter((x) => x !== id)
+        : s.length >= MAX_SELECTED
+          ? s
+          : [...s, id],
+    );
+
+  return (
+    <section
+      aria-labelledby="bandingkan"
+      className="border-line flex flex-col gap-4 rounded-3xl border p-5"
+    >
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <h2 id="bandingkan" className="font-display text-xl font-bold">
+          Bandingkan lokasi
+        </h2>
+        <span className="text-muted text-xs font-semibold">
+          Pilih sehingga {MAX_SELECTED}
+        </span>
+      </div>
+
+      <div
+        role="group"
+        aria-label="Lokasi untuk dibandingkan"
+        className="flex flex-wrap gap-2"
+      >
+        {options.map((l) => {
+          const on = selected.includes(l.id);
+          const index = chosen.findIndex((c) => c.id === l.id);
+          return (
+            <button
+              key={l.id}
+              type="button"
+              aria-pressed={on}
+              disabled={!on && selected.length >= MAX_SELECTED}
+              onClick={() => toggle(l.id)}
+              className={`flex min-h-10 items-center gap-2 rounded-full border-[1.5px] px-3.5 text-sm font-semibold disabled:opacity-40 ${
+                on ? "border-ink" : "border-line text-muted"
+              }`}
+            >
+              <span
+                aria-hidden="true"
+                className="size-2.5 rounded-full"
+                style={{
+                  background:
+                    on && index >= 0 ? SERIES[index].color : "var(--line)",
+                }}
+              />
+              {l.name}
+            </button>
+          );
+        })}
+      </div>
+
+      <figure className="m-0">
+        <svg
+          role="img"
+          aria-label="Graf perbandingan IPU hari ini"
+          viewBox={`0 0 ${W} ${H}`}
+          className="h-auto w-full"
+        >
+          {[0, 50, 100, 150, 200].map((v) => (
+            <g key={v}>
+              <line
+                x1={LEFT}
+                x2={W - RIGHT}
+                y1={y(v)}
+                y2={y(v)}
+                stroke="var(--line)"
+                strokeWidth="1"
+              />
+              <text
+                x={LEFT - 8}
+                y={y(v) + 4}
+                textAnchor="end"
+                fontSize="11"
+                fill="var(--muted)"
+              >
+                {v}
+              </text>
+            </g>
+          ))}
+          {[0, 6, 12, 18, 23].map((h) => (
+            <text
+              key={h}
+              x={x(h)}
+              y={H - 8}
+              textAnchor="middle"
+              fontSize="11"
+              fill="var(--muted)"
+            >
+              {h === 0
+                ? "12 pg"
+                : h === 6
+                  ? "6 pg"
+                  : h === 12
+                    ? "12 tgh"
+                    : h === 18
+                      ? "6 ptg"
+                      : "11 mlm"}
+            </text>
+          ))}
+          {chosen.map((l, i) => (
+            <SeriesLine key={l.id} location={l} color={SERIES[i].color} />
+          ))}
+        </svg>
+        <figcaption>
+          <ul className="flex flex-wrap gap-x-5 gap-y-2 text-sm">
+            {chosen.map((l, i) => (
+              <SeriesLegend key={l.id} location={l} color={SERIES[i].color} />
+            ))}
+          </ul>
+          <p className="text-muted mt-2 text-xs">
+            Garis penuh: jam lepas (rasmi APIMS jika ada). Garis putus: ramalan
+            model.
+          </p>
+        </figcaption>
+      </figure>
+    </section>
+  );
+}
+
+function points(values: { i: number; v: number | null }[]) {
+  return values
+    .filter((p): p is { i: number; v: number } => p.v !== null)
+    .map((p) => `${x(p.i).toFixed(1)},${y(p.v).toFixed(1)}`)
+    .join(" ");
+}
+
+function SeriesLine({
+  location,
+  color,
+}: {
+  location: SavedLocation;
+  color: string;
+}) {
+  const { entry } = useReading(location);
+  const today = entry?.reading?.today;
+  if (!today?.length) return null;
+  const nowIndex = today.findLastIndex((h) => !h.forecast);
+  const values = today.map((h, i) => ({
+    i,
+    v: displayIpu(h),
+    forecast: h.forecast,
+  }));
+  const past = values.filter((p) => p.i <= nowIndex);
+  const future = values.filter((p) => p.i >= nowIndex);
+  return (
+    <g>
+      <polyline
+        points={points(past)}
+        fill="none"
+        stroke={color}
+        strokeWidth="3"
+        strokeLinejoin="round"
+        strokeLinecap="round"
+      />
+      <polyline
+        points={points(future)}
+        fill="none"
+        stroke={color}
+        strokeWidth="3"
+        strokeDasharray="6 6"
+        strokeLinejoin="round"
+        strokeLinecap="round"
+      />
+    </g>
+  );
+}
+
+function SeriesLegend({
+  location,
+  color,
+}: {
+  location: SavedLocation;
+  color: string;
+}) {
+  const { entry } = useReading(location);
+  const current = primaryReading(entry?.reading);
+  return (
+    <li className="flex items-center gap-2">
+      <span
+        aria-hidden="true"
+        className="h-1 w-5 rounded-full"
+        style={{ background: color }}
+      />
+      <span className="font-semibold">{location.name}</span>
+      <span className="text-muted">
+        {current ? `IPU ${current.ipu} · ${current.label}` : "memuatkan…"}
+      </span>
+    </li>
+  );
+}

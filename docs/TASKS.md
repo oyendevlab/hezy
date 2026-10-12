@@ -133,8 +133,8 @@ Setiap item dibuat dalam cabang `feat/*` dan PR sendiri; digabung selepas CI lul
 
 ### 9. Bandingkan lokasi (desktop)
 
-- [ ] Pilih 2–3 lokasi (semasa + kegemaran) untuk graf trend dalam satu paparan
-- [ ] Hanya ≥ 1024 px; telefon kekal satu lokasi
+- [x] Pilih 2–3 lokasi (semasa + kegemaran) untuk graf trend dalam satu paparan
+- [x] Hanya ≥ 1024 px; telefon kekal satu lokasi
 
 ### 10. Lapisan sensor tambahan WAQI (menunggu token)
 
