@@ -76,6 +76,23 @@ Buka **https://hezy.my** pada telefon.
 - [ ] Utama: ⓘ di sebelah "Stesen … · km · masa" membuka butiran sumber
 - [ ] Utama: kad "Lihat trend jam demi jam" dengan graf mini → Trend
 
+## Ciri baharu v0.6.0
+
+- [ ] Utama: tolak kad putih ke atas → berhenti tepat di atas (~124 px); lepas separuh jalan → melekat ke rehat atau atas
+- [ ] Utama/Trend: ketik cip lokasi → helaian bawah (telefon) dengan lokasi semasa ✓, kegemaran + IPU, "Guna lokasi saya", "Tambah bandar"
+- [ ] Muat semula (tarik ke bawah, Muat semula, atau tukar lokasi) → nombor IPU dikira naik/turun
+- [ ] Android: tarik kad putih hingga ambang → getaran ringan sekali
+- [ ] Buka Hezy dengan internet perlahan → rangka bentuk kad putih (bukan kotak kelabu)
+- [ ] Bar navigasi: ikon terisi untuk halaman aktif
+- [ ] Tukar tab → pudar pantas; Lokasi → IPU mengikut negeri → negeri → gelongsor ke kiri; pautan laluan kembali → ke kanan
+- [ ] iPhone: buang dan pasang semula Hezy di skrin utama → skrin pembuka awan (terang dan gelap)
+- [ ] Pengguna baharu (Tetapan → Padam data): pengenalan 3 skrin; Langkau berfungsi; tidak muncul semula
+- [ ] Lokasi → Peta: cip Titik panas / Sensor / Angin di kiri atas; zum keluar → pin dihimpunkan; ketik himpunan → zum masuk
+- [ ] Lokasi → Peta: ketik pin → kad di bawah peta; X atau ketik di luar untuk tutup
+- [ ] Lokasi → Senarai: leret kegemaran ke kiri untuk buang; seret ⋮⋮ untuk susun semula
+- [ ] Tetapan → Amaran (hidup) → **Hantar notifikasi ujian** → notifikasi "Hezy: notifikasi ujian" muncul; tekan lagi → "Tunggu … saat"
+- [ ] Mod gelap: semua perkara di atas boleh dibaca
+
 ## Jika ada masalah
 
 Ambil tangkapan skrin dan catat model telefon serta versi OS, kemudian buka isu di
