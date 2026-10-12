@@ -702,6 +702,26 @@ test.describe("muat semula", () => {
   });
 });
 
+test.describe("navigasi", () => {
+  test("ikon Phosphor terisi untuk halaman aktif sahaja", async ({ page }) => {
+    await seedLocation(page);
+    await page.goto("/trend");
+    const nav = page
+      .getByRole("navigation", { name: "Navigasi utama" })
+      .filter({ visible: true });
+    const active = nav.getByRole("link", { name: "Trend" });
+    await expect(active).toHaveAttribute("aria-current", "page");
+    await expect(active.locator("svg")).toHaveAttribute("data-active", "true");
+    await expect(nav.locator('svg[data-active="true"]')).toHaveCount(1);
+    await nav.getByRole("link", { name: "Lokasi" }).click();
+    await expect(
+      nav.getByRole("link", { name: "Lokasi" }).locator("svg"),
+    ).toHaveAttribute("data-active", "true");
+    await expect(nav.locator('svg[data-active="true"]')).toHaveCount(1);
+    await page.screenshot({ path: "test-results/navigasi.png" });
+  });
+});
+
 test.describe("rangka muat", () => {
   test("Utama memaparkan rangka bentuk baharu semasa bacaan dimuat", async ({
     page,
