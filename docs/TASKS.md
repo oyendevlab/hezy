@@ -361,6 +361,6 @@ Penambahbaikan sebelum ciri baharu. Cadangan v0.6.0 (notifikasi ujian, semalam v
 
 ### Selesai v0.5.1
 
-- [ ] Ujian unit dan E2E lulus pada CI dan production; axe tanpa pelanggaran
-- [ ] Lighthouse ≥ 90 dikekalkan
-- [ ] Kemas kini `UJIAN-TELEFON.md`, versi 0.5.1, tag dan GitHub Release
+- [x] Ujian unit dan E2E lulus pada CI dan production; axe tanpa pelanggaran (199 unit, 110 E2E; production 108 lulus)
+- [x] Lighthouse ≥ 90 dikekalkan (production 12 Okt 2026: telefon 98/100/100/100, desktop 98/100/100/100)
+- [x] Kemas kini `UJIAN-TELEFON.md`, versi 0.5.1, tag dan GitHub Release
