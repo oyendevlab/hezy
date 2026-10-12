@@ -1,4 +1,5 @@
 import type { AccuracySummary } from "./accuracy";
+import type { Wind } from "./wind";
 import type { HourlyOfficial } from "./apims";
 import { findBestWindow, type BestWindow } from "./best-time";
 import {
@@ -67,6 +68,8 @@ export type Reading = {
   stale: boolean;
   /** Bacaan rasmi APIMS stesen terdekat (≤ 30 km, ≤ 3 jam); diisi oleh route API. */
   official: OfficialReading | null;
+  /** Angin 850 hPa semasa dan anggaran asal jerebu (item 1); diisi oleh route API. */
+  wind?: Wind | null;
   /** Ralat purata 14 hari berbanding bacaan rasmi (item 4); diisi oleh route API. */
   accuracy?: AccuracySummary | null;
   /** Pembetulan ramalan dengan bacaan APIMS; tiada dalam bacaan lama tersimpan. */

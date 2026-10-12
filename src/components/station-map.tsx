@@ -23,7 +23,10 @@ import {
   waqiBoundsUrl,
   type Sensor,
 } from "@/lib/waqi";
+import { useReading } from "@/lib/use-reading";
+import { CALM_KMH } from "@/lib/wind";
 import { IpuPill } from "./ipu-pill";
+import { WindArrow, useWindText } from "./wind-line";
 import { Notice, Skeleton } from "./status";
 
 /** Pusat Malaysia (Semenanjung + Borneo) bila tiada lokasi semasa. */
@@ -96,6 +99,8 @@ export function StationMap() {
 
   const stations = state.status === "ready" ? state.stations : null;
   const current = prefs?.current ?? null;
+  const wind = useReading(current).entry?.reading?.wind ?? null;
+  const windText = useWindText();
 
   // Bina peta selepas stesen dimuatkan.
   useEffect(() => {
@@ -251,6 +256,12 @@ export function StationMap() {
           aria-label={t("Peta stesen APIMS")}
           className="border-line h-[420px] overflow-hidden rounded-3xl border md:h-[520px]"
         />
+        {wind && (
+          <div className="bg-page/90 pointer-events-none absolute top-3 right-3 z-[500] flex max-w-[70%] items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold shadow">
+            {wind.speed >= CALM_KMH && <WindArrow direction={wind.direction} />}
+            {windText(wind)}
+          </div>
+        )}
       </div>
 
       {WAQI_TOKEN && sensors !== null && sensors.length > 0 && (

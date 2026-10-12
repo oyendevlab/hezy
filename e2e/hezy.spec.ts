@@ -158,6 +158,36 @@ test.describe("aliran utama", () => {
   });
 });
 
+test.describe("arah angin", () => {
+  test("Utama dan peta memaparkan angin dan asal jerebu", async ({ page }) => {
+    const reading = {
+      ...fakeReading(OFFICIAL_SHAH_ALAM),
+      wind: {
+        direction: 225,
+        speed: 18,
+        compass: "barat-daya",
+        source: "sumatera",
+      },
+    };
+    await seedLocation(page);
+    await page.route("**/api/aqi?**", (route) =>
+      route.fulfill({ json: reading }),
+    );
+    await page.goto("/");
+    await expect(
+      page
+        .getByText("Angin dari barat daya (arah Sumatera) · 18 km/j")
+        .filter({ visible: true })
+        .first(),
+    ).toBeVisible();
+    await page.goto("/lokasi");
+    await page.getByRole("tab", { name: "Peta" }).click();
+    await expect(
+      page.getByText("Angin dari barat daya (arah Sumatera) · 18 km/j"),
+    ).toBeVisible();
+  });
+});
+
 test.describe("kongsi imej kad", () => {
   test("helaian kongsi memaparkan pratonton dan memuat turun imej", async ({
     page,

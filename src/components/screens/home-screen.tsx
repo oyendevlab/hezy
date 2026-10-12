@@ -24,6 +24,7 @@ import { Skyline } from "../skyline";
 import { Notice, Skeleton } from "../status";
 import { TrendPanel } from "../trend-panel";
 import { useCurrent } from "../use-current";
+import { WindLine } from "../wind-line";
 
 export function HomeScreen() {
   const { prefs, location, entry, refresh } = useCurrent();
@@ -367,6 +368,7 @@ function Headline({
       >
         {t(adviceFor(current.category, profile).headline)}
       </p>
+      {reading.wind && <WindLine wind={reading.wind} />}
       {official ? (
         <p className="text-muted text-xs font-medium">
           {t("Rasmi APIMS · Stesen {station} ({km} km)", {

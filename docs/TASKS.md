@@ -203,8 +203,8 @@ Masalah: model CAMS (Open-Meteo) kurang menganggar jerebu. Contoh Putrajaya 12 O
 ### Data dan ramalan
 
 1. **Arah angin & asal jerebu**
-   - [ ] Angin 10 m daripada Open-Meteo bersama data sedia ada (tiada token)
-   - [ ] Ayat ringkas di Utama, cth. "Angin dari barat daya (arah Sumatera)", dan anak panah angin pada peta
+   - [x] Angin paras 850 hPa (~1.5 km) daripada Open-Meteo, purata vektor ±3 jam (angin 10 m terlalu berubah-ubah); tiada token
+   - [x] Ayat ringkas di Utama, cth. "Angin dari barat daya (arah Sumatera)", dan anak panah angin pada peta; asal ditentukan dengan menyemak Sumatera/Kalimantan dalam 600 km ke hulu angin
 2. **Titik panas kebakaran (NASA FIRMS)**
    - [x] **Pengguna**: daftar MAP_KEY percuma di firms.modaps.eosdis.nasa.gov/api/map_key; `FIRMS_MAP_KEY` ditambah di Vercel (sensitif)
    - [ ] API `/api/hotspots` (cache 1 jam): titik VIIRS 24 jam terakhir bagi Malaysia, Sumatera dan Kalimantan
