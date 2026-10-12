@@ -25,7 +25,7 @@ export function StationTable({
         <thead className="bg-surface text-muted text-xs font-bold tracking-wide">
           <tr>
             <th scope="col" className="px-4 py-3">
-              STESEN
+              KAWASAN
             </th>
             <th scope="col" className="px-4 py-3">
               IPU

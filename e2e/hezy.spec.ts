@@ -454,6 +454,40 @@ test.describe("halaman negeri", () => {
       page.getByRole("heading", { name: "IPU mengikut negeri" }),
     ).toBeVisible();
     await expect(page.locator('a[href^="/negeri/"]')).toHaveCount(16);
+    // Susunan ikut peta: Perlis di atas, Johor, kemudian Sarawak dan Sabah; wilayah berasingan.
+    const negeri = page.getByRole("region", { name: "NEGERI" });
+    const names = await negeri
+      .locator('a[href^="/negeri/"] [data-name]')
+      .allTextContents();
+    expect(names).toEqual([
+      "Perlis",
+      "Kedah",
+      "Kelantan",
+      "Pulau Pinang",
+      "Terengganu",
+      "Perak",
+      "Pahang",
+      "Selangor",
+      "Negeri Sembilan",
+      "Melaka",
+      "Johor",
+      "Sarawak",
+      "Sabah",
+    ]);
+    await expect(
+      page
+        .getByRole("region", { name: "WILAYAH PERSEKUTUAN" })
+        .locator('a[href^="/negeri/"]'),
+    ).toHaveCount(3);
+  });
+
+  test("Lokasi mempunyai butang ke IPU mengikut negeri", async ({ page }) => {
+    await seedLocation(page);
+    await page.goto("/lokasi");
+    await page.getByRole("link", { name: /IPU mengikut negeri/ }).click();
+    await expect(page).toHaveURL(/\/negeri$/);
+    await page.getByRole("link", { name: /^Selangor/ }).click();
+    await expect(page).toHaveURL(/\/negeri\/selangor$/);
   });
 
   test("halaman Selangor memaparkan jadual stesen atau notis", async ({
