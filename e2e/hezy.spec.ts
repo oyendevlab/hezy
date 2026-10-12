@@ -530,12 +530,27 @@ test.describe("muat semula", () => {
       "data-state",
       "pulling",
     );
+    // Kad putih turun dengan rintangan (dihadkan) sementara langit kekal di tempatnya.
+    const offset = () =>
+      page
+        .getByTestId("elastic-card")
+        .evaluate((el) => new DOMMatrix(getComputedStyle(el).transform).m42);
+    const pulled = await offset();
+    expect(pulled).toBeGreaterThan(64);
+    expect(pulled).toBeLessThanOrEqual(140);
+    await expect(page.getByTestId("sky")).toHaveCount(1);
+    expect(
+      await page
+        .getByTestId("sky")
+        .evaluate((el) => el.getBoundingClientRect().top),
+    ).toBe(0);
     await touch("touchEnd");
     await expect.poll(() => calls.n).toBe(2);
     await expect(page.getByTestId("pull-indicator")).toHaveAttribute(
       "data-state",
       "idle",
     );
+    await expect.poll(offset).toBeCloseTo(0, 0);
 
     // Tarikan pendek tidak memuat semula.
     await touch("touchStart", 120);

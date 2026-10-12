@@ -5,14 +5,12 @@ import type { PrimaryReading } from "@/lib/official";
 import { useI18n } from "@/lib/use-i18n";
 import { IpuPill } from "./ipu-pill";
 
-/** Jarak tatal (px) sehingga latar kaca pengepala penuh. */
-const FADE_PX = 160;
 /** Tinggi kira-kira pengepala: nombor di bawahnya dianggap tersorok. */
 const HEADER_PX = 80;
 
 /**
- * Pengepala Utama yang kekal di atas semasa menatal: latar kaca kabur semakin pekat,
- * dan IPU ringkas dipaparkan bila nombor besar (`[data-ipu-headline]`) keluar dari skrin.
+ * Pengepala Utama yang kekal di atas semasa menatal (cip terapung, tanpa jalur latar),
+ * dan IPU ringkas dalam pil bila nombor besar (`[data-ipu-headline]`) keluar dari skrin.
  */
 export function HomeHeader({
   left,
@@ -28,15 +26,13 @@ export function HomeHeader({
   innerClassName?: string;
 }) {
   const { t } = useI18n();
-  const [fade, setFade] = useState(0);
   const [compact, setCompact] = useState(false);
 
-  // Semasa menatal: latar kaca ikut jarak tatal; IPU ringkas bila nombor besar yang
+  // Semasa menatal: IPU ringkas bila nombor besar yang
   // kelihatan (bukan versi telefon/desktop yang tersembunyi) sudah di bawah pengepala.
   const ipu = current?.ipu ?? null;
   useEffect(() => {
     const onScroll = () => {
-      setFade(Math.min(Math.max(window.scrollY / FADE_PX, 0), 1));
       const shown = [
         ...document.querySelectorAll("[data-ipu-headline]"),
       ].filter((el) => el.getBoundingClientRect().height > 0);
@@ -61,11 +57,6 @@ export function HomeHeader({
       className={`sticky top-0 z-20 ${className}`}
     >
       <div
-        aria-hidden="true"
-        className="border-line bg-page/85 absolute inset-0 border-b backdrop-blur-md transition-opacity duration-200"
-        style={{ opacity: fade }}
-      />
-      <div
         className={`relative flex items-center justify-between gap-3 ${innerClassName}`}
       >
         <div className="min-w-0">{left}</div>
@@ -73,7 +64,7 @@ export function HomeHeader({
           {current && (
             <div
               aria-hidden="true"
-              className={`flex items-center gap-1.5 transition-all duration-200 motion-reduce:transition-none ${
+              className={`flex items-center gap-1.5 rounded-full bg-white/70 py-1 pr-1.5 pl-3 text-[#1c1a16] shadow-[0_1px_6px_rgb(0_0_0/0.12)] backdrop-blur transition-all duration-200 motion-reduce:transition-none ${
                 compact
                   ? "translate-y-0 opacity-100"
                   : "pointer-events-none translate-y-1 opacity-0"

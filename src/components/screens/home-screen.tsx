@@ -30,6 +30,7 @@ import { AdviceIcon } from "../advice-icon";
 import { WeatherNow } from "../weather-icon";
 import { InstallBanner } from "../install-banner";
 import { HomeHeader } from "../home-header";
+import { ElasticCard } from "../elastic-card";
 
 export function HomeScreen() {
   const { prefs, location, entry, refresh } = useCurrent();
@@ -129,7 +130,8 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
 
   return (
     <>
-      <PullToRefresh />
+      {/* Tablet sentuh: penunjuk biasa; telefon guna kad elastik. */}
+      {wide && <PullToRefresh />}
       {/* Telefon: mockup C */}
       <section className="md:hidden">
         {/* Pengepala tetap menindih langit (margin negatif = tinggi pengepala). */}
@@ -144,16 +146,20 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
               path={sharePath}
               card={card}
               fileName={fileName}
-              className="bg-white/70 text-[#1c1a16]"
+              className="bg-white/70 text-[#1c1a16] shadow-[0_1px_6px_rgb(0_0_0/0.12)] backdrop-blur"
             />
           }
         />
-        <div className="relative h-[440px]">
-          {!wide && (
-            <SkyCanvas {...sky} className="absolute inset-0 h-full w-full" />
-          )}
-        </div>
-        <div className="bg-page relative -mt-8 flex flex-col gap-4 rounded-t-[28px] px-5.5 pt-6">
+        {/* Langit tetap di belakang; hanya kad putih bergerak (dan ditarik seperti getah). */}
+        {!wide && (
+          <SkyCanvas
+            {...sky}
+            coverAt={300}
+            className="fixed inset-x-0 top-0 h-[560px] w-full"
+          />
+        )}
+        <div aria-hidden="true" className="h-[408px]" />
+        <ElasticCard className="bg-page flex min-h-[calc(100svh-120px)] flex-col gap-4 rounded-t-[28px] px-5.5 pt-6 pb-8">
           <Summary
             entry={entry}
             reading={reading}
@@ -163,7 +169,7 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
           />
           {current && showSchool && <SchoolCard reading={current} />}
           <InstallBanner />
-        </div>
+        </ElasticCard>
       </section>
 
       {/* Tablet & desktop: pilihan 2 */}
@@ -175,13 +181,13 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
           left={<LocationLink location={location} />}
           right={
             <>
-              <RefreshButton className="inline-flex border-transparent bg-white/70 text-[#1c1a16] hover:bg-white" />
+              <RefreshButton className="inline-flex border-transparent bg-white/70 text-[#1c1a16] shadow-[0_1px_6px_rgb(0_0_0/0.12)] backdrop-blur hover:bg-white" />
               <ShareButton
                 text={shareText}
                 path={sharePath}
                 card={card}
                 fileName={fileName}
-                className="bg-white/70 text-[#1c1a16]"
+                className="bg-white/70 text-[#1c1a16] shadow-[0_1px_6px_rgb(0_0_0/0.12)] backdrop-blur"
               />
             </>
           }
@@ -239,7 +245,7 @@ function LocationLink({ location }: { location: SavedLocation }) {
   return (
     <Link
       href="/lokasi"
-      className="flex min-h-11 items-center gap-1.5 rounded-full bg-white/70 px-3.5 text-base font-semibold text-[#1c1a16]"
+      className="flex min-h-11 items-center gap-1.5 rounded-full bg-white/70 px-3.5 text-base font-semibold text-[#1c1a16] shadow-[0_1px_6px_rgb(0_0_0/0.12)] backdrop-blur"
     >
       <svg
         aria-hidden="true"

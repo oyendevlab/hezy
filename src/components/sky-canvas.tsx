@@ -96,7 +96,12 @@ export function SkyCanvas({
   weather,
   wind,
   className = "",
-}: Input & { className?: string }) {
+  coverAt,
+}: Input & {
+  className?: string;
+  /** Tatalan (px) yang hampir menutup langit: animasi diperlahankan (~10 fps) untuk jimat bateri. */
+  coverAt?: number;
+}) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const input = useRef<Input>({ ipu, weather, wind });
   const [ready, setReady] = useState(false);
@@ -134,8 +139,20 @@ export function SkyCanvas({
     let visible = true;
     let raf = 0;
 
+    let lastDraw = 0;
     const frame = (now: number) => {
       raf = 0;
+      // Langit hampir tertutup oleh kad: lukis jarang-jarang.
+      if (
+        coverAt !== undefined &&
+        window.scrollY > coverAt &&
+        now - lastDraw < 100
+      ) {
+        if (!reduce.matches && visible && !document.hidden)
+          raf = requestAnimationFrame(frame);
+        return;
+      }
+      lastDraw = now;
       if (now - paramsAt > PARAMS_EVERY_MS) {
         params = skyParams({ ...input.current, now: new Date() });
         paramsAt = now;
@@ -174,7 +191,7 @@ export function SkyCanvas({
       window.removeEventListener("hezy-sky", refresh);
       reduce.removeEventListener("change", kick);
     };
-  }, []);
+  }, [coverAt]);
 
   return (
     <div
