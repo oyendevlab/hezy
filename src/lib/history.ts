@@ -135,3 +135,19 @@ export function toWeeks(days: readonly HistoryDay[]): (HistoryDay | null)[][] {
     cells.slice(w * 7, w * 7 + 7),
   );
 }
+
+/**
+ * Label bulan bagi setiap lajur minggu: pada minggu yang mengandungi hari 1 bulan itu.
+ * Minggu pertama dilabel juga jika minggu kedua tiada label (elak label bertindih).
+ */
+export function monthLabelWeeks(
+  weeks: readonly (HistoryDay | null)[][],
+): (string | null)[] {
+  const labels = weeks.map(
+    (week) => week.find((d) => d?.date.endsWith("-01"))?.date ?? null,
+  );
+  if (labels.length > 0 && labels[0] === null && !labels[1]) {
+    labels[0] = weeks[0].find((d) => d)?.date ?? null;
+  }
+  return labels;
+}
