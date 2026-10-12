@@ -1,6 +1,8 @@
 "use client";
 
+import { Info } from "@phosphor-icons/react";
 import Link from "next/link";
+import { Fragment, useId, useState } from "react";
 import { shownError } from "@/lib/accuracy";
 import { HEALTH_PROFILES, adviceFor, type QuickTone } from "@/lib/advice";
 import { CATEGORY_STYLE } from "@/lib/category-style";
@@ -31,6 +33,7 @@ import { WeatherNow } from "../weather-icon";
 import { InstallBanner } from "../install-banner";
 import { HomeHeader } from "../home-header";
 import { ElasticCard } from "../elastic-card";
+import { TrendLink } from "../trend-link";
 
 export function HomeScreen() {
   const { prefs, location, entry, refresh } = useCurrent();
@@ -169,6 +172,7 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
           />
           {current && showSchool && <SchoolCard reading={current} />}
           <InstallBanner />
+          {reading && <TrendLink hours={reading.today} />}
         </ElasticCard>
       </section>
 
@@ -352,7 +356,6 @@ function Headline({
   // Perubahan 3 jam dikira daripada model, jadi hanya dipaparkan bila nombor utama ialah anggaran model.
   const change =
     current.source === "model" ? formatChange(reading.change3h, lang) : null;
-  const official = reading.official;
   const estimateError = shownError(reading.accuracy, "estimate");
   const big = size === "desktop" ? "text-[112px]" : "text-[84px]";
   return (
@@ -421,29 +424,102 @@ function Headline({
         {t(adviceFor(current.category, profile).headline)}
       </p>
       {reading.wind && <WindLine wind={reading.wind} />}
-      {official ? (
-        <p className="text-muted text-xs font-medium">
-          {t("Rasmi APIMS · Stesen {station} ({km} km)", {
-            station: official.stationName,
-            km: official.distanceKm,
-          })}
-          {official.pollutant ? ` · ${official.pollutant}` : ""} ·{" "}
-          {formatClock(official.time, lang)}
-          {reading.current
-            ? ` · ${t("Anggaran model: {ipu}", { ipu: reading.current.ipu })}`
-            : ""}
-        </p>
-      ) : (
-        <p className="text-muted text-xs font-medium">
-          {t(
-            "Dikemas kini {time} · Anggaran daripada PM2.5 (Open-Meteo); tiada stesen APIMS berdekatan",
-            { time: formatClock(current.time, lang) },
-          )}
-          {estimateError !== null &&
-            ` · ${t("biasanya ±{n} berbanding bacaan rasmi", { n: estimateError })}`}
-        </p>
-      )}
+      <SourceLine
+        reading={reading}
+        current={current}
+        estimateError={estimateError}
+      />
     </>
+  );
+}
+
+/** Sumber ringkas; butiran (sumber penuh, pencemar, anggaran model, ketepatan) di sebalik ⓘ. */
+function SourceLine({
+  reading,
+  current,
+  estimateError,
+}: {
+  reading: Reading;
+  current: NonNullable<ReturnType<typeof primaryReading>>;
+  estimateError: number | null;
+}) {
+  const { t, lang } = useI18n();
+  const [open, setOpen] = useState(false);
+  const id = useId();
+  const official = reading.official;
+  const rows: [string, string][] = official
+    ? [
+        [t("Sumber"), t("IPU rasmi APIMS (Jabatan Alam Sekitar)")],
+        [t("Stesen"), `${official.stationName} · ${official.distanceKm} km`],
+        ...(official.pollutant
+          ? ([[t("Pencemar utama"), official.pollutant]] as [string, string][])
+          : []),
+        [t("Masa bacaan"), formatClock(official.time, lang)],
+        ...(reading.current
+          ? ([[t("Anggaran model"), String(reading.current.ipu)]] as [
+              string,
+              string,
+            ][])
+          : []),
+      ]
+    : [
+        [t("Sumber"), t("Anggaran daripada PM2.5 (Open-Meteo, model CAMS)")],
+        [t("Stesen"), t("Tiada stesen APIMS dalam 30 km")],
+        [t("Masa bacaan"), formatClock(current.time, lang)],
+        ...(estimateError !== null
+          ? ([
+              [
+                t("Ketepatan"),
+                t("biasanya ±{n} berbanding bacaan rasmi", {
+                  n: estimateError,
+                }),
+              ],
+            ] as [string, string][])
+          : []),
+      ];
+  return (
+    <div className="text-muted text-xs font-medium">
+      <div className="flex items-center gap-1">
+        <span>
+          {official
+            ? t("Stesen {station} · {km} km · {time}", {
+                station: official.stationName,
+                km: official.distanceKm,
+                time: formatClock(official.time, lang),
+              })
+            : t("Anggaran model · dikemas kini {time}", {
+                time: formatClock(current.time, lang),
+              })}
+        </span>
+        <button
+          type="button"
+          aria-expanded={open}
+          aria-controls={id}
+          aria-label={t("Butiran sumber bacaan")}
+          onClick={() => setOpen((o) => !o)}
+          className="hover:bg-surface text-muted -my-2 flex size-9 items-center justify-center rounded-full"
+        >
+          <Info
+            aria-hidden="true"
+            size={16}
+            weight={open ? "fill" : "regular"}
+          />
+        </button>
+      </div>
+      {open && (
+        <dl
+          id={id}
+          className="bg-surface mt-1.5 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 rounded-xl px-3 py-2.5"
+        >
+          {rows.map(([k, v]) => (
+            <Fragment key={k}>
+              <dt className="font-semibold">{k}</dt>
+              <dd className="text-ink">{v}</dd>
+            </Fragment>
+          ))}
+        </dl>
+      )}
+    </div>
   );
 }
 

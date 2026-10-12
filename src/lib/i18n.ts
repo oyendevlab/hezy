@@ -167,6 +167,7 @@ const EN: Record<string, string> = {
   "MASA TERBAIK UNTUK KELUAR": "BEST TIME TO GO OUT",
   "Anggaran IPU ~{ipu} · {label}": "Estimated API ~{ipu} · {label}",
   "Hari ini, jam demi jam": "Today, hour by hour",
+  "Lihat trend jam demi jam": "See the hour-by-hour trend",
   "Selepas {time}: ramalan": "After {time}: forecast",
   Pagi: "Morning",
   Petang: "Afternoon",
@@ -367,6 +368,23 @@ const EN: Record<string, string> = {
   "Angin dari {compass} · {speed} km/j":
     "Wind from the {compass} · {speed} km/h",
   "· kawasan kebakaran biasa di hulu angin": "· a common fire area upwind",
+  "titik panas di hulu angin · 2 hari": "fire hotspots upwind · 2 days",
+  "Tiada titik panas dikesan di hulu angin · 2 hari":
+    "No fire hotspots detected upwind · 2 days",
+  "Kawasan kebakaran biasa di hulu angin": "A common fire area upwind",
+  "Stesen {station} · {km} km · {time}": "{station} station · {km} km · {time}",
+  "Anggaran model · dikemas kini {time}": "Model estimate · updated {time}",
+  "Butiran sumber bacaan": "Reading source details",
+  Sumber: "Source",
+  Stesen: "Station",
+  "Pencemar utama": "Main pollutant",
+  "Masa bacaan": "Reading time",
+  Ketepatan: "Accuracy",
+  "IPU rasmi APIMS (Jabatan Alam Sekitar)":
+    "Official APIMS API (Department of Environment)",
+  "Anggaran daripada PM2.5 (Open-Meteo, model CAMS)":
+    "Estimated from PM2.5 (Open-Meteo, CAMS model)",
+  "Tiada stesen APIMS dalam 30 km": "No APIMS station within 30 km",
   "· {n} titik panas di hulu angin (2 hari, NASA FIRMS)":
     "· {n} fire hotspots upwind (2 days, NASA FIRMS)",
   "· tiada titik panas dikesan di hulu angin (2 hari)":
