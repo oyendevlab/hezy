@@ -97,7 +97,7 @@ test.describe("aliran utama", () => {
       "aria-valuetext",
       "10 pagi: IPU 156, Tidak Sihat · Anggaran model",
     );
-    await expect(page.getByText("Kini", { exact: true })).toBeVisible();
+    await expect(page.getByText("KINI", { exact: true })).toBeVisible();
 
     await chart.focus();
     await page.keyboard.press("ArrowRight");
@@ -108,16 +108,27 @@ test.describe("aliran utama", () => {
     await page.keyboard.press("End");
     await expect(chart).toHaveAttribute("aria-valuetext", /^11 malam: IPU 80/);
 
-    // Sentuh/klik di hujung kiri graf → tengah malam.
+    // Fokus beralih → kembali ke jam semasa.
+    await chart.blur();
+    await expect(chart).toHaveAttribute("aria-valuetext", /^10 pagi/);
+
+    // Tekan dan seret ke hujung kiri → tengah malam; lepas → kembali ke jam semasa.
     const box = (await chart.boundingBox())!;
-    await page.mouse.click(box.x + 3, box.y + box.height / 2);
+    const y = box.y + box.height / 2;
+    await page.mouse.move(box.x + box.width / 2, y);
+    await page.mouse.down();
+    await page.mouse.move(box.x + 3, y, { steps: 5 });
     await expect(chart).toHaveAttribute(
       "aria-valuetext",
       /^12 tengah malam: IPU 70/,
     );
-
-    await page.getByRole("button", { name: "Kembali ke jam semasa" }).click();
+    await expect(page.getByText("JAM LAIN", { exact: true })).toBeVisible();
+    await page.mouse.up();
     await expect(chart).toHaveAttribute("aria-valuetext", /^10 pagi/);
+    await expect(page.getByText("KINI", { exact: true })).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Kembali ke jam semasa" }),
+    ).toHaveCount(0);
   });
 
   test("menambah dan membuang lokasi kegemaran", async ({ page }) => {

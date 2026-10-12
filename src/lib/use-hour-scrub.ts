@@ -1,8 +1,8 @@
 import { useRef, useState } from "react";
 
 /**
- * Pilih satu jam pada graf dengan sentuh/leret, tetikus atau papan kekunci.
- * Selagi pengguna belum memilih, pilihan mengikut `defaultIndex` (jam semasa).
+ * Tekan dan seret (sentuh atau tetikus) untuk melihat jam lain; lepas → kembali ke jam semasa
+ * (`defaultIndex`). Papan kekunci: anak panah memilih jam; fokus beralih → kembali.
  */
 export function useHourScrub(
   count: number,
@@ -22,6 +22,11 @@ export function useHourScrub(
     setChosen(clamp(fracToIndex((e.clientX - rect.left) / rect.width)));
   };
 
+  const release = () => {
+    dragging.current = false;
+    setChosen(null);
+  };
+
   const handlers = {
     onPointerDown: (e: React.PointerEvent<HTMLElement>) => {
       dragging.current = true;
@@ -29,15 +34,14 @@ export function useHourScrub(
       fromPointer(e);
     },
     onPointerMove: (e: React.PointerEvent<HTMLElement>) => {
-      // Tetikus: ikut kursor; sentuh/pen: hanya semasa leret.
-      if (dragging.current || e.pointerType === "mouse") fromPointer(e);
+      if (dragging.current) fromPointer(e);
     },
-    onPointerUp: () => {
-      dragging.current = false;
+    onPointerUp: release,
+    onPointerCancel: release,
+    onLostPointerCapture: () => {
+      if (dragging.current) release();
     },
-    onPointerCancel: () => {
-      dragging.current = false;
-    },
+    onBlur: () => setChosen(null),
     onKeyDown: (e: React.KeyboardEvent<HTMLElement>) => {
       const step: Record<string, number> = {
         ArrowLeft: -1,
@@ -49,6 +53,10 @@ export function useHourScrub(
       if (e.key in step) next = index + step[e.key];
       else if (e.key === "Home") next = 0;
       else if (e.key === "End") next = count - 1;
+      else if (e.key === "Escape") {
+        setChosen(null);
+        return;
+      }
       if (next === null) return;
       e.preventDefault();
       setChosen(clamp(next));
@@ -57,9 +65,8 @@ export function useHourScrub(
 
   return {
     index,
-    /** Pengguna telah memilih jam selain jam semasa. */
-    moved: chosen !== null && index !== defaultIndex,
-    reset: () => setChosen(null),
+    /** Pengguna sedang melihat jam lain (seret atau papan kekunci). */
+    active: chosen !== null,
     handlers,
   };
 }

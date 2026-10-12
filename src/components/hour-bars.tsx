@@ -81,23 +81,26 @@ export function HourBars({
   return (
     <figure className="m-0">
       {selected && (
+        // Tinggi dan lebar tetap supaya baris tidak melompat semasa graf diseret.
         <div
           aria-hidden="true"
-          className="mb-3 flex min-h-12 flex-wrap items-center gap-x-3 gap-y-1"
+          className="mb-3 flex h-12 items-center gap-3 overflow-hidden whitespace-nowrap"
         >
-          <span className="text-sm font-bold">
-            {formatHour(selected.time, lang)}
-            {scrub.index === nowIndex && (
-              <span className="bg-ink text-page ml-1.5 rounded-full px-2 py-0.5 text-[11px]">
-                {t("Kini")}
-              </span>
-            )}
-          </span>
+          <div className="flex w-[6.75rem] shrink-0 flex-col leading-tight">
+            <span
+              className={`text-[11px] font-bold tracking-[0.12em] ${scrub.index === nowIndex ? "text-ink" : "text-muted"}`}
+            >
+              {scrub.index === nowIndex ? t("KINI") : t("JAM LAIN")}
+            </span>
+            <span className="text-sm font-bold">
+              {formatHour(selected.time, lang)}
+            </span>
+          </div>
           {selected.value === null ? (
             <span className="text-muted text-sm">{t("Tiada data")}</span>
           ) : (
-            <>
-              <span className="font-display text-[28px] leading-none font-bold tabular-nums">
+            <div className="flex shrink-0 items-center gap-2">
+              <span className="font-display w-[3.2ch] text-right text-[28px] leading-none font-bold tabular-nums">
                 {selected.value}
               </span>
               <IpuPill
@@ -105,9 +108,9 @@ export function HourBars({
                 label={t(ipuCategory(selected.value).label)}
                 className="!px-2 !py-0.5 !text-xs"
               />
-            </>
+            </div>
           )}
-          <span className="text-muted text-xs font-semibold">
+          <span className="text-muted ml-auto truncate text-xs font-semibold">
             {sourceOf(selected)}
           </span>
         </div>
@@ -197,19 +200,9 @@ export function HourBars({
             {forecastError !== null &&
               ` (${t("biasanya ±{n}", { n: forecastError })})`}
           </span>
-          {scrub.moved ? (
-            <button
-              type="button"
-              onClick={scrub.reset}
-              className="text-ink min-h-8 underline"
-            >
-              {t("Kembali ke jam semasa")}
-            </button>
-          ) : (
-            <span className="md:hidden">
-              {t("Leret graf untuk lihat jam lain")}
-            </span>
-          )}
+          <span className={scrub.active ? "invisible" : ""}>
+            {t("Tekan dan seret graf untuk lihat jam lain")}
+          </span>
         </div>
       </figcaption>
     </figure>

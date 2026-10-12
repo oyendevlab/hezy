@@ -1,6 +1,7 @@
 "use client";
 
 import { shownError } from "@/lib/accuracy";
+import { Moon, Sun, SunHorizon } from "@phosphor-icons/react";
 import { CATEGORY_STYLE } from "@/lib/category-style";
 import { formatDay, formatHour, formatWindow } from "@/lib/format";
 import { ipuCategory } from "@/lib/ipu";
@@ -8,6 +9,7 @@ import { displayIpu } from "@/lib/official";
 import type { HourPoint, Reading } from "@/lib/reading";
 import { useI18n } from "@/lib/use-i18n";
 import { HourBars } from "./hour-bars";
+import { DayWeatherIcon } from "./weather-icon";
 
 function average(hours: HourPoint[], from: number, to: number): number | null {
   const values = hours
@@ -38,14 +40,21 @@ export function TrendPanel({
   const lastPast = today.findLast((h) => !h.forecast);
   const bestCategory = bestWindow ? ipuCategory(bestWindow.averageIpu) : null;
   const blocks = [
-    { name: t("Pagi"), span: t("6 pg – 12 tgh"), value: average(today, 6, 12) },
+    {
+      name: t("Pagi"),
+      icon: SunHorizon,
+      span: t("6 pg – 12 tgh"),
+      value: average(today, 6, 12),
+    },
     {
       name: t("Petang"),
+      icon: Sun,
       span: t("12 tgh – 6 ptg"),
       value: average(today, 12, 18),
     },
     {
       name: t("Malam"),
+      icon: Moon,
       span: t("6 ptg – 12 mlm"),
       value: average(today, 18, 24),
     },
@@ -97,7 +106,15 @@ export function TrendPanel({
       <div className="grid grid-cols-3 gap-2.5">
         {blocks.map((b) => (
           <div key={b.name} className="bg-surface rounded-2xl p-3">
-            <div className="text-sm font-bold">{b.name}</div>
+            <div className="flex items-center justify-between gap-1">
+              <span className="text-sm font-bold">{b.name}</span>
+              <b.icon
+                aria-hidden="true"
+                size={18}
+                weight="duotone"
+                className="text-muted shrink-0"
+              />
+            </div>
             <div className="text-muted text-[11px] font-medium">{b.span}</div>
             <div className="font-display mt-1 text-2xl font-bold">
               {b.value ?? "–"}
@@ -128,8 +145,13 @@ export function TrendPanel({
           <ul className="mt-3 grid grid-cols-3 gap-2.5">
             {days.map((d) => (
               <li key={d.date} className="bg-surface rounded-2xl p-3">
-                <div className="text-sm font-bold">
-                  {formatDay(d.date, todayDate, lang)}
+                <div className="flex items-center justify-between gap-1">
+                  <span className="text-sm font-bold">
+                    {formatDay(d.date, todayDate, lang)}
+                  </span>
+                  <DayWeatherIcon
+                    day={reading.weatherDays?.find((w) => w.date === d.date)}
+                  />
                 </div>
                 <div className="font-display text-2xl font-bold">
                   {d.averageIpu}
