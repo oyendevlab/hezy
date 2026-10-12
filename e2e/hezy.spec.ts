@@ -470,6 +470,68 @@ test.describe("pintasan dan lencana", () => {
 });
 
 test.describe("rutin amaran", () => {
+  test("butang notifikasi ujian: dihantar, kemudian had kadar", async ({
+    page,
+  }) => {
+    test.skip(
+      !!process.env.E2E_BASE_URL,
+      "Kunci VAPID ujian hanya dalam binaan tempatan",
+    );
+    await seedLocation(page);
+    // Peranti sudah melanggan (langganan rekaan).
+    await page.addInitScript(() => {
+      const subscription = { endpoint: "https://push.example/hezy-ujian" };
+      const registration = {
+        pushManager: { getSubscription: async () => subscription },
+      };
+      Object.defineProperty(navigator.serviceWorker, "getRegistration", {
+        value: async () => registration,
+      });
+    });
+    const bodies: unknown[] = [];
+    await page.route("**/api/push/test", async (route) => {
+      bodies.push(route.request().postDataJSON());
+      await route.fulfill(
+        bodies.length === 1
+          ? { json: { ok: true } }
+          : {
+              status: 429,
+              json: { error: "Tunggu", retryAfter: 42 },
+            },
+      );
+    });
+    await page.goto("/tetapan");
+    const button = page.getByRole("button", {
+      name: "Hantar notifikasi ujian",
+    });
+    await expect(button).toBeVisible();
+    await button.click();
+    await expect(
+      page.getByText(
+        "Dihantar. Notifikasi sepatutnya muncul dalam beberapa saat.",
+      ),
+    ).toBeVisible();
+    expect(bodies[0]).toEqual({ endpoint: "https://push.example/hezy-ujian" });
+    await button.click();
+    await expect(
+      page.getByText("Tunggu 42 saat sebelum menghantar lagi."),
+    ).toBeVisible();
+    // Status amaran tidak berubah.
+    await expect(
+      page.getByRole("switch", { name: /Amaran bila IPU/ }),
+    ).toHaveAttribute("aria-checked", "true");
+  });
+
+  test("API notifikasi ujian menolak endpoint tidak sah", async ({
+    request,
+  }) => {
+    const res = await request.post("/api/push/test", {
+      data: { endpoint: "http://bukan-https.example" },
+    });
+    // 503 bila kunci VAPID peribadi tiada (binaan tempatan), 400 di production.
+    expect([400, 503]).toContain(res.status());
+  });
+
   test("ringkasan pagi, amaran ramalan dan waktu senyap disimpan", async ({
     page,
   }) => {

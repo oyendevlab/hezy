@@ -145,6 +145,21 @@ const EN: Record<string, string> = {
   "(semasa)": "(current)",
   "Tiada lokasi kegemaran lagi.": "No favourite locations yet.",
   "Tambah bandar": "Add a city",
+  // Notifikasi ujian
+  "Hantar notifikasi ujian": "Send a test notification",
+  "Menghantar…": "Sending…",
+  "Dihantar. Notifikasi sepatutnya muncul dalam beberapa saat.":
+    "Sent. The notification should appear within a few seconds.",
+  "Semak bahawa amaran sampai ke peranti ini. Status amaran tidak berubah.":
+    "Check that alerts reach this device. Your alert status won't change.",
+  "Tunggu {seconds} saat sebelum menghantar lagi.":
+    "Wait {seconds} seconds before sending again.",
+  "Langganan tidak dijumpai. Matikan dan hidupkan semula amaran.":
+    "Subscription not found. Turn alerts off and on again.",
+  "Langganan sudah tamat. Matikan dan hidupkan semula amaran.":
+    "Subscription has expired. Turn alerts off and on again.",
+  "Notifikasi ujian tidak dapat dihantar. Cuba lagi.":
+    "The test notification could not be sent. Try again.",
   // Kegemaran: leret dan susun semula
   "{name} dipindah ke kedudukan {n} daripada {total}":
     "{name} moved to position {n} of {total}",

@@ -1,5 +1,6 @@
 "use client";
 
+import { BellRinging } from "@phosphor-icons/react";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { MIN_DISPLAY_DAYS, type AccuracySummary } from "@/lib/accuracy";
 import { HEALTH_PROFILES } from "@/lib/advice";
@@ -445,6 +446,7 @@ function AlertRow({ prefs }: { prefs: Prefs }) {
           </p>
         </fieldset>
         <RoutineOptions prefs={prefs} />
+        {enabled && <TestNotification />}
       </>
     );
   }
@@ -457,6 +459,81 @@ function AlertRow({ prefs }: { prefs: Prefs }) {
           {message}
         </p>
       )}
+    </div>
+  );
+}
+
+/** Hantar satu notifikasi ujian ke peranti ini (tidak mengubah status amaran). */
+function TestNotification() {
+  const { t } = useI18n();
+  const [state, setState] = useState<
+    { status: "idle" | "busy" | "sent" } | { status: "error"; message: string }
+  >({ status: "idle" });
+
+  async function send() {
+    setState({ status: "busy" });
+    try {
+      const subscription = await currentSubscription();
+      if (!subscription)
+        throw new Error(
+          "Langganan tidak dijumpai. Matikan dan hidupkan semula amaran.",
+        );
+      const res = await fetch("/api/push/test", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ endpoint: subscription.endpoint }),
+      });
+      const body = (await res.json().catch(() => ({}))) as {
+        error?: string;
+        retryAfter?: number;
+      };
+      if (res.status === 429) {
+        setState({
+          status: "error",
+          message: t("Tunggu {seconds} saat sebelum menghantar lagi.", {
+            seconds: body.retryAfter ?? 60,
+          }),
+        });
+        return;
+      }
+      if (!res.ok) throw new Error(body.error ?? `Status ${res.status}`);
+      setState({ status: "sent" });
+    } catch (error) {
+      setState({
+        status: "error",
+        message: t(
+          error instanceof TypeError
+            ? "Tiada sambungan internet."
+            : error instanceof Error
+              ? error.message
+              : "Ralat tidak diketahui.",
+        ),
+      });
+    }
+  }
+
+  return (
+    <div className="border-line flex flex-col gap-2 border-t py-3">
+      <button
+        type="button"
+        onClick={() => void send()}
+        disabled={state.status === "busy"}
+        className="bg-page hover:bg-line flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold disabled:opacity-60"
+      >
+        <BellRinging aria-hidden="true" size={18} weight="duotone" />
+        {state.status === "busy"
+          ? t("Menghantar…")
+          : t("Hantar notifikasi ujian")}
+      </button>
+      <p role="status" className="text-muted text-xs">
+        {state.status === "sent"
+          ? t("Dihantar. Notifikasi sepatutnya muncul dalam beberapa saat.")
+          : state.status === "error"
+            ? state.message
+            : t(
+                "Semak bahawa amaran sampai ke peranti ini. Status amaran tidak berubah.",
+              )}
+      </p>
     </div>
   );
 }
