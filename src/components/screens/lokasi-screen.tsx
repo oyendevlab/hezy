@@ -20,6 +20,7 @@ import { pushSupport } from "@/lib/push-client";
 import { useI18n } from "@/lib/use-i18n";
 import { useReading } from "@/lib/use-reading";
 import { ChooseLocation } from "../choose-location";
+import { Chevron } from "../chevron";
 import { IpuPill } from "../ipu-pill";
 import { LocationSearch } from "../location-search";
 import { PullToRefresh } from "../pull-to-refresh";
@@ -86,9 +87,34 @@ export function LokasiScreen() {
 
       <Link
         href="/negeri"
-        className="text-muted self-start text-sm font-semibold underline"
+        className="bg-surface hover:bg-line flex min-h-16 items-center gap-3 rounded-[18px] py-3 pr-3 pl-3.5 transition-colors"
       >
-        {t("Lihat IPU semua stesen mengikut negeri")}
+        <span className="bg-page flex size-10 shrink-0 items-center justify-center rounded-full">
+          <svg
+            aria-hidden="true"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21" />
+            <line x1="9" y1="3" x2="9" y2="18" />
+            <line x1="15" y1="6" x2="15" y2="21" />
+          </svg>
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-[15px] font-bold">
+            {t("IPU mengikut negeri")}
+          </span>
+          <span className="text-muted block text-xs">
+            {t("Semua stesen APIMS di 13 negeri dan 3 wilayah")}
+          </span>
+        </span>
+        <Chevron />
       </Link>
 
       {view === "list" && prefs === null && <Skeleton className="h-64" />}

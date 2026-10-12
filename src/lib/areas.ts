@@ -17,6 +17,24 @@ const area = (id: string, name: string, lat: number, lon: number): Area => ({
   lon,
 });
 
+/** Susunan negeri ikut peta: Semenanjung dari utara ke selatan, kemudian Borneo. */
+const STATE_MAP_ORDER = [
+  "perlis",
+  "kedah",
+  "kelantan",
+  "pulau-pinang",
+  "terengganu",
+  "perak",
+  "pahang",
+  "selangor",
+  "negeri-sembilan",
+  "melaka",
+  "johor",
+  "sarawak",
+  "sabah",
+];
+const FEDERAL_TERRITORIES = ["kuala-lumpur", "putrajaya", "labuan"];
+
 export const STATES: readonly State[] = [
   {
     id: "johor",
@@ -232,4 +250,14 @@ export function findStateByApimsId(
   apimsStateId: number | null,
 ): State | undefined {
   return STATES.find((s) => s.apimsStateId === apimsStateId);
+}
+
+/** Negeri ikut susunan peta dan Wilayah Persekutuan secara berasingan. */
+export function statesInMapOrder(): { states: State[]; territories: State[] } {
+  const pick = (ids: string[]) =>
+    ids.map((id) => STATES.find((s) => s.id === id)!).filter(Boolean);
+  return {
+    states: pick(STATE_MAP_ORDER),
+    territories: pick(FEDERAL_TERRITORIES),
+  };
 }

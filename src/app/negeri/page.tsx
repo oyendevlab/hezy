@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Chevron } from "@/components/chevron";
 import { IpuPill } from "@/components/ipu-pill";
 import { Notice } from "@/components/status";
 import type { Station } from "@/lib/apims";
-import { STATES } from "@/lib/areas";
+import { statesInMapOrder, type State } from "@/lib/areas";
 import { getStations } from "@/lib/data";
 import { ipuCategory } from "@/lib/ipu";
 
@@ -21,62 +22,96 @@ export default async function NegeriIndexPage() {
   } catch {
     stations = null;
   }
+  const { states, territories } = statesInMapOrder();
 
   return (
     <div className="mx-auto flex max-w-[960px] flex-col gap-5 px-5 pt-13 md:px-10 md:pt-10">
+      <nav aria-label="Laluan" className="text-muted text-sm font-semibold">
+        <Link href="/lokasi" className="underline">
+          Lokasi
+        </Link>{" "}
+        / IPU mengikut negeri
+      </nav>
       <h1 className="font-display text-[32px] leading-tight font-bold">
         IPU mengikut negeri
       </h1>
+      <p className="text-muted -mt-2 text-sm">
+        Tekan negeri untuk melihat IPU setiap kawasan dan stesen.
+      </p>
       {stations === null && (
         <Notice>Data APIMS tidak dapat diambil buat masa ini.</Notice>
       )}
-      <ul className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
-        {[...STATES]
-          .sort((a, b) => a.name.localeCompare(b.name, "ms"))
-          .map((state) => {
-            const list =
-              stations?.filter(
-                (s) => s.stateId === state.apimsStateId && s.ipu !== null,
-              ) ?? [];
-            const max = list.reduce<number | null>(
-              (m, s) => Math.max(m ?? 0, s.ipu ?? 0),
-              null,
-            );
-            return (
-              <li key={state.id}>
-                <Link
-                  href={`/negeri/${state.id}`}
-                  className="bg-surface flex min-h-16 items-center justify-between gap-3 rounded-[18px] px-4 py-3"
-                >
-                  <span>
-                    <span className="block text-[15px] font-bold">
-                      {state.name}
-                    </span>
-                    <span className="text-muted block text-xs">
-                      {list.length} stesen
-                    </span>
-                  </span>
-                  {max !== null && (
-                    <span className="flex items-center gap-2">
-                      <span className="text-muted text-xs">maks</span>
-                      <span className="font-display text-xl font-bold">
-                        {max}
-                      </span>
-                      <IpuPill
-                        category={ipuCategory(max).key}
-                        label={ipuCategory(max).label}
-                        className="!px-2 !text-[11px]"
-                      />
-                    </span>
-                  )}
-                </Link>
-              </li>
-            );
-          })}
-      </ul>
+      <StateList title="Negeri" states={states} stations={stations} />
+      <StateList
+        title="Wilayah Persekutuan"
+        states={territories}
+        stations={stations}
+      />
       <p className="text-muted text-xs">
         Sumber: APIMS, Jabatan Alam Sekitar. Dikemas kini setiap 15 minit.
       </p>
     </div>
+  );
+}
+
+function StateList({
+  title,
+  states,
+  stations,
+}: {
+  title: string;
+  states: State[];
+  stations: Station[] | null;
+}) {
+  const id = `senarai-${title.toLowerCase().replace(/\s+/g, "-")}`;
+  return (
+    <section aria-labelledby={id} className="flex flex-col gap-2.5">
+      <h2 id={id} className="text-muted text-sm font-bold tracking-wide">
+        {title.toUpperCase()}
+      </h2>
+      <ul className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+        {states.map((state) => {
+          const list =
+            stations?.filter(
+              (s) => s.stateId === state.apimsStateId && s.ipu !== null,
+            ) ?? [];
+          const max = list.reduce<number | null>(
+            (m, s) => Math.max(m ?? 0, s.ipu ?? 0),
+            null,
+          );
+          return (
+            <li key={state.id}>
+              <Link
+                href={`/negeri/${state.id}`}
+                className="bg-surface hover:bg-line flex min-h-16 items-center gap-3 rounded-[18px] py-3 pr-3 pl-4 transition-colors"
+              >
+                <span className="min-w-0 flex-1">
+                  <span data-name className="block text-[15px] font-bold">
+                    {state.name}
+                  </span>
+                  <span className="text-muted block text-xs">
+                    {list.length} stesen
+                  </span>
+                </span>
+                {max !== null && (
+                  <span className="flex items-center gap-2">
+                    <span className="text-muted text-xs">maks</span>
+                    <span className="font-display text-xl font-bold">
+                      {max}
+                    </span>
+                    <IpuPill
+                      category={ipuCategory(max).key}
+                      label={ipuCategory(max).label}
+                      className="!px-2 !text-[11px]"
+                    />
+                  </span>
+                )}
+                <Chevron />
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
   );
 }

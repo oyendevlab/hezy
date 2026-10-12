@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   STATES,
+  statesInMapOrder,
   findArea,
   findState,
   findStateByApimsId,
@@ -57,5 +58,32 @@ describe("ID negeri APIMS", () => {
     expect(findState("selangor")?.apimsStateId).toBe(10);
     expect(findStateByApimsId(14)?.id).toBe("kuala-lumpur");
     expect(findStateByApimsId(null)).toBeUndefined();
+  });
+});
+
+describe("statesInMapOrder", () => {
+  it("menyusun negeri dari Perlis ke Johor, kemudian Sarawak, Sabah dan wilayah", () => {
+    const { states, territories } = statesInMapOrder();
+    expect(states.map((s) => s.id)).toEqual([
+      "perlis",
+      "kedah",
+      "kelantan",
+      "pulau-pinang",
+      "terengganu",
+      "perak",
+      "pahang",
+      "selangor",
+      "negeri-sembilan",
+      "melaka",
+      "johor",
+      "sarawak",
+      "sabah",
+    ]);
+    expect(territories.map((s) => s.id)).toEqual([
+      "kuala-lumpur",
+      "putrajaya",
+      "labuan",
+    ]);
+    expect(states.length + territories.length).toBe(STATES.length);
   });
 });

@@ -209,7 +209,9 @@ const EN: Record<string, string> = {
   "Amaran IPU untuk {name}": "API alerts for {name}",
   "Buang {name} daripada kegemaran": "Remove {name} from favourites",
   "+ Tambah lokasi kegemaran": "+ Add favourite location",
-  "Lihat IPU semua stesen mengikut negeri": "See API for all stations by state",
+  "IPU mengikut negeri": "API by state",
+  "Semua stesen APIMS di 13 negeri dan 3 wilayah":
+    "All APIMS stations in 13 states and 3 federal territories",
   "Tiada data": "No data",
   "Lokasi semasa": "Current location",
   "Berhampiran {name}": "Near {name}",
