@@ -181,6 +181,18 @@ test.describe("rutin amaran", () => {
     await expect(forecast).toBeChecked();
     await expect(quiet).toBeChecked();
 
+    // Susun atur: setiap pilihan bermula di tepi kiri kumpulan, bertindan menegak.
+    const group = (await routine.boundingBox())!;
+    const boxes = await Promise.all(
+      [morning, forecast, quiet].map(async (c) => (await c.boundingBox())!),
+    );
+    for (const b of boxes) expect(b.x - group.x).toBeLessThan(24);
+    expect(boxes[0].y).toBeLessThan(boxes[1].y);
+    expect(boxes[1].y).toBeLessThan(boxes[2].y);
+    await routine.screenshot({
+      path: test.info().outputPath("rutin-amaran.png"),
+    });
+
     await morning.check();
     await routine
       .getByRole("combobox", { name: "Waktu senyap bermula" })
