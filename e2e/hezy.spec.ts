@@ -256,6 +256,35 @@ test.describe("status sekolah", () => {
 });
 
 test.describe("API", () => {
+  test("kongsi: halaman mempunyai kad Open Graph dan imej PNG", async ({
+    page,
+    request,
+  }) => {
+    await page.goto("/kongsi?n=Shah%20Alam&i=172&s=apims");
+    await expect(
+      page.getByRole("heading", { name: "Status jerebu yang dikongsi" }),
+    ).toBeVisible();
+    await expect(
+      page.getByText("IPU rasmi APIMS (JAS)", { exact: false }),
+    ).toBeVisible();
+    const ogImage = await page
+      .locator('meta[property="og:image"]')
+      .getAttribute("content");
+    expect(ogImage).toContain("/kongsi/og?n=Shah+Alam&i=172&s=apims");
+    await expect(page).toHaveTitle("IPU Shah Alam: 172 (Tidak Sihat) · Hezy");
+
+    const image = await request.get("/kongsi/og?n=Shah%20Alam&i=172&s=apims");
+    expect(image.status()).toBe(200);
+    expect(image.headers()["content-type"]).toBe("image/png");
+  });
+
+  test("kongsi: pautan tidak sah tidak memaparkan kandungan sewenang-wenangnya", async ({
+    page,
+  }) => {
+    await page.goto("/kongsi?n=%3Cscript%3E&i=9999");
+    await expect(page.getByText("Pautan kongsi ini tidak sah.")).toBeVisible();
+  });
+
   test("push: menolak langganan tidak sah", async ({ request }) => {
     const res = await request.post("/api/push/subscribe", {
       data: {

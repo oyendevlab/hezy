@@ -2,18 +2,20 @@
 
 import { useState } from "react";
 
-/** Kongsi status melalui Web Share, atau salin ke papan keratan. */
+/** Kongsi status melalui Web Share, atau salin ke papan keratan. `path` = halaman kongsi (kad bergambar). */
 export function ShareButton({
   text,
+  path = "/",
   className = "",
 }: {
   text: string;
+  path?: string;
   className?: string;
 }) {
   const [copied, setCopied] = useState(false);
 
   async function share() {
-    const url = window.location.origin;
+    const url = new URL(path, window.location.origin).href;
     if (navigator.share) {
       try {
         await navigator.share({ title: "Hezy", text, url });

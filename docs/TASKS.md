@@ -122,8 +122,8 @@ Setiap item dibuat dalam cabang `feat/*` dan PR sendiri; digabung selepas CI lul
 
 ### 7. Imej kongsi automatik
 
-- [ ] Imej Open Graph dinamik (`next/og`) untuk status lokasi: IPU, kategori, warna dan logo awan
-- [ ] Butang Kongsi menghantar pautan yang memaparkan kad bergambar di WhatsApp/Telegram
+- [x] Imej Open Graph dinamik (`next/og`) untuk status lokasi: IPU, kategori, warna dan logo awan
+- [x] Butang Kongsi menghantar pautan yang memaparkan kad bergambar di WhatsApp/Telegram
 
 ### 8. Halaman negeri
 
