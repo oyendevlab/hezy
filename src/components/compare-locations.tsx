@@ -1,8 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import { displayIpu, primaryReading } from "@/lib/official";
+import { useId, useState } from "react";
+import { formatHour } from "@/lib/format";
+import { ipuCategory } from "@/lib/ipu";
+import { displayIpu } from "@/lib/official";
 import type { Prefs, SavedLocation } from "@/lib/prefs";
+import { useHourScrub } from "@/lib/use-hour-scrub";
 import { useI18n } from "@/lib/use-i18n";
 import { useReading } from "@/lib/use-reading";
 
@@ -39,7 +42,7 @@ function candidates(prefs: Prefs): SavedLocation[] {
 
 /** Bandingkan graf IPU hari ini bagi 2–3 lokasi (desktop sahaja). */
 export function CompareLocations({ prefs }: { prefs: Prefs }) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const options = candidates(prefs);
   const [selected, setSelected] = useState<string[]>(() =>
     options.slice(0, 2).map((l) => l.id),
@@ -47,6 +50,16 @@ export function CompareLocations({ prefs }: { prefs: Prefs }) {
   const chosen = options
     .filter((l) => selected.includes(l.id))
     .slice(0, MAX_SELECTED);
+  // Jam semasa dan label jam diambil daripada bacaan lokasi pertama.
+  const first = useReading(chosen[0] ?? null).entry?.reading?.today ?? [];
+  const nowIndex = first.findLastIndex((h) => !h.forecast);
+  const scrub = useHourScrub(24, nowIndex, (frac) =>
+    Math.round(((frac * W - LEFT) / (W - LEFT - RIGHT)) * 23),
+  );
+  const hourLabel = first[scrub.index]
+    ? formatHour(first[scrub.index].time, lang)
+    : "";
+  const captionId = useId();
 
   if (options.length < 2) {
     return (
@@ -123,63 +136,114 @@ export function CompareLocations({ prefs }: { prefs: Prefs }) {
       </div>
 
       <figure className="m-0">
-        <svg
-          role="img"
+        <div
+          role="slider"
+          tabIndex={0}
           aria-label={t("Graf perbandingan IPU hari ini")}
-          viewBox={`0 0 ${W} ${H}`}
-          className="h-auto w-full"
+          aria-describedby={captionId}
+          aria-valuemin={0}
+          aria-valuemax={23}
+          aria-valuenow={scrub.index}
+          aria-valuetext={hourLabel}
+          {...scrub.handlers}
+          className="focus-visible:outline-ink cursor-crosshair touch-pan-y rounded-md select-none focus-visible:outline-2 focus-visible:outline-offset-4"
         >
-          {[0, 50, 100, 150, 200].map((v) => (
-            <g key={v}>
-              <line
-                x1={LEFT}
-                x2={W - RIGHT}
-                y1={y(v)}
-                y2={y(v)}
-                stroke="var(--line)"
-                strokeWidth="1"
-              />
+          <svg
+            aria-hidden="true"
+            viewBox={`0 0 ${W} ${H}`}
+            className="h-auto w-full"
+          >
+            {[0, 50, 100, 150, 200].map((v) => (
+              <g key={v}>
+                <line
+                  x1={LEFT}
+                  x2={W - RIGHT}
+                  y1={y(v)}
+                  y2={y(v)}
+                  stroke="var(--line)"
+                  strokeWidth="1"
+                />
+                <text
+                  x={LEFT - 8}
+                  y={y(v) + 4}
+                  textAnchor="end"
+                  fontSize="11"
+                  fill="var(--muted)"
+                >
+                  {v}
+                </text>
+              </g>
+            ))}
+            {[0, 6, 12, 18, 23].map((h) => (
               <text
-                x={LEFT - 8}
-                y={y(v) + 4}
-                textAnchor="end"
+                key={h}
+                x={x(h)}
+                y={H - 8}
+                textAnchor="middle"
                 fontSize="11"
                 fill="var(--muted)"
               >
-                {v}
+                {t(
+                  h === 0
+                    ? "12 pg"
+                    : h === 6
+                      ? "6 pg"
+                      : h === 12
+                        ? "12 tgh"
+                        : h === 18
+                          ? "6 ptg"
+                          : "11 mlm",
+                )}
               </text>
-            </g>
-          ))}
-          {[0, 6, 12, 18, 23].map((h) => (
-            <text
-              key={h}
-              x={x(h)}
-              y={H - 8}
-              textAnchor="middle"
-              fontSize="11"
-              fill="var(--muted)"
-            >
-              {t(
-                h === 0
-                  ? "12 pg"
-                  : h === 6
-                    ? "6 pg"
-                    : h === 12
-                      ? "12 tgh"
-                      : h === 18
-                        ? "6 ptg"
-                        : "11 mlm",
-              )}
-            </text>
-          ))}
-          {chosen.map((l, i) => (
-            <SeriesLine key={l.id} location={l} color={SERIES[i].color} />
-          ))}
-        </svg>
-        <figcaption>
+            ))}
+            {chosen.map((l, i) => (
+              <SeriesLine key={l.id} location={l} color={SERIES[i].color} />
+            ))}
+            <line
+              x1={x(scrub.index)}
+              x2={x(scrub.index)}
+              y1={TOP}
+              y2={H - BOTTOM}
+              stroke="var(--ink)"
+              strokeWidth="2"
+              opacity="0.6"
+            />
+            {chosen.map((l, i) => (
+              <SeriesDot
+                key={l.id}
+                location={l}
+                color={SERIES[i].color}
+                index={scrub.index}
+              />
+            ))}
+          </svg>
+        </div>
+        <figcaption id={captionId}>
+          <div className="mb-1 flex flex-wrap items-baseline gap-x-3 text-sm font-bold">
+            {hourLabel}
+            {scrub.index === nowIndex && (
+              <span className="bg-ink text-page rounded-full px-2 py-0.5 text-[11px]">
+                {t("Kini")}
+              </span>
+            )}
+            {scrub.moved && (
+              <button
+                type="button"
+                onClick={scrub.reset}
+                className="text-muted min-h-8 text-xs font-semibold underline"
+              >
+                {t("Kembali ke jam semasa")}
+              </button>
+            )}
+          </div>
           <ul className="flex flex-wrap gap-x-5 gap-y-2 text-sm">
             {chosen.map((l, i) => (
-              <SeriesLegend key={l.id} location={l} color={SERIES[i].color} />
+              <SeriesLegend
+                key={l.id}
+                location={l}
+                color={SERIES[i].color}
+                index={scrub.index}
+              />
             ))}
           </ul>
           <p className="text-muted mt-2 text-xs">
@@ -241,16 +305,45 @@ function SeriesLine({
   );
 }
 
-function SeriesLegend({
+/** Titik nilai pada jam yang dipilih. */
+function SeriesDot({
   location,
   color,
+  index,
 }: {
   location: SavedLocation;
   color: string;
+  index: number;
+}) {
+  const hour = useReading(location).entry?.reading?.today?.[index];
+  const value = hour ? displayIpu(hour) : null;
+  if (value === null) return null;
+  return (
+    <circle
+      cx={x(index)}
+      cy={y(value)}
+      r="6"
+      fill={color}
+      stroke="var(--page)"
+      strokeWidth="2"
+    />
+  );
+}
+
+function SeriesLegend({
+  location,
+  color,
+  index,
+}: {
+  location: SavedLocation;
+  color: string;
+  index: number;
 }) {
   const { t } = useI18n();
   const { entry } = useReading(location);
-  const current = primaryReading(entry?.reading);
+  const hour = entry?.reading?.today?.[index];
+  const value = hour ? displayIpu(hour) : null;
+  const loading = !entry?.reading;
   return (
     <li className="flex items-center gap-2">
       <span
@@ -260,9 +353,11 @@ function SeriesLegend({
       />
       <span className="font-semibold">{t(location.name)}</span>
       <span className="text-muted">
-        {current
-          ? `${t("IPU {threshold}", { threshold: current.ipu })} · ${t(current.label)}`
-          : t("memuatkan…")}
+        {loading
+          ? t("memuatkan…")
+          : value === null
+            ? t("Tiada data")
+            : `${t("IPU {threshold}", { threshold: value })} · ${t(ipuCategory(value).label)}`}
       </span>
     </li>
   );
