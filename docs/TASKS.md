@@ -387,7 +387,7 @@ Fokus: UI/UX yang lebih licin dan seperti aplikasi asli. Termasuk pembetulan ked
 
 6. **Navigasi berikon Phosphor** (Utama, Trend, Lokasi, Tetapan); ikon terisi bila aktif — ✅ siap
 7. **Peralihan antara skrin** (View Transitions) yang licin; dimatikan untuk `prefers-reduced-motion` — ✅ siap
-8. **Skrin pembuka iOS** (splash) dengan logo awan untuk saiz iPhone/iPad biasa
+8. **Skrin pembuka iOS** (splash) dengan logo awan untuk saiz iPhone/iPad biasa — ✅ siap
 9. **Pengenalan ringkas pengguna baharu** (3 skrin): apa itu IPU, pilih lokasi, hidupkan amaran / pasang di iPhone; boleh dilangkau, dipaparkan sekali
 
 ### Lokasi dan peta

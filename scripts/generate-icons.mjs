@@ -1,7 +1,7 @@
 // Jana ikon PWA Hezy (awan comel) daripada SVG. Jalankan: npm run icons
 // Reka bentuk yang sama digunakan oleh src/components/logo.tsx.
 import sharp from "sharp";
-import { mkdir } from "node:fs/promises";
+import { mkdir, readFile } from "node:fs/promises";
 
 const SKY = "#bfe0f5";
 
@@ -65,4 +65,35 @@ for (const [name, glyph] of Object.entries(SHORTCUT_GLYPHS)) {
 for (const { file, size, scale } of outputs) {
   await sharp(svg(scale)).resize(size, size).png().toFile(file);
   console.log(`✓ ${file} (${size}×${size})`);
+}
+
+// Skrin pembuka iOS (apple-touch-startup-image): awan di tengah atas latar langit/gelap.
+const SPLASH_THEME = {
+  light: { top: "#cfe8f8", bottom: "#f4f9fc" },
+  dark: { top: "#1b2230", bottom: "#121316" },
+};
+const screens = JSON.parse(
+  await readFile("src/lib/splash-screens.json", "utf8"),
+);
+await mkdir("public/splash", { recursive: true });
+for (const { w, h, dpr } of screens) {
+  const [pw, ph] = [w * dpr, h * dpr];
+  // Awan ~38% lebar skrin terkecil, sedikit di atas tengah.
+  const size = Math.round(Math.min(pw, ph) * 0.38);
+  const x = (pw - size) / 2;
+  const y = ph * 0.45 - size / 2;
+  for (const [theme, { top, bottom }] of Object.entries(SPLASH_THEME)) {
+    const file = `public/splash/splash-${pw}x${ph}-${theme}.png`;
+    const image = Buffer.from(
+      `<svg xmlns="http://www.w3.org/2000/svg" width="${pw}" height="${ph}" viewBox="0 0 ${pw} ${ph}">
+        <defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="${top}"/><stop offset="1" stop-color="${bottom}"/>
+        </linearGradient></defs>
+        <rect width="${pw}" height="${ph}" fill="url(#g)"/>
+        <g transform="translate(${x} ${y}) scale(${size / 512})">${cloud}</g>
+      </svg>`,
+    );
+    await sharp(image).png({ palette: true, quality: 90 }).toFile(file);
+  }
+  console.log(`✓ public/splash/splash-${pw}x${ph}-{light,dark}.png`);
 }

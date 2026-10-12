@@ -1,0 +1,28 @@
+[
+  { "w": 440, "h": 956, "dpr": 3, "device": "iPhone 16 Pro Max" },
+  { "w": 402, "h": 874, "dpr": 3, "device": "iPhone 16 Pro" },
+  {
+    "w": 430,
+    "h": 932,
+    "dpr": 3,
+    "device": "iPhone 14 Pro Max, 15 Plus/Pro Max, 16 Plus"
+  },
+  { "w": 393, "h": 852, "dpr": 3, "device": "iPhone 14 Pro, 15, 15 Pro, 16" },
+  { "w": 428, "h": 926, "dpr": 3, "device": "iPhone 12/13 Pro Max, 14 Plus" },
+  { "w": 390, "h": 844, "dpr": 3, "device": "iPhone 12, 13, 14" },
+  {
+    "w": 375,
+    "h": 812,
+    "dpr": 3,
+    "device": "iPhone X, XS, 11 Pro, 12/13 mini"
+  },
+  { "w": 414, "h": 896, "dpr": 3, "device": "iPhone XS Max, 11 Pro Max" },
+  { "w": 414, "h": 896, "dpr": 2, "device": "iPhone XR, 11" },
+  { "w": 414, "h": 736, "dpr": 3, "device": "iPhone 8 Plus" },
+  { "w": 375, "h": 667, "dpr": 2, "device": "iPhone SE (2/3), 8" },
+  { "w": 744, "h": 1133, "dpr": 2, "device": "iPad mini (6)" },
+  { "w": 768, "h": 1024, "dpr": 2, "device": "iPad 9.7\"" },
+  { "w": 820, "h": 1180, "dpr": 2, "device": "iPad Air (4/5), iPad 10" },
+  { "w": 834, "h": 1194, "dpr": 2, "device": "iPad Pro 11\"" },
+  { "w": 1024, "h": 1366, "dpr": 2, "device": "iPad Pro 12.9\"" }
+]
