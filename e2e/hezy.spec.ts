@@ -9,6 +9,35 @@ import {
 } from "./fixtures";
 
 test.describe("aliran utama", () => {
+  test("log ralat: terima laporan sah, tolak input rosak", async ({
+    request,
+  }) => {
+    // Jangan cemari log production dengan laporan ujian.
+    if (!process.env.E2E_BASE_URL) {
+      const ok = await request.post("/api/log", {
+        data: {
+          kind: "error",
+          message: "TypeError: ujian E2E",
+          path: "/trend",
+        },
+      });
+      expect(ok.status()).toBe(204);
+    }
+    expect(
+      (await request.post("/api/log", { data: { message: "" } })).status(),
+    ).toBe(400);
+    expect(
+      (
+        await request.post("/api/log", {
+          data: { message: "x".repeat(5000) },
+        })
+      ).status(),
+    ).toBe(413);
+    expect(
+      (await request.get("/api/log/summary")).status(),
+    ).toBeGreaterThanOrEqual(401);
+  });
+
   test("penilaian ketepatan memerlukan rahsia", async ({ request }) => {
     const res = await request.get("/api/accuracy/run");
     expect([401, 503]).toContain(res.status());
