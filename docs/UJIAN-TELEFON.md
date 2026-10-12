@@ -67,6 +67,15 @@ Buka **https://hezy.my** pada telefon.
 - [ ] Tetapan → Privasi dan data anda
 - [ ] Tetapan → Bahasa → English: halaman negeri dan kongsi juga dalam English
 
+## Ciri baharu v0.5.1
+
+- [ ] Utama: langit tetap; tatal → hanya kad putih bergerak; tiada jalur putih di pengepala
+- [ ] Utama: tarik kad putih ke bawah → turun seperti getah (berhad), lepas → melantun; tarikan jauh → awan berputar di langit dan bacaan dimuat semula
+- [ ] Utama: tatal hingga nombor IPU tersorok → pil "152 · Tidak Sihat" di pengepala
+- [ ] Utama: ikon angin dan api (bilangan titik panas tebal)
+- [ ] Utama: ⓘ di sebelah "Stesen … · km · masa" membuka butiran sumber
+- [ ] Utama: kad "Lihat trend jam demi jam" dengan graf mini → Trend
+
 ## Jika ada masalah
 
 Ambil tangkapan skrin dan catat model telefon serta versi OS, kemudian buka isu di
