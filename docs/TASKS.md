@@ -154,9 +154,9 @@ Perubahan yang digabung selepas tag `v0.3.0`, dikeluarkan sebagai versi tampalan
 
 - [x] Panduan pasang langkah demi langkah di iPhone/iPad (butang "Cara pasang", termasuk menu ⋯ di iOS 26); iPadOS dikesan dengan betul (PR #24)
 - [x] Lapisan sensor tambahan WAQI pada peta (PR #25)
-- [ ] Versi 0.3.1 (package.json + Tetapan)
-- [ ] `UJIAN-TELEFON.md`: semakan panduan pasang iPhone dan lapisan sensor WAQI
-- [ ] Ujian E2E pada production, tag `v0.3.1` dan GitHub Release
+- [x] Versi 0.3.1 (package.json + Tetapan)
+- [x] `UJIAN-TELEFON.md`: semakan panduan pasang iPhone dan lapisan sensor WAQI
+- [x] Ujian E2E pada production, tag `v0.3.1` dan GitHub Release
 
 ## Fasa 11 — v0.4.0
 
