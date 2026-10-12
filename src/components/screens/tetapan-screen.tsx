@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useSyncExternalStore } from "react";
+import { MIN_DISPLAY_DAYS, type AccuracySummary } from "@/lib/accuracy";
 import { HEALTH_PROFILES } from "@/lib/advice";
 import { LANGUAGES } from "@/lib/i18n";
 import { promptInstall, useInstallStatus } from "@/lib/install";
@@ -201,9 +202,13 @@ export function TetapanScreen() {
                 label={t("Kaedah anggaran")}
                 value={t("Formula JAS, PM2.5 sahaja")}
               />
+              <AccuracyRows />
               <Row label={t("Versi")} value="0.3.1" />
             </div>
             <p className="text-muted mt-2 text-xs leading-relaxed">
+              {t(
+                "Ralat purata 14 hari berbanding bacaan rasmi APIMS (semua stesen). Ramalan dinilai setiap malam: ramalan esok disimpan, kemudian dibandingkan dengan bacaan sebenar.",
+              )}{" "}
               {t(
                 "Bila ada stesen APIMS dalam 30 km dengan bacaan 3 jam terakhir, Hezy memaparkan IPU rasmi stesen itu dan membetulkan ramalan model dengan bacaan tersebut. Jika tidak, Hezy memaparkan anggaran dan ramalan daripada PM2.5 model, yang mungkin berbeza daripada bacaan rasmi.",
               )}
@@ -450,5 +455,51 @@ function AlertRow({ prefs }: { prefs: Prefs }) {
         </p>
       )}
     </div>
+  );
+}
+
+/** Ketepatan 14 hari (kebangsaan) daripada /api/accuracy. */
+function AccuracyRows() {
+  const { t } = useI18n();
+  const [summary, setSummary] = useState<AccuracySummary | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/accuracy")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((body: AccuracySummary | null) => {
+        if (!cancelled && body) setSummary(body);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (!summary) return null;
+  const forecastReady =
+    summary.forecast !== null && summary.days >= MIN_DISPLAY_DAYS;
+  return (
+    <>
+      <Row
+        label={t("Ketepatan anggaran")}
+        value={
+          summary.estimate === null
+            ? t("Sedang dikumpul")
+            : t("±{n} IPU", { n: summary.estimate })
+        }
+      />
+      <Row
+        label={t("Ketepatan ramalan esok")}
+        value={
+          forecastReady
+            ? t("±{n} IPU (model asal ±{raw})", {
+                n: summary.forecast!,
+                raw: summary.forecastRaw ?? "–",
+              })
+            : t("Sedang dikumpul")
+        }
+      />
+    </>
   );
 }

@@ -1,6 +1,12 @@
-import type { HourlyOfficial } from "@/lib/apims";
+import { summarizeAccuracy } from "@/lib/accuracy";
+import { nearestStation, type HourlyOfficial } from "@/lib/apims";
 import { parseCoords } from "@/lib/coords";
-import { getAirQuality, getStateHistory, getStations } from "@/lib/data";
+import {
+  getAccuracyIndex,
+  getAirQuality,
+  getStateHistory,
+  getStations,
+} from "@/lib/data";
 import { officialFor, withOfficialHistory } from "@/lib/official";
 import { buildReading, localHourKey } from "@/lib/reading";
 
@@ -57,6 +63,22 @@ export async function GET(request: Request) {
   let reading = buildReading(series.value, now, history);
   reading.official = official;
   reading = withOfficialHistory(reading, history);
+
+  // Ketepatan 14 hari: stesen rasmi, atau stesen terdekat dalam 100 km, atau kebangsaan.
+  try {
+    const near =
+      station ??
+      (stations.status === "fulfilled"
+        ? nearestStation(stations.value, coords, 100)?.station
+        : undefined);
+    reading.accuracy = summarizeAccuracy(
+      await getAccuracyIndex(),
+      nowKey.slice(0, 10),
+      near?.id ?? null,
+    );
+  } catch (error) {
+    console.error("[api/aqi] ketepatan", error);
+  }
 
   return Response.json(reading, {
     headers: {

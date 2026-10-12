@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { shownError } from "@/lib/accuracy";
 import { HEALTH_PROFILES, adviceFor, type QuickTone } from "@/lib/advice";
 import { CATEGORY_STYLE, NEUTRAL_SKY } from "@/lib/category-style";
 import { formatChange, formatClock } from "@/lib/format";
@@ -305,6 +306,7 @@ function Headline({
   const change =
     current.source === "model" ? formatChange(reading.change3h, lang) : null;
   const official = reading.official;
+  const estimateError = shownError(reading.accuracy, "estimate");
   const big = size === "desktop" ? "text-[112px]" : "text-[84px]";
   return (
     <>
@@ -360,6 +362,8 @@ function Headline({
             "Dikemas kini {time} · Anggaran daripada PM2.5 (Open-Meteo); tiada stesen APIMS berdekatan",
             { time: formatClock(current.time, lang) },
           )}
+          {estimateError !== null &&
+            ` · ${t("biasanya ±{n} berbanding bacaan rasmi", { n: estimateError })}`}
         </p>
       )}
     </>

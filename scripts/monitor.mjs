@@ -71,6 +71,22 @@ const checks = [
     },
   },
   {
+    name: "Ketepatan: /api/accuracy",
+    async run() {
+      const { status, body } = await getJson("/api/accuracy");
+      if (status !== 200)
+        return `status ${status}: ${body?.error ?? "tiada mesej"}`;
+      if (!body?.updatedAt) return "indeks ketepatan belum wujud";
+      const age = (Date.now() - Date.parse(body.updatedAt)) / 3_600_000;
+      if (age > 30)
+        return `indeks ketepatan tidak dikemas kini sejak ${Math.round(age)} jam`;
+      console.log(
+        `   anggaran ±${body.estimate ?? "–"} · ramalan ±${body.forecast ?? "–"} (asal ±${body.forecastRaw ?? "–"}) · ${body.days} hari`,
+      );
+      return null;
+    },
+  },
+  {
     name: "Open-Meteo: /api/aqi (Kuching)",
     async run() {
       const { status, body } = await getJson("/api/aqi?lat=1.55&lon=110.36");

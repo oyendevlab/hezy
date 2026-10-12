@@ -1,3 +1,4 @@
+import type { AccuracySummary } from "./accuracy";
 import type { HourlyOfficial } from "./apims";
 import { findBestWindow, type BestWindow } from "./best-time";
 import {
@@ -66,6 +67,8 @@ export type Reading = {
   stale: boolean;
   /** Bacaan rasmi APIMS stesen terdekat (≤ 30 km, ≤ 3 jam); diisi oleh route API. */
   official: OfficialReading | null;
+  /** Ralat purata 14 hari berbanding bacaan rasmi (item 4); diisi oleh route API. */
+  accuracy?: AccuracySummary | null;
   /** Pembetulan ramalan dengan bacaan APIMS; tiada dalam bacaan lama tersimpan. */
   correction?: Correction | null;
 };
