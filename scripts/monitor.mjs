@@ -98,6 +98,37 @@ const checks = [
     },
   },
   {
+    name: "Ralat klien: /api/log/summary",
+    async run() {
+      const secret = process.env.CRON_SECRET;
+      if (!secret) {
+        console.log("   (dilangkau: CRON_SECRET tiada)");
+        return null;
+      }
+      const res = await fetch(`${BASE}/api/log/summary`, {
+        headers: { Authorization: `Bearer ${secret}` },
+        signal: AbortSignal.timeout(30_000),
+      });
+      const body = await res.json().catch(() => null);
+      if (res.status !== 200)
+        return `status ${res.status}: ${body?.error ?? "tiada mesej"}`;
+      console.log(
+        `   ${body.unique} ralat unik, ${body.total} laporan sejak ${body.from}`,
+      );
+      for (const e of body.top.slice(0, 5))
+        console.log(
+          `   · ${e.count}× ${e.message} (${e.path}, ${e.browser}, v${e.version})`,
+        );
+      // Gagal (buka issue) hanya bila ralat banyak, supaya ralat terpencil tidak bising.
+      if (body.unique >= 5 || body.total >= 50)
+        return `${body.unique} ralat unik / ${body.total} laporan: ${body.top
+          .slice(0, 3)
+          .map((e) => `${e.count}× ${e.message}`)
+          .join("; ")}`;
+      return null;
+    },
+  },
+  {
     name: "Open-Meteo: /api/aqi (Kuching)",
     async run() {
       const { status, body } = await getJson("/api/aqi?lat=1.55&lon=110.36");

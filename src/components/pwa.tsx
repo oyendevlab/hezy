@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { listenForInstall } from "@/lib/install";
+import { installErrorReporting } from "@/lib/report-errors";
 import {
   alertLocations,
   effectiveThreshold,
@@ -18,6 +19,7 @@ import { refreshStaleReadings, useReading } from "@/lib/use-reading";
 export function PwaSetup() {
   useEffect(() => {
     listenForInstall();
+    if (process.env.NODE_ENV === "production") installErrorReporting();
     if (
       process.env.NODE_ENV !== "production" ||
       !("serviceWorker" in navigator)

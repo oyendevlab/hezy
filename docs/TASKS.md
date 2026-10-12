@@ -246,7 +246,7 @@ Masalah: model CAMS (Open-Meteo) kurang menganggar jerebu. Contoh Putrajaya 12 O
 12. **Lencana ikon**
     - [x] Badging API: nombor IPU pada ikon aplikasi bila melebihi ambang (Android/desktop; iOS 16.4+ bila dipasang)
 13. **Pemantauan ralat klien**
-    - [ ] Endpoint `/api/log` (had kadar, tiada data peribadi) + ralat disimpan dalam Blob; ringkasan dalam semakan harian `pantau.yml`
+    - [x] Endpoint `/api/log` (had kadar, tiada data peribadi) + ralat disimpan dalam Blob; ringkasan dalam semakan harian `pantau.yml`
 14. **Keputusan berasaskan data**
     - [ ] Semak Vercel Analytics (halaman popular, peranti, kadar pasang) dan laporkan untuk keputusan item KIV
 15. **Model pembelajaran mesin untuk ramalan — KIV**

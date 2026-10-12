@@ -3,6 +3,7 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { MIN_DISPLAY_DAYS, type AccuracySummary } from "@/lib/accuracy";
 import { HEALTH_PROFILES } from "@/lib/advice";
+import { APP_VERSION } from "@/lib/version";
 import { formatHour } from "@/lib/format";
 import { LANGUAGES } from "@/lib/i18n";
 import { promptInstall, useInstallStatus } from "@/lib/install";
@@ -205,7 +206,7 @@ export function TetapanScreen() {
                 value={t("Formula JAS, PM2.5 sahaja")}
               />
               <AccuracyRows />
-              <Row label={t("Versi")} value="0.3.1" />
+              <Row label={t("Versi")} value={APP_VERSION} />
             </div>
             <p className="text-muted mt-2 text-xs leading-relaxed">
               {t(

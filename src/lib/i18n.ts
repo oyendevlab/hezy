@@ -23,6 +23,9 @@ const EN: Record<string, string> = {
   Tetapan: "Settings",
   "Navigasi utama": "Main navigation",
   "Cuba lagi": "Try again",
+  "Maaf, ada ralat": "Sorry, something went wrong",
+  "Ralat ini telah dilaporkan secara automatik. Cuba muat semula halaman.":
+    "This error has been reported automatically. Try reloading the page.",
   "Ralat tidak diketahui.": "Unknown error.",
   "Tiada sambungan internet.": "No internet connection.",
   "Data kualiti udara tidak dapat diambil. Cuba lagi sebentar.":

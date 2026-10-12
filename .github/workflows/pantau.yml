@@ -23,6 +23,7 @@ jobs:
         id: semak
         env:
           MONITOR_REPORT: ${{ runner.temp }}/laporan.md
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: node scripts/monitor.mjs
       - name: Buka atau kemas kini issue
         if: failure() && steps.semak.outcome == 'failure'
