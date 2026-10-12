@@ -248,8 +248,16 @@ const EN: Record<string, string> = {
   "Pasang Hezy": "Install Hezy",
   Pasang: "Install",
   "Hezy sudah dipasang di peranti ini.": "Hezy is installed on this device.",
-  "Di iPhone atau iPad: ketik butang Kongsi dalam Safari, kemudian pilih “Tambah ke Skrin Utama”.":
-    "On iPhone or iPad: tap the Share button in Safari, then choose “Add to Home Screen”.",
+  "Cara pasang": "How to install",
+  "Tutup panduan": "Close guide",
+  "Ketik butang Kongsi di bar Safari (di iOS 26, ketik ⋯ dahulu, kemudian Kongsi).":
+    "Tap the Share button in the Safari bar (on iOS 26, tap ⋯ first, then Share).",
+  "Tatal ke bawah dan pilih “Tambah ke Skrin Utama”.":
+    "Scroll down and choose “Add to Home Screen”.",
+  "Pastikan “Buka sebagai Apl Web” dihidupkan, kemudian ketik Tambah.":
+    "Make sure “Open as Web App” is on, then tap Add.",
+  "Buka Hezy dari ikon di skrin utama.":
+    "Open Hezy from the icon on your Home Screen.",
   "Buka menu pelayar dan pilih “Pasang aplikasi” atau “Tambah ke skrin utama”.":
     "Open the browser menu and choose “Install app” or “Add to Home screen”.",
   "Luar talian": "Offline",

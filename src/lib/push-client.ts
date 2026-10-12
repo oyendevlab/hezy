@@ -1,4 +1,5 @@
 import type { Lang } from "./i18n";
+import { isAppleMobile } from "./install";
 import type { SavedLocation } from "./prefs";
 import type { AlertThreshold } from "./push-validate";
 
@@ -18,7 +19,7 @@ export type PushSupport =
 
 export function pushSupport(): PushSupport {
   if (!VAPID_PUBLIC_KEY) return "unconfigured";
-  const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const ios = isAppleMobile();
   const standalone =
     window.matchMedia("(display-mode: standalone)").matches ||
     (navigator as Navigator & { standalone?: boolean }).standalone === true;

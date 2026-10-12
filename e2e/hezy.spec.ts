@@ -296,6 +296,24 @@ test.describe("Bahasa Inggeris", () => {
   });
 });
 
+test.describe("pasang di iPhone", () => {
+  test.use({
+    userAgent:
+      "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1",
+  });
+
+  test("Tetapan memaparkan panduan langkah demi langkah", async ({ page }) => {
+    await page.goto("/tetapan");
+    const button = page.getByRole("button", { name: "Cara pasang" });
+    await expect(button).toBeVisible();
+    await button.click();
+    await expect(page.getByText("Tatal ke bawah dan pilih")).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Tutup panduan" }),
+    ).toHaveAttribute("aria-expanded", "true");
+  });
+});
+
 test.describe("halaman negeri", () => {
   test("indeks menyenaraikan 16 negeri dan wilayah", async ({ page }) => {
     await page.goto("/negeri");
