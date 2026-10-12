@@ -1,5 +1,12 @@
 import { cacheLife } from "next/cache";
-import { APIMS_STATIONS_URL, parseStations, type Station } from "./apims";
+import {
+  APIMS_STATIONS_URL,
+  apimsHourlyUrl,
+  parseHourly,
+  parseStations,
+  type HourlyOfficial,
+  type Station,
+} from "./apims";
 import {
   airQualityUrl,
   parseAirQuality,
@@ -34,4 +41,23 @@ export async function getStations(): Promise<Station[]> {
     throw new Error(`APIMS memulangkan status ${res.status}`);
   }
   return parseStations(await res.json());
+}
+
+/** Sejarah IPU rasmi 25 jam bagi semua stesen dalam negeri, dicache 15 minit. */
+export async function getStateHistory(
+  stateId: number,
+  hourKey: string,
+): Promise<Record<string, HourlyOfficial[]>> {
+  "use cache";
+  cacheLife({ stale: 300, revalidate: 900, expire: 3600 });
+
+  const res = await fetch(apimsHourlyUrl(stateId, hourKey), {
+    headers: { "User-Agent": "Hezy/0.3 (+https://hezy.vercel.app)" },
+    signal: AbortSignal.timeout(8000),
+  });
+  if (!res.ok) {
+    throw new Error(`APIMS (sejarah) memulangkan status ${res.status}`);
+  }
+  // Objek biasa (bukan Map) supaya boleh disimpan dalam cache.
+  return Object.fromEntries(parseHourly(await res.json()));
 }

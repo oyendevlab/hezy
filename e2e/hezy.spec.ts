@@ -36,7 +36,7 @@ test.describe("aliran utama", () => {
     await expect(page.getByText("MASA TERBAIK UNTUK KELUAR")).toBeVisible();
     await expect(page.getByText("8 – 10 malam")).toBeVisible();
     await expect(
-      page.getByRole("img", { name: /Graf IPU sejam hari ini/ }),
+      page.getByRole("img", { name: /Graf IPU hari ini/ }),
     ).toBeVisible();
     await expect(
       page.getByRole("heading", { name: "Ramalan 3 hari" }),
@@ -178,6 +178,37 @@ test.describe("peta stesen", () => {
         (v) => `${v.id}: ${v.nodes.map((n) => n.target.join(" ")).join(", ")}`,
       ),
     ).toEqual([]);
+  });
+});
+
+test.describe("trend rasmi APIMS", () => {
+  test("jam lepas menggunakan bacaan rasmi, jam akan datang ramalan", async ({
+    page,
+  }) => {
+    await seedLocation(page);
+    const reading = fakeReading(OFFICIAL_SHAH_ALAM);
+    reading.today = reading.today.map((h) =>
+      h.forecast ? h : { ...h, officialIpu: 172 },
+    );
+    await page.route("**/api/aqi?**", (route) =>
+      route.fulfill({ json: reading }),
+    );
+    await page.goto("/trend");
+    await expect(page.getByText("Jam lepas: bacaan rasmi APIMS")).toBeVisible();
+    await expect(
+      page.getByText("Jam akan datang: ramalan model"),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("img", { name: /Tertinggi 172/ }),
+    ).toBeVisible();
+  });
+
+  test("kembali ke anggaran model bila tiada sejarah rasmi", async ({
+    page,
+  }) => {
+    await seedLocation(page);
+    await page.goto("/trend");
+    await expect(page.getByText("Jam lepas: anggaran model")).toBeVisible();
   });
 });
 

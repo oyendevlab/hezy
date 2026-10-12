@@ -1,11 +1,18 @@
 import { describe, expect, it } from "vitest";
 import type { Station } from "./apims";
-import { officialFor, primaryReading } from "./official";
+import {
+  displayIpu,
+  officialFor,
+  primaryReading,
+  withOfficialHistory,
+} from "./official";
+import type { Reading } from "./reading";
 
 const shahAlam: Station = {
   id: "CA20B",
   name: "Shah Alam",
   state: "Selangor",
+  stateId: 10,
   lat: 3.104,
   lon: 101.556,
   ipu: 156,
@@ -67,5 +74,28 @@ describe("primaryReading", () => {
       source: "model",
     });
     expect(primaryReading(undefined)).toBeNull();
+  });
+});
+
+describe("withOfficialHistory", () => {
+  const reading = {
+    today: [
+      { time: "2026-10-12T07:00", ipu: 60, hourlyIpu: 58, forecast: false },
+      { time: "2026-10-12T08:00", ipu: 61, hourlyIpu: 62, forecast: false },
+      { time: "2026-10-12T09:00", ipu: 62, hourlyIpu: 70, forecast: true },
+    ],
+  } as unknown as Reading;
+
+  it("melampirkan IPU rasmi pada jam lepas sahaja", () => {
+    const merged = withOfficialHistory(reading, [
+      { time: "2026-10-12T07:00", ipu: 74 },
+      { time: "2026-10-12T09:00", ipu: 99 },
+    ]);
+    expect(merged.today.map((h) => h.officialIpu)).toEqual([
+      74,
+      null,
+      undefined,
+    ]);
+    expect(merged.today.map(displayIpu)).toEqual([74, 62, 70]);
   });
 });

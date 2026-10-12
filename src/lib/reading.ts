@@ -29,6 +29,8 @@ export type HourPoint = {
    * Lebih responsif untuk graf dan masa terbaik keluar, tetapi bukan IPU rasmi.
    */
   hourlyIpu: number | null;
+  /** IPU rasmi APIMS bagi jam ini (stesen terdekat); hanya untuk jam yang sudah lepas. */
+  officialIpu?: number | null;
   forecast: boolean;
 };
 

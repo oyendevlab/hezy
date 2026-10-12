@@ -1,4 +1,4 @@
-import { nearestStation, type Station } from "./apims";
+import { nearestStation, type HourlyOfficial, type Station } from "./apims";
 import { ipuCategory, isEmergency, type IpuCategoryKey } from "./ipu";
 import type { Reading } from "./reading";
 
@@ -81,4 +81,27 @@ export function primaryReading(
     time: c.time,
     source: "model",
   };
+}
+
+/** Lampirkan IPU rasmi setiap jam pada jam hari ini yang sudah lepas. */
+export function withOfficialHistory(
+  reading: Reading,
+  history: readonly HourlyOfficial[],
+): Reading {
+  const byTime = new Map(history.map((h) => [h.time, h.ipu]));
+  return {
+    ...reading,
+    today: reading.today.map((h) =>
+      h.forecast ? h : { ...h, officialIpu: byTime.get(h.time) ?? null },
+    ),
+  };
+}
+
+/** Nilai yang dipaparkan dalam graf: rasmi untuk jam lepas jika ada, jika tidak IPU sejam model. */
+export function displayIpu(h: {
+  forecast: boolean;
+  hourlyIpu: number | null;
+  officialIpu?: number | null;
+}) {
+  return !h.forecast && h.officialIpu != null ? h.officialIpu : h.hourlyIpu;
 }

@@ -23,6 +23,8 @@ export type Station = {
   /** Nama lokasi stesen, cth. "Shah Alam". */
   name: string;
   state: string;
+  /** ID negeri APIMS (untuk sejarah setiap jam). */
+  stateId: number | null;
   lat: number;
   lon: number;
   /** IPU rasmi; `null` bila stesen tiada bacaan (N/A). */
@@ -35,6 +37,7 @@ export type Station = {
 type RawStation = {
   STATION_ID?: unknown;
   STATE_NAME?: unknown;
+  STATE_ID?: unknown;
   STATION_LOCATION?: unknown;
   LATITUDE?: unknown;
   LONGITUDE?: unknown;
@@ -82,6 +85,7 @@ export function parseStations(json: unknown): Station[] {
         id: row.STATION_ID,
         name: titleCase(location.split(",")[0].trim()),
         state: typeof row.STATE_NAME === "string" ? row.STATE_NAME : "",
+        stateId: typeof row.STATE_ID === "number" ? row.STATE_ID : null,
         lat,
         lon,
         ipu,
@@ -120,4 +124,40 @@ export function nearestStation(
       best = { station, distanceKm: d };
   }
   return best;
+}
+
+/** URL sejarah IPU setiap jam (25 jam hingga `hourKey`) bagi semua stesen dalam satu negeri. */
+export function apimsHourlyUrl(stateId: number, hourKey: string): string {
+  return `https://eqms.doe.gov.my/api3/publicportalapims/apitablehourly?stateid=${stateId}&datetime=${hourKey}:00&`;
+}
+
+export type HourlyOfficial = { time: string; ipu: number | null };
+
+/** Sejarah setiap jam mengikut stesen, disusun dari awal ke akhir. */
+export function parseHourly(json: unknown): Map<string, HourlyOfficial[]> {
+  const rows = (json as { api_table_hourly?: unknown } | null)
+    ?.api_table_hourly;
+  if (!Array.isArray(rows)) {
+    throw new Error("Respons APIMS tidak dijangka: api_table_hourly tiada.");
+  }
+  const byStation = new Map<string, HourlyOfficial[]>();
+  for (const row of rows as {
+    STATION_ID?: unknown;
+    DATETIME?: unknown;
+    API?: unknown;
+  }[]) {
+    if (typeof row.STATION_ID !== "string" || typeof row.DATETIME !== "string")
+      continue;
+    if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(row.DATETIME)) continue;
+    const ipu =
+      typeof row.API === "number" && Number.isFinite(row.API) && row.API >= 0
+        ? Math.round(row.API)
+        : null;
+    const list = byStation.get(row.STATION_ID) ?? [];
+    list.push({ time: row.DATETIME.slice(0, 16), ipu });
+    byStation.set(row.STATION_ID, list);
+  }
+  for (const list of byStation.values())
+    list.sort((a, b) => a.time.localeCompare(b.time));
+  return byStation;
 }
