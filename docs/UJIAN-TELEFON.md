@@ -93,6 +93,19 @@ Buka **https://hezy.my** pada telefon.
 - [ ] Tetapan → Amaran (hidup) → **Hantar notifikasi ujian** → notifikasi "Hezy: notifikasi ujian" muncul; tekan lagi → "Tunggu … saat"
 - [ ] Mod gelap: semua perkara di atas boleh dibaca
 
+## Ciri baharu v0.7.0
+
+- [ ] Pengguna baharu (Tetapan → Padam data): skrin alu-aluan terus dipaparkan (tiada kelipan Utama); togol BM | EN menukar bahasa
+- [ ] Skrin alu-aluan: jalur "Malaysia sekarang" (negeri tertinggi dan terendah); ketik cip bandar → terus ke Utama; "Guna lokasi saya" meminta kebenaran GPS
+- [ ] Utama (lawatan pertama): ⓘ pada pil tahap berdenyut sekali; ketik pil → helaian skala IPU dengan tahap anda ditanda
+- [ ] Utama: kad "Hidupkan amaran" muncul bila IPU > 100 atau pada lawatan kedua; "Nanti" menyembunyikannya
+- [ ] Lokasi → Peta: cip **Taburan IPU** → lapisan warna antara stesen (termasuk Sumatera/Singapura daripada WAQI) dengan legenda; **Angin** → zarah bergerak; peta tidak boleh dizum keluar melepasi Asia Tenggara
+- [ ] Tetapan → Rutin amaran: pilihan **Amaran jerebu dijangka** dan **Amaran lonjakan** (hidup secara lalai)
+- [ ] Notifikasi "Jerebu dijangka di … sekitar …" bila ramalan 6 jam melepasi ambang (sekali sehari); "IPU … naik mendadak: … → …" bila naik ≥ 30 dalam 3 jam (bergantung pada keadaan sebenar)
+- [ ] Halaman negeri → **Gambar** → kad negeri dengan bendera; Kongsi gambar / Untuk Status (9:16) membuka helaian kongsi telefon
+- [ ] Utama → Kongsi: kad lokasi dengan bendera negeri (tiada bendera bila lokasi GPS di sempadan negeri)
+- [ ] Kongsi pautan halaman negeri di WhatsApp → pratonton kad negeri
+
 ## Jika ada masalah
 
 Ambil tangkapan skrin dan catat model telefon serta versi OS, kemudian buka isu di

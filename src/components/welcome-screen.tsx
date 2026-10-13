@@ -167,7 +167,7 @@ export function WelcomeScreen({
       </section>
 
       <section className="bg-page relative -mt-6 flex flex-1 flex-col gap-3 rounded-t-[28px] px-5 pt-6 pb-8 md:mt-0 md:justify-center md:rounded-t-none md:rounded-r-[32px] md:border md:border-l-0 md:border-[var(--line)] md:px-12">
-        <h2 className="font-display hidden text-2xl font-bold md:block">
+        <h2 className="font-display sr-only text-2xl font-bold md:not-sr-only">
           {t("Di mana anda berada?")}
         </h2>
         <button
