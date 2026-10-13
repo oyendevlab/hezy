@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { StateShareButton } from "@/components/state-share-button";
 import { StationTable } from "@/components/station-table";
 import { Notice, Skeleton } from "@/components/status";
 import { T } from "@/components/t";
@@ -9,6 +10,7 @@ import type { Station } from "@/lib/apims";
 import { STATES, findState } from "@/lib/areas";
 import { getStations } from "@/lib/data";
 import { ipuCategory } from "@/lib/ipu";
+import { buildStateCardPath } from "@/lib/state-card";
 import { PageTransition } from "@/components/page-transition";
 
 export function generateStaticParams() {
@@ -24,6 +26,15 @@ export async function generateMetadata({
     title: `IPU ${state.name} hari ini`,
     description: `Bacaan Indeks Pencemaran Udara (IPU) rasmi semua stesen APIMS di ${state.name}, dikemas kini setiap jam.`,
     alternates: { canonical: `/negeri/${state.id}` },
+    openGraph: {
+      images: [
+        {
+          url: buildStateCardPath(state.id, "ms", "square"),
+          width: 1080,
+          height: 1080,
+        },
+      ],
+    },
   };
 }
 
@@ -66,9 +77,14 @@ async function StateContent({
         </Link>{" "}
         / {state.name}
       </nav>
-      <h1 className="font-display text-[32px] leading-tight font-bold">
-        <T vars={{ state: state.name }}>{"IPU {state} hari ini"}</T>
-      </h1>
+      <div className="flex items-center justify-between gap-3">
+        <h1 className="font-display text-[32px] leading-tight font-bold">
+          <T vars={{ state: state.name }}>{"IPU {state} hari ini"}</T>
+        </h1>
+        {withReading.length > 0 && (
+          <StateShareButton stateId={state.id} stateName={state.name} />
+        )}
+      </div>
 
       {stations === null ? (
         <Notice>

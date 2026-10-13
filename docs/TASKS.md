@@ -441,7 +441,8 @@ Fokus: pengalaman pertama kali yang "nilai dahulu, ajar kemudian" (mockup: https
 
 ### D. Kongsi
 
-11. **Mod gambar negeri**: imej kad negeri (stesen + IPU maksimum + bendera) untuk dikongsi dari halaman negeri
+11. ✅ **Mod gambar negeri**: butang **Gambar** di halaman negeri → kad imej (segi empat dan Status 9:16) dengan bendera, IPU tertinggi, stesen melebihi 100 dan stesen teratas; data terus daripada APIMS di pelayan (`/kongsi/negeri`), juga sebagai pratonton pautan halaman negeri
+    - [x] Bendera juga pada kad kongsi lokasi dan pratonton pautan: kawasan senarai bandar ikut negerinya; GPS ikut negeri stesen APIMS terdekat (≤ 30 km); **tiada bendera di sempadan** (stesen negeri lain < 1.5× jarak atau dalam +5 km)
 
 ### Selesai v0.7.0
 

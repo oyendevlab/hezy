@@ -19,6 +19,7 @@ describe("parseShare", () => {
       category: "tidak-sihat",
       label: "Tidak Sihat",
       source: "apims",
+      state: null,
     });
   });
 
@@ -35,5 +36,24 @@ describe("parseShare", () => {
     expect(parseShare({ n: "Klang", i: "abc" })).toBeNull();
     expect(parseShare({ n: "Klang", i: "1000" })).toBeNull();
     expect(parseShare({ n: "  ", i: "50" })).toBeNull();
+  });
+});
+
+describe("bendera negeri dalam pautan kongsi", () => {
+  it("negeri sah disimpan; yang lain diabaikan", () => {
+    const path = buildSharePath({
+      name: "Shah Alam",
+      ipu: 72,
+      source: "apims",
+      state: "selangor",
+    });
+    expect(path).toContain("g=selangor");
+    const q = (p: string) =>
+      Object.fromEntries(new URL(p, "https://hezy.my").searchParams);
+    expect(parseShare(q(path))?.state).toBe("selangor");
+    expect(parseShare({ n: "X", i: "50", g: "bukan" })?.state).toBeNull();
+    expect(
+      buildSharePath({ name: "X", ipu: 50, source: "model", state: null }),
+    ).not.toContain("g=");
   });
 });
