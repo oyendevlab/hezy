@@ -48,6 +48,8 @@ describe("parsePrefs", () => {
       lang: "ms",
       morningSummary: false,
       forecastAlert: true,
+      spikeAlert: true,
+      expectedAlert: true,
       quietHours: { start: 23, end: 6 },
     });
     expect(

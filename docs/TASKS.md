@@ -436,8 +436,8 @@ Fokus: pengalaman pertama kali yang "nilai dahulu, ajar kemudian" (mockup: https
 
 ### C. Amaran
 
-9. **Amaran lonjakan**: notifikasi bila IPU naik mendadak (cth. +30 dalam 3 jam) walaupun masih di bawah ambang; pilihan dalam Rutin amaran
-10. **Amaran jerebu dijangka**: notifikasi awal bila ramalan 6 jam akan datang melepasi ambang sedangkan sekarang masih di bawah; sekali sehari bagi setiap lokasi
+9. ✅ **Amaran lonjakan**: notifikasi bila IPU naik ≥ 30 dalam 3 jam (rasmi APIMS jika ada) dan > 50, walaupun masih di bawah ambang; sekali setiap 6 jam bagi setiap lokasi, tidak semasa waktu senyap; pilihan dalam Rutin amaran (hidup secara lalai)
+10. ✅ **Amaran jerebu dijangka**: notifikasi awal bila ramalan 6 jam akan datang melepasi ambang sedangkan sekarang masih di bawah (dengan jam dijangka); sekali sehari bagi setiap lokasi, tidak semasa waktu senyap; pilihan dalam Rutin amaran (hidup secara lalai)
 
 ### D. Kongsi
 

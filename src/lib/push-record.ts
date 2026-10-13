@@ -14,6 +14,10 @@ export type RecordLocation = AlertLocation &
   AlertState & {
     /** Tarikh (waktu Malaysia) amaran ramalan terakhir dihantar. */
     lastForecast?: string | null;
+    /** Jam (waktu Malaysia `YYYY-MM-DDTHH:00`) amaran lonjakan terakhir. */
+    lastSpike?: string | null;
+    /** Tarikh (waktu Malaysia) amaran jerebu dijangka terakhir. */
+    lastExpected?: string | null;
   };
 
 /** Rekod langganan dalam Vercel Blob (private): satu fail JSON bagi setiap peranti. */
@@ -90,6 +94,8 @@ export function mergeRecord(
         lastAlertKey: previous?.lastAlertKey ?? null,
         lastAlertAt: previous?.lastAlertAt ?? null,
         lastForecast: previous?.lastForecast ?? null,
+        lastSpike: previous?.lastSpike ?? null,
+        lastExpected: previous?.lastExpected ?? null,
       };
     }),
   };
