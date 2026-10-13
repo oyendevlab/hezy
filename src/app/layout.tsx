@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     template: "%s · Hezy",
   },
   description:
-    "Semak Indeks Pencemar Udara (IPU) di lokasi anda dengan pantas.",
+    "Semak Indeks Pencemaran Udara (IPU) di lokasi anda dengan pantas.",
   applicationName: "Hezy",
   appleWebApp: {
     capable: true,

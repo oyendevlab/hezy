@@ -118,7 +118,7 @@ const EN: Record<string, string> = {
 
   // Utama
   "Selamat datang ke Hezy": "Welcome to Hezy",
-  "Pilih lokasi untuk melihat Indeks Pencemar Udara (IPU) dan nasihat kesihatan.":
+  "Pilih lokasi untuk melihat Indeks Pencemaran Udara (IPU) dan nasihat kesihatan.":
     "Choose a location to see the Air Pollutant Index (API) and health advice.",
   "Guna lokasi saya": "Use my location",
   "Mengesan lokasi…": "Finding your location…",
@@ -145,7 +145,7 @@ const EN: Record<string, string> = {
   "(semasa)": "(current)",
   "Tiada lokasi kegemaran lagi.": "No favourite locations yet.",
   "Tambah bandar": "Add a city",
-  "Indeks Pencemar Udara": "Air Pollutant Index",
+  "Indeks Pencemaran Udara": "Air Pollutant Index",
   // Notifikasi ujian
   "Hantar notifikasi ujian": "Send a test notification",
   "Menghantar…": "Sending…",
@@ -186,7 +186,7 @@ const EN: Record<string, string> = {
   "Apa itu IPU?": "What is the API?",
   "Di mana anda berada?": "Where are you?",
   "Dapatkan amaran jerebu": "Get haze alerts",
-  "Indeks Pencemar Udara (IPU) mengukur kebersihan udara. Semakin tinggi nombornya, semakin teruk jerebu.":
+  "Indeks Pencemaran Udara (IPU) mengukur kebersihan udara. Semakin tinggi nombornya, semakin teruk jerebu.":
     "The Air Pollutant Index (API) measures how clean the air is. The higher the number, the worse the haze.",
   "Sumber rasmi: APIMS, Jabatan Alam Sekitar.":
     "Official source: APIMS, Department of Environment.",

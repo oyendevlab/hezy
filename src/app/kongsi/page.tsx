@@ -25,7 +25,7 @@ export async function generateMetadata({
   return {
     title,
     description:
-      "Semak Indeks Pencemar Udara (IPU) di lokasi anda dengan Hezy.",
+      "Semak Indeks Pencemaran Udara (IPU) di lokasi anda dengan Hezy.",
     openGraph: {
       title: `${title} · Hezy`,
       images: [{ url: image, width: 1200, height: 630 }],

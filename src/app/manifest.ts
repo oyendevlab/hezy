@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Hezy — Semak Jerebu",
     short_name: "Hezy",
     description:
-      "Semak Indeks Pencemar Udara (IPU) di lokasi anda dengan pantas.",
+      "Semak Indeks Pencemaran Udara (IPU) di lokasi anda dengan pantas.",
     lang: "ms",
     start_url: "/",
     scope: "/",

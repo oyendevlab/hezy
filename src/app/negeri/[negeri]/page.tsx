@@ -22,7 +22,7 @@ export async function generateMetadata({
   if (!state) return {};
   return {
     title: `IPU ${state.name} hari ini`,
-    description: `Bacaan Indeks Pencemar Udara (IPU) rasmi semua stesen APIMS di ${state.name}, dikemas kini setiap jam.`,
+    description: `Bacaan Indeks Pencemaran Udara (IPU) rasmi semua stesen APIMS di ${state.name}, dikemas kini setiap jam.`,
     alternates: { canonical: `/negeri/${state.id}` },
   };
 }

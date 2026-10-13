@@ -11,7 +11,7 @@
 
 ## 1. Ringkasan
 
-Hezy ialah aplikasi web progresif (PWA) untuk menyemak Indeks Pencemar Udara (IPU) semasa di Malaysia dengan cepat. Pengguna buka aplikasi, terus nampak tahap jerebu di lokasi mereka dan tahu apa yang perlu dibuat. Aplikasi ini tidak memerlukan login, ringan dan boleh dipasang di skrin utama.
+Hezy ialah aplikasi web progresif (PWA) untuk menyemak Indeks Pencemaran Udara (IPU) semasa di Malaysia dengan cepat. Pengguna buka aplikasi, terus nampak tahap jerebu di lokasi mereka dan tahu apa yang perlu dibuat. Aplikasi ini tidak memerlukan login, ringan dan boleh dipasang di skrin utama.
 
 ## 2. Masalah
 
