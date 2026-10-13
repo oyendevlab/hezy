@@ -234,3 +234,12 @@ body {
 .hezy-cluster.hezy-pin-sensor {
   border-style: dashed;
 }
+
+/* Pengguna baharu di "/": skrin alu-aluan (tanpa navigasi); pengguna lama: rangka Utama. */
+html[data-welcome] [data-app-nav],
+html[data-welcome] [data-home-skeleton] {
+  display: none !important;
+}
+html:not([data-welcome]) [data-welcome-screen] {
+  display: none !important;
+}

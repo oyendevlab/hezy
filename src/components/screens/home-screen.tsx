@@ -22,9 +22,7 @@ import { buildSharePath } from "@/lib/share";
 import { buildCardPath, type CardFormat } from "@/lib/share-card";
 import { useI18n } from "@/lib/use-i18n";
 import { useReading, type ReadingEntry } from "@/lib/use-reading";
-import { ChooseLocation } from "../choose-location";
 import { IpuPill } from "../ipu-pill";
-import { Logo } from "../logo";
 import { SchoolCard } from "../school-card";
 import { PullToRefresh } from "../pull-to-refresh";
 import { ReadingNotices } from "../reading-notices";
@@ -41,41 +39,44 @@ import { InstallBanner } from "../install-banner";
 import { HomeHeader } from "../home-header";
 import { ElasticCard } from "../elastic-card";
 import { TrendLink, TrendLinkSkeleton } from "../trend-link";
-import { Onboarding } from "../onboarding";
-import { useOnboarded } from "@/lib/onboarding";
+import { WelcomeScreen } from "../welcome-screen";
+import { IpuScaleButton, IpuScaleCoach } from "../ipu-scale";
+import { AlertCard } from "../alert-card";
+import type { NationalSummary } from "@/lib/national";
 import { AnimatedNumber } from "../animated-number";
 import { LocationMenu } from "../location-menu";
 
-export function HomeScreen() {
+export function HomeScreen({
+  national = null,
+}: {
+  national?: NationalSummary | null;
+}) {
   const { prefs, location, entry, refresh } = useCurrent();
-  const onboarded = useOnboarded();
-  // Langkah pengenalan; kekal dipaparkan selepas lokasi dipilih hingga pengguna selesai.
-  const [step, setStep] = useState<number | null>(null);
 
-  if (prefs === null) return <HomeSkeleton />;
-  if (!onboarded && (!location || step !== null))
-    return (
-      <Onboarding
-        prefs={prefs}
-        step={step ?? 0}
-        onStep={setStep}
-        onDone={() => setStep(null)}
-      />
-    );
-  if (!location) return <Welcome />;
+  // Sebelum prefs dibaca (HTML pelayan dan render pertama), rangka Utama DAN skrin alu-aluan
+  // dirender; skrip dalam <head> (`data-welcome`) memilih yang kelihatan supaya pengguna
+  // baharu terus nampak skrin alu-aluan tanpa menunggu JavaScript, tanpa kelipan untuk
+  // pengguna lama. Kedudukan anak kekal sama supaya WelcomeScreen tidak dipasang semula.
   return (
-    <HomeView
-      prefs={prefs}
-      location={location}
-      entry={entry}
-      onRetry={refresh}
-    />
+    <>
+      {prefs === null && <HomeSkeleton />}
+      {prefs === null || !location ? (
+        <WelcomeScreen national={national} active={prefs !== null} />
+      ) : (
+        <HomeView
+          prefs={prefs}
+          location={location}
+          entry={entry}
+          onRetry={refresh}
+        />
+      )}
+    </>
   );
 }
 
 function HomeSkeleton() {
   return (
-    <div aria-busy="true">
+    <div aria-busy="true" data-home-skeleton>
       {/* Telefon: bentuk sama seperti Utama — langit, kad putih, ringkasan, kad trend. */}
       <div className="md:hidden">
         <div
@@ -156,26 +157,6 @@ function SummarySkeleton() {
   );
 }
 
-function Welcome() {
-  const { t } = useI18n();
-  return (
-    <div className="mx-auto max-w-md px-5 pt-13 md:pt-16">
-      <Logo size={72} className="mb-4" />
-      <h1 className="font-display text-[32px] leading-tight font-bold">
-        {t("Selamat datang ke Hezy")}
-      </h1>
-      <p className="text-muted mt-2 text-[16px]">
-        {t(
-          "Pilih lokasi untuk melihat Indeks Pencemaran Udara (IPU) dan nasihat kesihatan.",
-        )}
-      </p>
-      <div className="mt-6">
-        <ChooseLocation />
-      </div>
-    </div>
-  );
-}
-
 /** Had kedudukan bahagian atas kad putih (px dari atas skrin) di telefon. */
 const CARD_TOP_MIN = 124;
 const CARD_TOP_MAX = 408;
@@ -220,7 +201,13 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
     };
     place();
     window.addEventListener("resize", place);
-    return () => window.removeEventListener("resize", place);
+    // Kandungan berubah saiz (cth. kad amaran muncul kemudian): kira semula kedudukan rehat.
+    const observer = new ResizeObserver(place);
+    if (cardContentRef.current) observer.observe(cardContentRef.current);
+    return () => {
+      window.removeEventListener("resize", place);
+      observer.disconnect();
+    };
   }, [reading, showSchool]);
 
   // Satu konteks WebGL sahaja: langit telefon atau panorama desktop.
@@ -329,6 +316,7 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
               profile={prefs.profile}
             />
             {current && showSchool && <SchoolCard reading={current} />}
+            {!wide && current && <AlertCard prefs={prefs} ipu={current.ipu} />}
             <InstallBanner />
             {reading ? (
               <TrendLink hours={reading.today} />
@@ -385,6 +373,7 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
         <div className="relative mx-auto -mt-9 flex max-w-[1200px] flex-wrap gap-5 px-10">
           <div className="flex min-w-0 flex-[1_1_340px] flex-col gap-5">
             {entry && <ReadingNotices entry={entry} onRetry={onRetry} />}
+            {wide && current && <AlertCard prefs={prefs} ipu={current.ipu} />}
             <InstallBanner />
             {current && showSchool && <SchoolCard reading={current} />}
             {current && <QuickAnswers category={current.category} />}
@@ -506,7 +495,11 @@ function Headline({
               <AnimatedNumber value={current.ipu} />
             </h1>
             <div className="flex flex-col items-start gap-1.5">
-              <IpuPill category={current.category} label={t(current.label)} />
+              <IpuScaleButton
+                ipu={current.ipu}
+                category={current.category}
+                label={t(current.label)}
+              />
               <span className="text-muted flex items-center gap-1.5 text-xs font-semibold whitespace-nowrap">
                 <span
                   aria-hidden="true"
@@ -537,6 +530,7 @@ function Headline({
           />
         )}
       </div>
+      <IpuScaleCoach label={t(current.label)} />
       {current.emergency && (
         <Notice tone="warning">
           {t(
