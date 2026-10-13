@@ -83,6 +83,21 @@ function createRenderer(canvas: HTMLCanvasElement) {
       gl.uniform1f(loc.windSpeed, p.windSpeed);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     },
+    /** Warna piksel tengah baris paling atas (dibaca terus selepas `draw`). */
+    topColor() {
+      const px = new Uint8Array(4);
+      // Asal koordinat WebGL di bawah kiri: baris atas ialah height - 1.
+      gl.readPixels(
+        Math.floor(canvas.width / 2),
+        canvas.height - 1,
+        1,
+        1,
+        gl.RGBA,
+        gl.UNSIGNED_BYTE,
+        px,
+      );
+      return `rgb(${px[0]} ${px[1]} ${px[2]})`;
+    },
   };
 }
 
@@ -116,8 +131,11 @@ export function SkyCanvas({
     const [top, bottom] = fallbackGradient(
       skyParams({ ipu, weather, wind, now: new Date() }),
     );
-    if (box.current)
-      box.current.style.background = `linear-gradient(to bottom, ${top}, ${bottom})`;
+    if (box.current) {
+      box.current.style.backgroundImage = `linear-gradient(to bottom, ${top}, ${bottom})`;
+      // Safari iOS mewarnakan bar status ikut background-color elemen tetap di atas.
+      box.current.style.backgroundColor = top;
+    }
     window.dispatchEvent(new Event("hezy-sky"));
   }, [ipu, weather, wind]);
 
@@ -140,6 +158,8 @@ export function SkyCanvas({
     let raf = 0;
 
     let lastDraw = 0;
+    // Warna bar status: diselaraskan dengan langit sebenar bila parameter berubah.
+    let syncTop = true;
     const frame = (now: number) => {
       raf = 0;
       // Langit hampir tertutup oleh kad: lukis jarang-jarang.
@@ -156,9 +176,14 @@ export function SkyCanvas({
       if (now - paramsAt > PARAMS_EVERY_MS) {
         params = skyParams({ ...input.current, now: new Date() });
         paramsAt = now;
+        syncTop = true;
       }
       r.resize();
       r.draw(params, reduce.matches ? 20 : (now - start) / 1000);
+      if (syncTop && box.current) {
+        syncTop = false;
+        box.current.style.backgroundColor = r.topColor();
+      }
       if (!reduce.matches && visible && !document.hidden)
         raf = requestAnimationFrame(frame);
     };
@@ -168,6 +193,7 @@ export function SkyCanvas({
     const refresh = () => {
       params = skyParams({ ...input.current, now: new Date() });
       paramsAt = performance.now();
+      syncTop = true;
       kick();
     };
 
@@ -199,7 +225,8 @@ export function SkyCanvas({
       aria-hidden="true"
       className={`overflow-hidden ${className}`}
       style={{
-        background: `linear-gradient(to bottom, ${initial[0]}, ${initial[1]})`,
+        backgroundImage: `linear-gradient(to bottom, ${initial[0]}, ${initial[1]})`,
+        backgroundColor: initial[0],
       }}
     >
       <canvas
