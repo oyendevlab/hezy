@@ -234,8 +234,9 @@ export function createWindLayer(
       ctx.fillStyle = "rgba(0,0,0,0.95)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.globalCompositeOperation = "source-over";
-      ctx.strokeStyle = "rgba(28, 40, 62, 0.5)";
-      ctx.lineWidth = 1.4;
+      // Garisan nipis dan telus supaya jubin peta dan pin kekal mudah dibaca.
+      ctx.strokeStyle = "rgba(28, 40, 62, 0.3)";
+      ctx.lineWidth = 1;
       ctx.lineCap = "round";
       ctx.beginPath();
       for (let k = 0; k < this.particles.length; k++) {
