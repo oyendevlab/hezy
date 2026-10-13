@@ -99,6 +99,51 @@ test.describe("aliran utama", () => {
     ).toBeVisible();
   });
 
+  test("skrin alu-aluan: togol BM/EN kekal selepas lokasi dipilih", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const group = page.getByRole("group", { name: "Bahasa" });
+    await expect(
+      group.getByRole("button", { name: "Bahasa Melayu" }),
+    ).toHaveAttribute("aria-pressed", "true");
+    await group.getByRole("button", { name: "English" }).click();
+    await expect(
+      page.getByRole("heading", { name: "Check the haze where you are" }),
+    ).toBeVisible();
+    await expect(page.locator("html")).toHaveAttribute("lang", "en");
+    await page.getByRole("button", { name: "Shah Alam" }).click();
+    await expect(
+      page.getByText("AIR POLLUTANT INDEX").filter({ visible: true }),
+    ).toBeVisible();
+  });
+
+  test("desktop: petunjuk skala tidak menganjak kotak IPU", async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, "Susun atur desktop");
+    await seedLocation(page);
+    await page.goto("/");
+    const headline = page
+      .locator("h1[data-ipu-headline]")
+      .filter({ visible: true });
+    await expect(headline).toBeVisible();
+    const chip = (await page
+      .getByTestId("location-menu-button")
+      .filter({ visible: true })
+      .boundingBox())!;
+    const before = (await headline.boundingBox())!.y;
+    expect(before).toBeGreaterThan(chip.y + chip.height);
+    await page
+      .getByTestId("ipu-scale-coach")
+      .filter({ visible: true })
+      .getByRole("button", { name: "Faham" })
+      .click();
+    await expect(page.getByTestId("ipu-scale-coach")).toHaveCount(0);
+    expect((await headline.boundingBox())!.y).toBeCloseTo(before, 0);
+  });
+
   test("pengguna sedia ada (ada lokasi) terus ke Utama, tiada skrin alu-aluan", async ({
     page,
   }) => {
@@ -119,7 +164,8 @@ test.describe("aliran utama", () => {
     await seedLocation(page);
     await page.goto("/");
     const coach = page.getByTestId("ipu-scale-coach").filter({ visible: true });
-    await expect(coach).toContainText("Apa maksud nombor ini?");
+    // Telefon: baris penuh; desktop: versi padat. Kedua-duanya menyebut skala IPU.
+    await expect(coach).toContainText("skala IPU");
     await page
       .getByTestId("ipu-scale-button")
       .filter({ visible: true })

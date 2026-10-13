@@ -221,10 +221,38 @@ function ScaleSheet({
  * butang lain): kategori boleh diketik untuk melihat skala. Hilang bila "Faham" atau
  * pil diketik.
  */
-export function IpuScaleCoach({ label }: { label: string }) {
+export function IpuScaleCoach({
+  label,
+  compact = false,
+}: {
+  label: string;
+  /** Desktop: satu baris pendek supaya kotak IPU hampir tidak berubah tinggi. */
+  compact?: boolean;
+}) {
   const { t } = useI18n();
   const seen = useSyncExternalStore(subscribeCoach, coachSeen, () => true);
   if (seen) return null;
+  if (compact)
+    return (
+      <div
+        role="status"
+        data-testid="ipu-scale-coach"
+        className="text-muted flex items-center gap-2 text-[13px] font-semibold"
+      >
+        <Info aria-hidden="true" size={16} weight="bold" className="shrink-0" />
+        <span className="min-w-0">
+          {t("Ketik “{label}” untuk lihat skala IPU", { label })}
+        </span>
+        <span aria-hidden="true">·</span>
+        <button
+          type="button"
+          onClick={markCoachSeen}
+          className="text-ink min-h-8 shrink-0 font-bold underline underline-offset-2"
+        >
+          {t("Faham")}
+        </button>
+      </div>
+    );
   return (
     <div
       role="status"
