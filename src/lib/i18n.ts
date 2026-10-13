@@ -164,12 +164,8 @@ const EN: Record<string, string> = {
     "Your location is rounded to ~1 km and not stored.",
   "ATAU PILIH BANDAR": "OR PICK A CITY",
   "— lihat skala IPU": "— see the API scale",
-  "Ketik “{label}” untuk melihat skala IPU dan kedudukan bacaan anda.":
-    "Tap “{label}” to see the API scale and where your reading sits.",
-  Faham: "Got it",
   "Skala IPU": "API scale",
   Bahasa: "Language",
-  "Ketik “{label}” untuk lihat skala IPU": "Tap “{label}” to see the API scale",
   "Sekarang {ipu} · {label}. Semakin tinggi nombor, semakin teruk jerebu.":
     "Now {ipu} · {label}. The higher the number, the worse the haze.",
   ANDA: "YOU",
@@ -183,7 +179,6 @@ const EN: Record<string, string> = {
   "Anda boleh menukar ambang dan rutin amaran di Tetapan.":
     "You can change the threshold and alert routine in Settings.",
   Nanti: "Later",
-  "Apa maksud nombor ini?": "What does this number mean?",
   // Notifikasi ujian
   "Hantar notifikasi ujian": "Send a test notification",
   "Menghantar…": "Sending…",

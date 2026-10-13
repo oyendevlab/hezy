@@ -41,7 +41,8 @@ const subscribeCoach = (listener: () => void) => {
 
 /**
  * Pil kategori IPU yang boleh diketik untuk membuka helaian skala (5 tahap, tahap semasa
- * ditanda). Petunjuk sekali sahaja: `IpuScaleCoach`.
+ * ditanda). Lawatan pertama: ikon ⓘ berdenyut lembut sekali (tanpa teks, tiada anjakan
+ * susun atur); dimatikan untuk `prefers-reduced-motion`.
  */
 export function IpuScaleButton({
   ipu,
@@ -55,6 +56,7 @@ export function IpuScaleButton({
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const button = useRef<HTMLButtonElement>(null);
+  const seen = useSyncExternalStore(subscribeCoach, coachSeen, () => true);
 
   const openSheet = () => {
     markCoachSeen();
@@ -69,10 +71,18 @@ export function IpuScaleButton({
         onClick={openSheet}
         aria-haspopup="dialog"
         data-testid="ipu-scale-button"
-        className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-bold ${CATEGORY_STYLE[category].tint}`}
+        className={`focus-visible:outline-ink inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-bold transition-[filter,transform] duration-150 hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2 active:scale-[0.96] motion-reduce:transition-none ${CATEGORY_STYLE[category].tint}`}
       >
         {label}
-        <Info aria-hidden="true" size={15} weight="bold" />
+        <Info
+          aria-hidden="true"
+          size={15}
+          weight="bold"
+          data-pulse={seen ? undefined : "true"}
+          // Denyutan sekali sahaja: bila selesai, tidak diulang pada lawatan seterusnya.
+          onAnimationEnd={markCoachSeen}
+          className={seen ? undefined : "ipu-info-pulse"}
+        />
         <span className="sr-only">{t("— lihat skala IPU")}</span>
       </button>
       {open && (
@@ -213,69 +223,5 @@ function ScaleSheet({
         </p>
       </div>
     </>
-  );
-}
-
-/**
- * Petunjuk sekali sahaja di bawah nombor IPU (dalam aliran kandungan, tidak menindih
- * butang lain): kategori boleh diketik untuk melihat skala. Hilang bila "Faham" atau
- * pil diketik.
- */
-export function IpuScaleCoach({
-  label,
-  compact = false,
-}: {
-  label: string;
-  /** Desktop: satu baris pendek supaya kotak IPU hampir tidak berubah tinggi. */
-  compact?: boolean;
-}) {
-  const { t } = useI18n();
-  const seen = useSyncExternalStore(subscribeCoach, coachSeen, () => true);
-  if (seen) return null;
-  if (compact)
-    return (
-      <div
-        role="status"
-        data-testid="ipu-scale-coach"
-        className="text-muted flex items-center gap-2 text-[13px] font-semibold"
-      >
-        <Info aria-hidden="true" size={16} weight="bold" className="shrink-0" />
-        <span className="min-w-0">
-          {t("Ketik “{label}” untuk lihat skala IPU", { label })}
-        </span>
-        <span aria-hidden="true">·</span>
-        <button
-          type="button"
-          onClick={markCoachSeen}
-          className="text-ink min-h-8 shrink-0 font-bold underline underline-offset-2"
-        >
-          {t("Faham")}
-        </button>
-      </div>
-    );
-  return (
-    <div
-      role="status"
-      data-testid="ipu-scale-coach"
-      className="bg-ink text-page flex items-center gap-3 rounded-2xl py-2.5 pr-2.5 pl-3.5 text-[13px] leading-snug"
-    >
-      <Info aria-hidden="true" size={18} weight="bold" className="shrink-0" />
-      <span className="min-w-0 flex-1">
-        <b>{t("Apa maksud nombor ini?")}</b>{" "}
-        {t(
-          "Ketik “{label}” untuk melihat skala IPU dan kedudukan bacaan anda.",
-          {
-            label,
-          },
-        )}
-      </span>
-      <button
-        type="button"
-        onClick={markCoachSeen}
-        className="min-h-9 shrink-0 rounded-full bg-white/15 px-3.5 text-xs font-bold"
-      >
-        {t("Faham")}
-      </button>
-    </div>
   );
 }

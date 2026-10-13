@@ -243,3 +243,22 @@ html[data-welcome] [data-home-skeleton] {
 html:not([data-welcome]) [data-welcome-screen] {
   display: none !important;
 }
+
+/* Lawatan pertama: ikon ⓘ pada pil kategori berdenyut lembut (3 kali) untuk menunjukkan ia boleh diketik. */
+@keyframes ipu-info-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.35);
+  }
+}
+.ipu-info-pulse {
+  animation: ipu-info-pulse 0.9s ease-in-out 0.8s 3;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ipu-info-pulse {
+    animation: none;
+  }
+}
