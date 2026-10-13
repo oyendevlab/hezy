@@ -182,6 +182,9 @@ export const test = base.extend<{ mockApi: void }>({
           },
         }),
       );
+      await page.route("**/api/wind", (route) =>
+        route.fulfill({ json: FAKE_WIND() }),
+      );
       await page.route("**/api/accuracy", (route) =>
         route.fulfill({
           json: {
@@ -223,4 +226,20 @@ export const OFFICIAL_SHAH_ALAM = {
   emergency: false,
   pollutant: "PM2.5",
   time: "2026-10-11T10:00",
+};
+
+/** Respons /api/wind rekaan: grid penuh, angin seragam dari timur (mengalir ke barat) 18 km/j. */
+export const FAKE_WIND = () => {
+  const n = 21 * 8;
+  return {
+    source: "Open-Meteo (850 hPa)",
+    lat0: 0.5,
+    lon0: 99,
+    step: 1,
+    nx: 21,
+    ny: 8,
+    u: Array.from({ length: n }, () => -18),
+    v: Array.from({ length: n }, () => 0),
+    time: "2026-10-13T19:00",
+  };
 };

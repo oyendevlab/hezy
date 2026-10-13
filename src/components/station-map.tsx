@@ -3,7 +3,7 @@
 import "leaflet/dist/leaflet.css";
 import type * as Leaflet from "leaflet";
 import type { Map as LeafletMap } from "leaflet";
-import { Broadcast, Fire, Wind, X } from "@phosphor-icons/react";
+import { Broadcast, Fire, Gradient, Wind, X } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { distanceKm, type Station } from "@/lib/apims";
@@ -34,6 +34,9 @@ import type { HotspotCell } from "@/lib/hotspots";
 import { useReading } from "@/lib/use-reading";
 import { CALM_KMH } from "@/lib/wind";
 import { IpuPill } from "./ipu-pill";
+import { createHeatLayer, createWindLayer } from "./map-layers";
+import type { WindGrid } from "@/lib/wind-grid";
+import { HEAT_STOPS } from "@/lib/heat";
 import { WindArrow, useWindText } from "./wind-line";
 import { Notice, Skeleton } from "./status";
 
@@ -175,6 +178,8 @@ export function StationMap() {
   const [fires, setFires] = useState<HotspotCell[] | null>(null);
   const [showFires, setShowFires] = useState(true);
   const [showWind, setShowWind] = useState(true);
+  const [showHeat, setShowHeat] = useState(false);
+  const [windGrid, setWindGrid] = useState<WindGrid | null>(null);
   const [zoom, setZoom] = useState<number | null>(null);
 
   // Ambil senarai stesen.
@@ -252,6 +257,62 @@ export function StationMap() {
     // Peta hanya dibina semula bila senarai stesen berubah.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stations]);
+
+  // Grid angin 850 hPa untuk aliran angin (dicache 1 jam di pelayan).
+  useEffect(() => {
+    if (!mapReady || windGrid) return;
+    let cancelled = false;
+    fetch("/api/wind")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((body: WindGrid | null) => {
+        if (!cancelled && body?.u?.length) setWindGrid(body);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [mapReady, windGrid]);
+
+  // Aliran angin (zarah; anak panah statik untuk gerakan dikurangkan).
+  useEffect(() => {
+    const m = map.current;
+    if (!mapReady || !m || !showWind || !windGrid) return;
+    let layer: Leaflet.Layer | null = null;
+    let disposed = false;
+    const reduce = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    const attribution = "Angin 850 hPa: Open-Meteo";
+    void import("leaflet").then((L) => {
+      if (disposed) return;
+      layer = createWindLayer(L, windGrid, reduce).addTo(m);
+      m.attributionControl.addAttribution(attribution);
+    });
+    return () => {
+      disposed = true;
+      layer?.remove();
+      m.attributionControl.removeAttribution(attribution);
+    };
+  }, [mapReady, showWind, windGrid]);
+
+  // Peta haba IPU (anggaran IDW antara stesen rasmi).
+  useEffect(() => {
+    const m = map.current;
+    if (!mapReady || !m || !showHeat || !stations) return;
+    const points = stations.flatMap((s) =>
+      s.ipu === null ? [] : [{ lat: s.lat, lon: s.lon, ipu: s.ipu }],
+    );
+    let layer: Leaflet.Layer | null = null;
+    let disposed = false;
+    void import("leaflet").then((L) => {
+      if (disposed) return;
+      layer = createHeatLayer(L, points).addTo(m);
+    });
+    return () => {
+      disposed = true;
+      layer?.remove();
+    };
+  }, [mapReady, showHeat, stations]);
 
   // Pin stesen APIMS: dibina semula bila zum berubah (himpunan).
   useEffect(() => {
@@ -492,7 +553,19 @@ export function StationMap() {
                 {t("Sensor ({count})", { count: sensors.length })}
               </label>
             )}
-            {wind && (
+            {stations && (
+              <label className={chip(showHeat)}>
+                <input
+                  type="checkbox"
+                  checked={showHeat}
+                  onChange={(e) => setShowHeat(e.target.checked)}
+                  className="absolute inset-0 cursor-pointer appearance-none rounded-full"
+                />
+                <Gradient aria-hidden="true" size={15} weight="bold" />
+                {t("Peta haba")}
+              </label>
+            )}
+            {(wind || windGrid) && (
               <label className={chip(showWind)}>
                 <input
                   type="checkbox"
@@ -505,6 +578,29 @@ export function StationMap() {
               </label>
             )}
           </fieldset>
+          {showHeat && (
+            <div
+              data-testid="heat-legend"
+              className="bg-page/90 flex flex-col gap-1 rounded-xl px-3 py-2 text-[11px] font-semibold shadow"
+            >
+              <span>{t("Anggaran IPU antara stesen")}</span>
+              <span
+                aria-hidden="true"
+                className="h-2 w-40 rounded-full"
+                style={{
+                  background: `linear-gradient(to right, ${HEAT_STOPS.map(
+                    ([v, c]) => `${c} ${(Math.min(v, 300) / 300) * 100}%`,
+                  ).join(", ")})`,
+                }}
+              />
+              <span className="text-muted flex w-40 justify-between font-medium tabular-nums">
+                <span>0</span>
+                <span>100</span>
+                <span>200</span>
+                <span>300+</span>
+              </span>
+            </div>
+          )}
           {wind && showWind && (
             <div className="bg-page/90 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold shadow">
               {wind.speed >= CALM_KMH && (
@@ -644,8 +740,22 @@ export function StationMap() {
         )}
       </div>
 
-      {(firesOn || sensorsOn) && (
+      {(firesOn || sensorsOn || showHeat || (showWind && windGrid)) && (
         <div className="text-muted flex flex-col gap-1.5 text-xs">
+          {showHeat && (
+            <p>
+              {t(
+                "Peta haba ialah anggaran antara stesen APIMS (interpolasi), bukan bacaan rasmi. Kawasan jauh dari stesen dibiarkan kosong.",
+              )}
+            </p>
+          )}
+          {showWind && windGrid && (
+            <p>
+              {t(
+                "Garisan bergerak menunjukkan aliran angin pada ~1.5 km (850 hPa) yang membawa asap jerebu. Sumber: Open-Meteo.",
+              )}
+            </p>
+          )}
           {firesOn && (
             <p>
               <span

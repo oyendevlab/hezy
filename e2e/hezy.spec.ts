@@ -703,9 +703,13 @@ test.describe("arah angin", () => {
     ).toBeVisible();
     const fires = page.getByRole("checkbox", { name: "Titik panas (3)" });
     await expect(fires).toBeChecked();
-    await expect(page.locator(".leaflet-container canvas")).toHaveCount(1);
+    await expect(
+      page.locator(".leaflet-container canvas:not(.hezy-wind):not(.hezy-heat)"),
+    ).toHaveCount(1);
     await fires.uncheck();
-    await expect(page.locator(".leaflet-container canvas")).toHaveCount(0);
+    await expect(
+      page.locator(".leaflet-container canvas:not(.hezy-wind):not(.hezy-heat)"),
+    ).toHaveCount(0);
   });
 });
 
@@ -1348,6 +1352,53 @@ test.describe("peta stesen", () => {
     await pin.click();
     await page.getByRole("button", { name: "Tutup" }).click();
     await expect(sheet).toHaveCount(0);
+  });
+
+  test("peta haba: cip menghidupkan lapisan dan legenda", async ({ page }) => {
+    await seedLocation(page);
+    await page.goto("/lokasi");
+    await page.getByRole("tab", { name: "Peta" }).click();
+    const heat = page.getByRole("checkbox", { name: "Peta haba" });
+    await expect(heat).not.toBeChecked();
+    await expect(page.locator("canvas.hezy-heat")).toHaveCount(0);
+    await heat.check();
+    await expect(page.locator("canvas.hezy-heat")).toHaveCount(1);
+    await expect(page.getByTestId("heat-legend")).toBeVisible();
+    // Lapisan berwarna di sekitar stesen (bukan kosong).
+    await expect
+      .poll(() =>
+        page.locator("canvas.hezy-heat").evaluate((c: HTMLCanvasElement) => {
+          const d = c
+            .getContext("2d")!
+            .getImageData(0, 0, c.width, c.height).data;
+          let n = 0;
+          for (let i = 3; i < d.length; i += 4) if (d[i] > 0) n++;
+          return n;
+        }),
+      )
+      .toBeGreaterThan(100);
+    await heat.uncheck();
+    await expect(page.locator("canvas.hezy-heat")).toHaveCount(0);
+  });
+
+  test("aliran angin: zarah beranimasi; statik bila gerakan dikurangkan", async ({
+    page,
+  }) => {
+    await seedLocation(page);
+    await page.goto("/lokasi");
+    await page.getByRole("tab", { name: "Peta" }).click();
+    const wind = page.locator("canvas.hezy-wind");
+    await expect(wind).toHaveAttribute("data-mode", "animated");
+    await page.getByRole("checkbox", { name: "Angin" }).uncheck();
+    await expect(wind).toHaveCount(0);
+
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.reload();
+    await page.getByRole("tab", { name: "Peta" }).click();
+    await expect(page.locator("canvas.hezy-wind")).toHaveAttribute(
+      "data-mode",
+      "static",
+    );
   });
 
   test("lapisan sensor tambahan WAQI tanpa pendua APIMS", async ({ page }) => {

@@ -179,6 +179,13 @@ const EN: Record<string, string> = {
   "Anda boleh menukar ambang dan rutin amaran di Tetapan.":
     "You can change the threshold and alert routine in Settings.",
   Nanti: "Later",
+  // Peta haba dan aliran angin (v0.7.0)
+  "Peta haba": "Heat map",
+  "Anggaran IPU antara stesen": "Estimated API between stations",
+  "Peta haba ialah anggaran antara stesen APIMS (interpolasi), bukan bacaan rasmi. Kawasan jauh dari stesen dibiarkan kosong.":
+    "The heat map is an estimate between APIMS stations (interpolated), not an official reading. Areas far from any station are left blank.",
+  "Garisan bergerak menunjukkan aliran angin pada ~1.5 km (850 hPa) yang membawa asap jerebu. Sumber: Open-Meteo.":
+    "Moving lines show the wind at ~1.5 km (850 hPa), which carries haze smoke. Source: Open-Meteo.",
   // Notifikasi ujian
   "Hantar notifikasi ujian": "Send a test notification",
   "Menghantar…": "Sending…",
