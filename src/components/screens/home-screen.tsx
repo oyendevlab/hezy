@@ -352,11 +352,13 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
             </>
           }
         />
-        <div className="relative h-[420px] overflow-hidden">
+        {/* Kotak dilekat di bawah baris cip (bukan di dasar langit) supaya membesar ke bawah
+            — petunjuk, teks panjang atau notis Kecemasan tidak menindih pengepala. */}
+        <div className="relative min-h-[420px] overflow-hidden">
           {wide && (
             <SkyCanvas {...sky} className="absolute inset-0 h-full w-full" />
           )}
-          <div className="absolute inset-x-0 bottom-16">
+          <div className="relative pt-[88px] pb-16">
             <div className="mx-auto max-w-[1200px] px-10">
               <div className="bg-page inline-flex max-w-[560px] flex-col gap-2 rounded-[28px] px-7 py-6">
                 <Headline
@@ -530,7 +532,7 @@ function Headline({
           />
         )}
       </div>
-      <IpuScaleCoach label={t(current.label)} />
+      <IpuScaleCoach label={t(current.label)} compact={size === "desktop"} />
       {current.emergency && (
         <Notice tone="warning">
           {t(

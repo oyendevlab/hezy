@@ -168,6 +168,8 @@ const EN: Record<string, string> = {
     "Tap “{label}” to see the API scale and where your reading sits.",
   Faham: "Got it",
   "Skala IPU": "API scale",
+  Bahasa: "Language",
+  "Ketik “{label}” untuk lihat skala IPU": "Tap “{label}” to see the API scale",
   "Sekarang {ipu} · {label}. Semakin tinggi nombor, semakin teruk jerebu.":
     "Now {ipu} · {label}. The higher the number, the worse the haze.",
   ANDA: "YOU",

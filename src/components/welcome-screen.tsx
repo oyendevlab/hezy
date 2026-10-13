@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { findArea } from "@/lib/areas";
 import { formatClock } from "@/lib/format";
 import { GEO_ERROR_MESSAGE, requestPosition } from "@/lib/geolocation";
+import { LANGUAGES } from "@/lib/i18n";
 import { ipuCategory } from "@/lib/ipu";
 import { areaToLocation, gpsToLocation } from "@/lib/locations";
 import type { NationalSummary } from "@/lib/national";
@@ -87,11 +88,35 @@ export function WelcomeScreen({
         className="relative flex flex-col gap-3 overflow-hidden px-5 pt-[max(env(safe-area-inset-top),28px)] pb-12 text-[#1c1a16] md:rounded-l-[32px] md:px-12 md:py-12"
         style={{ background: SKY }}
       >
-        <div className="flex items-center gap-2.5">
-          <Logo size={44} />
-          <span className="font-display hidden text-2xl font-extrabold md:inline">
-            Hezy
-          </span>
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <Logo size={44} />
+            <span className="font-display hidden text-2xl font-extrabold md:inline">
+              Hezy
+            </span>
+          </div>
+          {/* Bahasa boleh dipilih sebelum lokasi (Tetapan belum boleh dicapai). */}
+          <div
+            role="group"
+            aria-label={t("Bahasa")}
+            className="flex rounded-full bg-white/70 p-1 shadow-[0_1px_6px_rgb(0_0_0/0.1)]"
+          >
+            {LANGUAGES.map((l) => (
+              <button
+                key={l.key}
+                type="button"
+                lang={l.key}
+                aria-pressed={lang === l.key}
+                onClick={() => updatePrefs((p) => ({ ...p, lang: l.key }))}
+                className={`min-h-9 min-w-11 rounded-full px-3 text-[13px] font-bold ${
+                  lang === l.key ? "bg-[#1c1a16] text-white" : "text-[#1c1a16]"
+                }`}
+              >
+                <span aria-hidden="true">{l.key === "ms" ? "BM" : "EN"}</span>
+                <span className="sr-only">{l.label}</span>
+              </button>
+            ))}
+          </div>
         </div>
         <h1 className="font-display mt-3 max-w-[12ch] text-[34px] leading-[1.02] font-extrabold tracking-[-0.015em] text-balance md:mt-10 md:text-[52px]">
           {t("Semak jerebu di kawasan anda")}
