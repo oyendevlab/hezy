@@ -40,7 +40,7 @@ import { HomeHeader } from "../home-header";
 import { ElasticCard } from "../elastic-card";
 import { TrendLink, TrendLinkSkeleton } from "../trend-link";
 import { WelcomeScreen } from "../welcome-screen";
-import { IpuScaleButton, IpuScaleCoach } from "../ipu-scale";
+import { IpuScaleButton } from "../ipu-scale";
 import { AlertCard } from "../alert-card";
 import type { NationalSummary } from "@/lib/national";
 import { AnimatedNumber } from "../animated-number";
@@ -532,7 +532,6 @@ function Headline({
           />
         )}
       </div>
-      <IpuScaleCoach label={t(current.label)} compact={size === "desktop"} />
       {current.emergency && (
         <Notice tone="warning">
           {t(

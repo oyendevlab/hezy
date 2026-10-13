@@ -118,32 +118,6 @@ test.describe("aliran utama", () => {
     ).toBeVisible();
   });
 
-  test("desktop: petunjuk skala tidak menganjak kotak IPU", async ({
-    page,
-    isMobile,
-  }) => {
-    test.skip(isMobile, "Susun atur desktop");
-    await seedLocation(page);
-    await page.goto("/");
-    const headline = page
-      .locator("h1[data-ipu-headline]")
-      .filter({ visible: true });
-    await expect(headline).toBeVisible();
-    const chip = (await page
-      .getByTestId("location-menu-button")
-      .filter({ visible: true })
-      .boundingBox())!;
-    const before = (await headline.boundingBox())!.y;
-    expect(before).toBeGreaterThan(chip.y + chip.height);
-    await page
-      .getByTestId("ipu-scale-coach")
-      .filter({ visible: true })
-      .getByRole("button", { name: "Faham" })
-      .click();
-    await expect(page.getByTestId("ipu-scale-coach")).toHaveCount(0);
-    expect((await headline.boundingBox())!.y).toBeCloseTo(before, 0);
-  });
-
   test("pengguna sedia ada (ada lokasi) terus ke Utama, tiada skrin alu-aluan", async ({
     page,
   }) => {
@@ -158,18 +132,18 @@ test.describe("aliran utama", () => {
     await expect(page.locator("html")).not.toHaveAttribute("data-welcome", "");
   });
 
-  test("skala IPU: petunjuk sekali, helaian dengan tahap semasa ditanda", async ({
+  test("skala IPU: ⓘ berdenyut sekali, helaian dengan tahap semasa ditanda", async ({
     page,
   }) => {
     await seedLocation(page);
     await page.goto("/");
-    const coach = page.getByTestId("ipu-scale-coach").filter({ visible: true });
-    // Telefon: baris penuh; desktop: versi padat. Kedua-duanya menyebut skala IPU.
-    await expect(coach).toContainText("skala IPU");
-    await page
+    const button = page
       .getByTestId("ipu-scale-button")
-      .filter({ visible: true })
-      .click();
+      .filter({ visible: true });
+    // Lawatan pertama: ikon ⓘ berdenyut (tiada teks petunjuk).
+    await expect(button.locator('[data-pulse="true"]')).toHaveCount(1);
+    await expect(page.getByText("Apa maksud nombor ini?")).toHaveCount(0);
+    await button.click();
     const sheet = page.getByRole("dialog", { name: "Skala IPU" });
     await expect(sheet).toBeVisible();
     await expect(sheet.locator('[aria-current="true"]')).toContainText(
@@ -182,12 +156,12 @@ test.describe("aliran utama", () => {
     expect(axe.violations).toEqual([]);
     await page.keyboard.press("Escape");
     await expect(sheet).toHaveCount(0);
-    // Petunjuk tidak dipaparkan semula.
+    // Denyutan tidak diulang selepas pil diketik.
     await page.reload();
     await expect(
       page.locator("h1[data-ipu-headline]").filter({ visible: true }),
     ).toBeVisible();
-    await expect(page.getByTestId("ipu-scale-coach")).toHaveCount(0);
+    await expect(page.locator('[data-pulse="true"]')).toHaveCount(0);
   });
 
   test("kad amaran muncul bila IPU > 100; Nanti menyembunyikannya", async ({
@@ -373,9 +347,8 @@ test.describe("kedudukan kad putih", () => {
   }) => {
     test.skip(!isMobile, "Kad putih elastik untuk telefon");
     await seedLocation(page);
-    // Susun atur asas: petunjuk skala dan kad amaran (sekali sahaja) sudah ditutup.
+    // Susun atur asas: kad amaran (pada saat relevan) sudah ditutup.
     await page.addInitScript(() => {
-      localStorage.setItem("hezy:coach-skala", "1");
       localStorage.setItem("hezy:kad-amaran", String(Date.now()));
     });
     await page.goto("/");
