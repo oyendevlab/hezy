@@ -407,3 +407,43 @@ Fokus: UI/UX yang lebih licin dan seperti aplikasi asli. Termasuk pembetulan ked
 - [x] Ujian unit dan E2E lulus pada CI dan production; axe tanpa pelanggaran
 - [x] Lighthouse ≥ 90 dikekalkan
 - [x] Kemas kini `UJIAN-TELEFON.md`, versi 0.6.0, tag dan GitHub Release
+
+## Fasa 15 — v0.7.0 (menunggu pengesahan)
+
+Fokus: pengalaman pertama kali yang "nilai dahulu, ajar kemudian" (mockup: https://claude.ai/artifact/4raNnmQDKVAkgRRsJ8yZCC), kemudian ciri yang KIV sejak v0.5.1. Jika terlalu besar, bahagian C–D dipindah ke v0.8.0.
+
+**KIV:** pautan sandaran `hezy.vercel.app` tanpa ubah hala dan pemantauan DNS dalam `pantau.yml` (laporan "server can't be found" 13 Okt; DNS disahkan sihat). Item lama: mod guru, senarai semak, BM Cina/Tamil, model ML (≥ 3 bulan data).
+
+### A. Pengalaman pertama kali (keutamaan)
+
+1. **Skrin alu-aluan tunggal** menggantikan pengenalan 3 langkah dan halaman alu-aluan sedia ada
+   - [ ] Langit Hezy sebagai latar; tajuk "Semak jerebu di kawasan anda"
+   - [ ] Butang **Guna lokasi saya** dengan nota privasi (dibundarkan ~1 km, tidak disimpan)
+   - [ ] **Cip 6 bandar popular** (Kuala Lumpur, Shah Alam, Johor Bahru, Pulau Pinang, Kuching, Kota Kinabalu) + carian; satu ketikan terus ke Utama
+   - [ ] Pengguna sedia ada (yang sudah melihat pengenalan) tidak terjejas
+2. **Jalur "Malaysia sekarang"**: negeri tertinggi dan terendah daripada stesen APIMS, dengan masa bacaan
+3. **Helaian skala IPU**: ketik pil kategori (Utama, Trend) → 5 tahap dengan nasihat ringkas, tahap semasa ditanda "ANDA"
+   - [ ] Petunjuk sekali sahaja pada lawatan pertama ke Utama: "Apa maksud nombor ini?"
+4. **Kad amaran pada saat relevan** di Utama: bila IPU > 100 atau pada lawatan kedua; "Hidupkan amaran" / "Nanti" (tidak muncul semula selama 14 hari); di iPhone digabung dengan langkah pasang
+5. **Desktop dua lajur**: langit + IPU negara di kiri, pilihan lokasi di kanan; bar navigasi disembunyikan sehingga lokasi dipilih
+6. **Paparan pertama lebih pantas**: skrin alu-aluan dirender dari pelayan (HTML statik); skrip kecil dalam `<head>` menentukan pengguna baharu/lama sebelum lukisan pertama (tiada kelipan) — sasaran LCP < 2 s pada Lighthouse telefon
+
+### B. Peta
+
+7. **Peta haba IPU**: lapisan warna antara stesen (interpolasi IDW pada kanvas), cip "Peta haba", legenda, ketelusan boleh dilihat menembusi
+8. **Aliran angin**: zarah bergerak mengikut grid angin 850 hPa (Open-Meteo, dicache 1 jam di pelayan); `prefers-reduced-motion` → anak panah statik
+
+### C. Amaran
+
+9. **Amaran lonjakan**: notifikasi bila IPU naik mendadak (cth. +30 dalam 3 jam) walaupun masih di bawah ambang; pilihan dalam Rutin amaran
+10. **Amaran jerebu dijangka**: notifikasi awal bila ramalan 6 jam akan datang melepasi ambang sedangkan sekarang masih di bawah; sekali sehari bagi setiap lokasi
+
+### D. Kongsi
+
+11. **Mod gambar negeri**: imej kad negeri (stesen + IPU maksimum + bendera) untuk dikongsi dari halaman negeri
+
+### Selesai v0.7.0
+
+- [ ] Ujian unit dan E2E (termasuk aliran pengguna baharu dan axe); semakan di Safari iOS (simulator)
+- [ ] Lighthouse telefon ≥ 95 dengan LCP < 2 s
+- [ ] Kemas kini `UJIAN-TELEFON.md`, versi 0.7.0, tag dan GitHub Release
