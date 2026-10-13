@@ -242,7 +242,7 @@ export function StationMap() {
       L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 18,
         attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · Data IPU: APIMS (JAS)',
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · APIMS (JAS)',
       }).addTo(m);
 
       setMapReady(true);
@@ -282,7 +282,7 @@ export function StationMap() {
     const reduce = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
-    const attribution = "Angin 850 hPa: Open-Meteo";
+    const attribution = '<a href="https://open-meteo.com/">Open-Meteo</a>';
     void import("leaflet").then((L) => {
       if (disposed) return;
       layer = createWindLayer(L, windGrid, reduce).addTo(m);
@@ -390,7 +390,7 @@ export function StationMap() {
     let renderer: import("leaflet").Canvas | null = null;
     let disposed = false;
     const attribution =
-      'Titik panas: <a href="https://firms.modaps.eosdis.nasa.gov/">NASA FIRMS</a>';
+      '<a href="https://firms.modaps.eosdis.nasa.gov/">NASA FIRMS</a>';
     void import("leaflet").then((L) => {
       if (disposed) return;
       // Kanvas: ribuan titik tanpa elemen DOM berasingan.
@@ -423,8 +423,7 @@ export function StationMap() {
       return;
     let layer: Leaflet.LayerGroup | null = null;
     let disposed = false;
-    const attribution =
-      'Sensor tambahan: <a href="https://waqi.info/">WAQI</a> &amp; EPA asal';
+    const attribution = '<a href="https://waqi.info/">WAQI</a> &amp; EPA asal';
     void import("leaflet").then((L) => {
       if (disposed) return;
       layer = pinLayer(L, m, zoom, sensors, {
@@ -581,24 +580,20 @@ export function StationMap() {
           {showHeat && (
             <div
               data-testid="heat-legend"
-              className="bg-page/90 flex flex-col gap-1 rounded-xl px-3 py-2 text-[11px] font-semibold shadow"
+              className="bg-page/90 flex items-center gap-2 rounded-full px-3 py-1.5 text-[11px] font-semibold shadow"
             >
-              <span>{t("Anggaran IPU antara stesen")}</span>
+              <span>{t("Anggaran IPU")}</span>
+              <span className="text-muted tabular-nums">0</span>
               <span
                 aria-hidden="true"
-                className="h-2 w-40 rounded-full"
+                className="h-2 w-20 rounded-full"
                 style={{
                   background: `linear-gradient(to right, ${HEAT_STOPS.map(
                     ([v, c]) => `${c} ${(Math.min(v, 300) / 300) * 100}%`,
                   ).join(", ")})`,
                 }}
               />
-              <span className="text-muted flex w-40 justify-between font-medium tabular-nums">
-                <span>0</span>
-                <span>100</span>
-                <span>200</span>
-                <span>300+</span>
-              </span>
+              <span className="text-muted tabular-nums">300+</span>
             </div>
           )}
           {wind && showWind && (
