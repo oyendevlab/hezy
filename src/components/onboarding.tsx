@@ -98,7 +98,7 @@ export function Onboarding({
         <>
           <p className="text-[16px] leading-relaxed">
             {t(
-              "Indeks Pencemar Udara (IPU) mengukur kebersihan udara. Semakin tinggi nombornya, semakin teruk jerebu.",
+              "Indeks Pencemaran Udara (IPU) mengukur kebersihan udara. Semakin tinggi nombornya, semakin teruk jerebu.",
             )}
           </p>
           <ul className="flex flex-col gap-2">

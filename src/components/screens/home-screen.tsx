@@ -166,7 +166,7 @@ function Welcome() {
       </h1>
       <p className="text-muted mt-2 text-[16px]">
         {t(
-          "Pilih lokasi untuk melihat Indeks Pencemar Udara (IPU) dan nasihat kesihatan.",
+          "Pilih lokasi untuk melihat Indeks Pencemaran Udara (IPU) dan nasihat kesihatan.",
         )}
       </p>
       <div className="mt-6">
@@ -492,7 +492,7 @@ function Headline({
             aria-hidden="true"
             className="text-muted text-xs font-bold tracking-[0.14em] uppercase"
           >
-            {t("Indeks Pencemar Udara")}
+            {t("Indeks Pencemaran Udara")}
           </div>
           <div className="flex items-center gap-3.5">
             <h1
