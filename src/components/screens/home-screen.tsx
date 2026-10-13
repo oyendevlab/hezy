@@ -19,6 +19,7 @@ import { displayIpu, primaryReading } from "@/lib/official";
 import type { Prefs, SavedLocation } from "@/lib/prefs";
 import type { Reading } from "@/lib/reading";
 import { buildSharePath } from "@/lib/share";
+import { locationStateId } from "@/lib/state-flag";
 import { buildCardPath, type CardFormat } from "@/lib/share-card";
 import { useI18n } from "@/lib/use-i18n";
 import { useReading, type ReadingEntry } from "@/lib/use-reading";
@@ -234,11 +235,13 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
         label: t(current.label),
       })
     : t("Hezy — semak jerebu");
+  const flagState = locationStateId(location, reading?.state);
   const sharePath = current
     ? buildSharePath({
         name: location.name,
         ipu: current.ipu,
         source: current.source,
+        state: flagState,
       })
     : "/";
   const card =
@@ -253,6 +256,7 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
             time: formatClock(current.time, lang),
             lang,
             format,
+            state: flagState,
           })
       : undefined;
   const fileName = `hezy-${location.name

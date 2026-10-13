@@ -735,6 +735,8 @@ test.describe("kongsi imej kad", () => {
     const dialog = page.getByRole("dialog", { name: "Kongsi IPU terkini" });
     await expect(dialog).toBeVisible();
     await expect(dialog.getByRole("img")).toHaveJSProperty("complete", true);
+    // Kawasan dari senarai bandar: bendera negerinya pada kad.
+    await expect(dialog.getByRole("img")).toHaveAttribute("src", /&g=selangor/);
     expect(
       await dialog
         .getByRole("img")
@@ -779,6 +781,23 @@ test.describe("kongsi imej kad", () => {
     expect(story.status()).toBe(200);
     expect((await story.body()).length).toBeGreaterThan(10_000);
     expect((await request.get("/kongsi/kad?n=Klang&i=abc")).status()).toBe(400);
+  });
+
+  test("imej kad dengan bendera negeri, kad negeri dan pratonton pautan", async ({
+    request,
+  }) => {
+    const flagged = await request.get(
+      "/kongsi/kad?n=Klang&i=146&s=apims&h=80,90,146&k=2&t=10:00&g=selangor",
+    );
+    expect(flagged.status()).toBe(200);
+    const og = await request.get("/kongsi/og?n=Klang&i=146&s=apims&g=selangor");
+    expect(og.headers()["content-type"]).toBe("image/png");
+    for (const f of ["square", "story"]) {
+      const res = await request.get(`/kongsi/negeri?g=selangor&l=ms&f=${f}`);
+      expect(res.status()).toBe(200);
+      expect(res.headers()["content-type"]).toBe("image/png");
+    }
+    expect((await request.get("/kongsi/negeri?g=atlantis")).status()).toBe(400);
   });
 });
 
@@ -1850,6 +1869,27 @@ test.describe("halaman negeri", () => {
       .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
       .analyze();
     expect(results.violations.map((v) => v.id)).toEqual([]);
+  });
+
+  test("butang Gambar membuka kad imej negeri", async ({ page }) => {
+    await page.goto("/negeri/selangor");
+    const button = page.getByRole("button", { name: "Gambar" });
+    // Tiada butang bila APIMS gagal (tiada bacaan).
+    if (!(await button.isVisible())) return;
+    await button.click();
+    const dialog = page.getByRole("dialog", { name: "Kongsi gambar Selangor" });
+    await expect(dialog).toBeVisible();
+    await expect(dialog.locator("img")).toHaveAttribute(
+      "src",
+      "/kongsi/negeri?g=selangor&l=ms&f=square",
+    );
+    await expect(
+      dialog.getByRole("button", { name: "Kongsi gambar" }),
+    ).toBeEnabled();
+    await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
+      "content",
+      /\/kongsi\/negeri\?g=selangor/,
+    );
   });
 
   test("sitemap merangkumi halaman negeri", async ({ request }) => {

@@ -11,6 +11,7 @@ import { upwindHotspots } from "@/lib/hotspots";
 import { currentWeather } from "@/lib/weather";
 import { CALM_KMH, windAt } from "@/lib/wind";
 import { loadReading } from "@/lib/load-reading";
+import { stateForPoint } from "@/lib/state-flag";
 import { localHourKey } from "@/lib/reading";
 
 /**
@@ -59,6 +60,10 @@ export async function GET(request: Request) {
       (d) => d.date > nowKey.slice(0, 10),
     );
   }
+  reading.state =
+    stations.status === "fulfilled"
+      ? stateForPoint(stations.value, coords)
+      : null;
   if (wind.status === "rejected") console.error("[api/aqi] cuaca", wind.reason);
   if (reading.wind && reading.wind.speed >= CALM_KMH) {
     try {

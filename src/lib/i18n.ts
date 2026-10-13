@@ -186,6 +186,16 @@ const EN: Record<string, string> = {
     "The API spread is an estimate between stations (interpolated), not an official reading: APIMS within Malaysia, WAQI sensors outside Malaysia (US AQI converted to the API scale). Areas far from any station are left blank.",
   "Garisan bergerak menunjukkan aliran angin pada ~1.5 km (850 hPa) yang membawa asap jerebu. Sumber: Open-Meteo.":
     "Moving lines show the wind at ~1.5 km (850 hPa), which carries haze smoke. Source: Open-Meteo.",
+  // Kad imej negeri (v0.7.0)
+  "IPU tertinggi · {station}": "Highest API · {station}",
+  "{n} daripada {total} stesen melebihi IPU 100":
+    "{n} of {total} stations above API 100",
+  "Tiada stesen melebihi IPU 100": "No station above API 100",
+  "Bacaan APIMS tidak tersedia buat masa ini.":
+    "APIMS readings are not available right now.",
+  "IPU {state} hari ini · via Hezy": "{state} API today · via Hezy",
+  Gambar: "Image",
+  "Kongsi gambar {state}": "Share {state} image",
   // Amaran lonjakan dan jerebu dijangka (v0.7.0)
   "IPU {name} naik mendadak: {from} → {to}":
     "{name} API rising fast: {from} → {to}",

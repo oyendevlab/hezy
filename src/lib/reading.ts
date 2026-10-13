@@ -69,6 +69,8 @@ export type Reading = {
   stale: boolean;
   /** Bacaan rasmi APIMS stesen terdekat (≤ 30 km, ≤ 3 jam); diisi oleh route API. */
   official: OfficialReading | null;
+  /** Negeri lokasi untuk bendera kad kongsi (stesen terdekat; `null` di sempadan); diisi oleh route API. */
+  state?: string | null;
   /** Cuaca semasa (langit hidup, ikon dan suhu); diisi oleh route API. */
   weather?: CurrentWeather | null;
   /** Cuaca harian hari-hari akan datang (ikon ramalan 3 hari). */

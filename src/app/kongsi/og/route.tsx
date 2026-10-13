@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 import { CATEGORY_STYLE } from "@/lib/category-style";
+import { flagDataUrl } from "@/lib/flag-image";
 import { parseShare } from "@/lib/share";
 
 /** GET /kongsi/og?n=Shah+Alam&i=72&s=apims — imej kad kongsi 1200×630. */
@@ -7,6 +8,7 @@ export async function GET(request: Request) {
   const params = Object.fromEntries(new URL(request.url).searchParams);
   const data = parseShare(params);
   const style = CATEGORY_STYLE[data?.category ?? "sederhana"];
+  const flag = await flagDataUrl(data?.state, request.url);
 
   return new ImageResponse(
     <div
@@ -52,11 +54,26 @@ export async function GET(request: Request) {
           <div
             style={{
               display: "flex",
+              alignItems: "center",
+              gap: 18,
               fontSize: 40,
               fontWeight: 700,
               color: "#5a564e",
             }}
           >
+            {flag && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={flag}
+                width={72}
+                height={36}
+                alt=""
+                style={{
+                  borderRadius: 5,
+                  boxShadow: "0 0 0 2px rgba(0,0,0,0.12)",
+                }}
+              />
+            )}
             {data.name}
           </div>
           <div

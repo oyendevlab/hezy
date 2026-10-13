@@ -16,6 +16,8 @@ export function ShareButton({
   path = "/",
   card,
   fileName = "hezy",
+  label,
+  title,
   className = "",
 }: {
   text: string;
@@ -23,6 +25,10 @@ export function ShareButton({
   /** Laluan imej kad bagi setiap format. */
   card?: (format: CardFormat) => string;
   fileName?: string;
+  /** Teks butang yang kelihatan (cth. "Gambar"); tanpanya butang ikon bulat. */
+  label?: string;
+  /** Tajuk helaian; lalai "Kongsi IPU terkini". */
+  title?: string;
   className?: string;
 }) {
   const { t } = useI18n();
@@ -135,8 +141,14 @@ export function ShareButton({
         type="button"
         onClick={open}
         aria-haspopup={cardPaths ? "dialog" : undefined}
-        aria-label={copied ? t("Status disalin") : t("Kongsi status")}
-        className={`flex size-11 items-center justify-center rounded-full ${className}`}
+        aria-label={
+          label ? undefined : copied ? t("Status disalin") : t("Kongsi status")
+        }
+        className={
+          label
+            ? `flex min-h-11 items-center gap-1.5 rounded-full px-3.5 text-sm font-semibold ${className}`
+            : `flex size-11 items-center justify-center rounded-full ${className}`
+        }
       >
         <svg
           aria-hidden="true"
@@ -153,6 +165,7 @@ export function ShareButton({
           <polyline points="16 6 12 2 8 6" />
           <line x1="12" y1="2" x2="12" y2="15" />
         </svg>
+        {label}
       </button>
 
       {cardPaths && (
@@ -168,7 +181,7 @@ export function ShareButton({
           <div className="flex flex-col gap-4 p-5 pb-[max(env(safe-area-inset-bottom),20px)]">
             <div className="flex items-center justify-between">
               <h2 id={titleId} className="font-display text-xl font-bold">
-                {t("Kongsi IPU terkini")}
+                {title ?? t("Kongsi IPU terkini")}
               </h2>
               <button
                 type="button"

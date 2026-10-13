@@ -30,6 +30,7 @@ export function buildCardPath(data: {
   time: string;
   lang: Lang;
   format: CardFormat;
+  state?: string | null;
 }): string {
   const params = new URLSearchParams({
     n: data.name.slice(0, 40),
@@ -44,6 +45,7 @@ export function buildCardPath(data: {
     l: data.lang,
     f: data.format,
   });
+  if (data.state) params.set("g", data.state);
   return `/kongsi/kad?${params}`;
 }
 

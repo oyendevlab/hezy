@@ -3,6 +3,7 @@ import { adviceFor } from "@/lib/advice";
 import { CATEGORY_STYLE } from "@/lib/category-style";
 import { translate } from "@/lib/i18n";
 import { ipuCategory } from "@/lib/ipu";
+import { flagDataUrl } from "@/lib/flag-image";
 import { CARD_SIZE, parseCard } from "@/lib/share-card";
 
 const INK = "#1c1a16";
@@ -25,6 +26,7 @@ export async function GET(request: Request) {
   const style = CATEGORY_STYLE[card.category];
   const darkPill = card.category === "baik" || card.category === "sederhana";
   const chartHeight = story ? 340 : 200;
+  const flag = await flagDataUrl(card.state, request.url);
 
   return new ImageResponse(
     <div
@@ -84,11 +86,26 @@ export async function GET(request: Request) {
           <div
             style={{
               display: "flex",
+              alignItems: "center",
+              gap: 18,
               fontSize: 40,
               fontWeight: 700,
               color: MUTED,
             }}
           >
+            {flag && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={flag}
+                width={72}
+                height={36}
+                alt=""
+                style={{
+                  borderRadius: 5,
+                  boxShadow: "0 0 0 2px rgba(0,0,0,0.12)",
+                }}
+              />
+            )}
             {t(card.name)}
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 32 }}>
