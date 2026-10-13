@@ -307,6 +307,7 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
           <SkyCanvas
             {...sky}
             coverAt={300}
+            blendTop
             className="fixed inset-x-0 top-0 h-[560px] w-full"
           />
         )}
