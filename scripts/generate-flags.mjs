@@ -2,6 +2,7 @@
 // Guna: node scripts/generate-flags.mjs <folder-svg>  (fail <id-negeri>.svg + credits.json)
 // SVG sumber tidak disimpan dalam repo; lesen dan atribusi: public/flags/CREDITS.md.
 import sharp from "sharp";
+import { format } from "prettier";
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 
 const source = process.argv[2];
@@ -35,5 +36,8 @@ const lines = [
   ),
   "",
 ];
-await writeFile("public/flags/CREDITS.md", lines.join("\n"));
+await writeFile(
+  "public/flags/CREDITS.md",
+  await format(lines.join("\n"), { parser: "markdown" }),
+);
 console.log("✓ public/flags/CREDITS.md");
