@@ -153,6 +153,35 @@ const EN: Record<string, string> = {
   "; bendera lain dalam domain awam. Bendera digunakan untuk mengenal pasti negeri sahaja; Hezy tidak berkaitan dengan mana-mana kerajaan negeri.":
     "; the other flags are in the public domain. Flags are used only to identify each state; Hezy is not affiliated with any state government.",
   "Senarai penuh sumber dan lesen": "Full list of sources and licences",
+  // Skrin alu-aluan, skala IPU, kad amaran (v0.7.0)
+  "Semak jerebu di kawasan anda": "Check the haze where you are",
+  "IPU rasmi APIMS dan nasihat kesihatan, dikemas kini setiap jam.":
+    "Official APIMS API readings and health advice, updated every hour.",
+  "MALAYSIA SEKARANG": "MALAYSIA NOW",
+  Tertinggi: "Highest",
+  Terendah: "Lowest",
+  "Lokasi dibundarkan ~1 km dan tidak disimpan.":
+    "Your location is rounded to ~1 km and not stored.",
+  "ATAU PILIH BANDAR": "OR PICK A CITY",
+  "— lihat skala IPU": "— see the API scale",
+  "Ketik “{label}” untuk melihat skala IPU dan kedudukan bacaan anda.":
+    "Tap “{label}” to see the API scale and where your reading sits.",
+  Faham: "Got it",
+  "Skala IPU": "API scale",
+  "Sekarang {ipu} · {label}. Semakin tinggi nombor, semakin teruk jerebu.":
+    "Now {ipu} · {label}. The higher the number, the worse the haze.",
+  ANDA: "YOU",
+  "Udara bersih": "Clean air",
+  "Kumpulan sensitif perlu berwaspada": "Sensitive groups should take care",
+  "Kurangkan aktiviti luar": "Reduce outdoor activity",
+  "Kekal di dalam rumah": "Stay indoors",
+  "Mahu diberitahu bila jerebu teruk?": "Want to know when the haze gets bad?",
+  "Hezy akan menghantar notifikasi bila IPU {name} melepasi {threshold}.":
+    "Hezy will notify you when the API in {name} goes above {threshold}.",
+  "Anda boleh menukar ambang dan rutin amaran di Tetapan.":
+    "You can change the threshold and alert routine in Settings.",
+  Nanti: "Later",
+  "Apa maksud nombor ini?": "What does this number mean?",
   // Notifikasi ujian
   "Hantar notifikasi ujian": "Send a test notification",
   "Menghantar…": "Sending…",

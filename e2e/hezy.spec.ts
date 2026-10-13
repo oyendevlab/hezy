@@ -49,65 +49,57 @@ test.describe("aliran utama", () => {
     expect([401, 503]).toContain(res.status());
   });
 
-  test("pengguna baharu: pengenalan 3 skrin, pilih kawasan dan nampak IPU", async ({
+  test("pengguna baharu: skrin alu-aluan, satu ketikan cip bandar → IPU", async ({
     page,
   }) => {
     await page.goto("/");
-    const onboarding = page.getByTestId("onboarding");
     await expect(
-      page.getByRole("heading", { name: "Apa itu IPU?" }),
+      page.getByRole("heading", { name: "Semak jerebu di kawasan anda" }),
     ).toBeVisible();
-    await expect(onboarding.getByText("101–200")).toBeVisible();
+    // Navigasi disembunyikan sehingga lokasi dipilih.
+    await expect(
+      page
+        .getByRole("navigation", { name: "Navigasi utama" })
+        .filter({ visible: true }),
+    ).toHaveCount(0);
+    // Jalur "Malaysia sekarang" dijana di pelayan daripada data APIMS sebenar (jika tersedia).
+    const national = page.getByTestId("national-summary");
+    if (await national.count())
+      await expect(national).toContainText(/Tertinggi.*Terendah/);
     const axe = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
       .analyze();
     expect(axe.violations.map((v) => v.id)).toEqual([]);
-    await page.getByRole("button", { name: "Seterusnya" }).click();
 
-    await expect(
-      page.getByRole("heading", { name: "Di mana anda berada?" }),
-    ).toBeFocused();
-    // Seterusnya dilumpuhkan sehingga lokasi dipilih.
-    await expect(
-      page.getByRole("button", { name: "Seterusnya" }),
-    ).toBeDisabled();
-    await page.getByLabel("Cari kawasan atau negeri").fill("shah");
-    await page.getByRole("button", { name: /Shah Alam/ }).click();
-
-    await expect(
-      page.getByRole("heading", { name: "Dapatkan amaran jerebu" }),
-    ).toBeVisible();
-    await page.getByRole("button", { name: "Mula guna Hezy" }).click();
-
+    await page.getByRole("button", { name: "Shah Alam" }).click();
     await expect(
       page.getByRole("heading", { name: "IPU 156, Tidak Sihat" }),
     ).toBeVisible();
     await expect(
-      page
-        .getByText("Elak bersenam di luar hari ini.")
-        .filter({ visible: true }),
-    ).toBeVisible();
-    await expect(
       page.getByText("Naik 12 dalam 3 jam").filter({ visible: true }),
     ).toBeVisible();
+    await expect(
+      page
+        .getByRole("navigation", { name: "Navigasi utama" })
+        .filter({ visible: true }),
+    ).toHaveCount(1);
   });
 
-  test("pengenalan boleh dilangkau dan tidak dipaparkan semula", async ({
+  test("pengguna baharu: carian kawasan dari skrin alu-aluan", async ({
     page,
   }) => {
     await page.goto("/");
-    await page.getByRole("button", { name: "Langkau" }).click();
+    await page.getByLabel("Cari kawasan atau negeri").fill("klang");
+    await page
+      .getByRole("button", { name: /^Klang/ })
+      .first()
+      .click();
     await expect(
-      page.getByRole("heading", { name: "Selamat datang ke Hezy" }),
+      page.locator("h1[data-ipu-headline]").filter({ visible: true }),
     ).toBeVisible();
-    await page.reload();
-    await expect(
-      page.getByRole("heading", { name: "Selamat datang ke Hezy" }),
-    ).toBeVisible();
-    await expect(page.getByTestId("onboarding")).toHaveCount(0);
   });
 
-  test("pengguna sedia ada (ada lokasi) tidak nampak pengenalan", async ({
+  test("pengguna sedia ada (ada lokasi) terus ke Utama, tiada skrin alu-aluan", async ({
     page,
   }) => {
     await seedLocation(page);
@@ -115,7 +107,61 @@ test.describe("aliran utama", () => {
     await expect(
       page.locator("h1[data-ipu-headline]").filter({ visible: true }),
     ).toBeVisible();
-    await expect(page.getByTestId("onboarding")).toHaveCount(0);
+    await expect(
+      page.getByRole("heading", { name: "Semak jerebu di kawasan anda" }),
+    ).toBeHidden();
+    await expect(page.locator("html")).not.toHaveAttribute("data-welcome", "");
+  });
+
+  test("skala IPU: petunjuk sekali, helaian dengan tahap semasa ditanda", async ({
+    page,
+  }) => {
+    await seedLocation(page);
+    await page.goto("/");
+    const coach = page.getByTestId("ipu-scale-coach").filter({ visible: true });
+    await expect(coach).toContainText("Apa maksud nombor ini?");
+    await page
+      .getByTestId("ipu-scale-button")
+      .filter({ visible: true })
+      .click();
+    const sheet = page.getByRole("dialog", { name: "Skala IPU" });
+    await expect(sheet).toBeVisible();
+    await expect(sheet.locator('[aria-current="true"]')).toContainText(
+      "Tidak Sihat",
+    );
+    await expect(sheet.locator('[aria-current="true"]')).toContainText("ANDA");
+    const axe = await new AxeBuilder({ page })
+      .include('[data-testid="ipu-scale-sheet"]')
+      .analyze();
+    expect(axe.violations).toEqual([]);
+    await page.keyboard.press("Escape");
+    await expect(sheet).toHaveCount(0);
+    // Petunjuk tidak dipaparkan semula.
+    await page.reload();
+    await expect(
+      page.locator("h1[data-ipu-headline]").filter({ visible: true }),
+    ).toBeVisible();
+    await expect(page.getByTestId("ipu-scale-coach")).toHaveCount(0);
+  });
+
+  test("kad amaran muncul bila IPU > 100; Nanti menyembunyikannya", async ({
+    page,
+  }) => {
+    test.skip(
+      !!process.env.E2E_BASE_URL,
+      "Kunci VAPID ujian hanya dalam binaan tempatan",
+    );
+    await seedLocation(page);
+    await page.goto("/");
+    const card = page.getByTestId("alert-card").filter({ visible: true });
+    await expect(card).toContainText("Mahu diberitahu bila jerebu teruk?");
+    await card.getByRole("button", { name: "Nanti" }).click();
+    await expect(page.getByTestId("alert-card")).toHaveCount(0);
+    await page.reload();
+    await expect(
+      page.locator("h1[data-ipu-headline]").filter({ visible: true }),
+    ).toBeVisible();
+    await expect(page.getByTestId("alert-card")).toHaveCount(0);
   });
 
   test("trend memaparkan masa terbaik untuk keluar", async ({ page }) => {
@@ -281,6 +327,11 @@ test.describe("kedudukan kad putih", () => {
   }) => {
     test.skip(!isMobile, "Kad putih elastik untuk telefon");
     await seedLocation(page);
+    // Susun atur asas: petunjuk skala dan kad amaran (sekali sahaja) sudah ditutup.
+    await page.addInitScript(() => {
+      localStorage.setItem("hezy:coach-skala", "1");
+      localStorage.setItem("hezy:kad-amaran", String(Date.now()));
+    });
     await page.goto("/");
     const link = page.getByRole("link", { name: "Lihat trend jam demi jam" });
     await expect(link).toBeVisible();
@@ -912,9 +963,11 @@ test.describe("mod gelap", () => {
         .analyze();
       expect(results.violations.map((v) => v.id)).toEqual([]);
     };
-    // Pengenalan (pengguna baharu).
+    // Skrin alu-aluan (pengguna baharu).
     await page.goto("/");
-    await expect(page.getByTestId("onboarding")).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Semak jerebu di kawasan anda" }),
+    ).toBeVisible();
     await check();
 
     await seedLocation(page, [SHAH_ALAM, KLANG]);

@@ -417,16 +417,17 @@ Fokus: pengalaman pertama kali yang "nilai dahulu, ajar kemudian" (mockup: https
 ### A. Pengalaman pertama kali (keutamaan)
 
 1. **Skrin alu-aluan tunggal** menggantikan pengenalan 3 langkah dan halaman alu-aluan sedia ada
-   - [ ] Langit Hezy sebagai latar; tajuk "Semak jerebu di kawasan anda"
-   - [ ] Butang **Guna lokasi saya** dengan nota privasi (dibundarkan ~1 km, tidak disimpan)
-   - [ ] **Cip 6 bandar popular** (Kuala Lumpur, Shah Alam, Johor Bahru, Pulau Pinang, Kuching, Kota Kinabalu) + carian; satu ketikan terus ke Utama
-   - [ ] Pengguna sedia ada (yang sudah melihat pengenalan) tidak terjejas
-2. **Jalur "Malaysia sekarang"**: negeri tertinggi dan terendah daripada stesen APIMS, dengan masa bacaan
+   - [x] Langit Hezy sebagai latar (kecerunan statik supaya HTML pelayan tidak berkelip siang/malam); tajuk "Semak jerebu di kawasan anda"
+   - [x] Butang **Guna lokasi saya** dengan nota privasi (dibundarkan ~1 km, tidak disimpan)
+   - [x] **Cip 6 bandar popular** (Kuala Lumpur, Shah Alam, Johor Bahru, Pulau Pinang, Kuching, Kota Kinabalu) + carian; satu ketikan terus ke Utama
+   - [x] Pengguna sedia ada (ada lokasi) terus ke Utama; pengenalan 3 langkah dan halaman alu-aluan lama dibuang
+2. **Jalur "Malaysia sekarang"**: negeri tertinggi dan terendah daripada stesen APIMS, dengan masa bacaan — ✅ siap
 3. **Helaian skala IPU**: ketik pil kategori (Utama, Trend) → 5 tahap dengan nasihat ringkas, tahap semasa ditanda "ANDA"
-   - [ ] Petunjuk sekali sahaja pada lawatan pertama ke Utama: "Apa maksud nombor ini?"
-4. **Kad amaran pada saat relevan** di Utama: bila IPU > 100 atau pada lawatan kedua; "Hidupkan amaran" / "Nanti" (tidak muncul semula selama 14 hari); di iPhone digabung dengan langkah pasang
-5. **Desktop dua lajur**: langit + IPU negara di kiri, pilihan lokasi di kanan; bar navigasi disembunyikan sehingga lokasi dipilih
-6. **Paparan pertama lebih pantas**: skrin alu-aluan dirender dari pelayan (HTML statik); skrip kecil dalam `<head>` menentukan pengguna baharu/lama sebelum lukisan pertama (tiada kelipan) — sasaran LCP < 2 s pada Lighthouse telefon
+   - [x] Petunjuk sekali sahaja pada lawatan pertama ke Utama: "Apa maksud nombor ini?" (baris di bawah nombor, tidak menindih butang)
+   - [x] Helaian di Utama (telefon dan desktop); Trend: KIV (bacaan Trend sebahagian daripada graf seret)
+4. ✅ **Kad amaran pada saat relevan** di Utama: bila IPU > 100 atau pada lawatan kedua; "Hidupkan amaran" / "Nanti" (tidak muncul semula selama 14 hari); di iPhone digabung dengan langkah pasang
+5. ✅ **Desktop dua lajur**: langit + IPU negara di kiri, pilihan lokasi di kanan; bar navigasi disembunyikan sehingga lokasi dipilih
+6. **Paparan pertama lebih pantas**: skrin alu-aluan dirender dari pelayan (HTML statik); skrip kecil dalam `<head>` menentukan pengguna baharu/lama sebelum lukisan pertama (tiada kelipan) — ✅ LCP diperhati = FCP (39 ms tempatan; sebelum ini selepas JavaScript). LCP _simulasi_ Lighthouse masih 2.4–3.0 s kerana model Lantern mengira muat turun pakej React/Next (~230 KB) yang bermula sebelum LCP; < 2 s memerlukan pengurangan JavaScript awal (item berasingan)
 
 ### B. Peta
 

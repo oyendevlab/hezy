@@ -14,6 +14,7 @@ export function TopNav() {
 
   return (
     <header
+      data-app-nav
       className="border-line hidden border-b md:block"
       style={{ viewTransitionName: "top-nav" }}
     >
@@ -59,6 +60,7 @@ export function BottomNav() {
   return (
     <nav
       data-bottom-nav
+      data-app-nav
       style={{ viewTransitionName: "bottom-nav" }}
       aria-label={t("Navigasi utama")}
       className="border-line bg-page fixed inset-x-0 bottom-0 z-10 grid grid-cols-4 border-t px-3 pt-1.5 pb-[max(env(safe-area-inset-bottom),12px)] md:hidden"
