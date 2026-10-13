@@ -113,7 +113,7 @@ function HeadlineSkeleton({ size }: { size: "phone" | "desktop" }) {
     >
       <div className="flex items-start justify-between gap-6">
         <div className="flex flex-col gap-2">
-          <Skeleton className="h-3 w-8 rounded-md" />
+          <Skeleton className="h-3 w-44 rounded-md" />
           <div className="flex items-center gap-3.5">
             <Skeleton
               className={desktop ? "h-[100px] w-[160px]" : "h-[76px] w-[118px]"}
@@ -490,9 +490,9 @@ function Headline({
         <div className="min-w-0">
           <div
             aria-hidden="true"
-            className="text-muted text-xs font-bold tracking-[0.14em]"
+            className="text-muted text-xs font-bold tracking-[0.14em] uppercase"
           >
-            {t("IPU")}
+            {t("Indeks Pencemar Udara")}
           </div>
           <div className="flex items-center gap-3.5">
             <h1

@@ -145,6 +145,7 @@ const EN: Record<string, string> = {
   "(semasa)": "(current)",
   "Tiada lokasi kegemaran lagi.": "No favourite locations yet.",
   "Tambah bandar": "Add a city",
+  "Indeks Pencemar Udara": "Air Pollutant Index",
   // Notifikasi ujian
   "Hantar notifikasi ujian": "Send a test notification",
   "Menghantar…": "Sending…",
