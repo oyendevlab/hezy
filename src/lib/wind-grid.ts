@@ -1,14 +1,24 @@
 /**
- * Grid angin 850 hPa untuk lapisan aliran angin di peta (item 8, v0.7.0): 1° × 1° meliputi
- * Semenanjung, Sumatera utara, Borneo dan Laut China Selatan. Satu permintaan Open-Meteo
- * berbilang lokasi; disimpan sebagai komponen u/v (km/j) supaya mudah diinterpolasi.
+ * Rantau peta Hezy: Asia Tenggara dari Jawa hingga Myanmar/Thailand dan dari Sumatera hingga
+ * Filipina — meliputi semua sumber jerebu yang berkaitan. Peta tidak dizum keluar melepasinya.
+ */
+export const MAP_REGION = {
+  south: -8,
+  north: 20,
+  west: 92,
+  east: 128,
+} as const;
+
+/**
+ * Grid angin 850 hPa untuk lapisan aliran angin (item 8, v0.7.0): 2° × 2° meliputi MAP_REGION
+ * (285 titik, satu permintaan Open-Meteo berbilang lokasi); komponen u/v (km/j).
  */
 export const WIND_GRID = {
-  lat0: 0.5,
-  lon0: 99,
-  step: 1,
-  ny: 8,
-  nx: 21,
+  lat0: MAP_REGION.south,
+  lon0: MAP_REGION.west,
+  step: 2,
+  ny: (MAP_REGION.north - MAP_REGION.south) / 2 + 1,
+  nx: (MAP_REGION.east - MAP_REGION.west) / 2 + 1,
 } as const;
 
 export type WindGrid = {
@@ -105,4 +115,11 @@ export function sampleWind(
     at(arr, i, j + 1) * (1 - fx) * fy +
     at(arr, i + 1, j + 1) * fx * fy;
   return [lerp(grid.u), lerp(grid.v)];
+}
+
+/** Jarak (dalam sel grid) ke tepi terdekat grid; negatif di luar grid. Untuk memudarkan tepi. */
+export function edgeDistance(grid: WindGrid, lat: number, lon: number): number {
+  const x = (lon - grid.lon0) / grid.step;
+  const y = (lat - grid.lat0) / grid.step;
+  return Math.min(x, y, grid.nx - 1 - x, grid.ny - 1 - y);
 }

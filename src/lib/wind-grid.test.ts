@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   WIND_GRID,
+  edgeDistance,
   parseWindGrid,
   sampleWind,
   toUV,
@@ -20,7 +21,8 @@ describe("toUV", () => {
 });
 
 describe("grid angin", () => {
-  it("168 titik dalam satu URL", () => {
+  it("rantau Asia Tenggara 2° (285 titik) dalam satu URL", () => {
+    expect(WIND_GRID.nx * WIND_GRID.ny).toBe(285);
     expect(windGridPoints()).toHaveLength(WIND_GRID.nx * WIND_GRID.ny);
     expect(windGridUrl()).toContain("wind_direction_850hPa");
   });
@@ -56,5 +58,23 @@ describe("grid angin", () => {
     expect(sampleWind(grid, 0.5, 0.5)).toEqual([5, 2]);
     expect(sampleWind(grid, 0, 1)).toEqual([10, 0]);
     expect(sampleWind(grid, 2, 0)).toBeNull();
+  });
+});
+
+describe("edgeDistance", () => {
+  it("tengah grid jauh dari tepi; di tepi = 0; di luar negatif", () => {
+    const grid = {
+      lat0: 0,
+      lon0: 0,
+      step: 1,
+      nx: 5,
+      ny: 5,
+      u: [],
+      v: [],
+      time: null,
+    };
+    expect(edgeDistance(grid, 2, 2)).toBe(2);
+    expect(edgeDistance(grid, 0, 2)).toBe(0);
+    expect(edgeDistance(grid, -1, 2)).toBe(-1);
   });
 });

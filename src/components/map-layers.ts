@@ -1,6 +1,6 @@
 import type * as Leaflet from "leaflet";
 import { heatColor, idw, type HeatPoint } from "@/lib/heat";
-import { sampleWind, type WindGrid } from "@/lib/wind-grid";
+import { edgeDistance, sampleWind, type WindGrid } from "@/lib/wind-grid";
 
 /** Saiz sel (px) peta haba sebelum dilicinkan; lebih kecil = lebih halus tetapi lebih perlahan. */
 const HEAT_CELL = 8;
@@ -27,7 +27,7 @@ function overlayCanvas(L: typeof Leaflet, map: Leaflet.Map, className: string) {
 }
 
 /**
- * Peta haba IPU: interpolasi IDW antara stesen, dilukis pada grid kasar kemudian
+ * Taburan IPU: interpolasi IDW antara stesen, dilukis pada grid kasar kemudian
  * dibesarkan dengan pelicinan; memudar jauh dari stesen.
  */
 export function createHeatLayer(
@@ -234,11 +234,11 @@ export function createWindLayer(
       ctx.fillStyle = "rgba(0,0,0,0.95)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.globalCompositeOperation = "source-over";
-      // Garisan nipis dan telus supaya jubin peta dan pin kekal mudah dibaca.
-      ctx.strokeStyle = "rgba(28, 40, 62, 0.3)";
       ctx.lineWidth = 1;
       ctx.lineCap = "round";
-      ctx.beginPath();
+      // Dua laluan: dalaman, dan tepi grid (lebih pudar) supaya pinggir aliran tidak terputus.
+      const inner = new Path2D();
+      const edge = new Path2D();
       for (let k = 0; k < this.particles.length; k++) {
         const p = this.particles[k];
         const v = this.velocity(p.x, p.y);
@@ -248,15 +248,21 @@ export function createWindLayer(
         }
         const nx = p.x + v[0];
         const ny = p.y + v[1];
-        ctx.moveTo(p.x, p.y);
-        ctx.lineTo(nx, ny);
+        const ll = this.map!.containerPointToLatLng([p.x, p.y]);
+        const path = edgeDistance(grid, ll.lat, ll.lng) < 0.8 ? edge : inner;
+        path.moveTo(p.x, p.y);
+        path.lineTo(nx, ny);
         p.x = nx;
         p.y = ny;
         p.age++;
         if (nx < 0 || ny < 0 || nx > canvas.width || ny > canvas.height)
           this.particles[k] = this.spawn();
       }
-      ctx.stroke();
+      // Garisan nipis dan telus supaya jubin peta dan pin kekal mudah dibaca.
+      ctx.strokeStyle = "rgba(28, 40, 62, 0.3)";
+      ctx.stroke(inner);
+      ctx.strokeStyle = "rgba(28, 40, 62, 0.12)";
+      ctx.stroke(edge);
     }
 
     /** Anak panah statik pada setiap titik grid yang kelihatan (gerakan dikurangkan). */
