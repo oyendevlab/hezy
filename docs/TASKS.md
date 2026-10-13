@@ -446,6 +446,6 @@ Fokus: pengalaman pertama kali yang "nilai dahulu, ajar kemudian" (mockup: https
 
 ### Selesai v0.7.0
 
-- [ ] Ujian unit dan E2E (termasuk aliran pengguna baharu dan axe); semakan di Safari iOS (simulator)
-- [ ] Lighthouse telefon ≥ 95 dengan LCP < 2 s
-- [ ] Kemas kini `UJIAN-TELEFON.md`, versi 0.7.0, tag dan GitHub Release
+- [x] Ujian unit (253) dan E2E (161, termasuk aliran pengguna baharu dan axe); semakan di Safari iOS (simulator: kad negeri, helaian kongsi iOS, bendera kad lokasi)
+- [x] Lighthouse production 13 Okt 2026: telefon 97–100/100/100/100 (LCP 1.2–1.4 s; satu larian 2.6 s), desktop 100/100/100/100; susunan tajuk skrin alu-aluan dibetulkan (h2 `sr-only` di telefon)
+- [x] Kemas kini `UJIAN-TELEFON.md`, versi 0.7.0, tag dan GitHub Release
