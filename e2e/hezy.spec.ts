@@ -1377,8 +1377,14 @@ test.describe("peta stesen", () => {
     const heat = page.getByRole("checkbox", { name: "Taburan IPU" });
     await expect(heat).not.toBeChecked();
     await expect(page.locator("canvas.hezy-heat")).toHaveCount(0);
+    const region = page.waitForRequest(
+      (r) =>
+        r.url().includes("api.waqi.info") && r.url().includes("-8,92,20,128"),
+    );
     await heat.check();
     await expect(page.locator("canvas.hezy-heat")).toHaveCount(1);
+    // Luar Malaysia: sensor WAQI seluruh rantau diambil bila lapisan dihidupkan.
+    await region;
     await expect(page.getByTestId("heat-legend")).toBeVisible();
     // Lapisan berwarna di sekitar stesen (bukan kosong).
     await expect

@@ -138,6 +138,13 @@ export const FAKE_WAQI = () => {
         aqi: "120",
         station: { name: "Klang, Selangor, Malaysia", time },
       },
+      {
+        lat: 0.51,
+        lon: 101.45,
+        uid: 9001,
+        aqi: "180",
+        station: { name: "Pekanbaru, Riau, Indonesia", time },
+      },
     ],
   };
 };

@@ -182,8 +182,8 @@ const EN: Record<string, string> = {
   // Taburan IPU dan aliran angin (v0.7.0)
   "Taburan IPU": "API spread",
   "Anggaran IPU": "Estimated API",
-  "Taburan IPU ialah anggaran antara stesen APIMS (interpolasi), bukan bacaan rasmi. Kawasan jauh dari stesen dibiarkan kosong.":
-    "The API spread is an estimate between APIMS stations (interpolated), not an official reading. Areas far from any station are left blank.",
+  "Taburan IPU ialah anggaran antara stesen (interpolasi), bukan bacaan rasmi: di Malaysia daripada APIMS, di luar Malaysia daripada sensor WAQI (AQI AS ditukar ke skala IPU). Kawasan jauh dari stesen dibiarkan kosong.":
+    "The API spread is an estimate between stations (interpolated), not an official reading: APIMS within Malaysia, WAQI sensors outside Malaysia (US AQI converted to the API scale). Areas far from any station are left blank.",
   "Garisan bergerak menunjukkan aliran angin pada ~1.5 km (850 hPa) yang membawa asap jerebu. Sumber: Open-Meteo.":
     "Moving lines show the wind at ~1.5 km (850 hPa), which carries haze smoke. Source: Open-Meteo.",
   // Notifikasi ujian
