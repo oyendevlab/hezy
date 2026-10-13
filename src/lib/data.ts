@@ -17,6 +17,7 @@ import {
   type HotspotCell,
 } from "./hotspots";
 import { parseWeather, weatherUrl, type WeatherSeries } from "./weather";
+import { parseWindGrid, windGridUrl, type WindGrid } from "./wind-grid";
 import { readAccuracy, readIndex } from "./history-store";
 import {
   airQualityUrl,
@@ -117,6 +118,18 @@ export async function getWeather(
   if (!res.ok)
     throw new Error(`Open-Meteo (cuaca) memulangkan status ${res.status}`);
   return parseWeather(await res.json());
+}
+
+/** Grid angin 850 hPa (168 titik, satu permintaan) untuk lapisan aliran angin, dicache 1 jam. */
+export async function getWindGrid(): Promise<WindGrid> {
+  "use cache";
+  cacheLife({ stale: 1800, revalidate: 3600, expire: 10800 });
+  const res = await fetch(windGridUrl(), {
+    signal: AbortSignal.timeout(10000),
+  });
+  if (!res.ok)
+    throw new Error(`Open-Meteo (grid angin) memulangkan status ${res.status}`);
+  return parseWindGrid(await res.json());
 }
 
 /** Titik panas FIRMS (2 hari, VIIRS SNPP + NOAA-20) digabung ikut sel ~5 km, dicache 1 jam. */
