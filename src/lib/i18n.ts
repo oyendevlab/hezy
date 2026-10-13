@@ -186,6 +186,20 @@ const EN: Record<string, string> = {
     "The API spread is an estimate between stations (interpolated), not an official reading: APIMS within Malaysia, WAQI sensors outside Malaysia (US AQI converted to the API scale). Areas far from any station are left blank.",
   "Garisan bergerak menunjukkan aliran angin pada ~1.5 km (850 hPa) yang membawa asap jerebu. Sumber: Open-Meteo.":
     "Moving lines show the wind at ~1.5 km (850 hPa), which carries haze smoke. Source: Open-Meteo.",
+  // Amaran lonjakan dan jerebu dijangka (v0.7.0)
+  "IPU {name} naik mendadak: {from} → {to}":
+    "{name} API rising fast: {from} → {to}",
+  "Naik {rise} dalam {hours} jam.": "Up {rise} in {hours} hours.",
+  "Jerebu dijangka di {name} sekitar {time}":
+    "Haze expected in {name} around {time}",
+  "Ramalan IPU ~{ipu} ({label}) dalam {hours} jam akan datang.":
+    "Forecast API ~{ipu} ({label}) within the next {hours} hours.",
+  "Amaran jerebu dijangka": "Haze expected alert",
+  "Bila ramalan 6 jam akan datang melepasi ambang anda":
+    "When the forecast for the next 6 hours goes above your threshold",
+  "Amaran lonjakan": "Rapid rise alert",
+  "Bila IPU naik 30 atau lebih dalam 3 jam, walaupun di bawah ambang":
+    "When the API rises by 30 or more within 3 hours, even below your threshold",
   // Notifikasi ujian
   "Hantar notifikasi ujian": "Send a test notification",
   "Menghantar…": "Sending…",

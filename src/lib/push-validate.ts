@@ -39,6 +39,10 @@ export type PushOptions = {
   morning: boolean;
   /** Amaran ramalan esok jam 8 malam (item 6/7). */
   forecast: boolean;
+  /** Amaran lonjakan: IPU naik mendadak walaupun di bawah ambang (v0.7.0 item 9). */
+  spike: boolean;
+  /** Amaran jerebu dijangka: ramalan 6 jam melepasi ambang (v0.7.0 item 10). */
+  expected: boolean;
   /** Waktu senyap; `null` = tiada. Amaran ditangguh kecuali IPU > 300. */
   quiet: { start: number; end: number } | null;
 };
@@ -47,6 +51,8 @@ export type PushOptions = {
 export const LEGACY_OPTIONS: PushOptions = {
   morning: false,
   forecast: false,
+  spike: false,
+  expected: false,
   quiet: null,
 };
 
@@ -57,6 +63,8 @@ export function parseOptions(raw: unknown): PushOptions {
   const r = raw as {
     morning?: unknown;
     forecast?: unknown;
+    spike?: unknown;
+    expected?: unknown;
     quiet?: { start?: unknown; end?: unknown } | null;
   } | null;
   const quiet =
@@ -69,6 +77,8 @@ export function parseOptions(raw: unknown): PushOptions {
   return {
     morning: r?.morning === true,
     forecast: r?.forecast === true,
+    spike: r?.spike === true,
+    expected: r?.expected === true,
     quiet,
   };
 }

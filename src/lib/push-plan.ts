@@ -5,14 +5,14 @@
 
 import { adviceFor } from "./advice";
 import { decideAlert, type AlertState } from "./alert";
-import { formatWindow } from "./format";
+import { formatHour, formatWindow } from "./format";
 import { addDays } from "./history";
 import { translate } from "./i18n";
 import { ipuCategory } from "./ipu";
-import { primaryReading } from "./official";
+import { displayIpu, primaryReading } from "./official";
 import type { PushRecord } from "./push-record";
 import { LEGACY_OPTIONS } from "./push-validate";
-import { localHourKey, type Reading } from "./reading";
+import { localHourKey, type HourPoint, type Reading } from "./reading";
 
 /** IPU melebihi nilai ini tetap dihantar walaupun dalam waktu senyap. */
 export const QUIET_OVERRIDE_IPU = 300;
@@ -21,10 +21,64 @@ export const MORNING_HOURS = [7, 11] as const;
 /** Amaran ramalan esok: dari jam 8 malam hingga sebelum 11 malam (sekali sehari). */
 export const FORECAST_HOURS = [20, 23] as const;
 
+/** Lonjakan: kenaikan sekurang-kurangnya ini dalam SPIKE_HOURS jam (v0.7.0 item 9). */
+export const SPIKE_RISE = 30;
+export const SPIKE_HOURS = 3;
+/** Lonjakan hanya bila IPU sekarang melebihi ini (abaikan turun naik dalam tahap Baik). */
+export const SPIKE_MIN_IPU = 50;
+/** Satu amaran lonjakan bagi setiap lokasi dalam tempoh ini. */
+export const SPIKE_COOLDOWN_HOURS = 6;
+/** Jerebu dijangka: tetingkap ramalan ke hadapan (v0.7.0 item 10). */
+export const EXPECTED_HOURS = 6;
+
 export type PlannedUpdate =
   | { kind: "alert"; index: number; next: AlertState }
   | { kind: "forecast"; index: number }
+  | { kind: "spike"; index: number }
+  | { kind: "expected"; index: number }
   | { kind: "morning" };
+
+/** Milisaat bagi kunci jam `YYYY-MM-DDTHH:mm` (waktu tempatan dianggap UTC; hanya untuk beza). */
+const keyMs = (key: string) => Date.parse(`${key}:00Z`);
+
+/**
+ * Lonjakan IPU: nilai jam terkini berbanding SPIKE_HOURS jam sebelumnya (rasmi APIMS jika ada).
+ * `null` jika data tidak cukup atau kenaikan kurang daripada SPIKE_RISE.
+ */
+export function detectSpike(
+  today: readonly HourPoint[],
+): { from: number; to: number } | null {
+  const past = today.filter((h) => !h.forecast && displayIpu(h) !== null);
+  const last = past.at(-1);
+  if (!last) return null;
+  const target = keyMs(last.time) - SPIKE_HOURS * 3_600_000;
+  const before = past.find((h) => keyMs(h.time) === target);
+  if (!before) return null;
+  const to = displayIpu(last)!;
+  const from = displayIpu(before)!;
+  return to - from >= SPIKE_RISE && to > SPIKE_MIN_IPU ? { from, to } : null;
+}
+
+/**
+ * Jerebu dijangka: jam ramalan pertama dalam EXPECTED_HOURS jam selepas `nowKey` yang
+ * melepasi ambang. `null` jika tiada.
+ */
+export function detectExpected(
+  today: readonly HourPoint[],
+  threshold: number,
+  nowKey: string,
+): { ipu: number; time: string } | null {
+  const now = keyMs(nowKey);
+  const limit = now + EXPECTED_HOURS * 3_600_000;
+  for (const h of today) {
+    if (!h.forecast) continue;
+    const t = keyMs(h.time);
+    if (t <= now || t > limit) continue;
+    const v = displayIpu(h);
+    if (v !== null && v > threshold) return { ipu: v, time: h.time };
+  }
+  return null;
+}
 
 export type Planned = {
   title: string;
@@ -90,6 +144,61 @@ export function planNotifications(
           ...(index === 0
             ? { badge: decision.next.lastAlertKey ? primary.ipu : null }
             : {}),
+        });
+      }
+    }
+
+    // Amaran lonjakan: naik mendadak tetapi masih di bawah ambang (amaran ambang mengendalikan selebihnya).
+    if (options.spike && !quiet && primary.ipu <= record.threshold) {
+      const spike = detectSpike(reading.today);
+      const cooled =
+        !location.lastSpike ||
+        keyMs(nowKey) - keyMs(location.lastSpike) >=
+          SPIKE_COOLDOWN_HOURS * 3_600_000;
+      if (spike && cooled) {
+        planned.push({
+          title: t("IPU {name} naik mendadak: {from} → {to}", {
+            name,
+            from: spike.from,
+            to: spike.to,
+          }),
+          body: `${t("Naik {rise} dalam {hours} jam.", {
+            rise: spike.to - spike.from,
+            hours: SPIKE_HOURS,
+          })} ${t(adviceFor(ipuCategory(spike.to).key).headline)}`,
+          tag: `hezy-lonjakan-${location.id}`,
+          urgency: "normal",
+          update: { kind: "spike", index },
+        });
+      }
+    }
+
+    // Amaran jerebu dijangka: ramalan 6 jam akan datang melepasi ambang (sekali sehari).
+    if (
+      options.expected &&
+      !quiet &&
+      primary.ipu <= record.threshold &&
+      location.lastExpected !== today
+    ) {
+      const expected = detectExpected(reading.today, record.threshold, nowKey);
+      if (expected) {
+        const category = ipuCategory(expected.ipu);
+        planned.push({
+          title: t("Jerebu dijangka di {name} sekitar {time}", {
+            name,
+            time: formatHour(expected.time, lang),
+          }),
+          body: `${t(
+            "Ramalan IPU ~{ipu} ({label}) dalam {hours} jam akan datang.",
+            {
+              ipu: expected.ipu,
+              label: t(category.label),
+              hours: EXPECTED_HOURS,
+            },
+          )} ${t(adviceFor(category.key).headline)}`,
+          tag: `hezy-dijangka-${location.id}`,
+          urgency: "normal",
+          update: { kind: "expected", index },
         });
       }
     }
@@ -166,14 +275,21 @@ export function applySent(
   update: PlannedUpdate,
   now: Date,
 ): PushRecord {
-  const today = localHourKey(now).slice(0, 10);
+  const nowKey = localHourKey(now);
+  const today = nowKey.slice(0, 10);
   if (update.kind === "morning") return { ...record, lastMorning: today };
-  const locations = record.locations.map((l, i) =>
-    i !== update.index
-      ? l
-      : update.kind === "alert"
-        ? { ...l, ...update.next }
-        : { ...l, lastForecast: today },
-  );
+  const locations = record.locations.map((l, i) => {
+    if (i !== update.index) return l;
+    switch (update.kind) {
+      case "alert":
+        return { ...l, ...update.next };
+      case "spike":
+        return { ...l, lastSpike: nowKey };
+      case "expected":
+        return { ...l, lastExpected: today };
+      default:
+        return { ...l, lastForecast: today };
+    }
+  });
   return { ...record, locations };
 }

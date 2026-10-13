@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { ipuCategory } from "./ipu";
-import { applySent, inQuietHours, planNotifications } from "./push-plan";
+import {
+  applySent,
+  detectExpected,
+  detectSpike,
+  inQuietHours,
+  planNotifications,
+} from "./push-plan";
 import type { PushRecord } from "./push-record";
 import type { Reading } from "./reading";
 
@@ -52,6 +58,8 @@ const record = (over: Partial<PushRecord> = {}): PushRecord => ({
   options: {
     morning: true,
     forecast: true,
+    spike: false,
+    expected: false,
     quiet: { start: 23, end: 6 },
   },
   ...over,
@@ -78,6 +86,8 @@ describe("planNotifications", () => {
       options: {
         morning: false,
         forecast: false,
+        spike: false,
+        expected: false,
         quiet: { start: 23, end: 6 },
       },
     });
@@ -180,5 +190,207 @@ describe("planNotifications", () => {
     );
     expect(notes[0].title).toBe("This morning in Shah Alam: API 80 (Moderate)");
     expect(notes[0].body).toContain("Best time to go out: 8 – 10 am (~70).");
+  });
+});
+
+/** Jam hari ini: `[jam, IPU, ramalan?]` pada 2026-10-12. */
+const hours = (list: [number, number, boolean?][]) =>
+  list.map(([h, v, forecast = false]) => ({
+    time: `2026-10-12T${String(h).padStart(2, "0")}:00`,
+    ipu: v,
+    hourlyIpu: v,
+    forecast,
+  }));
+
+const withToday = (ipu: number, today: ReturnType<typeof hours>): Reading =>
+  ({ ...reading(ipu), today }) as Reading;
+
+const on = (spike: boolean, expected: boolean) =>
+  record({
+    options: {
+      morning: false,
+      forecast: false,
+      spike,
+      expected,
+      quiet: { start: 23, end: 6 },
+    },
+  });
+
+describe("detectSpike", () => {
+  it("kenaikan ≥ 30 dalam 3 jam dan IPU > 50", () => {
+    expect(
+      detectSpike(
+        hours([
+          [9, 40],
+          [10, 45],
+          [11, 60],
+          [12, 75],
+        ]),
+      ),
+    ).toEqual({ from: 40, to: 75 });
+    // Naik 25 sahaja.
+    expect(
+      detectSpike(
+        hours([
+          [9, 50],
+          [12, 75],
+        ]),
+      ),
+    ).toBeNull();
+    // Naik 30 tetapi masih Baik (≤ 50).
+    expect(
+      detectSpike(
+        hours([
+          [9, 15],
+          [12, 48],
+        ]),
+      ),
+    ).toBeNull();
+    // Tiada bacaan 3 jam sebelumnya.
+    expect(
+      detectSpike(
+        hours([
+          [11, 20],
+          [12, 90],
+        ]),
+      ),
+    ).toBeNull();
+    // Jam ramalan diabaikan.
+    expect(
+      detectSpike(
+        hours([
+          [9, 40],
+          [12, 50],
+          [13, 99, true],
+        ]),
+      ),
+    ).toBeNull();
+  });
+});
+
+describe("detectExpected", () => {
+  it("jam ramalan pertama melepasi ambang dalam 6 jam", () => {
+    const today = hours([
+      [12, 80],
+      [13, 90, true],
+      [15, 120, true],
+      [17, 140, true],
+      [19, 160, true],
+    ]);
+    expect(detectExpected(today, 100, "2026-10-12T12:00")).toEqual({
+      ipu: 120,
+      time: "2026-10-12T15:00",
+    });
+    // 19:00 di luar 6 jam dari 12:00 bila hanya itu yang tinggi.
+    expect(
+      detectExpected(
+        hours([
+          [13, 90, true],
+          [19, 160, true],
+        ]),
+        100,
+        "2026-10-12T12:00",
+      ),
+    ).toBeNull();
+  });
+});
+
+describe("amaran lonjakan dan jerebu dijangka", () => {
+  const spiking = hours([
+    [9, 40],
+    [10, 50],
+    [11, 60],
+    [12, 75],
+  ]);
+
+  it("lonjakan dihantar sekali, kemudian bertenang 6 jam", () => {
+    const now = at("2026-10-12T12:12");
+    const notes = planNotifications(
+      on(true, false),
+      [withToday(75, spiking)],
+      now,
+    );
+    expect(notes).toHaveLength(1);
+    expect(notes[0]).toMatchObject({
+      title: "IPU Shah Alam naik mendadak: 40 → 75",
+      tag: "hezy-lonjakan-semasa",
+      update: { kind: "spike", index: 0 },
+    });
+    expect(notes[0].body.startsWith("Naik 35 dalam 3 jam.")).toBe(true);
+    const sent = applySent(on(true, false), notes[0].update, now);
+    expect(sent.locations[0].lastSpike).toBe("2026-10-12T12:00");
+    expect(
+      planNotifications(sent, [withToday(75, spiking)], at("2026-10-12T15:12")),
+    ).toEqual([]);
+    expect(
+      planNotifications(sent, [withToday(75, spiking)], at("2026-10-12T18:12")),
+    ).toHaveLength(1);
+  });
+
+  it("lonjakan tidak dihantar bila dimatikan, waktu senyap atau melepasi ambang", () => {
+    const now = at("2026-10-12T12:12");
+    expect(
+      planNotifications(on(false, false), [withToday(75, spiking)], now),
+    ).toEqual([]);
+    expect(
+      planNotifications(
+        on(true, false),
+        [withToday(75, spiking)],
+        at("2026-10-12T23:12"),
+      ),
+    ).toEqual([]);
+    // Melepasi ambang 100: hanya amaran ambang biasa.
+    const over = hours([
+      [9, 80],
+      [12, 130],
+    ]);
+    const notes = planNotifications(
+      on(true, false),
+      [withToday(130, over)],
+      now,
+    );
+    expect(notes.map((n) => n.update.kind)).toEqual(["alert"]);
+  });
+
+  it("jerebu dijangka sekali sehari dengan masa ramalan", () => {
+    const today = hours([
+      [12, 80],
+      [14, 95, true],
+      [16, 130, true],
+    ]);
+    const now = at("2026-10-12T12:12");
+    const notes = planNotifications(
+      on(false, true),
+      [withToday(80, today)],
+      now,
+    );
+    expect(notes).toHaveLength(1);
+    expect(notes[0]).toMatchObject({
+      title: "Jerebu dijangka di Shah Alam sekitar 4 petang",
+      tag: "hezy-dijangka-semasa",
+    });
+    expect(
+      notes[0].body.startsWith(
+        "Ramalan IPU ~130 (Tidak Sihat) dalam 6 jam akan datang.",
+      ),
+    ).toBe(true);
+    const sent = applySent(on(false, true), notes[0].update, now);
+    expect(sent.locations[0].lastExpected).toBe("2026-10-12");
+    expect(
+      planNotifications(sent, [withToday(80, today)], at("2026-10-12T13:12")),
+    ).toEqual([]);
+  });
+
+  it("jerebu dijangka dalam bahasa Inggeris", () => {
+    const today = hours([
+      [12, 80],
+      [16, 130, true],
+    ]);
+    const notes = planNotifications(
+      { ...on(false, true), lang: "en" },
+      [withToday(80, today)],
+      at("2026-10-12T12:12"),
+    );
+    expect(notes[0].title).toBe("Haze expected in Shah Alam around 4 pm");
   });
 });

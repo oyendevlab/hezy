@@ -36,6 +36,10 @@ export type Prefs = {
   morningSummary: boolean;
   /** Amaran ramalan esok jam 8 malam (item 7). */
   forecastAlert: boolean;
+  /** Amaran lonjakan IPU (v0.7.0). */
+  spikeAlert: boolean;
+  /** Amaran jerebu dijangka dalam 6 jam (v0.7.0). */
+  expectedAlert: boolean;
   /** Waktu senyap (jam waktu Malaysia); `null` = mati (item 6). */
   quietHours: { start: number; end: number } | null;
 };
@@ -53,6 +57,8 @@ export const DEFAULT_PREFS: Prefs = {
   lang: "ms",
   morningSummary: false,
   forecastAlert: true,
+  spikeAlert: true,
+  expectedAlert: true,
   quietHours: { start: 23, end: 6 },
 };
 
@@ -83,6 +89,8 @@ export function pushOptions(prefs: Prefs): PushOptions {
   return {
     morning: prefs.morningSummary,
     forecast: prefs.forecastAlert,
+    spike: prefs.spikeAlert,
+    expected: prefs.expectedAlert,
     quiet: prefs.quietHours,
   };
 }
@@ -125,6 +133,8 @@ export function parsePrefs(raw: string | null): Prefs {
       lang: isLang(v.lang) ? v.lang : "ms",
       morningSummary: v.morningSummary === true,
       forecastAlert: v.forecastAlert !== false,
+      spikeAlert: v.spikeAlert !== false,
+      expectedAlert: v.expectedAlert !== false,
       quietHours:
         v.quietHours === null
           ? null

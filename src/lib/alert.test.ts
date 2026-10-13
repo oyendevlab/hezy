@@ -118,7 +118,13 @@ describe("parseSubscribeBody", () => {
           { id: "semasa", name: "Shah Alam", lat: 3.07, lon: 101.52 },
         ],
         lang: "ms",
-        options: { morning: false, forecast: false, quiet: null },
+        options: {
+          morning: false,
+          forecast: false,
+          spike: false,
+          expected: false,
+          quiet: null,
+        },
       },
     });
   });
@@ -131,6 +137,8 @@ describe("parseSubscribeBody", () => {
     expect(p.ok && p.value.options).toEqual({
       morning: true,
       forecast: true,
+      spike: false,
+      expected: false,
       quiet: { start: 23, end: 6 },
     });
     const bad = parseSubscribeBody({
@@ -140,6 +148,8 @@ describe("parseSubscribeBody", () => {
     expect(bad.ok && bad.value.options).toEqual({
       morning: false,
       forecast: false,
+      spike: false,
+      expected: false,
       quiet: null,
     });
   });

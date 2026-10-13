@@ -118,6 +118,8 @@ describe("mergeRecord", () => {
         options: {
           morning: true,
           forecast: false,
+          spike: false,
+          expected: false,
           quiet: { start: 23, end: 6 },
         },
         locations: [

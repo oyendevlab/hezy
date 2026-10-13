@@ -639,6 +639,40 @@ function RoutineOptions({ prefs }: { prefs: Prefs }) {
         <label className={check}>
           <input
             type="checkbox"
+            checked={prefs.expectedAlert}
+            onChange={(e) =>
+              updatePrefs((x) => ({ ...x, expectedAlert: e.target.checked }))
+            }
+            className="mt-0.5 size-4 shrink-0 accent-[#1c1a16]"
+          />
+          <span>
+            {t("Amaran jerebu dijangka")}
+            <span className="text-muted block text-xs font-medium">
+              {t("Bila ramalan 6 jam akan datang melepasi ambang anda")}
+            </span>
+          </span>
+        </label>
+        <label className={check}>
+          <input
+            type="checkbox"
+            checked={prefs.spikeAlert}
+            onChange={(e) =>
+              updatePrefs((x) => ({ ...x, spikeAlert: e.target.checked }))
+            }
+            className="mt-0.5 size-4 shrink-0 accent-[#1c1a16]"
+          />
+          <span>
+            {t("Amaran lonjakan")}
+            <span className="text-muted block text-xs font-medium">
+              {t(
+                "Bila IPU naik 30 atau lebih dalam 3 jam, walaupun di bawah ambang",
+              )}
+            </span>
+          </span>
+        </label>
+        <label className={check}>
+          <input
+            type="checkbox"
             checked={quiet !== null}
             onChange={(e) =>
               updatePrefs((x) => ({
