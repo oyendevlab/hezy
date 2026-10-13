@@ -146,6 +146,13 @@ const EN: Record<string, string> = {
   "Tiada lokasi kegemaran lagi.": "No favourite locations yet.",
   "Tambah bandar": "Add a city",
   "Indeks Pencemaran Udara": "Air Pollutant Index",
+  // Kredit bendera negeri
+  Kredit: "Credits",
+  "Bendera negeri daripada Wikimedia Commons. Bendera Kelantan, Selangor dan Terengganu oleh Mysid, dan Sarawak oleh Matthew A. Lockhart, berlesen":
+    "State flags from Wikimedia Commons. The flags of Kelantan, Selangor and Terengganu by Mysid, and Sarawak by Matthew A. Lockhart, are licensed under",
+  "; bendera lain dalam domain awam. Bendera digunakan untuk mengenal pasti negeri sahaja; Hezy tidak berkaitan dengan mana-mana kerajaan negeri.":
+    "; the other flags are in the public domain. Flags are used only to identify each state; Hezy is not affiliated with any state government.",
+  "Senarai penuh sumber dan lesen": "Full list of sources and licences",
   // Notifikasi ujian
   "Hantar notifikasi ujian": "Send a test notification",
   "Menghantar…": "Sending…",
