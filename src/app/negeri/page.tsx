@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { Chevron } from "@/components/chevron";
 import { IpuPill } from "@/components/ipu-pill";
@@ -104,6 +105,16 @@ function StateList({
                 transitionTypes={["nav-forward"]}
                 className="bg-surface hover:bg-line flex min-h-16 items-center gap-3 rounded-[18px] py-3 pr-3 pl-4 transition-colors"
               >
+                {/* Bendera negeri (hiasan; nama di sebelahnya). Sumber: public/flags/CREDITS.md */}
+                <Image
+                  src={`/flags/${state.id}.png`}
+                  alt=""
+                  width={32}
+                  height={16}
+                  unoptimized
+                  data-flag={state.id}
+                  className="h-4 w-8 shrink-0 rounded-[3px] shadow-[0_0_0_1px_color-mix(in_srgb,var(--ink)_18%,transparent)]"
+                />
                 <span className="min-w-0 flex-1">
                   <span data-name className="block text-[15px] font-bold">
                     {state.name}

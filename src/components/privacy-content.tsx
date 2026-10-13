@@ -89,6 +89,29 @@ export function PrivacyContent() {
           </ul>
         </section>
       ))}
+      <section className="flex flex-col gap-2">
+        <h2 className="font-display text-xl font-bold">{t("Kredit")}</h2>
+        <p className="text-[15px] leading-relaxed">
+          {t(
+            "Bendera negeri daripada Wikimedia Commons. Bendera Kelantan, Selangor dan Terengganu oleh Mysid, dan Sarawak oleh Matthew A. Lockhart, berlesen",
+          )}{" "}
+          <a
+            href="https://creativecommons.org/licenses/by-sa/3.0/"
+            className="underline"
+          >
+            CC BY-SA 3.0
+          </a>
+          {t(
+            "; bendera lain dalam domain awam. Bendera digunakan untuk mengenal pasti negeri sahaja; Hezy tidak berkaitan dengan mana-mana kerajaan negeri.",
+          )}{" "}
+          <a
+            href="https://github.com/oyendevlab/hezy/blob/main/public/flags/CREDITS.md"
+            className="underline"
+          >
+            {t("Senarai penuh sumber dan lesen")}
+          </a>
+        </p>
+      </section>
       <p className="text-muted text-sm">
         {t("Soalan atau permintaan berkaitan data:")}{" "}
         <a

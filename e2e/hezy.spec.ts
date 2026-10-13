@@ -943,6 +943,30 @@ test.describe("mod gelap", () => {
   });
 });
 
+test.describe("bendera negeri", () => {
+  test("setiap negeri dan wilayah ada bendera; kredit di Privasi", async ({
+    page,
+    request,
+  }) => {
+    await page.goto("/negeri");
+    const flags = page.locator("img[data-flag]");
+    await expect(flags).toHaveCount(16);
+    // Hiasan: nama negeri di sebelahnya, jadi alt kosong.
+    await expect(flags.first()).toHaveAttribute("alt", "");
+    for (const id of await flags.evaluateAll((els) =>
+      els.map((e) => e.getAttribute("data-flag")),
+    )) {
+      const res = await request.get(`/flags/${id}.png`);
+      expect(res.status(), id!).toBe(200);
+    }
+    await page.goto("/privasi");
+    await expect(page.getByRole("heading", { name: "Kredit" })).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "CC BY-SA 3.0" }),
+    ).toBeVisible();
+  });
+});
+
 test.describe("navigasi", () => {
   test("ikon Phosphor terisi untuk halaman aktif sahaja", async ({ page }) => {
     await seedLocation(page);
