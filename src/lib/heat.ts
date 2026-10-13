@@ -1,5 +1,5 @@
 /**
- * Peta haba IPU (item 7, v0.7.0): interpolasi IDW (pemberat jarak songsang) antara stesen
+ * Taburan IPU (item 7, v0.7.0): interpolasi IDW (pemberat jarak songsang) antara stesen
  * APIMS. Jauh dari mana-mana stesen, lapisan memudar supaya tidak meneka kawasan tanpa data.
  */
 export type HeatPoint = { lat: number; lon: number; ipu: number };

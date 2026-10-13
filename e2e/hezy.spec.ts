@@ -1311,19 +1311,33 @@ test.describe("peta stesen", () => {
   test("pin dihimpunkan bila dizum keluar; klik himpunan menzum masuk", async ({
     page,
   }) => {
-    // Tanpa lokasi semasa: peta bermula pada zum 5 (seluruh Malaysia).
+    // Tanpa lokasi semasa: peta bermula dizum keluar (zum minimum ikut rantau Asia Tenggara,
+    // bergantung pada lebar skrin) — Klang dan stesen berdekatan dihimpunkan.
     await page.goto("/lokasi");
     await page.getByRole("tab", { name: "Peta" }).click();
-    // Zum 5: ketiga-tiga stesen satu himpunan, berwarna ikut IPU terburuk.
-    const all = page.locator('[title="3 stesen, IPU tertinggi 146"]');
-    await expect(all).toBeVisible();
+    const cluster = page.locator('[title$="stesen, IPU tertinggi 146"]');
+    await expect(cluster).toBeVisible();
     await expect(page.locator('[title="Klang, IPU 146"]')).toHaveCount(0);
-    await all.click();
+    await cluster.click();
     // Dizum masuk ke kawasan himpunan: setiap stesen kini pin sendiri.
-    await expect(page.locator('[title="Seri Manjung, IPU N/A"]')).toBeVisible();
     await expect(page.locator('[title="Klang, IPU 146"]')).toBeVisible();
-    await expect(page.locator('[title^="3 stesen"]')).toHaveCount(0);
     await expect(page.locator('[title="Shah Alam, IPU 72"]')).toBeVisible();
+    await expect(
+      page.locator('[title$="stesen, IPU tertinggi 146"]'),
+    ).toHaveCount(0);
+  });
+
+  test("peta tidak boleh dizum keluar melepasi rantau Asia Tenggara", async ({
+    page,
+  }) => {
+    await page.goto("/lokasi");
+    await page.getByRole("tab", { name: "Peta" }).click();
+    const zoomOut = page.getByRole("button", { name: "Zoom out" });
+    await expect(
+      page.getByRole("region", { name: "Peta stesen APIMS" }),
+    ).toBeVisible();
+    for (let i = 0; i < 6; i++) await zoomOut.click({ force: true });
+    await expect(zoomOut).toHaveClass(/leaflet-disabled/);
   });
 
   test("kad stesen sebagai helaian di atas peta; Tutup dan Escape", async ({
@@ -1354,11 +1368,13 @@ test.describe("peta stesen", () => {
     await expect(sheet).toHaveCount(0);
   });
 
-  test("peta haba: cip menghidupkan lapisan dan legenda", async ({ page }) => {
+  test("taburan IPU: cip menghidupkan lapisan dan legenda", async ({
+    page,
+  }) => {
     await seedLocation(page);
     await page.goto("/lokasi");
     await page.getByRole("tab", { name: "Peta" }).click();
-    const heat = page.getByRole("checkbox", { name: "Peta haba" });
+    const heat = page.getByRole("checkbox", { name: "Taburan IPU" });
     await expect(heat).not.toBeChecked();
     await expect(page.locator("canvas.hezy-heat")).toHaveCount(0);
     await heat.check();

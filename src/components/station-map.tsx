@@ -35,7 +35,7 @@ import { useReading } from "@/lib/use-reading";
 import { CALM_KMH } from "@/lib/wind";
 import { IpuPill } from "./ipu-pill";
 import { createHeatLayer, createWindLayer } from "./map-layers";
-import type { WindGrid } from "@/lib/wind-grid";
+import { MAP_REGION, type WindGrid } from "@/lib/wind-grid";
 import { HEAT_STOPS } from "@/lib/heat";
 import { WindArrow, useWindText } from "./wind-line";
 import { Notice, Skeleton } from "./status";
@@ -228,11 +228,25 @@ export function StationMap() {
       const center: [number, number] = current
         ? [current.lat, current.lon]
         : MALAYSIA_CENTER;
+      // Rantau Asia Tenggara: tidak boleh dizum keluar melepasinya, supaya aliran angin dan
+      // taburan IPU sentiasa memenuhi peta (tiada tepi terpotong).
+      const region = L.latLngBounds(
+        [MAP_REGION.south, MAP_REGION.west],
+        [MAP_REGION.north, MAP_REGION.east],
+      );
       const m = L.map(container.current, {
         center,
         zoom: current ? 9 : 5,
         zoomControl: false,
+        maxBounds: region,
+        maxBoundsViscosity: 1,
       });
+      const fitRegion = () => {
+        m.setMinZoom(m.getBoundsZoom(region, true));
+        if (m.getZoom() < m.getMinZoom()) m.setZoom(m.getMinZoom());
+      };
+      fitRegion();
+      m.on("resize", fitRegion);
       map.current = m;
       // Cip lapisan di kiri atas; kawalan zum ke kanan atas.
       L.control.zoom({ position: "topright" }).addTo(m);
@@ -295,7 +309,7 @@ export function StationMap() {
     };
   }, [mapReady, showWind, windGrid]);
 
-  // Peta haba IPU (anggaran IDW antara stesen rasmi).
+  // Taburan IPU (anggaran IDW antara stesen rasmi).
   useEffect(() => {
     const m = map.current;
     if (!mapReady || !m || !showHeat || !stations) return;
@@ -561,7 +575,7 @@ export function StationMap() {
                   className="absolute inset-0 cursor-pointer appearance-none rounded-full"
                 />
                 <Gradient aria-hidden="true" size={15} weight="bold" />
-                {t("Peta haba")}
+                {t("Taburan IPU")}
               </label>
             )}
             {(wind || windGrid) && (
@@ -740,7 +754,7 @@ export function StationMap() {
           {showHeat && (
             <p>
               {t(
-                "Peta haba ialah anggaran antara stesen APIMS (interpolasi), bukan bacaan rasmi. Kawasan jauh dari stesen dibiarkan kosong.",
+                "Taburan IPU ialah anggaran antara stesen APIMS (interpolasi), bukan bacaan rasmi. Kawasan jauh dari stesen dibiarkan kosong.",
               )}
             </p>
           )}
