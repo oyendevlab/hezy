@@ -83,20 +83,18 @@ function createRenderer(canvas: HTMLCanvasElement) {
       gl.uniform1f(loc.windSpeed, p.windSpeed);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     },
-    /** Warna piksel tengah baris paling atas (dibaca terus selepas `draw`). */
+    /** Purata warna jalur paling atas (dibaca terus selepas `draw`). */
     topColor() {
-      const px = new Uint8Array(4);
-      // Asal koordinat WebGL di bawah kiri: baris atas ialah height - 1.
-      gl.readPixels(
-        Math.floor(canvas.width / 2),
-        canvas.height - 1,
-        1,
-        1,
-        gl.RGBA,
-        gl.UNSIGNED_BYTE,
-        px,
-      );
-      return `rgb(${px[0]} ${px[1]} ${px[2]})`;
+      const w = canvas.width;
+      const h = Math.min(24, canvas.height);
+      const px = new Uint8Array(w * h * 4);
+      // Asal koordinat WebGL di bawah kiri: jalur atas bermula pada height - h.
+      gl.readPixels(0, canvas.height - h, w, h, gl.RGBA, gl.UNSIGNED_BYTE, px);
+      const sum = [0, 0, 0];
+      for (let i = 0; i < px.length; i += 4)
+        for (let c = 0; c < 3; c++) sum[c] += px[i + c];
+      const n = px.length / 4 || 1;
+      return `rgb(${sum.map((v) => Math.round(v / n)).join(" ")})`;
     },
   };
 }
@@ -112,8 +110,14 @@ export function SkyCanvas({
   wind,
   className = "",
   coverAt,
+  blendTop = false,
 }: Input & {
   className?: string;
+  /**
+   * Telefon: lapisan pudar dari warna bar status Safari (diambil daripada background-color)
+   * ke langit, supaya tiada jalur warna berbeza di bahagian atas.
+   */
+  blendTop?: boolean;
   /** Tatalan (px) yang hampir menutup langit: animasi diperlahankan (~10 fps) untuk jimat bateri. */
   coverAt?: number;
 }) {
@@ -135,6 +139,7 @@ export function SkyCanvas({
       box.current.style.backgroundImage = `linear-gradient(to bottom, ${top}, ${bottom})`;
       // Safari iOS mewarnakan bar status ikut background-color elemen tetap di atas.
       box.current.style.backgroundColor = top;
+      box.current.style.setProperty("--sky-top", top);
     }
     window.dispatchEvent(new Event("hezy-sky"));
   }, [ipu, weather, wind]);
@@ -182,7 +187,9 @@ export function SkyCanvas({
       r.draw(params, reduce.matches ? 20 : (now - start) / 1000);
       if (syncTop && box.current) {
         syncTop = false;
-        box.current.style.backgroundColor = r.topColor();
+        const top = r.topColor();
+        box.current.style.backgroundColor = top;
+        box.current.style.setProperty("--sky-top", top);
       }
       if (!reduce.matches && visible && !document.hidden)
         raf = requestAnimationFrame(frame);
@@ -227,6 +234,7 @@ export function SkyCanvas({
       style={{
         backgroundImage: `linear-gradient(to bottom, ${initial[0]}, ${initial[1]})`,
         backgroundColor: initial[0],
+        ["--sky-top" as string]: initial[0],
       }}
     >
       <canvas
@@ -234,6 +242,15 @@ export function SkyCanvas({
         data-testid="sky"
         className={`h-full w-full transition-opacity duration-700 ${ready ? "opacity-100" : "opacity-0"}`}
       />
+      {blendTop && (
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 h-14"
+          style={{
+            background:
+              "linear-gradient(to bottom, var(--sky-top), transparent)",
+          }}
+        />
+      )}
     </div>
   );
 }
