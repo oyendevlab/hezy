@@ -26,8 +26,11 @@ import {
 import { useI18n } from "@/lib/use-i18n";
 import {
   WAQI_TOKEN,
+  parseRegionSensors,
   parseSensors,
   waqiBoundsUrl,
+  waqiRegionUrl,
+  type RegionPoint,
   type Sensor,
 } from "@/lib/waqi";
 import type { HotspotCell } from "@/lib/hotspots";
@@ -180,6 +183,7 @@ export function StationMap() {
   const [showWind, setShowWind] = useState(true);
   const [showHeat, setShowHeat] = useState(false);
   const [windGrid, setWindGrid] = useState<WindGrid | null>(null);
+  const [regionPoints, setRegionPoints] = useState<RegionPoint[] | null>(null);
   const [zoom, setZoom] = useState<number | null>(null);
 
   // Ambil senarai stesen.
@@ -309,13 +313,34 @@ export function StationMap() {
     };
   }, [mapReady, showWind, windGrid]);
 
-  // Taburan IPU (anggaran IDW antara stesen rasmi).
+  // Luar Malaysia: sensor WAQI (AQI AS → IPU) untuk taburan IPU; diambil terus dari pelayar
+  // (terma WAQI) dan hanya bila lapisan dihidupkan.
+  useEffect(() => {
+    if (!showHeat || regionPoints || !WAQI_TOKEN) return;
+    let cancelled = false;
+    fetch(waqiRegionUrl(WAQI_TOKEN))
+      .then((res) => res.json())
+      .then((body: unknown) => {
+        if (!cancelled) setRegionPoints(parseRegionSensors(body, new Date()));
+      })
+      .catch(() => {
+        if (!cancelled) setRegionPoints([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [showHeat, regionPoints]);
+
+  // Taburan IPU: Malaysia = APIMS rasmi, luar Malaysia = sensor WAQI (anggaran IDW).
   useEffect(() => {
     const m = map.current;
     if (!mapReady || !m || !showHeat || !stations) return;
-    const points = stations.flatMap((s) =>
-      s.ipu === null ? [] : [{ lat: s.lat, lon: s.lon, ipu: s.ipu }],
-    );
+    const points = [
+      ...stations.flatMap((s) =>
+        s.ipu === null ? [] : [{ lat: s.lat, lon: s.lon, ipu: s.ipu }],
+      ),
+      ...(regionPoints ?? []),
+    ];
     let layer: Leaflet.Layer | null = null;
     let disposed = false;
     void import("leaflet").then((L) => {
@@ -326,7 +351,7 @@ export function StationMap() {
       disposed = true;
       layer?.remove();
     };
-  }, [mapReady, showHeat, stations]);
+  }, [mapReady, showHeat, stations, regionPoints]);
 
   // Pin stesen APIMS: dibina semula bila zum berubah (himpunan).
   useEffect(() => {
@@ -754,7 +779,7 @@ export function StationMap() {
           {showHeat && (
             <p>
               {t(
-                "Taburan IPU ialah anggaran antara stesen APIMS (interpolasi), bukan bacaan rasmi. Kawasan jauh dari stesen dibiarkan kosong.",
+                "Taburan IPU ialah anggaran antara stesen (interpolasi), bukan bacaan rasmi: di Malaysia daripada APIMS, di luar Malaysia daripada sensor WAQI (AQI AS ditukar ke skala IPU). Kawasan jauh dari stesen dibiarkan kosong.",
               )}
             </p>
           )}

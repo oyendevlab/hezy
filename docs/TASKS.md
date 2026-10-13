@@ -431,8 +431,8 @@ Fokus: pengalaman pertama kali yang "nilai dahulu, ajar kemudian" (mockup: https
 
 ### B. Peta
 
-7. ✅ **Peta haba IPU**: lapisan warna antara stesen (interpolasi IDW pada kanvas), cip "Peta haba", legenda, ketelusan boleh dilihat menembusi
-8. ✅ **Aliran angin**: zarah bergerak mengikut grid angin 850 hPa (Open-Meteo, dicache 1 jam di pelayan); `prefers-reduced-motion` → anak panah statik
+7. ✅ **Taburan IPU** (asalnya "peta haba"; di luar Malaysia daripada sensor WAQI, AQI AS → PM2.5 → IPU, bukan anggaran model): lapisan warna antara stesen (interpolasi IDW pada kanvas), cip "Peta haba", legenda, ketelusan boleh dilihat menembusi
+8. ✅ **Aliran angin** (rantau Asia Tenggara 2°, peta tidak boleh dizum keluar melepasinya): zarah bergerak mengikut grid angin 850 hPa (Open-Meteo, dicache 1 jam di pelayan); `prefers-reduced-motion` → anak panah statik
 
 ### C. Amaran
 
