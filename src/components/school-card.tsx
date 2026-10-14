@@ -1,12 +1,20 @@
 "use client";
 
-import { Backpack, CaretRight } from "@phosphor-icons/react";
+import {
+  Backpack,
+  CheckCircle,
+  Info,
+  Megaphone,
+  Prohibit,
+  TrendUp,
+  Warning,
+} from "@phosphor-icons/react";
 import { useState } from "react";
+import { formatHour } from "@/lib/format";
 import type { PrimaryReading } from "@/lib/official";
 import {
-  SCHOOL_PROLONGED_DAYS,
+  schoolPersistentHigh,
   schoolStatus,
-  schoolTomorrow,
   type SchoolLevel,
 } from "@/lib/school";
 import { useI18n } from "@/lib/use-i18n";
@@ -24,9 +32,16 @@ const ICON_CLASS: Record<SchoolLevel, string> = {
   closed: "bg-ipu-berbahaya",
 };
 
+const LEVEL_ICON = {
+  normal: CheckCircle,
+  "no-outdoor": Backpack,
+  closed: Warning,
+} as const;
+
 /**
- * Kad padat status sekolah (KPM) berdasarkan IPU utama, dengan jangkaan sekolah ditutup
- * esok daripada bacaan jam 2 petang. Ketik → helaian dengan garis panduan penuh.
+ * Kad padat status sekolah (v0.7.3): tajuk ringkas ikut IPU utama dan peringatan untuk
+ * menyemak keputusan rasmi; tiada ambang, ramalan penutupan atau arahan operasi sekolah.
+ * Ketik → helaian dengan butiran berikon.
  */
 export function SchoolCard({
   reading,
@@ -39,23 +54,11 @@ export function SchoolCard({
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const status = schoolStatus(reading.ipu);
-  const tomorrow = twoPm ? schoolTomorrow(twoPm) : null;
-  const level: SchoolLevel =
-    tomorrow?.level === "likely" ? "closed" : status.level;
-  const title =
-    tomorrow?.level === "likely"
-      ? t("Sekolah mungkin ditutup esok")
-      : t(status.title);
-  const summary = tomorrow
-    ? tomorrow.level === "likely"
-      ? t("IPU jam 2 petang {ipu} · Tunggu pengumuman JPN/PPD", {
-          ipu: tomorrow.ipu,
-        })
-      : t("IPU jam 2 petang melebihi 150 (hari {n} daripada {total})", {
-          n: tomorrow.streak,
-          total: SCHOOL_PROLONGED_DAYS,
-        })
-    : t(status.summary);
+  const persistent = twoPm ? schoolPersistentHigh(twoPm) !== null : false;
+  const Icon = LEVEL_ICON[status.level];
+  const summary = persistent
+    ? t("Bacaan tinggi berterusan · Pantau pengumuman sekolah")
+    : t("Semak keputusan rasmi sekolah");
 
   return (
     <>
@@ -64,30 +67,36 @@ export function SchoolCard({
         onClick={() => setOpen(true)}
         aria-haspopup="dialog"
         data-testid="school-card"
-        data-level={level}
-        className={`flex w-full items-center gap-3 rounded-[20px] px-3.5 py-3 text-left ${LEVEL_CLASS[level]}`}
+        data-level={status.level}
+        data-persistent={persistent ? "true" : undefined}
+        className={`flex w-full items-center gap-3 rounded-[20px] px-3.5 py-3 text-left ${LEVEL_CLASS[status.level]}`}
       >
         <span
           aria-hidden="true"
-          className={`flex size-10 shrink-0 items-center justify-center rounded-full text-white ${ICON_CLASS[level]}`}
+          className={`flex size-10 shrink-0 items-center justify-center rounded-full text-white ${ICON_CLASS[status.level]}`}
         >
-          <Backpack size={22} weight="fill" />
+          <Icon size={22} weight="fill" />
         </span>
         <span className="min-w-0 flex-1">
           <span className="block text-[15px] leading-tight font-bold">
-            {title}
+            {t(status.title)}
           </span>
-          <span className="mt-0.5 block text-[13px] leading-snug font-medium">
+          <span className="mt-0.5 flex items-center gap-1 text-[13px] leading-snug font-medium">
+            {persistent ? (
+              <TrendUp aria-hidden="true" size={14} weight="bold" />
+            ) : (
+              <Megaphone aria-hidden="true" size={14} weight="bold" />
+            )}
             {summary}
           </span>
         </span>
-        <CaretRight aria-hidden="true" size={18} weight="bold" />
+        <Info aria-hidden="true" size={20} weight="bold" />
+        <span className="sr-only">{t("— butiran status sekolah")}</span>
       </button>
       {open && (
         <SchoolSheet
           reading={reading}
-          tomorrowLine={tomorrow ? summary : null}
-          title={title}
+          persistent={persistent}
           onClose={() => setOpen(false)}
         />
       )}
@@ -97,39 +106,64 @@ export function SchoolCard({
 
 function SchoolSheet({
   reading,
-  title,
-  tomorrowLine,
+  persistent,
   onClose,
 }: {
   reading: PrimaryReading;
-  title: string;
-  tomorrowLine: string | null;
+  persistent: boolean;
   onClose: () => void;
 }) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const status = schoolStatus(reading.ipu);
+  const rows: { icon: typeof Info; text: string }[] = [
+    status.level === "normal"
+      ? { icon: CheckCircle, text: t("Aktiviti luar dibenarkan") }
+      : {
+          icon: Prohibit,
+          text: t("Tiada perhimpunan, sukan atau kokurikulum di luar"),
+        },
+    ...(status.level === "closed"
+      ? [{ icon: Warning, text: t("IPU sangat tinggi: semak pengumuman PdPR") }]
+      : []),
+    ...(persistent
+      ? [
+          {
+            icon: TrendUp,
+            text: t("Bacaan tinggi berterusan: pantau pengumuman untuk esok"),
+          },
+        ]
+      : []),
+    { icon: Megaphone, text: t("Keputusan rasmi oleh sekolah, PPD dan JPN") },
+  ];
   return (
     <BottomSheet
-      title={title}
+      title={t(status.title)}
       eyebrow={t("STATUS SEKOLAH")}
       onClose={onClose}
       testId="school-sheet"
     >
-      {tomorrowLine && (
-        <p className="text-sm leading-relaxed font-semibold">
-          {tomorrowLine}.{" "}
-          {t(
-            "Garis panduan KPM: sekolah ditutup bila IPU melebihi 180, atau melebihi 150 tiga hari berturut-turut. Keputusan harian berdasarkan bacaan jam 2 petang.",
-          )}
-        </p>
-      )}
-      <p className="text-sm leading-relaxed">{t(status.detail)}</p>
-      <p className="text-muted text-xs font-semibold">
+      <ul className="flex flex-col gap-2.5">
+        {rows.map(({ icon: RowIcon, text }) => (
+          <li
+            key={text}
+            className="flex items-start gap-3 text-sm leading-snug"
+          >
+            <RowIcon
+              aria-hidden="true"
+              size={20}
+              weight="duotone"
+              className="mt-px shrink-0"
+            />
+            {text}
+          </li>
+        ))}
+      </ul>
+      <p className="text-muted border-line border-t pt-3 text-xs font-semibold">
         {t(
           reading.source === "apims"
-            ? "Panduan sahaja (IPU rasmi {ipu}). Keputusan rasmi dibuat oleh sekolah, PPD dan JPN."
-            : "Panduan sahaja (anggaran IPU {ipu}). Keputusan rasmi dibuat oleh sekolah, PPD dan JPN.",
-          { ipu: reading.ipu },
+            ? "Berdasarkan IPU rasmi {ipu} · {time}"
+            : "Berdasarkan anggaran IPU {ipu} · {time}",
+          { ipu: reading.ipu, time: formatHour(reading.time, lang) },
         )}
       </p>
     </BottomSheet>

@@ -398,11 +398,11 @@ describe("amaran lonjakan dan jerebu dijangka", () => {
   });
 });
 
-describe("notifikasi sekolah mungkin ditutup esok", () => {
+describe("notifikasi bacaan tinggi berterusan (sekolah)", () => {
   const withSchool = (twoPm: (number | null)[]) =>
     ({ ...reading(90), schoolTwoPm: twoPm }) as Reading;
 
-  it("sekali sehari dari 3 petang bila syarat KPM dipenuhi", () => {
+  it("sekali sehari dari 3 petang bila jam 2 petang kekal tinggi", () => {
     const now = at("2026-10-12T15:12");
     const notes = planNotifications(
       on(false, false, true),
@@ -411,8 +411,8 @@ describe("notifikasi sekolah mungkin ditutup esok", () => {
     );
     expect(notes).toHaveLength(1);
     expect(notes[0]).toMatchObject({
-      title: "Sekolah di Shah Alam mungkin ditutup esok",
-      body: "IPU jam 2 petang 172. Tunggu pengumuman rasmi JPN/PPD.",
+      title: "IPU di Shah Alam kekal tinggi (172)",
+      body: "Semak pengumuman sekolah untuk esok.",
       tag: "hezy-sekolah-semasa",
     });
     const sent = applySent(on(false, false, true), notes[0].update, now);
@@ -426,7 +426,7 @@ describe("notifikasi sekolah mungkin ditutup esok", () => {
     ).toEqual([]);
   });
 
-  it("tidak dihantar sebelum 3 petang, bila dimatikan, atau baru hari pertama > 150", () => {
+  it("tidak dihantar sebelum 3 petang, bila dimatikan, atau baru satu hari tinggi", () => {
     expect(
       planNotifications(
         on(false, false, true),
@@ -444,7 +444,7 @@ describe("notifikasi sekolah mungkin ditutup esok", () => {
     expect(
       planNotifications(
         on(false, false, true),
-        [withSchool([null, 120, 160])],
+        [withSchool([null, 140, 160])],
         at("2026-10-12T15:12"),
       ),
     ).toEqual([]);

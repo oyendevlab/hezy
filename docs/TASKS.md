@@ -476,3 +476,10 @@ Mulakan polish paparan satu demi satu (siri v0.8.0).
 5. ✅ Versi 0.7.2, `UJIAN-TELEFON.md`, tag dan GitHub Release
 
 **KIV (polish Trend):** kepala graf terpotong ("Rasmi A…"); legenda dan petunjuk graf diringkaskan; Ramalan 3 hari (purata besar + "puncak"); perenggan kaedah → ⓘ helaian; Sejarah 12 minggu hanya minggu berdata (min. 4); legenda sejarah sebagai jalur skala; kad Pagi/Petang/Malam tanda tempoh semasa.
+
+## Fasa 18 — v0.7.3 (status sekolah ringkas; disahkan 14 Okt 2026)
+
+1. ✅ Kad sekolah: › diganti ⓘ; tajuk ringkas ikut IPU (Aktiviti luar dibenarkan / dihentikan / Sekolah mungkin ditutup) dan "Semak keputusan rasmi sekolah"; tiada ambang, ramalan penutupan atau arahan "sekolah dibuka"
+2. ✅ Jalan tengah: ramalan KPM (180 / 150 × 3 hari) dibuang; isyarat neutral "Bacaan tinggi berterusan · Pantau pengumuman sekolah" bila IPU jam 2 petang > 150 dua hari berturut-turut; notifikasi "IPU di … kekal tinggi — semak pengumuman sekolah untuk esok"
+3. ✅ Helaian sekolah berikon (Prohibit, Warning, TrendUp, Megaphone) dan "Berdasarkan IPU rasmi … · masa"
+4. ✅ Versi 0.7.3, `UJIAN-TELEFON.md`, tag dan GitHub Release

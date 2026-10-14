@@ -13,7 +13,7 @@ import { displayIpu, primaryReading } from "./official";
 import type { PushRecord } from "./push-record";
 import { LEGACY_OPTIONS } from "./push-validate";
 import { localHourKey, type HourPoint, type Reading } from "./reading";
-import { schoolTomorrow } from "./school";
+import { schoolPersistentHigh } from "./school";
 
 /** IPU melebihi nilai ini tetap dihantar walaupun dalam waktu senyap. */
 export const QUIET_OVERRIDE_IPU = 300;
@@ -208,7 +208,7 @@ export function planNotifications(
       }
     }
 
-    // Sekolah mungkin ditutup esok (bacaan jam 2 petang; peraturan KPM).
+    // Bacaan jam 2 petang kekal tinggi: minta semak pengumuman sekolah (tanpa meramal penutupan).
     if (
       options.school &&
       !quiet &&
@@ -216,15 +216,13 @@ export function planNotifications(
       hour < SCHOOL_HOURS[1] &&
       location.lastSchool !== today
     ) {
-      const school = reading.schoolTwoPm
-        ? schoolTomorrow(reading.schoolTwoPm)
+      const high = reading.schoolTwoPm
+        ? schoolPersistentHigh(reading.schoolTwoPm)
         : null;
-      if (school?.level === "likely") {
+      if (high !== null) {
         planned.push({
-          title: t("Sekolah di {name} mungkin ditutup esok", { name }),
-          body: t("IPU jam 2 petang {ipu}. Tunggu pengumuman rasmi JPN/PPD.", {
-            ipu: school.ipu,
-          }),
+          title: t("IPU di {name} kekal tinggi ({ipu})", { name, ipu: high }),
+          body: t("Semak pengumuman sekolah untuk esok."),
           tag: `hezy-sekolah-${location.id}`,
           urgency: "normal",
           update: { kind: "school", index },

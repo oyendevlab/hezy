@@ -1768,34 +1768,44 @@ test.describe("status sekolah", () => {
     );
   });
 
-  test("dipaparkan untuk profil Kanak-kanak ikut panduan KPM", async ({
+  test("dipaparkan untuk profil Kanak-kanak: tajuk ringkas, semak keputusan rasmi", async ({
     page,
   }) => {
     await page.goto("/tetapan");
     await page.getByRole("radio", { name: "Kanak-kanak" }).check();
     await page.goto("/");
     const card = page.getByTestId("school-card").filter({ visible: true });
-    await expect(card).toContainText("Aktiviti luar sekolah dihentikan");
+    await expect(card).toContainText("Aktiviti luar dihentikan");
+    await expect(card).toContainText("Semak keputusan rasmi sekolah");
+    // Tiada ambang, ramalan penutupan atau arahan "sekolah dibuka".
+    await expect(card).not.toContainText(/dibuka|\d{3}/);
     await expect(card).toHaveAttribute("data-level", "no-outdoor");
     await card.click();
     const sheet = page.getByRole("dialog", {
-      name: "Aktiviti luar sekolah dihentikan",
+      name: "Aktiviti luar dihentikan",
     });
-    await expect(sheet).toContainText("IPU rasmi 172");
+    await expect(sheet).toContainText(
+      "Tiada perhimpunan, sukan atau kokurikulum di luar",
+    );
+    await expect(sheet).toContainText(
+      "Keputusan rasmi oleh sekolah, PPD dan JPN",
+    );
+    await expect(sheet).toContainText("Berdasarkan IPU rasmi 172");
+    await expect(sheet).not.toContainText("dibuka");
     await page.keyboard.press("Escape");
     await expect(sheet).toBeHidden();
     await page.goto("/trend");
     await expect(page.getByTestId("school-card")).toBeVisible();
   });
 
-  test("jangkaan sekolah ditutup esok daripada bacaan jam 2 petang", async ({
+  test("bacaan jam 2 petang kekal tinggi: isyarat pantau pengumuman", async ({
     page,
   }) => {
     await page.route("**/api/aqi?**", (route) =>
       route.fulfill({
         json: {
           ...fakeReading(OFFICIAL_SHAH_ALAM),
-          schoolTwoPm: [160, 158, 172],
+          schoolTwoPm: [140, 158, 172],
         },
       }),
     );
@@ -1803,9 +1813,11 @@ test.describe("status sekolah", () => {
     await page.getByRole("radio", { name: "Kanak-kanak" }).check();
     await page.goto("/");
     const card = page.getByTestId("school-card").filter({ visible: true });
-    await expect(card).toHaveAttribute("data-level", "closed");
-    await expect(card).toContainText("Sekolah mungkin ditutup esok");
-    await expect(card).toContainText("IPU jam 2 petang 172");
+    await expect(card).toHaveAttribute("data-persistent", "true");
+    await expect(card).toContainText(
+      "Bacaan tinggi berterusan · Pantau pengumuman sekolah",
+    );
+    await expect(card).not.toContainText("ditutup esok");
   });
 
   test("tersembunyi untuk profil Umum kecuali dipilih di Tetapan", async ({

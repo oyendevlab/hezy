@@ -123,6 +123,12 @@ Buka **https://hezy.my** pada telefon.
 - [ ] Utama: ⓘ di sebelah "Stesen …" → helaian "Sumber bacaan" (kad Utama tidak berubah saiz)
 - [ ] Hidupkan amaran dari kad kuning → "Amaran dihidupkan" dengan X; hilang sendiri selepas ~5 saat
 
+## Ciri baharu v0.7.3
+
+- [ ] Profil Kanak-kanak: kad sekolah dengan ⓘ, tajuk ringkas dan "Semak keputusan rasmi sekolah" (tiada nombor ambang atau "sekolah dibuka")
+- [ ] Ketik kad → helaian berikon: aktiviti luar, keputusan rasmi oleh sekolah/PPD/JPN, "Berdasarkan IPU rasmi …"
+- [ ] Bila IPU jam 2 petang kekal tinggi dua hari: "Bacaan tinggi berterusan · Pantau pengumuman sekolah" dan notifikasi dari 3 petang (bergantung pada keadaan sebenar)
+
 ## Jika ada masalah
 
 Ambil tangkapan skrin dan catat model telefon serta versi OS, kemudian buka isu di
