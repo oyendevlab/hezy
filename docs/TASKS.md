@@ -473,5 +473,6 @@ Mulakan polish paparan satu demi satu (siri v0.8.0).
 2. ✅ **Helaian bersama** (`BottomSheet`): meluncur naik dan **meluncur turun** bila ditutup (X, latar, Escape), **tarik ke bawah untuk tutup**, dialog di tengah pada desktop; digunakan oleh Skala IPU, Status sekolah, Kongsi, menu lokasi dan Sumber bacaan
 3. ✅ **Sumber bacaan** (ⓘ stesen) sebagai helaian, dengan penerangan bacaan rasmi berbanding anggaran model (kad Utama tidak lagi berubah saiz)
 4. ✅ **Kad "Amaran dihidupkan"**: butang X dan hilang sendiri selepas 5 saat (mengecil dan memudar)
+5. ✅ Versi 0.7.2, `UJIAN-TELEFON.md`, tag dan GitHub Release
 
 **KIV (polish Trend):** kepala graf terpotong ("Rasmi A…"); legenda dan petunjuk graf diringkaskan; Ramalan 3 hari (purata besar + "puncak"); perenggan kaedah → ⓘ helaian; Sejarah 12 minggu hanya minggu berdata (min. 4); legenda sejarah sebagai jalur skala; kad Pagi/Petang/Malam tanda tempoh semasa.
