@@ -454,10 +454,15 @@ Fokus: pengalaman pertama kali yang "nilai dahulu, ajar kemudian" (mockup: https
 
 Mulakan polish paparan satu demi satu (siri v0.8.0).
 
-1. **Langit penuh hingga ke atas**: bar status `black-translucent` dalam mod aplikasi; bayang halus di atas langit Utama supaya jam putih jelas; jalur langit pendek (warna tahap semasa) di atas Trend, Lokasi, Tetapan dan halaman lain
-2. **Nasihat pelbagai ikut keadaan**: "bersenam" → "aktiviti"; ayat dipilih ikut profil → arah IPU (naik/turun) → hujan → waktu (pagi/petang/malam); 2–3 variasi setiap keadaan, stabil ikut hari dan lokasi; BM dan EN
-3. **Kad putih elastik**: tolak ke atas → melantun kembali bila kandungan muat; kekal tinggi hanya bila kandungan lebih panjang daripada skrin (lantunan di hujung); kedudukan "atas" tetap dibuang
-4. **Kad sekolah padat**: satu baris dengan ikon (Backpack) dan ringkasan; ketik → helaian dengan garis panduan penuh dan penafian
+1. ✅ **Langit penuh hingga ke atas**: bar status `black-translucent` dalam mod aplikasi; bayang halus di atas langit Utama supaya jam putih jelas; jalur langit pendek (warna tahap semasa) di atas Trend, Lokasi, Tetapan dan halaman lain
+2. ✅ **Nasihat pelbagai ikut keadaan**: "bersenam" → "aktiviti"; ayat dipilih ikut profil → arah IPU (naik/turun) → hujan → waktu (pagi/petang/malam); 2–3 variasi setiap keadaan, stabil ikut hari dan lokasi; BM dan EN
+3. ✅ **Kad putih elastik**: tolak ke atas → melantun kembali bila kandungan muat; kekal tinggi hanya bila kandungan lebih panjang daripada skrin (lantunan di hujung); kedudukan "atas" tetap dibuang
+4. ✅ **Kad sekolah padat**: satu baris dengan ikon (Backpack) dan ringkasan; ketik → helaian dengan garis panduan penuh dan penafian
    - Jangkaan **sekolah mungkin ditutup esok** berdasarkan bacaan jam 2 petang stesen terdekat: > 180, atau > 150 tiga hari berturut-turut (KPM, 8 Okt 2026); ambang dalam satu pemalar
    - Pengumpul sejarah menyimpan bacaan jam 2 petang setiap stesen
-5. **Notifikasi sekolah mungkin ditutup esok** (~3 petang) bila jangkaan di atas dipenuhi
+5. ✅ **Notifikasi sekolah mungkin ditutup esok** (~3 petang) bila jangkaan di atas dipenuhi
+
+### Selesai v0.7.1
+
+- [x] Ujian unit (263) dan E2E (165, termasuk axe); semakan Safari iOS dan mod aplikasi (simulator)
+- [x] Versi 0.7.1, `UJIAN-TELEFON.md`, tag dan GitHub Release
