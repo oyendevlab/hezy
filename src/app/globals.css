@@ -295,6 +295,12 @@ main {
 .status-strip {
   height: env(safe-area-inset-top);
 }
+/* Utama dan skrin alu-aluan mengisi bar status dengan langitnya sendiri: tiada jalur.
+   (Tidak bergantung pada usePathname, yang tidak boleh dipercayai dalam susun atur yang diprarender.) */
+body:has([data-under-status-bar]) .page-sky,
+body:has([data-under-status-bar]) .status-strip {
+  display: none;
+}
 /* Bayang halus di atas langit Utama (mod aplikasi) supaya jam putih jelas pada langit cerah. */
 .status-scrim {
   display: none;

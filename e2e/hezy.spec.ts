@@ -418,6 +418,10 @@ test.describe("langit penuh", () => {
     isMobile,
   }) => {
     test.skip(!isMobile, "Jalur langit untuk telefon");
+    // Skrin alu-aluan (pengguna baharu): langitnya sendiri mengisi bar status.
+    await page.goto("/");
+    await expect(page.locator("[data-welcome-screen]")).toBeVisible();
+    await expect(page.locator(".status-strip")).toBeHidden();
     await seedLocation(page);
     await page.route("**/api/aqi?**", (route) =>
       route.fulfill({ json: fakeReading(OFFICIAL_SHAH_ALAM) }),
@@ -431,7 +435,9 @@ test.describe("langit penuh", () => {
       .toContain("rgb(231, 212, 164)");
     await page.goto("/");
     await expect(page.getByTestId("elastic-card")).toBeVisible();
-    await expect(page.getByTestId("page-sky")).toHaveCount(0);
+    // Tersembunyi walaupun dirender (production: usePathname dalam susun atur tidak boleh dipercayai).
+    await expect(page.getByTestId("page-sky")).toBeHidden();
+    await expect(page.locator(".status-strip")).toBeHidden();
   });
 });
 
