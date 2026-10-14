@@ -1700,7 +1700,10 @@ test.describe("Bahasa Inggeris", () => {
     ).toBeVisible();
     await expect(
       page
-        .getByText("Avoid exercising outdoors today.")
+        // Nasihat ikut keadaan (waktu/arah IPU), mana-mana ayat Tidak Sihat dalam English.
+        .getByText(
+          /Put off outdoor|strenuous outdoor|Cut back on outdoor|indoor activities|before bed|windows closed|getting worse|improving, but limit|Rain helps/,
+        )
         .filter({ visible: true }),
     ).toBeVisible();
     await expect(
