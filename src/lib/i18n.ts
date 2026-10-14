@@ -273,6 +273,12 @@ const EN: Record<string, string> = {
     "2 pm API {ipu}. Wait for the official announcement.",
   "Sentiasa dipaparkan untuk profil Kanak-kanak. Termasuk notifikasi jika sekolah mungkin ditutup esok (bila amaran hidup).":
     "Always shown for the Children profile. Includes a notification if schools may close tomorrow (when alerts are on).",
+  "Sumber bacaan": "Reading source",
+  "Tukar lokasi": "Change location",
+  "Nombor utama ialah bacaan rasmi stesen APIMS terdekat. Anggaran model dikira daripada PM2.5 di koordinat anda dan boleh berbeza daripada bacaan rasmi.":
+    "The main number is the official reading from the nearest APIMS station. The model estimate is calculated from PM2.5 at your location and may differ from the official reading.",
+  "Tiada stesen APIMS berdekatan, jadi nombor utama ialah anggaran daripada PM2.5 (model CAMS) di koordinat anda.":
+    "There is no APIMS station nearby, so the main number is an estimate from PM2.5 (CAMS model) at your location.",
   // Kad imej negeri (v0.7.0)
   "IPU tertinggi · {station}": "Highest API · {station}",
   "{n} daripada {total} stesen melebihi IPU 100":

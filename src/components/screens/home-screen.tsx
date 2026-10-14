@@ -2,7 +2,7 @@
 
 import { Info } from "@phosphor-icons/react";
 import Link from "next/link";
-import { Fragment, useId, useLayoutEffect, useRef, useState } from "react";
+import { Fragment, useLayoutEffect, useRef, useState } from "react";
 import { shownError } from "@/lib/accuracy";
 import { HEALTH_PROFILES, adviceFor, type QuickTone } from "@/lib/advice";
 import { CATEGORY_STYLE } from "@/lib/category-style";
@@ -30,6 +30,7 @@ import { WindLine } from "../wind-line";
 import { pickHeadline, recentChange } from "@/lib/headline";
 import { weatherKind } from "@/lib/weather";
 import { AdviceIcon } from "../advice-icon";
+import { BottomSheet } from "../bottom-sheet";
 import { WeatherNow } from "../weather-icon";
 import { InstallBanner } from "../install-banner";
 import { HomeHeader } from "../home-header";
@@ -580,7 +581,6 @@ function SourceLine({
 }) {
   const { t, lang } = useI18n();
   const [open, setOpen] = useState(false);
-  const id = useId();
   const official = reading.official;
   const rows: [string, string][] = official
     ? [
@@ -628,10 +628,9 @@ function SourceLine({
         </span>
         <button
           type="button"
-          aria-expanded={open}
-          aria-controls={id}
+          aria-haspopup="dialog"
           aria-label={t("Butiran sumber bacaan")}
-          onClick={() => setOpen((o) => !o)}
+          onClick={() => setOpen(true)}
           className="hover:bg-surface text-muted -my-2 flex size-9 items-center justify-center rounded-full"
         >
           <Info
@@ -642,17 +641,27 @@ function SourceLine({
         </button>
       </div>
       {open && (
-        <dl
-          id={id}
-          className="bg-surface mt-1.5 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 rounded-xl px-3 py-2.5"
+        <BottomSheet
+          title={t("Sumber bacaan")}
+          onClose={() => setOpen(false)}
+          testId="source-sheet"
         >
-          {rows.map(([k, v]) => (
-            <Fragment key={k}>
-              <dt className="font-semibold">{k}</dt>
-              <dd className="text-ink">{v}</dd>
-            </Fragment>
-          ))}
-        </dl>
+          <dl className="bg-surface grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5 rounded-2xl px-4 py-3 text-sm">
+            {rows.map(([k, v]) => (
+              <Fragment key={k}>
+                <dt className="text-muted font-semibold">{k}</dt>
+                <dd className="text-ink">{v}</dd>
+              </Fragment>
+            ))}
+          </dl>
+          <p className="text-muted text-xs leading-relaxed">
+            {t(
+              official
+                ? "Nombor utama ialah bacaan rasmi stesen APIMS terdekat. Anggaran model dikira daripada PM2.5 di koordinat anda dan boleh berbeza daripada bacaan rasmi."
+                : "Tiada stesen APIMS berdekatan, jadi nombor utama ialah anggaran daripada PM2.5 (model CAMS) di koordinat anda.",
+            )}
+          </p>
+        </BottomSheet>
       )}
     </div>
   );

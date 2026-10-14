@@ -466,3 +466,12 @@ Mulakan polish paparan satu demi satu (siri v0.8.0).
 
 - [x] Ujian unit (263) dan E2E (165, termasuk axe); semakan Safari iOS dan mod aplikasi (simulator)
 - [x] Versi 0.7.1, `UJIAN-TELEFON.md`, tag dan GitHub Release
+
+## Fasa 17 — v0.7.2 (polish; disahkan 14 Okt 2026)
+
+1. ✅ **Langit seragam**: kepala langit awan (warna tahap) dan kad bersudut bulat di Trend, Lokasi dan Tetapan, sama seperti Utama; jalur bar status muncul bila ditatal
+2. ✅ **Helaian bersama** (`BottomSheet`): meluncur naik dan **meluncur turun** bila ditutup (X, latar, Escape), **tarik ke bawah untuk tutup**, dialog di tengah pada desktop; digunakan oleh Skala IPU, Status sekolah, Kongsi, menu lokasi dan Sumber bacaan
+3. ✅ **Sumber bacaan** (ⓘ stesen) sebagai helaian, dengan penerangan bacaan rasmi berbanding anggaran model (kad Utama tidak lagi berubah saiz)
+4. ✅ **Kad "Amaran dihidupkan"**: butang X dan hilang sendiri selepas 5 saat (mengecil dan memudar)
+
+**KIV (polish Trend):** kepala graf terpotong ("Rasmi A…"); legenda dan petunjuk graf diringkaskan; Ramalan 3 hari (purata besar + "puncak"); perenggan kaedah → ⓘ helaian; Sejarah 12 minggu hanya minggu berdata (min. 4); legenda sejarah sebagai jalur skala; kad Pagi/Petang/Malam tanda tempoh semasa.

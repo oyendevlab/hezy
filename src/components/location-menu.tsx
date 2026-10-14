@@ -15,6 +15,7 @@ import { primaryReading } from "@/lib/official";
 import { updatePrefs, usePrefs, type SavedLocation } from "@/lib/prefs";
 import { useI18n } from "@/lib/use-i18n";
 import { useMediaQuery } from "@/lib/use-media-query";
+import { BottomSheet } from "./bottom-sheet";
 import { useReading } from "@/lib/use-reading";
 import { IpuPill } from "./ipu-pill";
 
@@ -50,8 +51,9 @@ export function LocationMenu({
     if (restoreFocus) button.current?.focus();
   };
 
+  // Desktop (menu jatuh): fokus, Escape, Tab dan klik di luar. Telefon: BottomSheet.
   useEffect(() => {
-    if (!open) return;
+    if (!open || !wide) return;
     panel.current?.querySelector<HTMLElement>("button, a")?.focus();
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -85,7 +87,7 @@ export function LocationMenu({
       document.removeEventListener("keydown", onKey);
       document.removeEventListener("pointerdown", onDown);
     };
-  }, [open]);
+  }, [open, wide]);
 
   const choose = (next: SavedLocation) => {
     updatePrefs((p) => ({ ...p, current: next }));
@@ -109,9 +111,21 @@ export function LocationMenu({
 
   const content = (
     <>
-      <h2 id={titleId} className="text-muted px-3 pt-1 pb-2 text-xs font-bold">
-        {t("TUKAR LOKASI")}
-      </h2>
+      {wide ? (
+        <h2
+          id={titleId}
+          className="text-muted px-3 pt-1 pb-2 text-xs font-bold"
+        >
+          {t("TUKAR LOKASI")}
+        </h2>
+      ) : (
+        <p
+          aria-hidden="true"
+          className="text-muted px-3 pb-1 text-xs font-bold"
+        >
+          {t("TUKAR LOKASI")}
+        </p>
+      )}
       <ul className="flex flex-col">
         <li>
           <button
@@ -209,26 +223,15 @@ export function LocationMenu({
             {content}
           </div>
         ) : (
-          <>
-            <div
-              aria-hidden="true"
-              className="sheet-backdrop fixed inset-0 z-50 bg-black/35"
-            />
-            <div
-              ref={panel}
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby={titleId}
-              data-testid="location-menu"
-              className="bg-page text-ink sheet-up fixed inset-x-0 bottom-0 z-50 max-h-[80svh] overflow-y-auto overscroll-contain rounded-t-[28px] px-3 pt-2 pb-[max(env(safe-area-inset-bottom),16px)]"
-            >
-              <div
-                aria-hidden="true"
-                className="bg-line mx-auto mb-3 h-1.5 w-10 rounded-full"
-              />
-              {content}
-            </div>
-          </>
+          <BottomSheet
+            bare
+            title={t("Tukar lokasi")}
+            onClose={() => close()}
+            testId="location-menu"
+            className="!gap-1 !px-3"
+          >
+            {content}
+          </BottomSheet>
         ))}
     </div>
   );

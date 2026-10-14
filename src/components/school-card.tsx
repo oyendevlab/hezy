@@ -1,8 +1,7 @@
 "use client";
 
-import { Backpack, CaretRight, X } from "@phosphor-icons/react";
-import { useEffect, useId, useRef, useState } from "react";
-import { createPortal } from "react-dom";
+import { Backpack, CaretRight } from "@phosphor-icons/react";
+import { useState } from "react";
 import type { PrimaryReading } from "@/lib/official";
 import {
   SCHOOL_PROLONGED_DAYS,
@@ -11,7 +10,7 @@ import {
   type SchoolLevel,
 } from "@/lib/school";
 import { useI18n } from "@/lib/use-i18n";
-import { useMediaQuery } from "@/lib/use-media-query";
+import { BottomSheet } from "./bottom-sheet";
 
 const LEVEL_CLASS: Record<SchoolLevel, string> = {
   normal: "bg-ipu-sederhana-tint text-ipu-sederhana-ink",
@@ -84,16 +83,14 @@ export function SchoolCard({
         </span>
         <CaretRight aria-hidden="true" size={18} weight="bold" />
       </button>
-      {open &&
-        createPortal(
-          <SchoolSheet
-            reading={reading}
-            tomorrowLine={tomorrow ? summary : null}
-            title={title}
-            onClose={() => setOpen(false)}
-          />,
-          document.body,
-        )}
+      {open && (
+        <SchoolSheet
+          reading={reading}
+          tomorrowLine={tomorrow ? summary : null}
+          title={title}
+          onClose={() => setOpen(false)}
+        />
+      )}
     </>
   );
 }
@@ -110,80 +107,31 @@ function SchoolSheet({
   onClose: () => void;
 }) {
   const { t } = useI18n();
-  const wide = useMediaQuery("(min-width: 768px)");
-  const titleId = useId();
-  const close = useRef<HTMLButtonElement>(null);
-  const onCloseRef = useRef(onClose);
   const status = schoolStatus(reading.ipu);
-
-  useEffect(() => {
-    onCloseRef.current = onClose;
-  }, [onClose]);
-
-  useEffect(() => {
-    close.current?.focus();
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onCloseRef.current();
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, []);
-
   return (
-    <>
-      <div
-        aria-hidden="true"
-        onClick={onClose}
-        className="sheet-backdrop fixed inset-0 z-50 bg-black/40"
-      />
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={titleId}
-        data-testid="school-sheet"
-        className={`bg-page text-ink fixed z-50 flex flex-col gap-3 p-5 ${
-          wide
-            ? "top-1/2 left-1/2 w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-[24px] shadow-[0_16px_48px_rgb(0_0_0/0.25)]"
-            : "sheet-up inset-x-0 bottom-0 max-h-[85svh] overflow-y-auto rounded-t-[28px] pb-[max(env(safe-area-inset-bottom),20px)]"
-        }`}
-      >
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="text-muted text-xs font-bold tracking-wide">
-              {t("STATUS SEKOLAH")}
-            </p>
-            <h2 id={titleId} className="font-display text-xl font-bold">
-              {title}
-            </h2>
-          </div>
-          <button
-            ref={close}
-            type="button"
-            onClick={onClose}
-            aria-label={t("Tutup")}
-            className="bg-surface hover:bg-line flex size-9 shrink-0 items-center justify-center rounded-full"
-          >
-            <X aria-hidden="true" size={16} weight="bold" />
-          </button>
-        </div>
-        {tomorrowLine && (
-          <p className="text-sm leading-relaxed font-semibold">
-            {tomorrowLine}.{" "}
-            {t(
-              "Garis panduan KPM: sekolah ditutup bila IPU melebihi 180, atau melebihi 150 tiga hari berturut-turut. Keputusan harian berdasarkan bacaan jam 2 petang.",
-            )}
-          </p>
-        )}
-        <p className="text-sm leading-relaxed">{t(status.detail)}</p>
-        <p className="text-muted text-xs font-semibold">
+    <BottomSheet
+      title={title}
+      eyebrow={t("STATUS SEKOLAH")}
+      onClose={onClose}
+      testId="school-sheet"
+    >
+      {tomorrowLine && (
+        <p className="text-sm leading-relaxed font-semibold">
+          {tomorrowLine}.{" "}
           {t(
-            reading.source === "apims"
-              ? "Panduan sahaja (IPU rasmi {ipu}). Keputusan rasmi dibuat oleh sekolah, PPD dan JPN."
-              : "Panduan sahaja (anggaran IPU {ipu}). Keputusan rasmi dibuat oleh sekolah, PPD dan JPN.",
-            { ipu: reading.ipu },
+            "Garis panduan KPM: sekolah ditutup bila IPU melebihi 180, atau melebihi 150 tiga hari berturut-turut. Keputusan harian berdasarkan bacaan jam 2 petang.",
           )}
         </p>
-      </div>
-    </>
+      )}
+      <p className="text-sm leading-relaxed">{t(status.detail)}</p>
+      <p className="text-muted text-xs font-semibold">
+        {t(
+          reading.source === "apims"
+            ? "Panduan sahaja (IPU rasmi {ipu}). Keputusan rasmi dibuat oleh sekolah, PPD dan JPN."
+            : "Panduan sahaja (anggaran IPU {ipu}). Keputusan rasmi dibuat oleh sekolah, PPD dan JPN.",
+          { ipu: reading.ipu },
+        )}
+      </p>
+    </BottomSheet>
   );
 }
