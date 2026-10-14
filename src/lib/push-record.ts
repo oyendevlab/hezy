@@ -18,7 +18,7 @@ export type RecordLocation = AlertLocation &
     lastSpike?: string | null;
     /** Tarikh (waktu Malaysia) amaran jerebu dijangka terakhir. */
     lastExpected?: string | null;
-    /** Tarikh (waktu Malaysia) notifikasi sekolah mungkin ditutup esok terakhir. */
+    /** Tarikh (waktu Malaysia) notifikasi status sekolah terakhir. */
     lastSchool?: string | null;
   };
 

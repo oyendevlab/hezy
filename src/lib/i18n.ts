@@ -267,13 +267,31 @@ const EN: Record<string, string> = {
     "The API spread is an estimate between stations (interpolated), not an official reading: APIMS within Malaysia, WAQI sensors outside Malaysia (US AQI converted to the API scale). Areas far from any station are left blank.",
   "Garisan bergerak menunjukkan aliran angin pada ~1.5 km (850 hPa) yang membawa asap jerebu. Sumber: Open-Meteo.":
     "Moving lines show the wind at ~1.5 km (850 hPa), which carries haze smoke. Source: Open-Meteo.",
-  "Sekolah di {name} mungkin ditutup esok":
-    "Schools in {name} may close tomorrow",
-  "IPU jam 2 petang {ipu}. Tunggu pengumuman rasmi JPN/PPD.":
-    "2 pm API {ipu}. Wait for the official announcement.",
-  "Sentiasa dipaparkan untuk profil Kanak-kanak. Termasuk notifikasi jika sekolah mungkin ditutup esok (bila amaran hidup).":
-    "Always shown for the Children profile. Includes a notification if schools may close tomorrow (when alerts are on).",
+  "Sentiasa dipaparkan untuk profil Kanak-kanak. Termasuk notifikasi bila bacaan kekal tinggi (bila amaran hidup).":
+    "Always shown for the Children profile. Includes a notification when readings stay high (when alerts are on).",
   "Sumber bacaan": "Reading source",
+  // Status sekolah (v0.7.3)
+  "Aktiviti luar dihentikan": "Outdoor activities stopped",
+  "Aktiviti luar dibenarkan": "Outdoor activities allowed",
+  "Semak keputusan rasmi sekolah": "Check the school's official decision",
+  "Bacaan tinggi berterusan · Pantau pengumuman sekolah":
+    "Readings stay high · Watch for school announcements",
+  "— butiran status sekolah": "— school status details",
+  "Tiada perhimpunan, sukan atau kokurikulum di luar":
+    "No outdoor assemblies, sports or co-curricular activities",
+  "IPU sangat tinggi: semak pengumuman PdPR":
+    "Very high API: check announcements on home-based learning",
+  "Bacaan tinggi berterusan: pantau pengumuman untuk esok":
+    "Readings stay high: watch for announcements about tomorrow",
+  "Keputusan rasmi oleh sekolah, PPD dan JPN":
+    "Official decisions are made by schools and education offices",
+  "Berdasarkan IPU rasmi {ipu} · {time}":
+    "Based on official API {ipu} · {time}",
+  "Berdasarkan anggaran IPU {ipu} · {time}":
+    "Based on estimated API {ipu} · {time}",
+  "IPU di {name} kekal tinggi ({ipu})": "{name} API stays high ({ipu})",
+  "Semak pengumuman sekolah untuk esok.":
+    "Check school announcements for tomorrow.",
   "Tukar lokasi": "Change location",
   "Nombor utama ialah bacaan rasmi stesen APIMS terdekat. Anggaran model dikira daripada PM2.5 di koordinat anda dan boleh berbeza daripada bacaan rasmi.":
     "The main number is the official reading from the nearest APIMS station. The model estimate is calculated from PM2.5 at your location and may differ from the official reading.",
@@ -367,28 +385,6 @@ const EN: Record<string, string> = {
   // Status sekolah
   "STATUS SEKOLAH": "SCHOOL STATUS",
   "Sekolah mungkin ditutup": "Schools may be closed",
-  "Garis panduan KPM: institusi pendidikan di kawasan dengan IPU melebihi 180 ditutup dan melaksanakan PdPR. Semak makluman rasmi sekolah dan PPD.":
-    "MOE guideline: education institutions in areas with an API above 180 close and switch to home-based learning. Check official notices from the school and district office.",
-  "Aktiviti luar sekolah dihentikan": "School outdoor activities stopped",
-  "IPU melebihi 180": "API above 180",
-  "IPU melebihi 100 · Sekolah dibuka": "API above 100 · Schools open",
-  "Aktiviti luar dibenarkan": "Outdoor activities allowed",
-  "Sekolah mungkin ditutup esok": "Schools may close tomorrow",
-  "IPU jam 2 petang {ipu} · Tunggu pengumuman JPN/PPD":
-    "2 pm API {ipu} · Wait for the official announcement",
-  "IPU jam 2 petang melebihi 150 (hari {n} daripada {total})":
-    "2 pm API above 150 (day {n} of {total})",
-  "Garis panduan KPM: sekolah ditutup bila IPU melebihi 180, atau melebihi 150 tiga hari berturut-turut. Keputusan harian berdasarkan bacaan jam 2 petang.":
-    "MOE guideline: schools close when the API is above 180, or above 150 for three days in a row. Daily decisions use the 2 pm reading.",
-  "Garis panduan KPM: semua aktiviti luar bilik darjah, termasuk perhimpunan, sukan dan kokurikulum, dihentikan bila IPU melebihi 100. Sekolah kekal dibuka.":
-    "MOE guideline: all outdoor activities, including assemblies, sports and co-curricular activities, stop when the API is above 100. Schools stay open.",
-  "Sekolah seperti biasa": "School as usual",
-  "Aktiviti luar dibenarkan. KPM menyarankan aktiviti luar ditangguhkan jika cuaca terlalu panas dan berjerebu; pantau murid yang ada asma.":
-    "Outdoor activities allowed. The MOE advises postponing outdoor activities in very hot and hazy weather; watch pupils with asthma.",
-  "Panduan sahaja (IPU rasmi {ipu}). Keputusan rasmi dibuat oleh sekolah, PPD dan JPN.":
-    "Guidance only (official API {ipu}). Official decisions are made by schools and education offices.",
-  "Panduan sahaja (anggaran IPU {ipu}). Keputusan rasmi dibuat oleh sekolah, PPD dan JPN.":
-    "Guidance only (estimated API {ipu}). Official decisions are made by schools and education offices.",
 
   // Trend
   "MASA TERBAIK UNTUK KELUAR": "BEST TIME TO GO OUT",

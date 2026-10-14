@@ -43,7 +43,7 @@ export type PushOptions = {
   spike: boolean;
   /** Amaran jerebu dijangka: ramalan 6 jam melepasi ambang (v0.7.0 item 10). */
   expected: boolean;
-  /** Notifikasi sekolah mungkin ditutup esok (v0.7.1); ikut paparan status sekolah. */
+  /** Notifikasi bacaan jam 2 petang kekal tinggi (semak pengumuman sekolah); ikut paparan status sekolah. */
   school: boolean;
   /** Waktu senyap; `null` = tiada. Amaran ditangguh kecuali IPU > 300. */
   quiet: { start: number; end: number } | null;
