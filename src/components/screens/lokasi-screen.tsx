@@ -24,6 +24,7 @@ import { IpuPill } from "../ipu-pill";
 import { LocationSearch } from "../location-search";
 import { PullToRefresh } from "../pull-to-refresh";
 import { RefreshButton } from "../refresh-button";
+import { SKY_CARD, SkyHeader } from "../sky-header";
 import { Skeleton } from "../status";
 import { FavouriteList } from "../favourite-list";
 
@@ -71,237 +72,246 @@ export function LokasiScreen() {
   };
 
   return (
-    <div className="mx-auto flex max-w-[960px] flex-col gap-5 px-5 pt-13 md:px-10 md:pt-10">
-      <PullToRefresh />
-      <div className="flex items-center justify-between gap-3">
-        <h1 className="font-display text-[30px] font-bold">{t("Lokasi")}</h1>
-        <RefreshButton className="hidden md:inline-flex" />
-      </div>
-
+    <>
+      <SkyHeader title={t("Lokasi")} />
       <div
-        role="tablist"
-        aria-label={t("Paparan lokasi")}
-        className="bg-surface grid grid-cols-2 gap-1 rounded-2xl p-1"
+        className={`mx-auto flex max-w-[960px] flex-col gap-5 px-5 md:px-10 md:pt-10 ${SKY_CARD}`}
       >
-        {(["map", "list"] as const).map((v) => (
-          <button
-            key={v}
-            type="button"
-            role="tab"
-            aria-selected={view === v}
-            onClick={() => setView(v)}
-            className={`min-h-10 rounded-xl text-sm ${view === v ? "bg-page font-bold" : "text-muted font-medium"}`}
-          >
-            {v === "list" ? t("Senarai") : t("Peta")}
-          </button>
-        ))}
-      </div>
+        <PullToRefresh />
+        <div className="hidden items-center justify-between gap-3 md:flex">
+          <h1 className="font-display text-[30px] font-bold">{t("Lokasi")}</h1>
+          <RefreshButton className="hidden md:inline-flex" />
+        </div>
 
-      {view === "map" && <StationMap />}
+        <div
+          role="tablist"
+          aria-label={t("Paparan lokasi")}
+          className="bg-surface grid grid-cols-2 gap-1 rounded-2xl p-1"
+        >
+          {(["map", "list"] as const).map((v) => (
+            <button
+              key={v}
+              type="button"
+              role="tab"
+              aria-selected={view === v}
+              onClick={() => setView(v)}
+              className={`min-h-10 rounded-xl text-sm ${view === v ? "bg-page font-bold" : "text-muted font-medium"}`}
+            >
+              {v === "list" ? t("Senarai") : t("Peta")}
+            </button>
+          ))}
+        </div>
 
-      <Link
-        href="/negeri"
-        transitionTypes={["nav-forward"]}
-        className="bg-surface hover:bg-line flex min-h-16 items-center gap-3 rounded-[18px] py-3 pr-3 pl-3.5 transition-colors"
-      >
-        <span className="bg-page flex size-10 shrink-0 items-center justify-center rounded-full">
-          <svg
-            aria-hidden="true"
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21" />
-            <line x1="9" y1="3" x2="9" y2="18" />
-            <line x1="15" y1="6" x2="15" y2="21" />
-          </svg>
-        </span>
-        <span className="min-w-0 flex-1">
-          <span className="block text-[15px] font-bold">
-            {t("IPU mengikut negeri")}
+        {view === "map" && <StationMap />}
+
+        <Link
+          href="/negeri"
+          transitionTypes={["nav-forward"]}
+          className="bg-surface hover:bg-line flex min-h-16 items-center gap-3 rounded-[18px] py-3 pr-3 pl-3.5 transition-colors"
+        >
+          <span className="bg-page flex size-10 shrink-0 items-center justify-center rounded-full">
+            <svg
+              aria-hidden="true"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21" />
+              <line x1="9" y1="3" x2="9" y2="18" />
+              <line x1="15" y1="6" x2="15" y2="21" />
+            </svg>
           </span>
-          <span className="text-muted block text-xs">
-            {t("Semua stesen APIMS di 13 negeri dan 3 wilayah")}
+          <span className="min-w-0 flex-1">
+            <span className="block text-[15px] font-bold">
+              {t("IPU mengikut negeri")}
+            </span>
+            <span className="text-muted block text-xs">
+              {t("Semua stesen APIMS di 13 negeri dan 3 wilayah")}
+            </span>
           </span>
-        </span>
-        <Chevron />
-      </Link>
+          <Chevron />
+        </Link>
 
-      {view === "list" && prefs === null && <Skeleton className="h-64" />}
+        {view === "list" && prefs === null && <Skeleton className="h-64" />}
 
-      {view === "list" && prefs && (
-        <>
-          <section className="flex flex-col gap-3">
-            <h2 className="text-muted text-sm font-bold tracking-wide">
-              {t("LOKASI SEMASA")}
-            </h2>
-            {prefs.current && !changing ? (
-              <div className="border-line flex flex-col gap-3 rounded-[18px] border-[1.5px] p-3.5 sm:flex-row sm:items-center">
-                <LocationReading
-                  location={prefs.current}
-                  onSelect={() => select(prefs.current!)}
-                />
-                <div className="flex gap-2 *:flex-1 sm:*:flex-none">
-                  {!prefs.favourites.some((f) =>
-                    samePlace(f, prefs.current!),
-                  ) &&
-                    prefs.favourites.length < MAX_FAVOURITES && (
-                      <button
-                        type="button"
-                        onClick={() =>
-                          updatePrefs((p) => addFavourite(p, p.current!))
-                        }
-                        className="bg-surface min-h-11 rounded-xl px-3.5 text-sm font-semibold"
-                      >
-                        {t("Simpan")}
-                      </button>
-                    )}
-                  <button
-                    type="button"
-                    onClick={() => setChanging(true)}
-                    className="bg-ink text-page min-h-11 rounded-xl px-3.5 text-sm font-semibold"
-                  >
-                    {t("Tukar")}
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="border-line rounded-[18px] border-[1.5px] p-4">
-                <ChooseLocation onChosen={() => setChanging(false)} />
-                {prefs.current && (
-                  <button
-                    type="button"
-                    onClick={() => setChanging(false)}
-                    className="mt-3 min-h-11 text-sm font-semibold underline"
-                  >
-                    {t("Batal")}
-                  </button>
-                )}
-              </div>
-            )}
-          </section>
-
-          <section className="flex flex-col gap-3">
-            <h2 className="text-muted text-sm font-bold tracking-wide">
-              {t("KEGEMARAN ({count}/{max})", {
-                count: prefs.favourites.length,
-                max: MAX_FAVOURITES,
-              })}
-            </h2>
-            {canAlert && prefs.favourites.length > 0 && (
-              <p className="text-muted -mt-1 text-xs">
-                {t(
-                  "Ketik loceng untuk menerima amaran IPU bagi lokasi itu. Hidupkan amaran di Tetapan dahulu.",
-                )}
-              </p>
-            )}
-            <FavouriteList
-              favourites={prefs.favourites}
-              renderRow={(f) => (
-                <>
+        {view === "list" && prefs && (
+          <>
+            <section className="flex flex-col gap-3">
+              <h2 className="text-muted text-sm font-bold tracking-wide">
+                {t("LOKASI SEMASA")}
+              </h2>
+              {prefs.current && !changing ? (
+                <div className="border-line flex flex-col gap-3 rounded-[18px] border-[1.5px] p-3.5 sm:flex-row sm:items-center">
                   <LocationReading
-                    location={f}
-                    onSelect={() => select(f)}
-                    isCurrent={!!prefs.current && samePlace(prefs.current, f)}
+                    location={prefs.current}
+                    onSelect={() => select(prefs.current!)}
                   />
-                  {canAlert && (
+                  <div className="flex gap-2 *:flex-1 sm:*:flex-none">
+                    {!prefs.favourites.some((f) =>
+                      samePlace(f, prefs.current!),
+                    ) &&
+                      prefs.favourites.length < MAX_FAVOURITES && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            updatePrefs((p) => addFavourite(p, p.current!))
+                          }
+                          className="bg-surface min-h-11 rounded-xl px-3.5 text-sm font-semibold"
+                        >
+                          {t("Simpan")}
+                        </button>
+                      )}
                     <button
                       type="button"
-                      aria-pressed={prefs.alertFavourites.includes(f.id)}
-                      aria-label={t("Amaran IPU untuk {name}", {
+                      onClick={() => setChanging(true)}
+                      className="bg-ink text-page min-h-11 rounded-xl px-3.5 text-sm font-semibold"
+                    >
+                      {t("Tukar")}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="border-line rounded-[18px] border-[1.5px] p-4">
+                  <ChooseLocation onChosen={() => setChanging(false)} />
+                  {prefs.current && (
+                    <button
+                      type="button"
+                      onClick={() => setChanging(false)}
+                      className="mt-3 min-h-11 text-sm font-semibold underline"
+                    >
+                      {t("Batal")}
+                    </button>
+                  )}
+                </div>
+              )}
+            </section>
+
+            <section className="flex flex-col gap-3">
+              <h2 className="text-muted text-sm font-bold tracking-wide">
+                {t("KEGEMARAN ({count}/{max})", {
+                  count: prefs.favourites.length,
+                  max: MAX_FAVOURITES,
+                })}
+              </h2>
+              {canAlert && prefs.favourites.length > 0 && (
+                <p className="text-muted -mt-1 text-xs">
+                  {t(
+                    "Ketik loceng untuk menerima amaran IPU bagi lokasi itu. Hidupkan amaran di Tetapan dahulu.",
+                  )}
+                </p>
+              )}
+              <FavouriteList
+                favourites={prefs.favourites}
+                renderRow={(f) => (
+                  <>
+                    <LocationReading
+                      location={f}
+                      onSelect={() => select(f)}
+                      isCurrent={!!prefs.current && samePlace(prefs.current, f)}
+                    />
+                    {canAlert && (
+                      <button
+                        type="button"
+                        aria-pressed={prefs.alertFavourites.includes(f.id)}
+                        aria-label={t("Amaran IPU untuk {name}", {
+                          name: f.name,
+                        })}
+                        onClick={() =>
+                          updatePrefs((p) => toggleAlertFavourite(p, f.id))
+                        }
+                        className={`flex size-11 shrink-0 items-center justify-center rounded-full ${
+                          prefs.alertFavourites.includes(f.id)
+                            ? "bg-ink text-page"
+                            : "text-muted hover:bg-line"
+                        }`}
+                      >
+                        <svg
+                          aria-hidden="true"
+                          width="18"
+                          height="18"
+                          viewBox="0 0 24 24"
+                          fill={
+                            prefs.alertFavourites.includes(f.id)
+                              ? "currentColor"
+                              : "none"
+                          }
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+                          <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+                        </svg>
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      aria-label={t("Buang {name} daripada kegemaran", {
                         name: f.name,
                       })}
                       onClick={() =>
-                        updatePrefs((p) => toggleAlertFavourite(p, f.id))
+                        updatePrefs((p) => removeFavourite(p, f.id))
                       }
-                      className={`flex size-11 shrink-0 items-center justify-center rounded-full ${
-                        prefs.alertFavourites.includes(f.id)
-                          ? "bg-ink text-page"
-                          : "text-muted hover:bg-line"
-                      }`}
+                      className="text-muted hover:bg-line flex size-11 shrink-0 items-center justify-center rounded-full"
                     >
                       <svg
                         aria-hidden="true"
-                        width="18"
-                        height="18"
+                        width="16"
+                        height="16"
                         viewBox="0 0 24 24"
-                        fill={
-                          prefs.alertFavourites.includes(f.id)
-                            ? "currentColor"
-                            : "none"
-                        }
+                        fill="none"
                         stroke="currentColor"
-                        strokeWidth="2"
+                        strokeWidth="2.4"
                         strokeLinecap="round"
-                        strokeLinejoin="round"
                       >
-                        <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-                        <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                        <line x1="18" y1="6" x2="6" y2="18" />
                       </svg>
                     </button>
-                  )}
-                  <button
-                    type="button"
-                    aria-label={t("Buang {name} daripada kegemaran", {
-                      name: f.name,
-                    })}
-                    onClick={() => updatePrefs((p) => removeFavourite(p, f.id))}
-                    className="text-muted hover:bg-line flex size-11 shrink-0 items-center justify-center rounded-full"
-                  >
-                    <svg
-                      aria-hidden="true"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.4"
-                      strokeLinecap="round"
-                    >
-                      <line x1="6" y1="6" x2="18" y2="18" />
-                      <line x1="18" y1="6" x2="6" y2="18" />
-                    </svg>
-                  </button>
-                </>
-              )}
-            />
+                  </>
+                )}
+              />
 
-            {prefs.favourites.length < MAX_FAVOURITES &&
-              (adding ? (
-                <div className="border-line rounded-[18px] border-[1.5px] p-4">
-                  <LocationSearch
-                    autoFocus
-                    onPick={(area) => {
-                      updatePrefs((p) => addFavourite(p, areaToLocation(area)));
-                      setAdding(false);
-                    }}
-                  />
+              {prefs.favourites.length < MAX_FAVOURITES &&
+                (adding ? (
+                  <div className="border-line rounded-[18px] border-[1.5px] p-4">
+                    <LocationSearch
+                      autoFocus
+                      onPick={(area) => {
+                        updatePrefs((p) =>
+                          addFavourite(p, areaToLocation(area)),
+                        );
+                        setAdding(false);
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setAdding(false)}
+                      className="mt-3 min-h-11 text-sm font-semibold underline"
+                    >
+                      {t("Batal")}
+                    </button>
+                  </div>
+                ) : (
                   <button
                     type="button"
-                    onClick={() => setAdding(false)}
-                    className="mt-3 min-h-11 text-sm font-semibold underline"
+                    onClick={() => setAdding(true)}
+                    className="border-line text-muted min-h-14 rounded-[18px] border-2 border-dashed font-semibold"
                   >
-                    {t("Batal")}
+                    {t("+ Tambah lokasi kegemaran")}
                   </button>
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => setAdding(true)}
-                  className="border-line text-muted min-h-14 rounded-[18px] border-2 border-dashed font-semibold"
-                >
-                  {t("+ Tambah lokasi kegemaran")}
-                </button>
-              ))}
-          </section>
-        </>
-      )}
-    </div>
+                ))}
+            </section>
+          </>
+        )}
+      </div>
+    </>
   );
 }
 

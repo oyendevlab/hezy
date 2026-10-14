@@ -413,7 +413,7 @@ test.describe("kedudukan kad putih", () => {
 });
 
 test.describe("langit penuh", () => {
-  test("jalur langit di halaman lain (warna tahap), bukan di Utama", async ({
+  test("kepala langit di Trend/Lokasi/Tetapan, jalur di halaman lain, tiada di Utama", async ({
     page,
     isMobile,
   }) => {
@@ -426,10 +426,26 @@ test.describe("langit penuh", () => {
     await page.route("**/api/aqi?**", (route) =>
       route.fulfill({ json: fakeReading(OFFICIAL_SHAH_ALAM) }),
     );
-    await page.goto("/trend");
+    // Trend, Lokasi, Tetapan: kepala langit (warna tahap) dengan kandungan dalam kad.
+    for (const path of ["/trend", "/lokasi", "/tetapan"]) {
+      await page.goto(path);
+      const header = page.getByTestId("sky-header");
+      await expect(header).toBeVisible();
+      // IPU 172: Tidak Sihat.
+      await expect(header).toHaveAttribute("data-category", "tidak-sihat");
+      await expect(page.getByTestId("page-sky")).toBeHidden();
+      const top = await header.evaluate((el) => el.getBoundingClientRect().top);
+      expect(top).toBeLessThanOrEqual(1);
+    }
+    // Jalur bar status: tersembunyi di atas langit, muncul bila ditatal.
+    const strip = page.locator(".sky-header-strip");
+    await expect(strip).toHaveCSS("opacity", "0");
+    await page.mouse.wheel(0, 600);
+    await expect(strip).toHaveCSS("opacity", "1");
+    // Halaman lain: jalur langit pendek.
+    await page.goto("/negeri/selangor");
     const sky = page.getByTestId("page-sky");
     await expect(sky).toBeVisible();
-    // IPU 172 (Tidak Sihat): langit kuning pasir.
     await expect
       .poll(() => sky.evaluate((el) => getComputedStyle(el).backgroundImage))
       .toContain("rgb(231, 212, 164)");

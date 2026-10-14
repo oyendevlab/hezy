@@ -29,6 +29,7 @@ import { useI18n } from "@/lib/use-i18n";
 import Link from "next/link";
 import { Chevron } from "../chevron";
 import { IosInstallSteps } from "../install-guide";
+import { SKY_CARD, SkyHeader } from "../sky-header";
 import { Skeleton } from "../status";
 
 const THEMES: { key: ThemePref; label: string }[] = [
@@ -62,189 +63,201 @@ export function TetapanScreen() {
   }
 
   return (
-    <div className="mx-auto flex max-w-[720px] flex-col gap-6 px-5 pt-13 md:px-10 md:pt-10">
-      <h1 className="font-display text-[30px] font-bold">{t("Tetapan")}</h1>
+    <>
+      <SkyHeader title={t("Tetapan")} />
+      <div
+        className={`mx-auto flex max-w-[720px] flex-col gap-6 px-5 md:px-10 md:pt-10 ${SKY_CARD}`}
+      >
+        <h1 className="font-display hidden text-[30px] font-bold md:block">
+          {t("Tetapan")}
+        </h1>
 
-      {prefs === null ? (
-        <Skeleton className="h-96" />
-      ) : (
-        <>
-          <fieldset>
-            <legend className="text-muted mb-2 text-sm font-bold tracking-wide">
-              {t("PROFIL KESIHATAN")}
-            </legend>
-            <div className="grid grid-cols-2 gap-2">
-              {HEALTH_PROFILES.map((p) => (
-                <label
-                  key={p.key}
-                  className={`flex min-h-12 cursor-pointer items-center gap-2.5 rounded-2xl border-2 px-3.5 text-sm font-semibold ${
-                    prefs.profile === p.key
-                      ? "border-ink bg-ipu-tidak-sihat-tint text-[#1c1a16]"
-                      : "bg-surface border-transparent"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="profile"
-                    value={p.key}
-                    checked={prefs.profile === p.key}
-                    onChange={() =>
-                      updatePrefs((x) => ({ ...x, profile: p.key }))
-                    }
-                    className="size-4 accent-[#1c1a16]"
-                  />
-                  {t(p.label)}
-                </label>
-              ))}
-            </div>
-            <p className="text-muted mt-2 text-xs">
-              {t("Nasihat di skrin Utama disesuaikan mengikut profil ini.")}
-            </p>
-            <label className="bg-surface mt-3 flex min-h-12 cursor-pointer items-center gap-3 rounded-2xl px-3.5 text-sm font-semibold">
-              <input
-                type="checkbox"
-                checked={prefs.profile === "anak" || prefs.showSchool}
-                disabled={prefs.profile === "anak"}
-                onChange={(e) =>
-                  updatePrefs((x) => ({ ...x, showSchool: e.target.checked }))
-                }
-                className="size-4 accent-[#1c1a16]"
-              />
-              <span>
-                {t("Papar status sekolah (panduan KPM)")}
-                <span className="text-muted block text-xs font-medium">
-                  {t(
-                    "Sentiasa dipaparkan untuk profil Kanak-kanak. Termasuk notifikasi jika sekolah mungkin ditutup esok (bila amaran hidup).",
-                  )}
+        {prefs === null ? (
+          <Skeleton className="h-96" />
+        ) : (
+          <>
+            <fieldset>
+              <legend className="text-muted mb-2 text-sm font-bold tracking-wide">
+                {t("PROFIL KESIHATAN")}
+              </legend>
+              <div className="grid grid-cols-2 gap-2">
+                {HEALTH_PROFILES.map((p) => (
+                  <label
+                    key={p.key}
+                    className={`flex min-h-12 cursor-pointer items-center gap-2.5 rounded-2xl border-2 px-3.5 text-sm font-semibold ${
+                      prefs.profile === p.key
+                        ? "border-ink bg-ipu-tidak-sihat-tint text-[#1c1a16]"
+                        : "bg-surface border-transparent"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="profile"
+                      value={p.key}
+                      checked={prefs.profile === p.key}
+                      onChange={() =>
+                        updatePrefs((x) => ({ ...x, profile: p.key }))
+                      }
+                      className="size-4 accent-[#1c1a16]"
+                    />
+                    {t(p.label)}
+                  </label>
+                ))}
+              </div>
+              <p className="text-muted mt-2 text-xs">
+                {t("Nasihat di skrin Utama disesuaikan mengikut profil ini.")}
+              </p>
+              <label className="bg-surface mt-3 flex min-h-12 cursor-pointer items-center gap-3 rounded-2xl px-3.5 text-sm font-semibold">
+                <input
+                  type="checkbox"
+                  checked={prefs.profile === "anak" || prefs.showSchool}
+                  disabled={prefs.profile === "anak"}
+                  onChange={(e) =>
+                    updatePrefs((x) => ({ ...x, showSchool: e.target.checked }))
+                  }
+                  className="size-4 accent-[#1c1a16]"
+                />
+                <span>
+                  {t("Papar status sekolah (panduan KPM)")}
+                  <span className="text-muted block text-xs font-medium">
+                    {t(
+                      "Sentiasa dipaparkan untuk profil Kanak-kanak. Termasuk notifikasi jika sekolah mungkin ditutup esok (bila amaran hidup).",
+                    )}
+                  </span>
                 </span>
-              </span>
-            </label>
-          </fieldset>
+              </label>
+            </fieldset>
 
-          <fieldset>
-            <legend className="text-muted mb-2 text-sm font-bold tracking-wide">
-              {t("TEMA")}
-            </legend>
-            <div className="bg-surface grid grid-cols-3 gap-1 rounded-2xl p-1">
-              {THEMES.map((theme) => (
-                <label
-                  key={theme.key}
-                  className={`has-focus-visible:outline-ink flex min-h-11 cursor-pointer items-center justify-center rounded-xl text-sm has-focus-visible:outline-2 ${
-                    prefs.theme === theme.key
-                      ? "bg-page font-bold"
-                      : "text-muted font-medium"
-                  }`}
+            <fieldset>
+              <legend className="text-muted mb-2 text-sm font-bold tracking-wide">
+                {t("TEMA")}
+              </legend>
+              <div className="bg-surface grid grid-cols-3 gap-1 rounded-2xl p-1">
+                {THEMES.map((theme) => (
+                  <label
+                    key={theme.key}
+                    className={`has-focus-visible:outline-ink flex min-h-11 cursor-pointer items-center justify-center rounded-xl text-sm has-focus-visible:outline-2 ${
+                      prefs.theme === theme.key
+                        ? "bg-page font-bold"
+                        : "text-muted font-medium"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="theme"
+                      value={theme.key}
+                      checked={prefs.theme === theme.key}
+                      onChange={() =>
+                        updatePrefs((x) => ({ ...x, theme: theme.key }))
+                      }
+                      className="sr-only"
+                    />
+                    {t(theme.label)}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend className="text-muted mb-2 text-sm font-bold tracking-wide">
+                {t("BAHASA")}
+              </legend>
+              <div className="bg-surface grid grid-cols-2 gap-1 rounded-2xl p-1">
+                {LANGUAGES.map((l) => (
+                  <label
+                    key={l.key}
+                    lang={l.key}
+                    className={`has-focus-visible:outline-ink flex min-h-11 cursor-pointer items-center justify-center rounded-xl text-sm has-focus-visible:outline-2 ${
+                      prefs.lang === l.key
+                        ? "bg-page font-bold"
+                        : "text-muted font-medium"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="lang"
+                      value={l.key}
+                      checked={prefs.lang === l.key}
+                      onChange={() =>
+                        updatePrefs((x) => ({ ...x, lang: l.key }))
+                      }
+                      className="sr-only"
+                    />
+                    {l.label}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            <section>
+              <h2 className="text-muted mb-2 text-sm font-bold tracking-wide">
+                {t("AMARAN")}
+              </h2>
+              <AlertRow prefs={prefs} />
+            </section>
+
+            <section>
+              <h2 className="text-muted mb-2 text-sm font-bold tracking-wide">
+                {t("APLIKASI")}
+              </h2>
+              <div className="divide-line bg-surface divide-y rounded-2xl px-4 text-sm">
+                <InstallRow />
+                <Row
+                  label={t("Luar talian")}
+                  value={t("Bacaan terakhir disimpan di peranti")}
+                />
+              </div>
+            </section>
+
+            <section>
+              <h2 className="text-muted mb-2 text-sm font-bold tracking-wide">
+                {t("TENTANG DATA")}
+              </h2>
+              <div className="divide-line bg-surface divide-y rounded-2xl px-4 text-sm">
+                <Row
+                  label={t("Bacaan rasmi")}
+                  value={t("APIMS (JAS), stesen ≤ 30 km")}
+                />
+                <Row
+                  label={t("Anggaran & ramalan")}
+                  value="Open-Meteo (CAMS)"
+                />
+                <Row
+                  label={t("Kaedah anggaran")}
+                  value={t("Formula JAS, PM2.5 sahaja")}
+                />
+                <AccuracyRows />
+                <Row label={t("Versi")} value={APP_VERSION} />
+                <Link
+                  href="/privasi"
+                  transitionTypes={["nav-forward"]}
+                  className="flex min-h-12 items-center justify-between gap-3 font-semibold"
                 >
-                  <input
-                    type="radio"
-                    name="theme"
-                    value={theme.key}
-                    checked={prefs.theme === theme.key}
-                    onChange={() =>
-                      updatePrefs((x) => ({ ...x, theme: theme.key }))
-                    }
-                    className="sr-only"
-                  />
-                  {t(theme.label)}
-                </label>
-              ))}
-            </div>
-          </fieldset>
+                  {t("Privasi dan data anda")}
+                  <Chevron />
+                </Link>
+              </div>
+              <p className="text-muted mt-2 text-xs leading-relaxed">
+                {t(
+                  "Ralat purata 14 hari berbanding bacaan rasmi APIMS (semua stesen). Ramalan dinilai setiap malam: ramalan esok disimpan, kemudian dibandingkan dengan bacaan sebenar.",
+                )}{" "}
+                {t(
+                  "Bila ada stesen APIMS dalam 30 km dengan bacaan 3 jam terakhir, Hezy memaparkan IPU rasmi stesen itu dan membetulkan ramalan model dengan bacaan tersebut. Jika tidak, Hezy memaparkan anggaran dan ramalan daripada PM2.5 model, yang mungkin berbeza daripada bacaan rasmi.",
+                )}
+              </p>
+            </section>
 
-          <fieldset>
-            <legend className="text-muted mb-2 text-sm font-bold tracking-wide">
-              {t("BAHASA")}
-            </legend>
-            <div className="bg-surface grid grid-cols-2 gap-1 rounded-2xl p-1">
-              {LANGUAGES.map((l) => (
-                <label
-                  key={l.key}
-                  lang={l.key}
-                  className={`has-focus-visible:outline-ink flex min-h-11 cursor-pointer items-center justify-center rounded-xl text-sm has-focus-visible:outline-2 ${
-                    prefs.lang === l.key
-                      ? "bg-page font-bold"
-                      : "text-muted font-medium"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="lang"
-                    value={l.key}
-                    checked={prefs.lang === l.key}
-                    onChange={() => updatePrefs((x) => ({ ...x, lang: l.key }))}
-                    className="sr-only"
-                  />
-                  {l.label}
-                </label>
-              ))}
-            </div>
-          </fieldset>
-
-          <section>
-            <h2 className="text-muted mb-2 text-sm font-bold tracking-wide">
-              {t("AMARAN")}
-            </h2>
-            <AlertRow prefs={prefs} />
-          </section>
-
-          <section>
-            <h2 className="text-muted mb-2 text-sm font-bold tracking-wide">
-              {t("APLIKASI")}
-            </h2>
-            <div className="divide-line bg-surface divide-y rounded-2xl px-4 text-sm">
-              <InstallRow />
-              <Row
-                label={t("Luar talian")}
-                value={t("Bacaan terakhir disimpan di peranti")}
-              />
-            </div>
-          </section>
-
-          <section>
-            <h2 className="text-muted mb-2 text-sm font-bold tracking-wide">
-              {t("TENTANG DATA")}
-            </h2>
-            <div className="divide-line bg-surface divide-y rounded-2xl px-4 text-sm">
-              <Row
-                label={t("Bacaan rasmi")}
-                value={t("APIMS (JAS), stesen ≤ 30 km")}
-              />
-              <Row label={t("Anggaran & ramalan")} value="Open-Meteo (CAMS)" />
-              <Row
-                label={t("Kaedah anggaran")}
-                value={t("Formula JAS, PM2.5 sahaja")}
-              />
-              <AccuracyRows />
-              <Row label={t("Versi")} value={APP_VERSION} />
-              <Link
-                href="/privasi"
-                transitionTypes={["nav-forward"]}
-                className="flex min-h-12 items-center justify-between gap-3 font-semibold"
-              >
-                {t("Privasi dan data anda")}
-                <Chevron />
-              </Link>
-            </div>
-            <p className="text-muted mt-2 text-xs leading-relaxed">
-              {t(
-                "Ralat purata 14 hari berbanding bacaan rasmi APIMS (semua stesen). Ramalan dinilai setiap malam: ramalan esok disimpan, kemudian dibandingkan dengan bacaan sebenar.",
-              )}{" "}
-              {t(
-                "Bila ada stesen APIMS dalam 30 km dengan bacaan 3 jam terakhir, Hezy memaparkan IPU rasmi stesen itu dan membetulkan ramalan model dengan bacaan tersebut. Jika tidak, Hezy memaparkan anggaran dan ramalan daripada PM2.5 model, yang mungkin berbeza daripada bacaan rasmi.",
-              )}
-            </p>
-          </section>
-
-          <button
-            type="button"
-            onClick={clearData}
-            className="border-line min-h-12 self-start rounded-2xl border-[1.5px] px-4 text-sm font-semibold"
-          >
-            {t("Padam data di peranti ini")}
-          </button>
-        </>
-      )}
-    </div>
+            <button
+              type="button"
+              onClick={clearData}
+              className="border-line min-h-12 self-start rounded-2xl border-[1.5px] px-4 text-sm font-semibold"
+            >
+              {t("Padam data di peranti ini")}
+            </button>
+          </>
+        )}
+      </div>
+    </>
   );
 }
 
