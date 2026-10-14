@@ -115,6 +115,14 @@ Buka **https://hezy.my** pada telefon.
 - [ ] Profil Kanak-kanak: kad sekolah satu baris dengan ikon beg; ketik → helaian butiran
 - [ ] Selepas 3 petang, bila IPU jam 2 petang > 180 atau > 150 tiga hari berturut-turut: "Sekolah mungkin ditutup esok" dan notifikasi (bergantung pada keadaan sebenar)
 
+## Ciri baharu v0.7.2
+
+- [ ] Trend, Lokasi, Tetapan: langit awan hingga ke belakang jam, kandungan dalam kad putih bersudut bulat; tatal → jalur langit di belakang jam
+- [ ] Ketik pil tahap (Skala IPU), kad sekolah, Kongsi atau cip lokasi → helaian naik; X / ketik latar → helaian meluncur turun
+- [ ] Tarik helaian ke bawah → tutup; tarikan pendek → melantun kembali
+- [ ] Utama: ⓘ di sebelah "Stesen …" → helaian "Sumber bacaan" (kad Utama tidak berubah saiz)
+- [ ] Hidupkan amaran dari kad kuning → "Amaran dihidupkan" dengan X; hilang sendiri selepas ~5 saat
+
 ## Jika ada masalah
 
 Ambil tangkapan skrin dan catat model telefon serta versi OS, kemudian buka isu di
