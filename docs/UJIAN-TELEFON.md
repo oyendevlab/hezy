@@ -106,6 +106,15 @@ Buka **https://hezy.my** pada telefon.
 - [ ] Utama → Kongsi: kad lokasi dengan bendera negeri (tiada bendera bila lokasi GPS di sempadan negeri)
 - [ ] Kongsi pautan halaman negeri di WhatsApp → pratonton kad negeri
 
+## Ciri baharu v0.7.1
+
+- [ ] iPhone: buang dan pasang semula Hezy di skrin utama → langit Utama hingga ke atas skrin (di belakang jam); jam boleh dibaca
+- [ ] Trend, Lokasi, Tetapan: jalur langit pendek di atas (warna ikut tahap IPU); tatal ke bawah → jam masih boleh dibaca
+- [ ] Utama: ayat nasihat ikut keadaan (pagi/petang/malam, IPU naik/turun, hujan, profil); tiada lagi "bersenam"
+- [ ] Utama: tolak kad putih ke atas → melantun kembali; dengan notis sekolah atau kad amaran (kandungan panjang) → boleh ditatal hingga hujung dan melantun
+- [ ] Profil Kanak-kanak: kad sekolah satu baris dengan ikon beg; ketik → helaian butiran
+- [ ] Selepas 3 petang, bila IPU jam 2 petang > 180 atau > 150 tiga hari berturut-turut: "Sekolah mungkin ditutup esok" dan notifikasi (bergantung pada keadaan sebenar)
+
 ## Jika ada masalah
 
 Ambil tangkapan skrin dan catat model telefon serta versi OS, kemudian buka isu di
