@@ -2,14 +2,7 @@
 
 import { Info } from "@phosphor-icons/react";
 import Link from "next/link";
-import {
-  Fragment,
-  useEffect,
-  useId,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import { Fragment, useId, useLayoutEffect, useRef, useState } from "react";
 import { shownError } from "@/lib/accuracy";
 import { HEALTH_PROFILES, adviceFor, type QuickTone } from "@/lib/advice";
 import { CATEGORY_STYLE } from "@/lib/category-style";
@@ -185,6 +178,7 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
   // dengan ruang langit antara CARD_TOP_MIN dan CARD_TOP_MAX.
   const spacerRef = useRef<HTMLDivElement>(null);
   const cardContentRef = useRef<HTMLDivElement>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
     const place = () => {
       const content = cardContentRef.current;
@@ -201,6 +195,13 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
         ),
         CARD_TOP_MAX,
       )}px`;
+      // Ruang bawah: bila kandungan muat, halaman tepat setinggi skrin (tiada tatalan; tolak ke
+      // atas hanya elastik); bila lebih panjang, kandungan terakhir berhenti di atas navigasi.
+      if (bottomRef.current)
+        bottomRef.current.style.height = `${Math.max(
+          window.innerHeight - navTop - CARD_PADDING_BOTTOM + REST_GAP,
+          0,
+        )}px`;
     };
     place();
     window.addEventListener("resize", place);
@@ -215,16 +216,6 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
 
   // Satu konteks WebGL sahaja: langit telefon atau panorama desktop.
   const wide = useMediaQuery("(min-width: 768px)");
-  // Telefon: kad berhenti di dua kedudukan sahaja — rehat atau atas (CARD_TOP_MIN).
-  // Kandungan lebih panjang daripada skrin masih boleh ditatal bebas di dalam kad.
-  useEffect(() => {
-    if (wide) return;
-    const root = document.documentElement;
-    root.style.scrollSnapType = "y mandatory";
-    return () => {
-      root.style.scrollSnapType = "";
-    };
-  }, [wide]);
   const sky = {
     ipu: current?.ipu ?? null,
     weather: reading?.weather,
@@ -271,9 +262,8 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
       {/* Tablet sentuh: penunjuk biasa; telefon guna kad elastik. */}
       {wide && <PullToRefresh />}
       {/* Telefon: mockup C */}
-      <section className="md:hidden">
-        {/* Titik snap kedudukan rehat (tatalan 0). */}
-        <div aria-hidden="true" className="absolute top-0 h-0 snap-start" />
+      {/* -mb-28 membatalkan pb-28 <main>; ruang bawah dikira (bottomRef). */}
+      <section className="-mb-28 md:hidden">
         {/* Pengepala tetap menindih langit (margin negatif = tinggi pengepala). */}
         <HomeHeader
           current={current}
@@ -311,8 +301,8 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
           data-testid="card-spacer"
           style={{ height: CARD_TOP_MAX }}
         />
-        {/* min-h: kad hanya boleh ditolak hingga bahagian atasnya ~124 px dari atas skrin. */}
-        <ElasticCard className="bg-page min-h-[calc(100svh-236px)] snap-start scroll-mt-[124px] rounded-t-[28px] px-5.5 pt-6 pb-8">
+        {/* Kad setinggi kandungan: elastik bila ditolak ke atas; boleh ditatal hanya bila kandungan lebih panjang daripada skrin. */}
+        <ElasticCard className="bg-page rounded-t-[28px] px-5.5 pt-6 pb-8">
           <div ref={cardContentRef} className="flex flex-col gap-4">
             <Summary
               entry={entry}
@@ -333,6 +323,7 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
             )}
           </div>
         </ElasticCard>
+        <div ref={bottomRef} aria-hidden="true" />
       </section>
 
       {/* Tablet & desktop: pilihan 2 */}

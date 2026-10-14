@@ -17,10 +17,24 @@ const MIN_SPIN_MS = 700;
 const SPRING = "transform 520ms cubic-bezier(.34,1.56,.64,1)";
 const IGNORE = ".leaflet-container, [data-no-pull]";
 
+/** Had anjakan bila kad ditolak ke atas melepasi hujung kandungan. */
+const PUSH_MAX = 110;
+
+/** Jarak tatalan maksimum halaman. */
+const maxScroll = () =>
+  Math.max(
+    0,
+    (document.scrollingElement ?? document.documentElement).scrollHeight -
+      window.innerHeight,
+  );
+
 /**
- * Kad putih Utama (telefon) yang boleh ditarik ke bawah seperti getah untuk muat semula.
- * Langit tetap di belakang; hanya kad bergerak. Lepas sebelum ambang → melantun semula;
- * selepas ambang → berhenti, awan berputar di ruang langit, kemudian melantun bila siap.
+ * Kad putih Utama (telefon) yang elastik seperti getah ke dua arah. Langit tetap di belakang;
+ * hanya kad bergerak.
+ * - Tarik ke bawah di atas halaman: lepas sebelum ambang → melantun semula; selepas ambang →
+ *   berhenti, awan berputar di ruang langit, kemudian melantun bila siap muat semula.
+ * - Tolak ke atas di hujung kandungan (atau bila kandungan muat dalam skrin): kad naik dengan
+ *   rintangan dan melantun kembali bila dilepaskan (v0.7.1).
  */
 export function ElasticCard({
   children,
@@ -35,7 +49,16 @@ export function ElasticCard({
   const [pull, setPull] = useState(0);
   const [dragging, setDragging] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const state = useRef({ startY: 0, tracking: false, pull: 0, busy: false });
+  const state = useRef({
+    startY: 0,
+    tracking: false,
+    /** Halaman di atas sekali semasa sentuhan bermula (tarik untuk muat semula). */
+    atTop: false,
+    /** Kedudukan jari bila hujung kandungan dicapai (tolak ke atas); `null` belum. */
+    edgeY: null as number | null,
+    pull: 0,
+    busy: false,
+  });
   const refreshRef = useRef(onRefresh);
 
   useEffect(() => {
@@ -57,16 +80,33 @@ export function ElasticCard({
     const onStart = (e: TouchEvent) => {
       const target = e.target as Element | null;
       s.tracking =
-        !s.busy &&
-        e.touches.length === 1 &&
-        window.scrollY <= 0 &&
-        !target?.closest(IGNORE);
+        !s.busy && e.touches.length === 1 && !target?.closest(IGNORE);
+      s.atTop = window.scrollY <= 0;
+      s.edgeY = null;
       s.startY = e.touches[0].clientY;
     };
     const onMove = (e: TouchEvent) => {
       if (!s.tracking) return;
-      const dy = e.touches[0].clientY - s.startY;
-      if (dy <= 0 || window.scrollY > 0) {
+      const y = e.touches[0].clientY;
+      // Tolak ke atas di hujung kandungan: getah, kemudian melantun kembali.
+      if (s.pull <= 0 && y < s.startY && window.scrollY >= maxScroll() - 1) {
+        s.edgeY ??= y;
+        const over = s.edgeY - y;
+        if (over > 0) {
+          if (e.cancelable) e.preventDefault();
+          setDragging(true);
+          update(-rubberBand(over, PUSH_MAX));
+          return;
+        }
+      }
+      if (s.pull < 0) {
+        // Jari kembali ke bawah: lepaskan getah dan biar tatalan biasa berjalan.
+        s.edgeY = null;
+        update(0);
+        return;
+      }
+      const dy = y - s.startY;
+      if (!s.atTop || dy <= 0 || window.scrollY > 0) {
         if (s.pull) update(0);
         return;
       }
@@ -81,6 +121,7 @@ export function ElasticCard({
       s.tracking = false;
       setDragging(false);
       if (s.pull < PULL_THRESHOLD) {
+        // Termasuk tolak ke atas (anjakan negatif): melantun kembali.
         update(0);
         return;
       }
@@ -146,6 +187,19 @@ export function ElasticCard({
         style={{ transform: `translateY(${pull}px)`, transition }}
       >
         {children}
+        {/* Sambungan kad ke bawah skrin supaya langit tidak kelihatan bila kad ditolak ke atas. */}
+        {/* Setinggi anjakan ke atas sahaja: hujungnya kekal di kedudukan asal kad, jadi
+            tidak menambah ketinggian halaman. */}
+        <div
+          aria-hidden="true"
+          className="bg-page pointer-events-none absolute inset-x-0 top-[calc(100%-1px)] motion-reduce:!transition-none"
+          style={{
+            height: Math.max(0, -pull),
+            transition: dragging
+              ? "none"
+              : "height 520ms cubic-bezier(.34,1.56,.64,1)",
+          }}
+        />
       </div>
       <span role="status" className="sr-only">
         {refreshing ? t("Memuat semula…") : ""}

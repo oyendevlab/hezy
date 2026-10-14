@@ -341,7 +341,7 @@ test.describe("pengepala tetap", () => {
 });
 
 test.describe("kedudukan kad putih", () => {
-  test("rehat: kandungan muat di atas navigasi; ditolak ke atas berhenti ~124 px", async ({
+  test("rehat: kandungan muat di atas navigasi; tolak ke atas melantun kembali", async ({
     page,
     isMobile,
   }) => {
@@ -364,13 +364,51 @@ test.describe("kedudukan kad putih", () => {
     expect(linkBottom).toBeLessThanOrEqual(navTop);
     expect(navTop - linkBottom).toBeLessThan(40);
 
+    // Kandungan muat: halaman tidak boleh ditatal (tiada kedudukan "tersangkut" di atas).
+    await page.evaluate(() => window.scrollTo(0, 5000));
+    expect(await page.evaluate(() => window.scrollY)).toBeLessThanOrEqual(1);
+
+    // Tolak ke atas: kad naik dengan rintangan, kemudian melantun kembali.
+    const cdp = await page.context().newCDPSession(page);
+    const touch = (type: "touchStart" | "touchMove" | "touchEnd", y?: number) =>
+      cdp.send("Input.dispatchTouchEvent", {
+        type,
+        touchPoints: y === undefined ? [] : [{ x: 200, y }],
+      });
+    const offset = () =>
+      card.evaluate((el) => new DOMMatrix(getComputedStyle(el).transform).m42);
+    await touch("touchStart", 600);
+    for (let y = 580; y >= 300; y -= 20) await touch("touchMove", y);
+    const pushed = await offset();
+    expect(pushed).toBeLessThan(-40);
+    expect(pushed).toBeGreaterThanOrEqual(-110);
+    await touch("touchEnd");
+    await expect.poll(offset).toBeCloseTo(0, 0);
+    expect(await page.evaluate(() => window.scrollY)).toBeLessThanOrEqual(1);
+  });
+
+  test("kandungan panjang: boleh ditatal hingga kandungan terakhir di atas navigasi", async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(!isMobile, "Kad putih elastik untuk telefon");
+    await page.setViewportSize({ width: 390, height: 560 });
+    await seedLocation(page);
+    await page.goto("/");
+    const link = page.getByRole("link", { name: "Lihat trend jam demi jam" });
+    await expect(link).toBeAttached();
     await page.evaluate(() => window.scrollTo(0, 5000));
     await expect
-      .poll(() => card.evaluate((el) => el.getBoundingClientRect().top))
-      .toBeGreaterThanOrEqual(123);
-    expect(
-      await card.evaluate((el) => el.getBoundingClientRect().top),
-    ).toBeLessThanOrEqual(126);
+      .poll(() => page.evaluate(() => window.scrollY))
+      .toBeGreaterThan(10);
+    const navTop = await page
+      .locator("[data-bottom-nav]")
+      .evaluate((el) => el.getBoundingClientRect().top);
+    const linkBottom = await link.evaluate(
+      (el) => el.getBoundingClientRect().bottom,
+    );
+    expect(linkBottom).toBeLessThanOrEqual(navTop);
+    expect(navTop - linkBottom).toBeLessThan(40);
   });
 });
 
