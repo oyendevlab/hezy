@@ -18,7 +18,8 @@ import {
 } from "./hotspots";
 import { parseWeather, weatherUrl, type WeatherSeries } from "./weather";
 import { parseWindGrid, windGridUrl, type WindGrid } from "./wind-grid";
-import { readAccuracy, readIndex } from "./history-store";
+import { readAccuracy, readHourlyDay, readIndex } from "./history-store";
+import { SCHOOL_DECISION_HOUR } from "./school";
 import {
   airQualityUrl,
   parseAirQuality,
@@ -95,6 +96,24 @@ export async function fetchStateHourly(
     throw new Error(`APIMS (sejarah) memulangkan status ${res.status}`);
   }
   return parseHourly(await res.json());
+}
+
+/**
+ * Bacaan IPU jam 2 petang semua stesen bagi satu tarikh lepas (Blob sejarah), untuk
+ * jangkaan penutupan sekolah. Dicache 6 jam.
+ */
+export async function getTwoPmReadings(
+  date: string,
+): Promise<Record<string, number | null>> {
+  "use cache";
+  cacheLife({ stale: 3600, revalidate: 21600, expire: 86400 });
+  const day = await readHourlyDay(date);
+  return Object.fromEntries(
+    Object.entries(day?.stations ?? {}).map(([id, hours]) => [
+      id,
+      hours[SCHOOL_DECISION_HOUR] ?? null,
+    ]),
+  );
 }
 
 /** Indeks ketepatan (Vercel Blob), dicache 1 jam; dikemas kini sekali sehari. */

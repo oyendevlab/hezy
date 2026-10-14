@@ -91,6 +91,7 @@ export function pushOptions(prefs: Prefs): PushOptions {
     forecast: prefs.forecastAlert,
     spike: prefs.spikeAlert,
     expected: prefs.expectedAlert,
+    school: prefs.profile === "anak" || prefs.showSchool,
     quiet: prefs.quietHours,
   };
 }

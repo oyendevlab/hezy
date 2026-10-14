@@ -18,6 +18,8 @@ export type RecordLocation = AlertLocation &
     lastSpike?: string | null;
     /** Tarikh (waktu Malaysia) amaran jerebu dijangka terakhir. */
     lastExpected?: string | null;
+    /** Tarikh (waktu Malaysia) notifikasi sekolah mungkin ditutup esok terakhir. */
+    lastSchool?: string | null;
   };
 
 /** Rekod langganan dalam Vercel Blob (private): satu fail JSON bagi setiap peranti. */
@@ -96,6 +98,7 @@ export function mergeRecord(
         lastForecast: previous?.lastForecast ?? null,
         lastSpike: previous?.lastSpike ?? null,
         lastExpected: previous?.lastExpected ?? null,
+        lastSchool: previous?.lastSchool ?? null,
       };
     }),
   };

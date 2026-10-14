@@ -113,7 +113,9 @@ export function TetapanScreen() {
               <span>
                 {t("Papar status sekolah (panduan KPM)")}
                 <span className="text-muted block text-xs font-medium">
-                  {t("Sentiasa dipaparkan untuk profil Kanak-kanak")}
+                  {t(
+                    "Sentiasa dipaparkan untuk profil Kanak-kanak. Termasuk notifikasi jika sekolah mungkin ditutup esok (bila amaran hidup).",
+                  )}
                 </span>
               </span>
             </label>

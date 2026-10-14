@@ -123,6 +123,7 @@ describe("parseSubscribeBody", () => {
           forecast: false,
           spike: false,
           expected: false,
+          school: false,
           quiet: null,
         },
       },
@@ -139,6 +140,7 @@ describe("parseSubscribeBody", () => {
       forecast: true,
       spike: false,
       expected: false,
+      school: false,
       quiet: { start: 23, end: 6 },
     });
     const bad = parseSubscribeBody({
@@ -150,6 +152,7 @@ describe("parseSubscribeBody", () => {
       forecast: false,
       spike: false,
       expected: false,
+      school: false,
       quiet: null,
     });
   });

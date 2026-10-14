@@ -267,6 +267,12 @@ const EN: Record<string, string> = {
     "The API spread is an estimate between stations (interpolated), not an official reading: APIMS within Malaysia, WAQI sensors outside Malaysia (US AQI converted to the API scale). Areas far from any station are left blank.",
   "Garisan bergerak menunjukkan aliran angin pada ~1.5 km (850 hPa) yang membawa asap jerebu. Sumber: Open-Meteo.":
     "Moving lines show the wind at ~1.5 km (850 hPa), which carries haze smoke. Source: Open-Meteo.",
+  "Sekolah di {name} mungkin ditutup esok":
+    "Schools in {name} may close tomorrow",
+  "IPU jam 2 petang {ipu}. Tunggu pengumuman rasmi JPN/PPD.":
+    "2 pm API {ipu}. Wait for the official announcement.",
+  "Sentiasa dipaparkan untuk profil Kanak-kanak. Termasuk notifikasi jika sekolah mungkin ditutup esok (bila amaran hidup).":
+    "Always shown for the Children profile. Includes a notification if schools may close tomorrow (when alerts are on).",
   // Kad imej negeri (v0.7.0)
   "IPU tertinggi · {station}": "Highest API · {station}",
   "{n} daripada {total} stesen melebihi IPU 100":
@@ -355,9 +361,19 @@ const EN: Record<string, string> = {
   // Status sekolah
   "STATUS SEKOLAH": "SCHOOL STATUS",
   "Sekolah mungkin ditutup": "Schools may be closed",
-  "Garis panduan KPM: sekolah di kawasan atau daerah dengan IPU melebihi 200 ditutup segera. Semak makluman rasmi sekolah dan PPD tentang PdPR.":
-    "MOE guideline: schools in areas or districts with an API above 200 close immediately. Check official notices from the school and district office about home-based learning.",
-  "Aktiviti luar dihentikan": "Outdoor activities stopped",
+  "Garis panduan KPM: institusi pendidikan di kawasan dengan IPU melebihi 180 ditutup dan melaksanakan PdPR. Semak makluman rasmi sekolah dan PPD.":
+    "MOE guideline: education institutions in areas with an API above 180 close and switch to home-based learning. Check official notices from the school and district office.",
+  "Aktiviti luar sekolah dihentikan": "School outdoor activities stopped",
+  "IPU melebihi 180": "API above 180",
+  "IPU melebihi 100 · Sekolah dibuka": "API above 100 · Schools open",
+  "Aktiviti luar dibenarkan": "Outdoor activities allowed",
+  "Sekolah mungkin ditutup esok": "Schools may close tomorrow",
+  "IPU jam 2 petang {ipu} · Tunggu pengumuman JPN/PPD":
+    "2 pm API {ipu} · Wait for the official announcement",
+  "IPU jam 2 petang melebihi 150 (hari {n} daripada {total})":
+    "2 pm API above 150 (day {n} of {total})",
+  "Garis panduan KPM: sekolah ditutup bila IPU melebihi 180, atau melebihi 150 tiga hari berturut-turut. Keputusan harian berdasarkan bacaan jam 2 petang.":
+    "MOE guideline: schools close when the API is above 180, or above 150 for three days in a row. Daily decisions use the 2 pm reading.",
   "Garis panduan KPM: semua aktiviti luar bilik darjah, termasuk perhimpunan, sukan dan kokurikulum, dihentikan bila IPU melebihi 100. Sekolah kekal dibuka.":
     "MOE guideline: all outdoor activities, including assemblies, sports and co-curricular activities, stop when the API is above 100. Schools stay open.",
   "Sekolah seperti biasa": "School as usual",
@@ -477,8 +493,6 @@ const EN: Record<string, string> = {
   "Nasihat di skrin Utama disesuaikan mengikut profil ini.":
     "Advice on the Home screen is tailored to this profile.",
   "Papar status sekolah (panduan KPM)": "Show school status (MOE guidance)",
-  "Sentiasa dipaparkan untuk profil Kanak-kanak":
-    "Always shown for the Children profile",
   TEMA: "THEME",
   "Ikut peranti": "Follow device",
   Terang: "Light",

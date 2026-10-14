@@ -43,6 +43,8 @@ export type PushOptions = {
   spike: boolean;
   /** Amaran jerebu dijangka: ramalan 6 jam melepasi ambang (v0.7.0 item 10). */
   expected: boolean;
+  /** Notifikasi sekolah mungkin ditutup esok (v0.7.1); ikut paparan status sekolah. */
+  school: boolean;
   /** Waktu senyap; `null` = tiada. Amaran ditangguh kecuali IPU > 300. */
   quiet: { start: number; end: number } | null;
 };
@@ -53,6 +55,7 @@ export const LEGACY_OPTIONS: PushOptions = {
   forecast: false,
   spike: false,
   expected: false,
+  school: false,
   quiet: null,
 };
 
@@ -65,6 +68,7 @@ export function parseOptions(raw: unknown): PushOptions {
     forecast?: unknown;
     spike?: unknown;
     expected?: unknown;
+    school?: unknown;
     quiet?: { start?: unknown; end?: unknown } | null;
   } | null;
   const quiet =
@@ -79,6 +83,7 @@ export function parseOptions(raw: unknown): PushOptions {
     forecast: r?.forecast === true,
     spike: r?.spike === true,
     expected: r?.expected === true,
+    school: r?.school === true,
     quiet,
   };
 }

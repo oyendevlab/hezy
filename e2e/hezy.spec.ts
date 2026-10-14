@@ -1651,15 +1651,38 @@ test.describe("status sekolah", () => {
     await page.goto("/tetapan");
     await page.getByRole("radio", { name: "Kanak-kanak" }).check();
     await page.goto("/");
-    const card = page
-      .getByRole("region", { name: "Aktiviti luar dihentikan" })
-      .filter({ visible: true });
-    await expect(card).toBeVisible();
-    await expect(card).toContainText("IPU rasmi 172");
+    const card = page.getByTestId("school-card").filter({ visible: true });
+    await expect(card).toContainText("Aktiviti luar sekolah dihentikan");
+    await expect(card).toHaveAttribute("data-level", "no-outdoor");
+    await card.click();
+    const sheet = page.getByRole("dialog", {
+      name: "Aktiviti luar sekolah dihentikan",
+    });
+    await expect(sheet).toContainText("IPU rasmi 172");
+    await page.keyboard.press("Escape");
+    await expect(sheet).toBeHidden();
     await page.goto("/trend");
-    await expect(
-      page.getByRole("heading", { name: "Aktiviti luar dihentikan" }),
-    ).toBeVisible();
+    await expect(page.getByTestId("school-card")).toBeVisible();
+  });
+
+  test("jangkaan sekolah ditutup esok daripada bacaan jam 2 petang", async ({
+    page,
+  }) => {
+    await page.route("**/api/aqi?**", (route) =>
+      route.fulfill({
+        json: {
+          ...fakeReading(OFFICIAL_SHAH_ALAM),
+          schoolTwoPm: [160, 158, 172],
+        },
+      }),
+    );
+    await page.goto("/tetapan");
+    await page.getByRole("radio", { name: "Kanak-kanak" }).check();
+    await page.goto("/");
+    const card = page.getByTestId("school-card").filter({ visible: true });
+    await expect(card).toHaveAttribute("data-level", "closed");
+    await expect(card).toContainText("Sekolah mungkin ditutup esok");
+    await expect(card).toContainText("IPU jam 2 petang 172");
   });
 
   test("tersembunyi untuk profil Umum kecuali dipilih di Tetapan", async ({
@@ -1669,13 +1692,13 @@ test.describe("status sekolah", () => {
     await expect(
       page.getByRole("heading", { name: "IPU 172, Tidak Sihat" }),
     ).toBeVisible();
-    await expect(page.getByText("STATUS SEKOLAH")).toHaveCount(0);
+    await expect(page.getByTestId("school-card")).toHaveCount(0);
 
     await page.goto("/tetapan");
     await page.getByLabel(/Papar status sekolah/).check();
     await page.goto("/");
     await expect(
-      page.getByText("STATUS SEKOLAH").filter({ visible: true }),
+      page.getByTestId("school-card").filter({ visible: true }),
     ).toBeVisible();
   });
 });
