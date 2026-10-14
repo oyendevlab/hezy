@@ -71,6 +71,8 @@ export type Reading = {
   official: OfficialReading | null;
   /** Negeri lokasi untuk bendera kad kongsi (stesen terdekat; `null` di sempadan); diisi oleh route API. */
   state?: string | null;
+  /** IPU jam 2 petang stesen rasmi (lama → hari ini) untuk jangkaan penutupan sekolah; diisi oleh route API. */
+  schoolTwoPm?: (number | null)[];
   /** Cuaca semasa (langit hidup, ikon dan suhu); diisi oleh route API. */
   weather?: CurrentWeather | null;
   /** Cuaca harian hari-hari akan datang (ikon ramalan 3 hari). */

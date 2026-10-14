@@ -13,6 +13,7 @@ import { displayIpu, primaryReading } from "./official";
 import type { PushRecord } from "./push-record";
 import { LEGACY_OPTIONS } from "./push-validate";
 import { localHourKey, type HourPoint, type Reading } from "./reading";
+import { schoolTomorrow } from "./school";
 
 /** IPU melebihi nilai ini tetap dihantar walaupun dalam waktu senyap. */
 export const QUIET_OVERRIDE_IPU = 300;
@@ -31,11 +32,15 @@ export const SPIKE_COOLDOWN_HOURS = 6;
 /** Jerebu dijangka: tetingkap ramalan ke hadapan (v0.7.0 item 10). */
 export const EXPECTED_HOURS = 6;
 
+/** Notifikasi sekolah esok: dari 3 petang (bacaan jam 2 tersedia) hingga sebelum 9 malam. */
+export const SCHOOL_HOURS = [15, 21] as const;
+
 export type PlannedUpdate =
   | { kind: "alert"; index: number; next: AlertState }
   | { kind: "forecast"; index: number }
   | { kind: "spike"; index: number }
   | { kind: "expected"; index: number }
+  | { kind: "school"; index: number }
   | { kind: "morning" };
 
 /** Milisaat bagi kunci jam `YYYY-MM-DDTHH:mm` (waktu tempatan dianggap UTC; hanya untuk beza). */
@@ -203,6 +208,30 @@ export function planNotifications(
       }
     }
 
+    // Sekolah mungkin ditutup esok (bacaan jam 2 petang; peraturan KPM).
+    if (
+      options.school &&
+      !quiet &&
+      hour >= SCHOOL_HOURS[0] &&
+      hour < SCHOOL_HOURS[1] &&
+      location.lastSchool !== today
+    ) {
+      const school = reading.schoolTwoPm
+        ? schoolTomorrow(reading.schoolTwoPm)
+        : null;
+      if (school?.level === "likely") {
+        planned.push({
+          title: t("Sekolah di {name} mungkin ditutup esok", { name }),
+          body: t("IPU jam 2 petang {ipu}. Tunggu pengumuman rasmi JPN/PPD.", {
+            ipu: school.ipu,
+          }),
+          tag: `hezy-sekolah-${location.id}`,
+          urgency: "normal",
+          update: { kind: "school", index },
+        });
+      }
+    }
+
     // Amaran ramalan esok.
     if (
       options.forecast &&
@@ -287,6 +316,8 @@ export function applySent(
         return { ...l, lastSpike: nowKey };
       case "expected":
         return { ...l, lastExpected: today };
+      case "school":
+        return { ...l, lastSchool: today };
       default:
         return { ...l, lastForecast: today };
     }

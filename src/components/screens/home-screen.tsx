@@ -321,7 +321,9 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
               size="phone"
               profile={prefs.profile}
             />
-            {current && showSchool && <SchoolCard reading={current} />}
+            {current && showSchool && (
+              <SchoolCard reading={current} twoPm={reading?.schoolTwoPm} />
+            )}
             {!wide && current && <AlertCard prefs={prefs} ipu={current.ipu} />}
             <InstallBanner />
             {reading ? (
@@ -383,7 +385,9 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
             {entry && <ReadingNotices entry={entry} onRetry={onRetry} />}
             {wide && current && <AlertCard prefs={prefs} ipu={current.ipu} />}
             <InstallBanner />
-            {current && showSchool && <SchoolCard reading={current} />}
+            {current && showSchool && (
+              <SchoolCard reading={current} twoPm={reading?.schoolTwoPm} />
+            )}
             {current && <QuickAnswers category={current.category} />}
             {current && (
               <AdviceCard category={current.category} profile={prefs.profile} />

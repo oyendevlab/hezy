@@ -60,6 +60,7 @@ const record = (over: Partial<PushRecord> = {}): PushRecord => ({
     forecast: true,
     spike: false,
     expected: false,
+    school: false,
     quiet: { start: 23, end: 6 },
   },
   ...over,
@@ -88,6 +89,7 @@ describe("planNotifications", () => {
         forecast: false,
         spike: false,
         expected: false,
+        school: false,
         quiet: { start: 23, end: 6 },
       },
     });
@@ -205,13 +207,14 @@ const hours = (list: [number, number, boolean?][]) =>
 const withToday = (ipu: number, today: ReturnType<typeof hours>): Reading =>
   ({ ...reading(ipu), today }) as Reading;
 
-const on = (spike: boolean, expected: boolean) =>
+const on = (spike: boolean, expected: boolean, school = false) =>
   record({
     options: {
       morning: false,
       forecast: false,
       spike,
       expected,
+      school,
       quiet: { start: 23, end: 6 },
     },
   });
@@ -392,5 +395,58 @@ describe("amaran lonjakan dan jerebu dijangka", () => {
       at("2026-10-12T12:12"),
     );
     expect(notes[0].title).toBe("Haze expected in Shah Alam around 4 pm");
+  });
+});
+
+describe("notifikasi sekolah mungkin ditutup esok", () => {
+  const withSchool = (twoPm: (number | null)[]) =>
+    ({ ...reading(90), schoolTwoPm: twoPm }) as Reading;
+
+  it("sekali sehari dari 3 petang bila syarat KPM dipenuhi", () => {
+    const now = at("2026-10-12T15:12");
+    const notes = planNotifications(
+      on(false, false, true),
+      [withSchool([160, 158, 172])],
+      now,
+    );
+    expect(notes).toHaveLength(1);
+    expect(notes[0]).toMatchObject({
+      title: "Sekolah di Shah Alam mungkin ditutup esok",
+      body: "IPU jam 2 petang 172. Tunggu pengumuman rasmi JPN/PPD.",
+      tag: "hezy-sekolah-semasa",
+    });
+    const sent = applySent(on(false, false, true), notes[0].update, now);
+    expect(sent.locations[0].lastSchool).toBe("2026-10-12");
+    expect(
+      planNotifications(
+        sent,
+        [withSchool([160, 158, 172])],
+        at("2026-10-12T17:12"),
+      ),
+    ).toEqual([]);
+  });
+
+  it("tidak dihantar sebelum 3 petang, bila dimatikan, atau baru hari pertama > 150", () => {
+    expect(
+      planNotifications(
+        on(false, false, true),
+        [withSchool([160, 158, 172])],
+        at("2026-10-12T14:12"),
+      ),
+    ).toEqual([]);
+    expect(
+      planNotifications(
+        on(false, false, false),
+        [withSchool([160, 158, 172])],
+        at("2026-10-12T15:12"),
+      ),
+    ).toEqual([]);
+    expect(
+      planNotifications(
+        on(false, false, true),
+        [withSchool([null, 120, 160])],
+        at("2026-10-12T15:12"),
+      ),
+    ).toEqual([]);
   });
 });

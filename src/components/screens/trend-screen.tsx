@@ -52,7 +52,7 @@ export function TrendScreen() {
         <Skeleton className="h-[420px]" />
       )}
       {current && prefs && (prefs.profile === "anak" || prefs.showSchool) && (
-        <SchoolCard reading={current} />
+        <SchoolCard reading={current} twoPm={reading?.schoolTwoPm} />
       )}
       {reading && <TrendPanel reading={reading} />}
       {reading?.official && (
