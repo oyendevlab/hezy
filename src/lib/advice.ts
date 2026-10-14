@@ -53,7 +53,7 @@ const ADVICE: Record<IpuCategoryKey, CategoryAdvice> = {
     ],
   },
   "tidak-sihat": {
-    headline: "Elak bersenam di luar hari ini.",
+    headline: "Hadkan aktiviti luar hari ini.",
     tips: [
       "Pakai topeng N95 jika perlu keluar",
       "Tutup tingkap dan pintu",

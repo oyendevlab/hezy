@@ -79,7 +79,88 @@ const EN: Record<string, string> = {
   "Bawa inhaler bila keluar": "Carry an inhaler when going out",
   "Pantau anak jika batuk atau sesak nafas":
     "Watch children for coughing or breathlessness",
-  "Elak bersenam di luar hari ini.": "Avoid exercising outdoors today.",
+  "Hadkan aktiviti luar hari ini.": "Limit outdoor activities today.",
+  // Nasihat ikut keadaan (v0.7.1)
+  "Udara masih bersih, tetapi IPU sedang naik.":
+    "The air is still clean, but the API is rising.",
+  "Udara kembali bersih. Aktiviti luar seperti biasa.":
+    "The air is clean again. Outdoor activities as usual.",
+  "Udara bersih. Bawa payung jika keluar.":
+    "Clean air. Bring an umbrella if you go out.",
+  "Udara bersih pagi ini. Sesuai untuk aktiviti luar.":
+    "Clean air this morning. Good for outdoor activities.",
+  "Pagi yang baik untuk keluar rumah.": "A good morning to head outside.",
+  "Udara bersih petang ini. Nikmati masa di luar.":
+    "Clean air this afternoon. Enjoy your time outside.",
+  "Udara bersih malam ini. Buka tingkap untuk udara segar.":
+    "Clean air tonight. Open the windows for fresh air.",
+  "Udara bersih. Sesuai untuk berjalan malam.":
+    "Clean air. Good for an evening walk.",
+  "Anak boleh bermain di luar. Pantau jika batuk.":
+    "Children can play outside. Watch for coughing.",
+  "Aktiviti luar boleh. Bawa inhaler bersama.":
+    "Outdoor activities are fine. Keep your inhaler with you.",
+  "Jalan santai boleh diteruskan. Berehat jika penat.":
+    "Light walks are fine. Rest if you feel tired.",
+  "IPU sedang naik. Pantau bacaan jika merancang aktiviti luar.":
+    "The API is rising. Keep an eye on it if you plan to be outside.",
+  "Udara semakin baik. Aktiviti luar seperti biasa.":
+    "The air is improving. Outdoor activities as usual.",
+  "Hujan membantu membersihkan udara. Aktiviti luar seperti biasa.":
+    "Rain helps clear the air. Outdoor activities as usual.",
+  "Udara sederhana pagi ini. Aktiviti luar masih boleh.":
+    "Moderate air this morning. Outdoor activities are still fine.",
+  "Aktiviti luar boleh diteruskan. Berehat jika rasa tidak selesa.":
+    "Outdoor activities can continue. Take a break if you feel unwell.",
+  "Udara sederhana malam ini. Tiada sekatan aktiviti.":
+    "Moderate air tonight. No restrictions on activities.",
+  "Anak elok bermain di dalam rumah hari ini.":
+    "Children should play indoors today.",
+  "Hadkan aktiviti luar dan bawa inhaler.":
+    "Limit outdoor activities and carry your inhaler.",
+  "Tangguhkan berjalan di luar hari ini.": "Put off walks outside today.",
+  "Jerebu semakin teruk. Hadkan masa di luar.":
+    "The haze is getting worse. Limit your time outside.",
+  "Udara beransur pulih, tetapi hadkan aktiviti luar dahulu.":
+    "The air is improving, but limit outdoor activities for now.",
+  "Hujan membantu, tetapi udara masih tidak sihat.":
+    "Rain helps, but the air is still unhealthy.",
+  "Tangguhkan aktiviti luar pagi ini.":
+    "Put off outdoor activities this morning.",
+  "Elak aktiviti luar yang berat pagi ini.":
+    "Avoid strenuous outdoor activities this morning.",
+  "Kurangkan aktiviti luar petang ini.":
+    "Cut back on outdoor activities this afternoon.",
+  "Pilih aktiviti dalam bangunan petang ini.":
+    "Choose indoor activities this afternoon.",
+  "Tutup tingkap sebelum tidur malam ini.":
+    "Close the windows before bed tonight.",
+  "Kekal di dalam dan tutup tingkap malam ini.":
+    "Stay in and keep the windows closed tonight.",
+  "Anak perlu kekal di dalam rumah.": "Children should stay indoors.",
+  "Kekal di dalam. Jumpa doktor jika simptom bertambah.":
+    "Stay indoors. See a doctor if symptoms get worse.",
+  "Jerebu semakin teruk. Kekal di dalam.":
+    "The haze is getting worse. Stay indoors.",
+  "Udara beransur pulih, tetapi masih sangat tidak sihat.":
+    "The air is improving, but still very unhealthy.",
+  "Hujan belum cukup. Udara masih sangat tidak sihat.":
+    "The rain isn't enough. The air is still very unhealthy.",
+  "Kekal di dalam pagi ini. Elak semua aktiviti luar.":
+    "Stay indoors this morning. Avoid all outdoor activities.",
+  "Tutup tingkap dan pintu. Guna penapis udara jika ada.":
+    "Close windows and doors. Use an air purifier if you have one.",
+  "Anak tidak boleh keluar rumah.": "Children must not go outside.",
+  "Dapatkan rawatan segera jika sesak nafas.":
+    "Seek treatment immediately if you are short of breath.",
+  "Kekal di dalam dan dapatkan rawatan jika sesak nafas.":
+    "Stay indoors and seek treatment if you are short of breath.",
+  "IPU menurun, tetapi masih berbahaya. Jangan keluar.":
+    "The API is falling, but still hazardous. Stay indoors.",
+  "Kekal di dalam dan jumpa doktor jika tidak sihat.":
+    "Stay indoors and see a doctor if you feel unwell.",
+  "Kekal di dalam. Ikut pengumuman rasmi.":
+    "Stay indoors. Follow official announcements.",
   "Pakai topeng N95 jika perlu keluar": "Wear an N95 mask if you must go out",
   "Tutup tingkap dan pintu": "Close windows and doors",
   "Minum air secukupnya": "Drink enough water",

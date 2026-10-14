@@ -408,7 +408,7 @@ Fokus: UI/UX yang lebih licin dan seperti aplikasi asli. Termasuk pembetulan ked
 - [x] Lighthouse ≥ 90 dikekalkan
 - [x] Kemas kini `UJIAN-TELEFON.md`, versi 0.6.0, tag dan GitHub Release
 
-## Fasa 15 — v0.7.0 (menunggu pengesahan)
+## Fasa 15 — v0.7.0
 
 Fokus: pengalaman pertama kali yang "nilai dahulu, ajar kemudian" (mockup: https://claude.ai/artifact/4raNnmQDKVAkgRRsJ8yZCC), kemudian ciri yang KIV sejak v0.5.1. Jika terlalu besar, bahagian C–D dipindah ke v0.8.0.
 
@@ -449,3 +449,15 @@ Fokus: pengalaman pertama kali yang "nilai dahulu, ajar kemudian" (mockup: https
 - [x] Ujian unit (253) dan E2E (161, termasuk aliran pengguna baharu dan axe); semakan di Safari iOS (simulator: kad negeri, helaian kongsi iOS, bendera kad lokasi)
 - [x] Lighthouse production 13 Okt 2026: telefon 97–100/100/100/100 (LCP 1.2–1.4 s; satu larian 2.6 s), desktop 100/100/100/100; susunan tajuk skrin alu-aluan dibetulkan (h2 `sr-only` di telefon)
 - [x] Kemas kini `UJIAN-TELEFON.md`, versi 0.7.0, tag dan GitHub Release
+
+## Fasa 16 — v0.7.1 (polish Utama; disahkan 14 Okt 2026)
+
+Mulakan polish paparan satu demi satu (siri v0.8.0).
+
+1. **Langit penuh hingga ke atas**: bar status `black-translucent` dalam mod aplikasi; bayang halus di atas langit Utama supaya jam putih jelas; jalur langit pendek (warna tahap semasa) di atas Trend, Lokasi, Tetapan dan halaman lain
+2. **Nasihat pelbagai ikut keadaan**: "bersenam" → "aktiviti"; ayat dipilih ikut profil → arah IPU (naik/turun) → hujan → waktu (pagi/petang/malam); 2–3 variasi setiap keadaan, stabil ikut hari dan lokasi; BM dan EN
+3. **Kad putih elastik**: tolak ke atas → melantun kembali bila kandungan muat; kekal tinggi hanya bila kandungan lebih panjang daripada skrin (lantunan di hujung); kedudukan "atas" tetap dibuang
+4. **Kad sekolah padat**: satu baris dengan ikon (Backpack) dan ringkasan; ketik → helaian dengan garis panduan penuh dan penafian
+   - Jangkaan **sekolah mungkin ditutup esok** berdasarkan bacaan jam 2 petang stesen terdekat: > 180, atau > 150 tiga hari berturut-turut (KPM, 8 Okt 2026); ambang dalam satu pemalar
+   - Pengumpul sejarah menyimpan bacaan jam 2 petang setiap stesen
+5. **Notifikasi sekolah mungkin ditutup esok** (~3 petang) bila jangkaan di atas dipenuhi

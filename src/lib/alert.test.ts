@@ -26,7 +26,7 @@ describe("decideAlert", () => {
       send: true,
       title: "Jerebu di Shah Alam: IPU 156 (Tidak Sihat)",
     });
-    expect(d.send && d.body).toBe("Elak bersenam di luar hari ini.");
+    expect(d.send && d.body).toBe("Hadkan aktiviti luar hari ini.");
     expect(d.next.lastAlertKey).toBe("tidak-sihat");
   });
 
@@ -42,7 +42,7 @@ describe("decideAlert", () => {
     expect(d).toMatchObject({
       send: true,
       title: "Haze in Near Shah Alam: API 156 (Unhealthy)",
-      body: "Avoid exercising outdoors today.",
+      body: "Limit outdoor activities today.",
     });
     const recovered = decideAlert(d.next, moderate, "Klang", NOW, 100, "en");
     expect(recovered).toMatchObject({

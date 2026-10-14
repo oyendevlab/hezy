@@ -34,6 +34,8 @@ import { Notice, Skeleton } from "../status";
 import { TrendPanel } from "../trend-panel";
 import { useCurrent } from "../use-current";
 import { WindLine } from "../wind-line";
+import { pickHeadline, recentChange } from "@/lib/headline";
+import { weatherKind } from "@/lib/weather";
 import { AdviceIcon } from "../advice-icon";
 import { WeatherNow } from "../weather-icon";
 import { InstallBanner } from "../install-banner";
@@ -546,7 +548,18 @@ function Headline({
       <p
         className={`font-display font-semibold ${size === "desktop" ? "text-[26px]" : "text-[22px]"} leading-snug`}
       >
-        {t(adviceFor(current.category, profile).headline)}
+        {t(
+          pickHeadline({
+            category: current.category,
+            profile,
+            change: recentChange(reading.today),
+            raining: ["hujan", "ribut"].includes(
+              reading.weather ? weatherKind(reading.weather.code) : "",
+            ),
+            hour: Number(current.time.slice(11, 13)),
+            seed: `${current.time.slice(0, 10)}:${reading.official?.stationId ?? "model"}`,
+          }),
+        )}
       </p>
       {reading.wind && <WindLine wind={reading.wind} />}
       <SourceLine
