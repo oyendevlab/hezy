@@ -412,6 +412,29 @@ test.describe("kedudukan kad putih", () => {
   });
 });
 
+test.describe("langit penuh", () => {
+  test("jalur langit di halaman lain (warna tahap), bukan di Utama", async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(!isMobile, "Jalur langit untuk telefon");
+    await seedLocation(page);
+    await page.route("**/api/aqi?**", (route) =>
+      route.fulfill({ json: fakeReading(OFFICIAL_SHAH_ALAM) }),
+    );
+    await page.goto("/trend");
+    const sky = page.getByTestId("page-sky");
+    await expect(sky).toBeVisible();
+    // IPU 172 (Tidak Sihat): langit kuning pasir.
+    await expect
+      .poll(() => sky.evaluate((el) => getComputedStyle(el).backgroundImage))
+      .toContain("rgb(231, 212, 164)");
+    await page.goto("/");
+    await expect(page.getByTestId("elastic-card")).toBeVisible();
+    await expect(page.getByTestId("page-sky")).toHaveCount(0);
+  });
+});
+
 test.describe("butang lihat trend", () => {
   test("kad graf mini membawa ke Trend (telefon)", async ({
     page,

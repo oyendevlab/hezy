@@ -2,6 +2,7 @@ import { Analytics } from "@vercel/analytics/next";
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Plus_Jakarta_Sans } from "next/font/google";
 import { BottomNav, TopNav } from "@/components/app-nav";
+import { PageSky } from "@/components/page-sky";
 import { OfflineBanner, PwaSetup } from "@/components/pwa";
 import { SITE_URL } from "@/lib/site";
 import { THEME_BOOT_SCRIPT } from "@/lib/storage-keys";
@@ -30,13 +31,15 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     title: "Hezy",
-    statusBarStyle: "default",
+    // Langit penuh hingga ke atas dalam mod aplikasi (v0.7.1); teks bar status putih.
+    statusBarStyle: "black-translucent",
     startupImage: startupImages(),
   },
   icons: { apple: "/icons/apple-touch-icon.png" },
 };
 
 export const viewport: Viewport = {
+  viewportFit: "cover",
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#ffffff" },
     { media: "(prefers-color-scheme: dark)", color: "#121316" },
@@ -56,6 +59,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-full flex-col font-sans">
         <PwaSetup />
         <OfflineBanner />
+        <PageSky />
         <TopNav />
         <main className="flex-1 pb-28 md:pb-12">{children}</main>
         <BottomNav />

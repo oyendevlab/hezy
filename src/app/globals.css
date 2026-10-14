@@ -262,3 +262,51 @@ html:not([data-welcome]) [data-welcome-screen] {
     animation: none;
   }
 }
+
+/*
+ * Langit penuh hingga ke atas (v0.7.1): bar status `black-translucent` dalam mod aplikasi,
+ * jadi kandungan dilukis di bawah bar status. <main> diberi ruang bar status; Utama dan skrin
+ * alu-aluan membatalkannya kerana langitnya sendiri mengisi ruang itu.
+ */
+main {
+  padding-top: env(safe-area-inset-top);
+}
+[data-under-status-bar] {
+  margin-top: calc(-1 * env(safe-area-inset-top));
+}
+/* Jalur langit halaman lain: setinggi bar status + tajuk, memudar ke latar halaman. */
+.page-sky {
+  height: calc(env(safe-area-inset-top) + 150px);
+  background: linear-gradient(
+    to bottom,
+    var(--sky) 0%,
+    color-mix(in srgb, var(--sky) 55%, transparent) 45%,
+    transparent 100%
+  );
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .page-sky {
+    opacity: 0.4;
+  }
+}
+:root[data-theme="dark"] .page-sky {
+  opacity: 0.4;
+}
+.status-strip {
+  height: env(safe-area-inset-top);
+}
+/* Bayang halus di atas langit Utama (mod aplikasi) supaya jam putih jelas pada langit cerah. */
+.status-scrim {
+  display: none;
+}
+@media (display-mode: standalone) {
+  .status-scrim {
+    display: block;
+    position: fixed;
+    inset: 0 0 auto;
+    height: calc(env(safe-area-inset-top) + 16px);
+    background: linear-gradient(rgb(0 0 0 / 0.18), transparent);
+    pointer-events: none;
+    z-index: 30;
+  }
+}

@@ -54,7 +54,9 @@ export function HomeScreen({
   // baharu terus nampak skrin alu-aluan tanpa menunggu JavaScript, tanpa kelipan untuk
   // pengguna lama. Kedudukan anak kekal sama supaya WelcomeScreen tidak dipasang semula.
   return (
-    <>
+    // Langit Utama dan skrin alu-aluan mengisi ruang bar status (membatalkan padding <main>).
+    <div data-under-status-bar>
+      <div aria-hidden="true" className="status-scrim" />
       {prefs === null && <HomeSkeleton />}
       {prefs === null || !location ? (
         <WelcomeScreen national={national} active={prefs !== null} />
@@ -66,7 +68,7 @@ export function HomeScreen({
           onRetry={refresh}
         />
       )}
-    </>
+    </div>
   );
 }
 
