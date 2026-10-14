@@ -118,10 +118,51 @@ body {
 .sheet-backdrop {
   animation: sheet-fade 0.2s ease-out;
 }
+/* Tutup helaian (v0.7.2): meluncur turun dari kedudukan semasa (termasuk tarikan jari). */
+@keyframes sheet-down {
+  to {
+    transform: translateY(100%);
+  }
+}
+@keyframes sheet-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.97);
+  }
+}
+@keyframes dialog-out {
+  to {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.97);
+  }
+}
+.sheet-down {
+  animation: sheet-down 0.22s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+.sheet-backdrop-out {
+  animation: sheet-fade-out 0.22s ease-in forwards;
+}
+.dialog-in {
+  animation: dialog-in 0.2s ease-out;
+}
+.dialog-out {
+  animation: dialog-out 0.18s ease-in forwards;
+}
 @media (prefers-reduced-motion: reduce) {
   .sheet-up,
-  .sheet-backdrop {
+  .sheet-backdrop,
+  .dialog-in {
     animation: none;
+  }
+  .sheet-down,
+  .dialog-out,
+  .sheet-backdrop-out {
+    animation: sheet-fade-out 0.12s ease-in forwards;
   }
 }
 

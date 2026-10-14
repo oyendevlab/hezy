@@ -457,6 +457,50 @@ test.describe("langit penuh", () => {
   });
 });
 
+test.describe("helaian bawah", () => {
+  test("tarik ke bawah menutup helaian; tarikan pendek melantun kembali", async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(!isMobile, "Gerak isyarat sentuh untuk telefon");
+    await seedLocation(page);
+    await page.route("**/api/aqi?**", (route) =>
+      route.fulfill({ json: fakeReading(OFFICIAL_SHAH_ALAM) }),
+    );
+    await page.goto("/");
+    await page
+      .getByRole("button", { name: "Butiran sumber bacaan" })
+      .filter({ visible: true })
+      .click();
+    const sheet = page.getByRole("dialog", { name: "Sumber bacaan" });
+    await expect(sheet).toBeVisible();
+    await expect(page.getByTestId("sheet-grabber")).toBeVisible();
+    const box = (await sheet.boundingBox())!;
+    const cdp = await page.context().newCDPSession(page);
+    const touch = (type: "touchStart" | "touchMove" | "touchEnd", y?: number) =>
+      cdp.send("Input.dispatchTouchEvent", {
+        type,
+        touchPoints: y === undefined ? [] : [{ x: 200, y }],
+      });
+    const offset = () =>
+      sheet.evaluate((el) => new DOMMatrix(getComputedStyle(el).transform).m42);
+    // Tarikan pendek: kembali ke tempat asal.
+    const top = box.y + 20;
+    await touch("touchStart", top);
+    for (let d = 10; d <= 60; d += 10) await touch("touchMove", top + d);
+    expect(await offset()).toBeGreaterThan(40);
+    await touch("touchEnd");
+    await expect.poll(offset).toBeCloseTo(0, 0);
+    await expect(sheet).toBeVisible();
+    // Tarikan panjang: helaian meluncur turun dan ditutup.
+    await touch("touchStart", top);
+    for (let d = 20; d <= 200; d += 20) await touch("touchMove", top + d);
+    await touch("touchEnd");
+    await expect(sheet).toHaveAttribute("data-state", "closing");
+    await expect(sheet).toHaveCount(0);
+  });
+});
+
 test.describe("butang lihat trend", () => {
   test("kad graf mini membawa ke Trend (telefon)", async ({
     page,
@@ -827,7 +871,7 @@ test.describe("kongsi imej kad", () => {
     ).toBe(1080);
 
     const axe = await new AxeBuilder({ page })
-      .include("dialog[open]")
+      .include("[data-testid=share-sheet]")
       .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
       .analyze();
     expect(axe.violations.map((v) => v.id)).toEqual([]);
@@ -1369,12 +1413,8 @@ test.describe("bacaan rasmi APIMS", () => {
     const info = page
       .getByRole("button", { name: "Butiran sumber bacaan" })
       .filter({ visible: true });
-    await expect(info).toHaveAttribute("aria-expanded", "false");
     await info.click();
-    await expect(info).toHaveAttribute("aria-expanded", "true");
-    const details = page.locator(
-      `[id="${await info.getAttribute("aria-controls")}"]`,
-    );
+    const details = page.getByRole("dialog", { name: "Sumber bacaan" });
     await expect(details).toContainText(
       "IPU rasmi APIMS (Jabatan Alam Sekitar)",
     );

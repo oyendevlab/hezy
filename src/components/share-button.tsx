@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import type { CardFormat } from "@/lib/share-card";
 import { useI18n } from "@/lib/use-i18n";
+import { BottomSheet } from "./bottom-sheet";
 
 type Files = Partial<Record<CardFormat, File>>;
 
@@ -32,8 +33,7 @@ export function ShareButton({
   className?: string;
 }) {
   const { t } = useI18n();
-  const dialog = useRef<HTMLDialogElement>(null);
-  const titleId = useId();
+  const [open, setOpen] = useState(false);
   const [files, setFiles] = useState<Files>({});
   const [message, setMessage] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -48,11 +48,9 @@ export function ShareButton({
 
   // Muat imej awal semasa helaian dibuka, supaya navigator.share dipanggil terus dalam ketikan.
   useEffect(() => {
-    if (!squarePath || !storyPath) return;
-    const node = dialog.current;
+    if (!open || !squarePath || !storyPath) return;
     let cancelled = false;
-    const load = () => {
-      setFiles({});
+    {
       for (const [format, src] of [
         ["square", squarePath],
         ["story", storyPath],
@@ -68,22 +66,20 @@ export function ShareButton({
           })
           .catch(() => undefined);
       }
-    };
-    node?.addEventListener("hezy-open", load);
+    }
     return () => {
       cancelled = true;
-      node?.removeEventListener("hezy-open", load);
     };
-  }, [squarePath, storyPath, fileName]);
+  }, [open, squarePath, storyPath, fileName]);
 
-  function open() {
+  function openSheet() {
     setMessage(null);
     if (!cardPaths) {
       void shareLink();
       return;
     }
-    dialog.current?.showModal();
-    dialog.current?.dispatchEvent(new Event("hezy-open"));
+    setFiles({});
+    setOpen(true);
   }
 
   async function shareLink() {
@@ -139,7 +135,7 @@ export function ShareButton({
     <>
       <button
         type="button"
-        onClick={open}
+        onClick={openSheet}
         aria-haspopup={cardPaths ? "dialog" : undefined}
         aria-label={
           label ? undefined : copied ? t("Status disalin") : t("Kongsi status")
@@ -168,84 +164,53 @@ export function ShareButton({
         {label}
       </button>
 
-      {cardPaths && (
-        <dialog
-          ref={dialog}
-          aria-labelledby={titleId}
-          onClick={(e) => {
-            // Klik pada latar belakang menutup helaian.
-            if (e.target === e.currentTarget) dialog.current?.close();
-          }}
-          className="bg-page text-ink m-0 mt-auto w-full max-w-none rounded-t-3xl p-0 backdrop:bg-black/50 sm:m-auto sm:max-w-md sm:rounded-3xl"
+      {cardPaths && open && (
+        <BottomSheet
+          title={title ?? t("Kongsi IPU terkini")}
+          onClose={() => setOpen(false)}
+          testId="share-sheet"
         >
-          <div className="flex flex-col gap-4 p-5 pb-[max(env(safe-area-inset-bottom),20px)]">
-            <div className="flex items-center justify-between">
-              <h2 id={titleId} className="font-display text-xl font-bold">
-                {title ?? t("Kongsi IPU terkini")}
-              </h2>
-              <button
-                type="button"
-                onClick={() => dialog.current?.close()}
-                aria-label={t("Tutup helaian")}
-                className="hover:bg-surface flex size-11 items-center justify-center rounded-full"
-              >
-                <svg
-                  aria-hidden="true"
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.4"
-                  strokeLinecap="round"
-                >
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                </svg>
-              </button>
-            </div>
-            <div className="bg-surface aspect-square overflow-hidden rounded-2xl">
-              {/* Imej dijana pelayan (next/og); next/image tidak diperlukan. */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={cardPaths.square}
-                alt={t("Pratonton kad: {text}", { text })}
-                width={1080}
-                height={1080}
-                className="h-full w-full object-cover"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => void shareImage("square")}
-                disabled={!files.square}
-                className="bg-ink text-page min-h-12 rounded-2xl px-3 text-sm font-semibold disabled:opacity-50"
-              >
-                {t("Kongsi gambar")}
-              </button>
-              <button
-                type="button"
-                onClick={() => void shareImage("story")}
-                disabled={!files.story}
-                className="bg-ink text-page min-h-12 rounded-2xl px-3 text-sm font-semibold disabled:opacity-50"
-              >
-                {t("Untuk Status (9:16)")}
-              </button>
-            </div>
+          <div className="bg-surface aspect-square overflow-hidden rounded-2xl">
+            {/* Imej dijana pelayan (next/og); next/image tidak diperlukan. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={cardPaths.square}
+              alt={t("Pratonton kad: {text}", { text })}
+              width={1080}
+              height={1080}
+              className="h-full w-full object-cover"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
-              onClick={() => void copyLink()}
-              className="border-line min-h-12 rounded-2xl border-[1.5px] text-sm font-semibold"
+              onClick={() => void shareImage("square")}
+              disabled={!files.square}
+              className="bg-ink text-page min-h-12 rounded-2xl px-3 text-sm font-semibold disabled:opacity-50"
             >
-              {t("Salin pautan")}
+              {t("Kongsi gambar")}
             </button>
-            <p role="status" className="text-muted min-h-5 text-center text-xs">
-              {message ??
-                (!files.square || !files.story ? t("Menyediakan imej…") : "")}
-            </p>
+            <button
+              type="button"
+              onClick={() => void shareImage("story")}
+              disabled={!files.story}
+              className="bg-ink text-page min-h-12 rounded-2xl px-3 text-sm font-semibold disabled:opacity-50"
+            >
+              {t("Untuk Status (9:16)")}
+            </button>
           </div>
-        </dialog>
+          <button
+            type="button"
+            onClick={() => void copyLink()}
+            className="border-line min-h-12 rounded-2xl border-[1.5px] text-sm font-semibold"
+          >
+            {t("Salin pautan")}
+          </button>
+          <p role="status" className="text-muted min-h-5 text-center text-xs">
+            {message ??
+              (!files.square || !files.story ? t("Menyediakan imej…") : "")}
+          </p>
+        </BottomSheet>
       )}
     </>
   );
