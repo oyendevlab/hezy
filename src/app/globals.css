@@ -316,3 +316,78 @@ body:has([data-under-status-bar]) .status-strip {
     z-index: 30;
   }
 }
+
+/* Kepala langit halaman (Trend, Lokasi, Tetapan): langit awan statik ikut tahap IPU. */
+.sky-header {
+  --sky-top: color-mix(in srgb, var(--sky) 78%, var(--sky-far));
+  background:
+    radial-gradient(
+      160px 50px at 22% 72%,
+      rgb(255 255 255 / 0.55),
+      transparent 70%
+    ),
+    radial-gradient(
+      220px 60px at 78% 62%,
+      rgb(255 255 255 / 0.5),
+      transparent 70%
+    ),
+    linear-gradient(
+      to bottom,
+      var(--sky-top),
+      var(--sky) 60%,
+      color-mix(in srgb, var(--sky) 65%, white)
+    );
+}
+.sky-header-strip {
+  position: fixed;
+  inset: 0 0 auto;
+  height: env(safe-area-inset-top);
+  background: var(--sky-top);
+  z-index: 40;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+html[data-scrolled] .sky-header-strip {
+  opacity: 1;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .sky-header {
+    --sky-top: color-mix(in srgb, var(--sky) 18%, #121316);
+    background:
+      radial-gradient(
+        160px 50px at 22% 72%,
+        rgb(255 255 255 / 0.07),
+        transparent 70%
+      ),
+      radial-gradient(
+        220px 60px at 78% 62%,
+        rgb(255 255 255 / 0.06),
+        transparent 70%
+      ),
+      linear-gradient(
+        to bottom,
+        var(--sky-top),
+        color-mix(in srgb, var(--sky) 28%, #121316)
+      );
+  }
+}
+:root[data-theme="dark"] .sky-header {
+  --sky-top: color-mix(in srgb, var(--sky) 18%, #121316);
+  background:
+    radial-gradient(
+      160px 50px at 22% 72%,
+      rgb(255 255 255 / 0.07),
+      transparent 70%
+    ),
+    radial-gradient(
+      220px 60px at 78% 62%,
+      rgb(255 255 255 / 0.06),
+      transparent 70%
+    ),
+    linear-gradient(
+      to bottom,
+      var(--sky-top),
+      color-mix(in srgb, var(--sky) 28%, #121316)
+    );
+}
