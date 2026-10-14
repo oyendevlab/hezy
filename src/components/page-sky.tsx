@@ -1,6 +1,5 @@
 "use client";
 
-import { usePathname } from "next/navigation";
 import { CATEGORY_STYLE } from "@/lib/category-style";
 import { primaryReading } from "@/lib/official";
 import { useCurrent } from "./use-current";
@@ -11,12 +10,13 @@ const DEFAULT_SKY = CATEGORY_STYLE.baik.sky.sky;
 /**
  * Jalur langit pendek di atas halaman selain Utama (telefon), warna ikut tahap IPU lokasi
  * semasa (v0.7.1). Dalam mod aplikasi (bar status `black-translucent`), jalur tetap setinggi
- * bar status memastikan jam putih sentiasa boleh dibaca semasa halaman ditatal.
+ * bar status memastikan jam sentiasa boleh dibaca semasa halaman ditatal.
+ *
+ * Sentiasa dirender (susun atur akar diprarender tanpa laluan sebenar); CSS menyembunyikannya
+ * bila halaman mempunyai langit sendiri (`[data-under-status-bar]`: Utama, skrin alu-aluan).
  */
 export function PageSky() {
-  const pathname = usePathname();
   const { entry } = useCurrent();
-  if (pathname === "/") return null;
   const category = primaryReading(entry?.reading)?.category;
   const sky = category ? CATEGORY_STYLE[category].sky.sky : DEFAULT_SKY;
   return (
