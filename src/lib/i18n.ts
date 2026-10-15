@@ -270,6 +270,25 @@ const EN: Record<string, string> = {
   "Sentiasa dipaparkan untuk profil Kanak-kanak. Termasuk notifikasi bila bacaan kekal tinggi (bila amaran hidup).":
     "Always shown for the Children profile. Includes a notification when readings stay high (when alerts are on).",
   "Sumber bacaan": "Reading source",
+  // Trend (v0.7.4)
+  "Lepas (rasmi)": "Past (official)",
+  "Lepas (anggaran)": "Past (estimate)",
+  "Ramalan dibetulkan dengan bacaan APIMS":
+    "Forecast corrected with APIMS readings",
+  "PURATA RAMALAN HARI INI": "TODAY'S AVERAGE FORECAST",
+  "Ramalan per jam": "Hourly forecast",
+  "Ramalan per jam, 24 jam akan datang": "Hourly forecast, next 24 hours",
+  "24 jam · leret →": "24 hours · swipe →",
+  "Angin permukaan dalam km/j · anak panah menunjukkan arah angin bertiup":
+    "Surface wind in km/h · arrows show where the wind blows",
+  "Ramalan harian": "Daily forecast",
+  "Hari ini": "Today",
+  "Tempoh ramalan": "Forecast range",
+  "{n} hari": "{n} days",
+  "{n} km/j": "{n} km/h",
+  "Puncak ~{peak} · {label}": "Peak ~{peak} · {label}",
+  "Nombor ialah purata IPU hari itu · ketik untuk lihat puncak · ramalan model CAMS":
+    "Numbers are the day's average API · tap to see the peak · CAMS model forecast",
   // Status sekolah (v0.7.3)
   "Aktiviti luar dihentikan": "Outdoor activities stopped",
   "Aktiviti luar dibenarkan": "Outdoor activities allowed",

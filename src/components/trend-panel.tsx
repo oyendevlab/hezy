@@ -3,13 +3,13 @@
 import { shownError } from "@/lib/accuracy";
 import { Moon, Sun, SunHorizon } from "@phosphor-icons/react";
 import { CATEGORY_STYLE } from "@/lib/category-style";
-import { formatDay, formatWindow } from "@/lib/format";
+import { formatWindow } from "@/lib/format";
 import { ipuCategory } from "@/lib/ipu";
 import { displayIpu } from "@/lib/official";
 import type { HourPoint, Reading } from "@/lib/reading";
 import { useI18n } from "@/lib/use-i18n";
 import { HourBars } from "./hour-bars";
-import { DayWeatherIcon } from "./weather-icon";
+import { DailyForecast, HourlyStrip } from "./forecast-lists";
 
 function average(hours: HourPoint[], from: number, to: number): number | null {
   const values = hours
@@ -38,6 +38,19 @@ export function TrendPanel({
   const days = reading.days ?? [];
   const todayDate = today[0]?.time.slice(0, 10) ?? "";
   const bestCategory = bestWindow ? ipuCategory(bestWindow.averageIpu) : null;
+  // Hari ini untuk ramalan harian: rasmi bagi jam lepas, ramalan bagi jam akan datang.
+  const todayValues = today
+    .map(displayIpu)
+    .filter((v): v is number => v !== null);
+  const todaySummary =
+    todayValues.length > 0
+      ? {
+          average: Math.round(
+            todayValues.reduce((a, b) => a + b, 0) / todayValues.length,
+          ),
+          peak: Math.max(...todayValues),
+        }
+      : null;
   const blocks = [
     {
       name: t("Pagi"),
@@ -82,9 +95,7 @@ export function TrendPanel({
 
       <div>
         <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="font-display text-xl font-bold">
-            {t("Hari ini, jam demi jam")}
-          </h2>
+          <h2 className="font-display text-xl font-bold">{t("Hari ini")}</h2>
         </div>
         <div className="mt-3">
           <HourBars
@@ -95,74 +106,54 @@ export function TrendPanel({
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-2.5">
-        {blocks.map((b) => (
-          <div key={b.name} className="bg-surface rounded-2xl p-3">
-            <div className="flex items-center justify-between gap-1">
-              <span className="text-sm font-bold">{b.name}</span>
-              <b.icon
-                aria-hidden="true"
-                size={18}
-                weight="duotone"
-                className="text-muted shrink-0"
+      <section
+        aria-labelledby="purata-hari-ini"
+        className="flex flex-col gap-2"
+      >
+        <h2
+          id="purata-hari-ini"
+          className="text-muted text-[13px] font-bold tracking-wide"
+        >
+          {t("PURATA RAMALAN HARI INI")}
+        </h2>
+        <div className="grid grid-cols-3 gap-2.5">
+          {blocks.map((b) => (
+            <div key={b.name} className="bg-surface rounded-2xl p-3">
+              <div className="flex items-center justify-between gap-1">
+                <span className="text-sm font-bold">{b.name}</span>
+                <b.icon
+                  aria-hidden="true"
+                  size={18}
+                  weight="duotone"
+                  className="text-muted shrink-0"
+                />
+              </div>
+              <div className="text-muted text-[11px] font-medium">{b.span}</div>
+              <div className="font-display mt-1 text-2xl font-bold">
+                {b.value ?? "–"}
+              </div>
+              <div
+                className="mt-1 h-1.5 rounded-full"
+                style={{
+                  background:
+                    b.value === null
+                      ? "var(--line)"
+                      : CATEGORY_STYLE[ipuCategory(b.value).key].accent,
+                }}
               />
             </div>
-            <div className="text-muted text-[11px] font-medium">{b.span}</div>
-            <div className="font-display mt-1 text-2xl font-bold">
-              {b.value ?? "–"}
-            </div>
-            <div
-              className="mt-1 h-1.5 rounded-full"
-              style={{
-                background:
-                  b.value === null
-                    ? "var(--line)"
-                    : CATEGORY_STYLE[ipuCategory(b.value).key].accent,
-              }}
-            />
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      </section>
 
-      {days.length > 0 && (
-        <section aria-labelledby="ramalan-3-hari">
-          <div className="flex items-baseline justify-between gap-2">
-            <h2 id="ramalan-3-hari" className="font-display text-xl font-bold">
-              {t("Ramalan 3 hari")}
-            </h2>
-            <span className="text-muted text-xs font-semibold">
-              {t("Anggaran")}
-            </span>
-          </div>
-          <ul className="mt-3 grid grid-cols-3 gap-2.5">
-            {days.map((d) => (
-              <li key={d.date} className="bg-surface rounded-2xl p-3">
-                <div className="flex items-center justify-between gap-1">
-                  <span className="text-sm font-bold">
-                    {formatDay(d.date, todayDate, lang)}
-                  </span>
-                  <DayWeatherIcon
-                    day={reading.weatherDays?.find((w) => w.date === d.date)}
-                  />
-                </div>
-                <div className="font-display text-2xl font-bold">
-                  {d.averageIpu}
-                </div>
-                <div className="text-muted text-[11px] font-medium">
-                  {t("Purata · maks {max}", { max: d.maxIpu })}
-                </div>
-                <div
-                  className="mt-1 h-1.5 rounded-full"
-                  style={{
-                    background:
-                      CATEGORY_STYLE[ipuCategory(d.averageIpu).key].accent,
-                  }}
-                />
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+      <HourlyStrip hours={reading.hourly ?? []} />
+
+      <DailyForecast
+        todayDate={todayDate}
+        today={todaySummary}
+        days={days}
+        weatherDays={reading.weatherDays ?? []}
+      />
 
       <p className="text-muted text-xs">
         {reading.correction

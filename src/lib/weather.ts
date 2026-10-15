@@ -15,6 +15,9 @@ export type WeatherSeries = WindSeries & {
   code: (number | null)[];
   isDay: (number | null)[];
   precipitation: (number | null)[];
+  /** Angin permukaan (10 m), km/j dan arah datang (darjah), untuk ramalan per jam. */
+  windSpeed10: (number | null)[];
+  windDir10: (number | null)[];
   days: DayWeather[];
   /** Matahari terbit/terbenam ikut tarikh, `YYYY-MM-DDTHH:mm` waktu Malaysia. */
   sun: Record<string, { rise: string; set: string }>;
@@ -25,6 +28,11 @@ export type DayWeather = {
   code: number;
   max: number;
   min: number;
+  /** Kebarangkalian hujan maksimum hari itu (%). */
+  rainChance?: number | null;
+  /** Angin permukaan maksimum (km/j) dan arah dominan (darjah datang). */
+  windMax?: number | null;
+  windDir?: number | null;
 };
 
 export type CurrentWeather = {
@@ -47,12 +55,13 @@ export function weatherUrl(lat: number, lon: number): string {
     latitude: String(lat),
     longitude: String(lon),
     hourly:
-      "wind_speed_850hPa,wind_direction_850hPa,cloud_cover,visibility,temperature_2m,weather_code,is_day,precipitation",
-    daily: "sunrise,sunset,weather_code,temperature_2m_max,temperature_2m_min",
+      "wind_speed_850hPa,wind_direction_850hPa,cloud_cover,visibility,temperature_2m,weather_code,is_day,precipitation,wind_speed_10m,wind_direction_10m",
+    daily:
+      "sunrise,sunset,weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max,wind_direction_10m_dominant",
     wind_speed_unit: "kmh",
     timezone: "Asia/Kuala_Lumpur",
     past_days: "1",
-    forecast_days: "4",
+    forecast_days: "5",
   });
   return `${ENDPOINT}?${params}`;
 }
@@ -77,6 +86,12 @@ export function parseWeather(json: unknown): WeatherSeries {
     }
     return v.map(num);
   };
+  const optionalCol = (key: string) => {
+    const v = h?.[key];
+    return Array.isArray(v) && v.length === times.length
+      ? v.map(num)
+      : times.map(() => null);
+  };
   const d = r?.daily ?? {};
   const dTimes = Array.isArray(d.time) ? (d.time as unknown[]).map(String) : [];
   const dCol = (key: string) =>
@@ -87,8 +102,19 @@ export function parseWeather(json: unknown): WeatherSeries {
     const code = num(dCol("weather_code")[i]);
     const max = num(dCol("temperature_2m_max")[i]);
     const min = num(dCol("temperature_2m_min")[i]);
-    if (code !== null && max !== null && min !== null)
-      days.push({ date, code, max: Math.round(max), min: Math.round(min) });
+    if (code !== null && max !== null && min !== null) {
+      const rain = num(dCol("precipitation_probability_max")[i]);
+      const windMax = num(dCol("wind_speed_10m_max")[i]);
+      days.push({
+        date,
+        code,
+        max: Math.round(max),
+        min: Math.round(min),
+        rainChance: rain === null ? null : Math.round(rain),
+        windMax: windMax === null ? null : Math.round(windMax),
+        windDir: num(dCol("wind_direction_10m_dominant")[i]),
+      });
+    }
     const rise = dCol("sunrise")[i];
     const set = dCol("sunset")[i];
     if (typeof rise === "string" && typeof set === "string")
@@ -104,6 +130,9 @@ export function parseWeather(json: unknown): WeatherSeries {
     code: col("weather_code"),
     isDay: col("is_day"),
     precipitation: col("precipitation"),
+    // Medan baharu (v0.7.4): tidak wajib supaya respons lama/ujian tidak gagal.
+    windSpeed10: optionalCol("wind_speed_10m"),
+    windDir10: optionalCol("wind_direction_10m"),
     days,
     sun,
   };

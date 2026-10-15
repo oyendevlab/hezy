@@ -1,6 +1,6 @@
 "use client";
 
-import { useId } from "react";
+import { useEffect, useId, useSyncExternalStore } from "react";
 import { CATEGORY_STYLE } from "@/lib/category-style";
 import { formatHour } from "@/lib/format";
 import { ipuCategory } from "@/lib/ipu";
@@ -11,6 +11,30 @@ import { useI18n } from "@/lib/use-i18n";
 import { IpuPill } from "./ipu-pill";
 
 const SCALE_MAX = 200;
+/** Petunjuk "tekan dan seret" dipaparkan sehingga graf pertama kali disentuh (v0.7.4). */
+const HINT_KEY = "hezy:petunjuk-graf";
+const hintListeners = new Set<() => void>();
+const hintSeen = () => {
+  try {
+    return window.localStorage.getItem(HINT_KEY) === "1";
+  } catch {
+    return true;
+  }
+};
+const markHintSeen = () => {
+  try {
+    window.localStorage.setItem(HINT_KEY, "1");
+  } catch {
+    // Storan disekat: petunjuk kekal untuk sesi ini.
+  }
+  hintListeners.forEach((l) => l());
+};
+const subscribeHint = (l: () => void) => {
+  hintListeners.add(l);
+  return () => {
+    hintListeners.delete(l);
+  };
+};
 
 /**
  * Graf bar IPU bagi hari ini (mockup G), boleh disentuh dan dileret untuk melihat nilai setiap jam.
@@ -37,6 +61,14 @@ export function HourBars({
   const scrub = useHourScrub(points.length, nowIndex);
   const summaryId = useId();
   const selected = scrub.index >= 0 ? points[scrub.index] : null;
+  const seen = useSyncExternalStore(subscribeHint, hintSeen, () => true);
+  useEffect(() => {
+    if (scrub.active && !seen) markHintSeen();
+  }, [scrub.active, seen]);
+  const current = nowIndex >= 0 ? points[nowIndex]?.value : null;
+  // Contoh warna legenda = warna bar sebenar (tahap jam semasa).
+  const swatch =
+    CATEGORY_STYLE[ipuCategory(current ?? known[0]?.value ?? 0).key].accent;
 
   const peak = known.reduce<(typeof known)[number] | null>(
     (a, p) => (a && a.value >= p.value ? a : p),
@@ -110,15 +142,6 @@ export function HourBars({
               />
             </div>
           )}
-          <span className="text-muted ml-auto truncate text-xs font-semibold">
-            {t(
-              selected.forecast
-                ? "Ramalan"
-                : selected.officialIpu != null
-                  ? "Rasmi APIMS"
-                  : "Anggaran",
-            )}
-          </span>
         </div>
       )}
       <div
@@ -184,32 +207,48 @@ export function HourBars({
           <span>{t("6 ptg")}</span>
           <span>{t("11 mlm")}</span>
         </div>
-        <div className="text-muted mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-semibold">
+        <div
+          data-testid="hour-legend"
+          className="text-muted mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-semibold"
+        >
           <span className="flex items-center gap-1.5">
-            <span aria-hidden="true" className="bg-ink size-2.5 rounded-sm" />
-            {t(
-              officialPast
-                ? "Jam lepas: bacaan rasmi APIMS"
-                : "Jam lepas: anggaran model",
-            )}
+            <span
+              aria-hidden="true"
+              className="h-3.5 w-2 rounded-[2px]"
+              style={{ background: swatch }}
+            />
+            {t(officialPast ? "Lepas (rasmi)" : "Lepas (anggaran)")}
+          </span>
+          <span
+            className="flex items-center gap-1.5"
+            title={
+              correctedFuture
+                ? t("Ramalan dibetulkan dengan bacaan APIMS")
+                : undefined
+            }
+          >
+            <span
+              aria-hidden="true"
+              className="h-3.5 w-2 rounded-[2px] opacity-45"
+              style={{ background: swatch }}
+            />
+            {t("Ramalan")}
+            {forecastError !== null &&
+              ` (${t("biasanya ±{n}", { n: forecastError })})`}
           </span>
           <span className="flex items-center gap-1.5">
             <span
               aria-hidden="true"
-              className="bg-ink size-2.5 rounded-sm opacity-45"
+              className="border-ink h-3.5 w-0 border-l-2 border-dashed opacity-45"
             />
-            {t(
-              correctedFuture
-                ? "Jam akan datang: ramalan dibetulkan dengan APIMS"
-                : "Jam akan datang: ramalan model",
-            )}
-            {forecastError !== null &&
-              ` (${t("biasanya ±{n}", { n: forecastError })})`}
-          </span>
-          <span className={scrub.active ? "invisible" : ""}>
-            {t("Tekan dan seret graf untuk lihat jam lain")}
+            {t("Kini")}
           </span>
         </div>
+        {!seen && (
+          <p className="text-muted mt-1 text-xs">
+            {t("Tekan dan seret graf untuk lihat jam lain")}
+          </p>
+        )}
       </figcaption>
     </figure>
   );

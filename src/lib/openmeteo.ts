@@ -13,8 +13,8 @@ export function airQualityUrl(lat: number, lon: number): string {
     timezone: "Asia/Kuala_Lumpur",
     // 2 hari lepas cukup untuk purata 24 jam bagi setiap jam hari ini.
     past_days: "2",
-    // Hari ini + 3 hari ramalan.
-    forecast_days: "4",
+    // Hari ini + 4 hari ramalan (CAMS global meramal ~5 hari; v0.7.4 ramalan 5 hari).
+    forecast_days: "5",
   });
   return `${ENDPOINT}?${params}`;
 }
