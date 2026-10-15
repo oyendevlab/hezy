@@ -39,6 +39,7 @@ export function BottomSheet({
   children,
   className = "",
   bare = false,
+  titleAction,
 }: {
   title: React.ReactNode;
   description?: React.ReactNode;
@@ -50,6 +51,8 @@ export function BottomSheet({
   className?: string;
   /** Tanpa pengepala lalai (kandungan menyediakan tajuknya sendiri; `title` jadi label). */
   bare?: boolean;
+  /** Butang kecil di sebelah tajuk (cth. ⓘ), di luar `<h2>` supaya nama tajuk kekal bersih. */
+  titleAction?: React.ReactNode;
 }) {
   const { t } = useI18n();
   const wide = useMediaQuery("(min-width: 768px)");
@@ -196,9 +199,12 @@ export function BottomSheet({
                   {eyebrow}
                 </p>
               )}
-              <h2 id={titleId} className="font-display text-xl font-bold">
-                {title}
-              </h2>
+              <div className="flex items-center gap-1">
+                <h2 id={titleId} className="font-display text-xl font-bold">
+                  {title}
+                </h2>
+                {titleAction}
+              </div>
               {description && (
                 <p className="text-muted mt-0.5 text-sm">{description}</p>
               )}

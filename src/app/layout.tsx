@@ -56,7 +56,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
       </head>
-      <body className="flex min-h-full flex-col font-sans">
+      {/* min-h-lvh: iOS 26 (PWA/Safari) meletakkan halaman yang lebih pendek daripada skrin pada
+          viewport kecil (tanpa bar status), jadi bar navigasi bawah terangkat ~62 pt (v0.7.7). */}
+      <body className="flex min-h-lvh flex-col font-sans">
         <PwaSetup />
         <OfflineBanner />
         <PageSky />

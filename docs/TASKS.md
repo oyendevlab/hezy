@@ -501,3 +501,15 @@ Mulakan polish paparan satu demi satu (siri v0.8.0).
 4. ✅ Heatmap: kotak 18 px, warna kategori dengan keamatan ikut nilai, legenda jalur satu baris
 5. ✅ Kad butiran hari: hari penuh ("Khamis"), tarikh penuh di bawah, Maks + tahap dan Purata di kanan ("jam data" dibuang)
 6. ✅ Versi 0.7.5, `UJIAN-TELEFON.md`, tag dan GitHub Release
+
+## Fasa 21 — v0.7.7 (polish Lokasi; disahkan 15 Okt 2026)
+
+Mockup: https://claude.ai/artifact/3R4rdhx2k8QwRwKkuH6zr6. Peta kekal OpenStreetMap.
+
+1. ✅ Satu butang **Lapisan** (dengan bilangan aktif) menggantikan cip lapisan; helaian "Lapisan peta" dengan suis berikon dan keterangan sebaris; ⓘ untuk penerangan panjang
+2. ✅ Teks penerangan di bawah peta dibuang; pil angin kecil dan legenda taburan di kiri bawah peta
+3. ✅ Peta lebih tinggi ikut skrin; butang **skrin penuh** (✕ untuk keluar, Escape, butang kembali)
+4. ✅ Muat lebih lancar: peta dan jubin dibina serentak dengan pengambilan stesen; lapisan berat (angin, titik panas) dimuat berperingkat
+5. ✅ Bar navigasi terangkat di iOS 26: halaman lebih pendek daripada skrin diletakkan pada viewport kecil (100svh, tanpa bar status ~62 pt); disahkan di simulator dan dibetulkan dengan `min-h-lvh` pada `body`
+6. ✅ Senarai: **Tukar** dan **+ Tambah** membuka helaian carian (satu carian pada satu masa); kegemaran dari GPS memaparkan negeri, bukan "Lokasi semasa"
+7. ✅ Versi 0.7.7, `UJIAN-TELEFON.md`, tag dan GitHub Release

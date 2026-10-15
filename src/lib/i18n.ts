@@ -793,6 +793,21 @@ const EN: Record<string, string> = {
     "This morning in {name}: API {ipu} ({label})",
   "Masa terbaik keluar: {window} (~{ipu}).":
     "Best time to go out: {window} (~{ipu}).",
+  // v0.7.7: Lokasi
+  Lapisan: "Layers",
+  "Lapisan peta, {count} aktif": "Map layers, {count} on",
+  "Tentang lapisan peta": "About map layers",
+  "Kebakaran dikesan satelit · 2 hari": "Fires detected by satellite · 2 days",
+  "Pin bergaris putus · skala AQI AS": "Dashed pins · US AQI scale",
+  "Anggaran antara stesen": "Estimated between stations",
+  "Aliran angin pembawa jerebu": "Wind flow that carries haze",
+  "Skrin penuh": "Full screen",
+  "Keluar skrin penuh": "Exit full screen",
+  "Zum masuk": "Zoom in",
+  "Zum keluar": "Zoom out",
+  "Ke lokasi saya": "Go to my location",
+  "Tukar lokasi semasa": "Change current location",
+  "Tambah kegemaran": "Add favourite",
 };
 
 /** Corak untuk teks yang disimpan dengan nama tempat, cth. nama lokasi GPS. */
