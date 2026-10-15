@@ -1,4 +1,5 @@
 import AxeBuilder from "@axe-core/playwright";
+import type { Page } from "@playwright/test";
 import {
   KLANG,
   OFFICIAL_SHAH_ALAM,
@@ -8,6 +9,16 @@ import {
   seedLocation,
   test,
 } from "./fixtures";
+
+/** Suis lapisan peta dalam helaian Lapisan (v0.7.7); buka helaian jika belum terbuka. */
+async function layerSwitch(page: Page, name: string) {
+  const sheet = page.getByTestId("layers-sheet");
+  if (!(await sheet.isVisible())) {
+    await page.getByRole("button", { name: /^Lapisan peta/ }).click();
+    await expect(sheet).toBeVisible();
+  }
+  return sheet.getByRole("switch", { name });
+}
 
 test.describe("aliran utama", () => {
   test("log ralat: terima laporan sah, tolak input rosak", async ({
@@ -868,7 +879,7 @@ test.describe("arah angin", () => {
     await expect(
       page.getByText("Angin dari barat daya (arah Sumatera) · 18 km/j"),
     ).toBeVisible();
-    const fires = page.getByRole("checkbox", { name: "Titik panas (3)" });
+    const fires = await layerSwitch(page, "Titik panas (3)");
     await expect(fires).toBeChecked();
     await expect(
       page.locator(".leaflet-container canvas:not(.hezy-wind):not(.hezy-heat)"),
@@ -1514,12 +1525,12 @@ test.describe("peta stesen", () => {
   }) => {
     await page.goto("/lokasi");
     await page.getByRole("tab", { name: "Peta" }).click();
-    const zoomOut = page.getByRole("button", { name: "Zoom out" });
+    const zoomOut = page.getByRole("button", { name: "Zum keluar" });
     await expect(
       page.getByRole("region", { name: "Peta stesen APIMS" }),
     ).toBeVisible();
     for (let i = 0; i < 6; i++) await zoomOut.click({ force: true });
-    await expect(zoomOut).toHaveClass(/leaflet-disabled/);
+    await expect(zoomOut).toBeDisabled();
   });
 
   test("kad stesen sebagai helaian di atas peta; Tutup dan Escape", async ({
@@ -1556,7 +1567,7 @@ test.describe("peta stesen", () => {
     await seedLocation(page);
     await page.goto("/lokasi");
     await page.getByRole("tab", { name: "Peta" }).click();
-    const heat = page.getByRole("checkbox", { name: "Taburan IPU" });
+    const heat = await layerSwitch(page, "Taburan IPU");
     await expect(heat).not.toBeChecked();
     await expect(page.locator("canvas.hezy-heat")).toHaveCount(0);
     const region = page.waitForRequest(
@@ -1593,7 +1604,7 @@ test.describe("peta stesen", () => {
     await page.getByRole("tab", { name: "Peta" }).click();
     const wind = page.locator("canvas.hezy-wind");
     await expect(wind).toHaveAttribute("data-mode", "animated");
-    await page.getByRole("checkbox", { name: "Angin" }).uncheck();
+    await (await layerSwitch(page, "Angin")).uncheck();
     await expect(wind).toHaveCount(0);
 
     await page.emulateMedia({ reducedMotion: "reduce" });
@@ -1609,15 +1620,16 @@ test.describe("peta stesen", () => {
     await seedLocation(page);
     await page.goto("/lokasi");
     await page.getByRole("tab", { name: "Peta" }).click();
-    const toggle = page.getByRole("checkbox", { name: "Sensor (1)" });
+    const toggle = await layerSwitch(page, "Sensor (1)");
     await expect(toggle).toBeChecked();
+    await page.keyboard.press("Escape");
     const pin = page.locator('[title="Jalan Anggun 3P, AQI 88"]');
     await expect(pin).toBeVisible();
     await expect(page.locator('[title^="Klang, Selangor"]')).toHaveCount(0);
 
     // Sensor ini ~5 km dari stesen Shah Alam (pin rasmi di atas): zum masuk dahulu.
-    await page.getByRole("button", { name: "Zoom in" }).click();
-    await page.getByRole("button", { name: "Zoom in" }).click();
+    await page.getByRole("button", { name: "Zum masuk" }).click();
+    await page.getByRole("button", { name: "Zum masuk" }).click();
     await pin.click();
     await expect(
       page.getByRole("heading", { name: "Jalan Anggun 3P" }),
@@ -1626,7 +1638,7 @@ test.describe("peta stesen", () => {
       page.getByText("Sensor tambahan WAQI · skala AQI AS"),
     ).toBeVisible();
 
-    await toggle.uncheck();
+    await (await layerSwitch(page, "Sensor (1)")).uncheck();
     await expect(pin).toHaveCount(0);
     await expect(
       page.getByRole("heading", { name: "Jalan Anggun 3P" }),
@@ -2312,4 +2324,96 @@ test.describe("kebolehcapaian mod gelap", () => {
       expect(summary).toEqual([]);
     });
   }
+});
+
+test.describe("Lokasi v0.7.7", () => {
+  test("butang Lapisan membuka helaian suis dengan ⓘ", async ({ page }) => {
+    await seedLocation(page);
+    await page.goto("/lokasi");
+    const button = page.getByRole("button", {
+      name: /^Lapisan peta, \d+ aktif$/,
+    });
+    await expect(button).toBeVisible();
+    // Teks penerangan panjang tidak lagi di bawah peta.
+    await expect(page.getByText(/Garisan bergerak menunjukkan/)).toHaveCount(0);
+    await button.click();
+    const sheet = page.getByTestId("layers-sheet");
+    await expect(sheet.getByRole("switch", { name: "Angin" })).toBeChecked();
+    await expect(
+      sheet.getByRole("switch", { name: "Taburan IPU" }),
+    ).not.toBeChecked();
+    await expect(page.getByTestId("layers-info")).toHaveCount(0);
+    await sheet.getByRole("button", { name: "Tentang lapisan peta" }).click();
+    await expect(page.getByTestId("layers-info")).toContainText("850 hPa");
+    const results = await new AxeBuilder({ page })
+      .include("[data-testid=layers-sheet]")
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+      .analyze();
+    expect(results.violations.map((v) => v.id)).toEqual([]);
+    await page.keyboard.press("Escape");
+    await expect(sheet).toHaveCount(0);
+  });
+
+  test("skrin penuh: ✕ dan butang kembali menutupnya", async ({ page }) => {
+    await seedLocation(page);
+    await page.goto("/lokasi");
+    const frame = page.getByTestId("map-frame");
+    await page.getByRole("button", { name: "Skrin penuh" }).click();
+    await expect(frame).toHaveAttribute("data-full", "");
+    const viewport = page.viewportSize()!;
+    await expect
+      .poll(async () => (await frame.boundingBox())?.height)
+      .toBe(viewport.height);
+    await page.getByRole("button", { name: "Keluar skrin penuh" }).click();
+    await expect(frame).not.toHaveAttribute("data-full");
+    await expect(page).toHaveURL(/\/lokasi$/);
+
+    await page.getByRole("button", { name: "Skrin penuh" }).click();
+    await expect(frame).toHaveAttribute("data-full", "");
+    await page.goBack();
+    await expect(frame).not.toHaveAttribute("data-full");
+    await expect(page).toHaveURL(/\/lokasi$/);
+  });
+
+  test("Tukar membuka helaian; kegemaran GPS memaparkan negeri", async ({
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      if (localStorage.getItem("hezy:prefs:v1")) return;
+      const gps = {
+        id: "gps",
+        name: "Shah Alam",
+        detail: "Lokasi semasa",
+        lat: 3.07,
+        lon: 101.52,
+        source: "gps",
+      };
+      localStorage.setItem(
+        "hezy:prefs:v1",
+        JSON.stringify({
+          current: gps,
+          favourites: [gps],
+          profile: "umum",
+          theme: "system",
+        }),
+      );
+    });
+    await page.goto("/lokasi#senarai");
+    // Kegemaran dari GPS: negeri, bukan "Lokasi semasa" (tanda SEMASA sudah cukup).
+    await expect(page.getByText("SEMASA", { exact: true })).toBeVisible();
+    await expect(page.getByText("Lokasi semasa", { exact: true })).toHaveCount(
+      0,
+    );
+    await page.getByRole("button", { name: "Tukar" }).click();
+    const sheet = page.getByTestId("change-sheet");
+    await expect(
+      sheet.getByRole("button", { name: "Guna lokasi saya" }),
+    ).toBeVisible();
+    await sheet.getByLabel("Cari kawasan atau negeri").fill("klang");
+    await sheet.getByRole("button", { name: /Klang/ }).first().click();
+    await expect(sheet).toHaveCount(0);
+    await expect(
+      page.getByRole("button", { name: /^Klang/ }).first(),
+    ).toBeVisible();
+  });
 });

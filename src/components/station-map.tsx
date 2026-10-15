@@ -3,7 +3,19 @@
 import "leaflet/dist/leaflet.css";
 import type * as Leaflet from "leaflet";
 import type { Map as LeafletMap } from "leaflet";
-import { Broadcast, Fire, Gradient, Wind, X } from "@phosphor-icons/react";
+import {
+  ArrowsOut,
+  Broadcast,
+  Fire,
+  Gradient,
+  Info,
+  Minus,
+  NavigationArrow,
+  Plus,
+  StackSimple,
+  Wind,
+  X,
+} from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { distanceKm, type Station } from "@/lib/apims";
@@ -36,6 +48,7 @@ import {
 import type { HotspotCell } from "@/lib/hotspots";
 import { useReading } from "@/lib/use-reading";
 import { CALM_KMH } from "@/lib/wind";
+import { BottomSheet } from "./bottom-sheet";
 import { IpuPill } from "./ipu-pill";
 import { createHeatLayer, createWindLayer } from "./map-layers";
 import { MAP_REGION, type WindGrid } from "@/lib/wind-grid";
@@ -185,6 +198,13 @@ export function StationMap() {
   const [windGrid, setWindGrid] = useState<WindGrid | null>(null);
   const [regionPoints, setRegionPoints] = useState<RegionPoint[] | null>(null);
   const [zoom, setZoom] = useState<number | null>(null);
+  const [minZoom, setMinZoom] = useState<number | null>(null);
+  // Jubin pertama siap: lapisan berat (angin, titik panas) dimuat selepas ini supaya peta
+  // muncul dahulu tanpa tersekat (v0.7.7).
+  const [tilesLoaded, setTilesLoaded] = useState(false);
+  const [layersOpen, setLayersOpen] = useState(false);
+  const [layersInfo, setLayersInfo] = useState(false);
+  const [full, setFull] = useState(false);
 
   // Ambil senarai stesen.
   useEffect(() => {
@@ -222,9 +242,12 @@ export function StationMap() {
   const wind = useReading(current).entry?.reading?.wind ?? null;
   const windText = useWindText();
 
-  // Bina peta selepas stesen dimuatkan.
+  const prefsLoaded = prefs !== null;
+  const failed = state.status === "error";
+
+  // Bina peta serta-merta (selari dengan pengambilan stesen), bukan selepas stesen siap.
   useEffect(() => {
-    if (!stations || !container.current) return;
+    if (!prefsLoaded || failed || !container.current) return;
     let disposed = false;
 
     void import("leaflet").then((L) => {
@@ -247,13 +270,13 @@ export function StationMap() {
       });
       const fitRegion = () => {
         m.setMinZoom(m.getBoundsZoom(region, true));
+        setMinZoom(m.getMinZoom());
         if (m.getZoom() < m.getMinZoom()) m.setZoom(m.getMinZoom());
       };
       fitRegion();
       m.on("resize", fitRegion);
       map.current = m;
-      // Cip lapisan di kiri atas; kawalan zum ke kanan atas.
-      L.control.zoom({ position: "topright" }).addTo(m);
+      // Butang Lapisan di kiri atas; zum dan skrin penuh (butang sendiri) di kanan atas.
       setZoom(m.getZoom());
       m.on("zoomend", () => setZoom(m.getZoom()));
 
@@ -261,7 +284,15 @@ export function StationMap() {
         maxZoom: 18,
         attribution:
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · APIMS (JAS)',
-      }).addTo(m);
+      })
+        .once("load", () => {
+          if (!disposed) setTilesLoaded(true);
+        })
+        .addTo(m);
+      // Jubin gagal dimuat (luar talian): jangan tahan lapisan lain selama-lamanya.
+      setTimeout(() => {
+        if (!disposed) setTilesLoaded(true);
+      }, 4000);
 
       setMapReady(true);
     });
@@ -269,16 +300,17 @@ export function StationMap() {
     return () => {
       disposed = true;
       setMapReady(false);
+      setTilesLoaded(false);
       map.current?.remove();
       map.current = null;
     };
-    // Peta hanya dibina semula bila senarai stesen berubah.
+    // Peta dibina sekali bila keutamaan dimuatkan (pusat = lokasi semasa).
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stations]);
+  }, [prefsLoaded, failed]);
 
   // Grid angin 850 hPa untuk aliran angin (dicache 1 jam di pelayan).
   useEffect(() => {
-    if (!mapReady || windGrid) return;
+    if (!mapReady || !tilesLoaded || windGrid) return;
     let cancelled = false;
     fetch("/api/wind")
       .then((res) => (res.ok ? res.json() : null))
@@ -289,7 +321,7 @@ export function StationMap() {
     return () => {
       cancelled = true;
     };
-  }, [mapReady, windGrid]);
+  }, [mapReady, tilesLoaded, windGrid]);
 
   // Aliran angin (zarah; anak panah statik untuk gerakan dikurangkan).
   useEffect(() => {
@@ -409,18 +441,63 @@ export function StationMap() {
 
   // Titik panas NASA FIRMS (dicache di pelayan 1 jam).
   useEffect(() => {
-    if (!mapReady || fires !== null) return;
+    if (!mapReady || !tilesLoaded || fires !== null) return;
     let cancelled = false;
-    fetch("/api/hotspots")
-      .then((res) => (res.ok ? res.json() : null))
-      .then((body: { cells?: HotspotCell[] } | null) => {
-        if (!cancelled && body?.cells) setFires(body.cells);
-      })
-      .catch(() => undefined);
+    // Ribuan titik: tunggu pelayar lapang supaya tidak bersaing dengan jubin dan pin.
+    const idle =
+      window.requestIdleCallback ?? ((cb: () => void) => setTimeout(cb, 200));
+    const cancelIdle = window.cancelIdleCallback ?? clearTimeout;
+    const handle = idle(() => {
+      fetch("/api/hotspots")
+        .then((res) => (res.ok ? res.json() : null))
+        .then((body: { cells?: HotspotCell[] } | null) => {
+          if (!cancelled && body?.cells) setFires(body.cells);
+        })
+        .catch(() => undefined);
+    });
     return () => {
       cancelled = true;
+      cancelIdle(handle);
     };
-  }, [mapReady, fires]);
+  }, [mapReady, tilesLoaded, fires]);
+
+  // Entri sejarah ditambah semasa dibuka (dalam klik, bukan kesan) supaya butang kembali
+  // menutup skrin penuh; ✕/Escape kembali melalui sejarah supaya entri itu dibuang.
+  const enterFull = () => {
+    window.history.pushState({ hezyMapFull: true }, "");
+    setFull(true);
+  };
+  const exitFull = () => {
+    if (window.history.state?.hezyMapFull) window.history.back();
+    else setFull(false);
+  };
+
+  // Skrin penuh: saiz peta berubah; Escape dan butang kembali menutupnya; halaman tidak ditatal.
+  useEffect(() => {
+    map.current?.invalidateSize();
+    if (!full) return;
+    const onPop = () => {
+      if (!window.history.state?.hezyMapFull) setFull(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (
+        e.key === "Escape" &&
+        !document.querySelector("[role=dialog], [data-testid=map-sheet]")
+      ) {
+        exitFull();
+      }
+    };
+    window.addEventListener("popstate", onPop);
+    document.addEventListener("keydown", onKey);
+    const root = document.documentElement;
+    root.dataset.mapFull = "";
+    return () => {
+      window.removeEventListener("popstate", onPop);
+      document.removeEventListener("keydown", onKey);
+      delete root.dataset.mapFull;
+      requestAnimationFrame(() => map.current?.invalidateSize());
+    };
+  }, [full]);
 
   useEffect(() => {
     const m = map.current;
@@ -531,91 +608,179 @@ export function StationMap() {
     router.push("/");
   };
 
-  const chip = (on: boolean) =>
-    `relative flex min-h-9 cursor-pointer items-center gap-1.5 rounded-full px-3 text-xs font-bold shadow-[0_1px_6px_rgb(0_0_0/0.18)] has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 ${
-      on ? "bg-ink text-page" : "bg-page/95 text-ink"
-    }`;
   const closeSheet = () => {
     setSelectedId(null);
     setSensorUid(null);
   };
-  const firesOn = showFires && fires !== null && fires.length > 0;
-  const sensorsOn =
-    showSensors && !!WAQI_TOKEN && sensors !== null && sensors.length > 0;
+
+  // Lapisan yang tersedia (helaian Lapisan, v0.7.7).
+  const layers = [
+    fires !== null &&
+      fires.length > 0 && {
+        key: "fires",
+        icon: Fire,
+        tone: "bg-[#fde3dc] text-[#b3401a]",
+        name: t("Titik panas ({count})", {
+          count: fires.length.toLocaleString("ms-MY"),
+        }),
+        desc: t("Kebakaran dikesan satelit · 2 hari"),
+        on: showFires,
+        set: setShowFires,
+      },
+    !!WAQI_TOKEN &&
+      sensors !== null &&
+      sensors.length > 0 && {
+        key: "sensors",
+        icon: Broadcast,
+        tone: "bg-[#e9e6f6] text-[#4b3fa0]",
+        name: t("Sensor ({count})", { count: sensors.length }),
+        desc: t("Pin bergaris putus · skala AQI AS"),
+        on: showSensors,
+        set: setShowSensors,
+      },
+    stations && {
+      key: "heat",
+      icon: Gradient,
+      tone: "bg-ipu-tidak-sihat-tint text-ipu-tidak-sihat-ink",
+      name: t("Taburan IPU"),
+      desc: t("Anggaran antara stesen"),
+      on: showHeat,
+      set: setShowHeat,
+    },
+    (wind || windGrid) && {
+      key: "wind",
+      icon: Wind,
+      tone: "bg-[#dceaf8] text-[#1f5fa8]",
+      name: t("Angin"),
+      desc: t("Aliran angin pembawa jerebu"),
+      on: showWind,
+      set: setShowWind,
+    },
+  ].filter((l) => !!l);
+  const activeLayers = layers.filter((l) => l.on).length;
+  const fab =
+    "bg-page/95 text-ink flex size-11 items-center justify-center shadow-[0_1px_6px_rgb(0_0_0/0.18)]";
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="relative">
-        {state.status === "loading" && (
-          <Skeleton className="absolute inset-0 z-[1] h-full" />
-        )}
+      <div
+        data-testid="map-frame"
+        data-full={full ? "" : undefined}
+        className={
+          full
+            ? "bg-page fixed inset-0 z-40 h-[100dvh]"
+            : "relative isolate h-[max(380px,calc(100svh-380px))] md:h-[520px]"
+        }
+      >
+        {!mapReady && <Skeleton className="absolute inset-0 z-[1] h-full" />}
+        {/* Kelas container Leaflet mesti kekal (React tidak boleh menukarnya), jadi gaya
+            bingkai pada pembalut. */}
         <div
-          ref={container}
-          role="region"
-          aria-label={t("Peta stesen APIMS")}
-          className="border-line h-[420px] overflow-hidden rounded-3xl border md:h-[520px]"
-        />
+          className={`h-full overflow-hidden ${full ? "" : "border-line rounded-3xl border"}`}
+        >
+          <div
+            ref={container}
+            role="region"
+            aria-label={t("Peta stesen APIMS")}
+            className="h-full"
+          />
+        </div>
 
-        {/* Cip lapisan terapung (kiri atas). */}
-        <div className="pointer-events-none absolute top-3 left-3 z-[500] flex max-w-[calc(100%-64px)] flex-col items-start gap-2">
-          <fieldset className="pointer-events-auto flex flex-wrap gap-2">
-            <legend className="sr-only">{t("Lapisan peta")}</legend>
-            {fires !== null && fires.length > 0 && (
-              <label className={chip(showFires)}>
-                <input
-                  type="checkbox"
-                  checked={showFires}
-                  onChange={(e) => setShowFires(e.target.checked)}
-                  className="absolute inset-0 cursor-pointer appearance-none rounded-full"
-                />
-                <Fire
+        {/* Kiri atas: satu butang Lapisan dengan bilangan lapisan aktif. */}
+        <div
+          className={`pointer-events-none absolute left-3 z-[500] ${full ? "top-[calc(env(safe-area-inset-top)+12px)]" : "top-3"}`}
+        >
+          {layers.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setLayersOpen(true)}
+              aria-haspopup="dialog"
+              aria-label={t("Lapisan peta, {count} aktif", {
+                count: activeLayers,
+              })}
+              className="bg-page/95 text-ink pointer-events-auto flex min-h-11 items-center gap-2 rounded-full pr-3 pl-3.5 text-sm font-bold shadow-[0_1px_6px_rgb(0_0_0/0.18)]"
+            >
+              <StackSimple aria-hidden="true" size={18} weight="bold" />
+              {t("Lapisan")}
+              <span
+                aria-hidden="true"
+                className="bg-ink text-page flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[11px]"
+              >
+                {activeLayers}
+              </span>
+            </button>
+          )}
+        </div>
+
+        {/* Kanan atas: (✕ skrin penuh) zum, skrin penuh / lokasi saya. */}
+        <div
+          className={`absolute right-3 z-[500] flex flex-col gap-2 ${full ? "top-[calc(env(safe-area-inset-top)+12px)]" : "top-3"}`}
+        >
+          {full && (
+            <button
+              type="button"
+              onClick={exitFull}
+              aria-label={t("Keluar skrin penuh")}
+              className="bg-ink text-page flex size-11 items-center justify-center rounded-full shadow-[0_1px_6px_rgb(0_0_0/0.25)]"
+            >
+              <X aria-hidden="true" size={16} weight="bold" />
+            </button>
+          )}
+          <div className="bg-page/95 flex flex-col rounded-[14px] shadow-[0_1px_6px_rgb(0_0_0/0.18)]">
+            <button
+              type="button"
+              onClick={() => map.current?.zoomIn()}
+              disabled={zoom !== null && zoom >= 18}
+              aria-label={t("Zum masuk")}
+              className="text-ink flex size-11 items-center justify-center disabled:opacity-35"
+            >
+              <Plus aria-hidden="true" size={18} weight="bold" />
+            </button>
+            <span aria-hidden="true" className="bg-line mx-2 h-px" />
+            <button
+              type="button"
+              onClick={() => map.current?.zoomOut()}
+              disabled={zoom !== null && minZoom !== null && zoom <= minZoom}
+              aria-label={t("Zum keluar")}
+              className="text-ink flex size-11 items-center justify-center disabled:opacity-35"
+            >
+              <Minus aria-hidden="true" size={18} weight="bold" />
+            </button>
+          </div>
+          {full ? (
+            current && (
+              <button
+                type="button"
+                onClick={() =>
+                  map.current?.setView([current.lat, current.lon], 10)
+                }
+                aria-label={t("Ke lokasi saya")}
+                className={`${fab} rounded-[14px]`}
+              >
+                <NavigationArrow
                   aria-hidden="true"
-                  size={15}
-                  weight="fill"
-                  className={showFires ? "" : "text-[#d23b3b]"}
+                  size={18}
+                  weight="bold"
+                  className="-scale-x-100"
                 />
-                {t("Titik panas ({count})", {
-                  count: fires.length.toLocaleString("ms-MY"),
-                })}
-              </label>
-            )}
-            {WAQI_TOKEN && sensors !== null && sensors.length > 0 && (
-              <label className={chip(showSensors)}>
-                <input
-                  type="checkbox"
-                  checked={showSensors}
-                  onChange={(e) => setShowSensors(e.target.checked)}
-                  className="absolute inset-0 cursor-pointer appearance-none rounded-full"
-                />
-                <Broadcast aria-hidden="true" size={15} weight="bold" />
-                {t("Sensor ({count})", { count: sensors.length })}
-              </label>
-            )}
-            {stations && (
-              <label className={chip(showHeat)}>
-                <input
-                  type="checkbox"
-                  checked={showHeat}
-                  onChange={(e) => setShowHeat(e.target.checked)}
-                  className="absolute inset-0 cursor-pointer appearance-none rounded-full"
-                />
-                <Gradient aria-hidden="true" size={15} weight="bold" />
-                {t("Taburan IPU")}
-              </label>
-            )}
-            {(wind || windGrid) && (
-              <label className={chip(showWind)}>
-                <input
-                  type="checkbox"
-                  checked={showWind}
-                  onChange={(e) => setShowWind(e.target.checked)}
-                  className="absolute inset-0 cursor-pointer appearance-none rounded-full"
-                />
-                <Wind aria-hidden="true" size={15} weight="bold" />
-                {t("Angin")}
-              </label>
-            )}
-          </fieldset>
+              </button>
+            )
+          ) : (
+            <button
+              type="button"
+              onClick={enterFull}
+              aria-label={t("Skrin penuh")}
+              className={`${fab} rounded-[14px]`}
+            >
+              <ArrowsOut aria-hidden="true" size={18} weight="bold" />
+            </button>
+          )}
+        </div>
+
+        {/* Kiri bawah: legenda taburan (bila hidup) dan pil angin kecil. */}
+        <div
+          className={`pointer-events-none absolute left-3 z-[500] flex flex-col items-start gap-1.5 ${full ? "bottom-[calc(env(safe-area-inset-bottom)+28px)]" : "bottom-7"}`}
+        >
           {showHeat && (
             <div
               data-testid="heat-legend"
@@ -625,7 +790,7 @@ export function StationMap() {
               <span className="text-muted tabular-nums">0</span>
               <span
                 aria-hidden="true"
-                className="h-2 w-20 rounded-full"
+                className="h-2 w-16 rounded-full"
                 style={{
                   background: `linear-gradient(to right, ${HEAT_STOPS.map(
                     ([v, c]) => `${c} ${(Math.min(v, 300) / 300) * 100}%`,
@@ -636,18 +801,102 @@ export function StationMap() {
             </div>
           )}
           {wind && showWind && (
-            <div className="bg-page/90 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold shadow">
+            <div className="bg-page/90 flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold shadow">
               {wind.speed >= CALM_KMH && (
-                <WindArrow direction={wind.direction} />
+                <WindArrow direction={wind.direction} size={14} />
               )}
               {windText(wind)}
             </div>
           )}
         </div>
 
+        {layersOpen && (
+          <BottomSheet
+            title={t("Lapisan peta")}
+            testId="layers-sheet"
+            onClose={() => {
+              setLayersOpen(false);
+              setLayersInfo(false);
+            }}
+            titleAction={
+              <button
+                type="button"
+                onClick={() => setLayersInfo((v) => !v)}
+                aria-expanded={layersInfo}
+                aria-label={t("Tentang lapisan peta")}
+                className="text-muted hover:bg-surface inline-flex size-9 items-center justify-center rounded-full"
+              >
+                <Info aria-hidden="true" size={18} weight="bold" />
+              </button>
+            }
+          >
+            {layersInfo && (
+              <div
+                data-testid="layers-info"
+                className="bg-surface flex flex-col gap-2 rounded-2xl p-3.5 text-xs leading-snug"
+              >
+                <p>
+                  {t(
+                    "Titik merah ialah kebakaran yang dikesan satelit VIIRS dalam 2 hari terakhir (setiap titik ≈ kawasan 5 km). Satelit tidak mengesan semua kebakaran, terutama api gambut di bawah permukaan atau di bawah awan.",
+                  )}{" "}
+                  {t("Sumber: NASA FIRMS.")}
+                </p>
+                <p>
+                  {t(
+                    "Pin bergaris putus ialah sensor tambahan dalam skala AQI AS, yang biasanya lebih tinggi daripada IPU bagi udara yang sama. Nombor utama dan amaran Hezy kekal menggunakan IPU rasmi.",
+                  )}
+                </p>
+                <p>
+                  {t(
+                    "Taburan IPU ialah anggaran antara stesen (interpolasi), bukan bacaan rasmi: di Malaysia daripada APIMS, di luar Malaysia daripada sensor WAQI (AQI AS ditukar ke skala IPU). Kawasan jauh dari stesen dibiarkan kosong.",
+                  )}
+                </p>
+                <p>
+                  {t(
+                    "Garisan bergerak menunjukkan aliran angin pada ~1.5 km (850 hPa) yang membawa asap jerebu. Sumber: Open-Meteo.",
+                  )}
+                </p>
+              </div>
+            )}
+            <ul className="divide-line flex flex-col divide-y">
+              {layers.map((l) => (
+                <li key={l.key}>
+                  <label className="relative flex min-h-15 cursor-pointer items-center gap-3 py-1.5">
+                    <span
+                      aria-hidden="true"
+                      className={`flex size-10 shrink-0 items-center justify-center rounded-xl ${l.tone}`}
+                    >
+                      <l.icon size={20} weight="fill" />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-[15px] font-bold">
+                        {l.name}
+                      </span>
+                      <span className="text-muted block text-xs">{l.desc}</span>
+                    </span>
+                    <input
+                      type="checkbox"
+                      role="switch"
+                      aria-label={l.name}
+                      checked={l.on}
+                      onChange={(e) => l.set(e.target.checked)}
+                      className="peer absolute inset-0 size-full cursor-pointer appearance-none rounded-xl opacity-0"
+                    />
+                    <span
+                      aria-hidden="true"
+                      className="bg-line peer-checked:bg-ink peer-focus-visible:outline-ink relative h-7 w-12 shrink-0 rounded-full transition-colors peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 after:absolute after:top-[3px] after:left-[3px] after:size-[22px] after:rounded-full after:bg-white after:shadow after:transition-transform peer-checked:after:translate-x-5"
+                    />
+                  </label>
+                </li>
+              ))}
+            </ul>
+          </BottomSheet>
+        )}
         {/* Kad stesen/sensor terpilih sebagai helaian di atas peta. */}
         {(sensor || selected) && (
-          <div className="pointer-events-none absolute inset-x-2 bottom-2 z-[1100] md:right-auto md:bottom-3 md:left-3 md:w-[380px]">
+          <div
+            className={`pointer-events-none absolute inset-x-2 z-[1100] md:right-auto md:left-3 md:w-[380px] ${full ? "bottom-[calc(env(safe-area-inset-bottom)+8px)]" : "bottom-2 md:bottom-3"}`}
+          >
             <div className="relative">
               {sensor && (
                 <section
@@ -773,44 +1022,6 @@ export function StationMap() {
           </div>
         )}
       </div>
-
-      {(firesOn || sensorsOn || showHeat || (showWind && windGrid)) && (
-        <div className="text-muted flex flex-col gap-1.5 text-xs">
-          {showHeat && (
-            <p>
-              {t(
-                "Taburan IPU ialah anggaran antara stesen (interpolasi), bukan bacaan rasmi: di Malaysia daripada APIMS, di luar Malaysia daripada sensor WAQI (AQI AS ditukar ke skala IPU). Kawasan jauh dari stesen dibiarkan kosong.",
-              )}
-            </p>
-          )}
-          {showWind && windGrid && (
-            <p>
-              {t(
-                "Garisan bergerak menunjukkan aliran angin pada ~1.5 km (850 hPa) yang membawa asap jerebu. Sumber: Open-Meteo.",
-              )}
-            </p>
-          )}
-          {firesOn && (
-            <p>
-              <span
-                aria-hidden="true"
-                className="mr-1.5 inline-block size-2.5 rounded-full bg-[#d23b3b]"
-              />
-              {t(
-                "Titik merah ialah kebakaran yang dikesan satelit VIIRS dalam 2 hari terakhir (setiap titik ≈ kawasan 5 km). Satelit tidak mengesan semua kebakaran, terutama api gambut di bawah permukaan atau di bawah awan.",
-              )}{" "}
-              {t("Sumber: NASA FIRMS.")}
-            </p>
-          )}
-          {sensorsOn && (
-            <p>
-              {t(
-                "Pin bergaris putus ialah sensor tambahan dalam skala AQI AS, yang biasanya lebih tinggi daripada IPU bagi udara yang sama. Nombor utama dan amaran Hezy kekal menggunakan IPU rasmi.",
-              )}
-            </p>
-          )}
-        </div>
-      )}
 
       {nearby.length > 0 && (
         <section aria-labelledby="stesen-terdekat">

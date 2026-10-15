@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useSyncExternalStore } from "react";
+import { nearestArea } from "@/lib/areas";
 import { areaToLocation, samePlace } from "@/lib/locations";
 import { primaryReading } from "@/lib/official";
 import {
@@ -18,6 +19,7 @@ import {
 import { pushSupport } from "@/lib/push-client";
 import { useI18n } from "@/lib/use-i18n";
 import { useReading } from "@/lib/use-reading";
+import { BottomSheet, useSheetDismiss } from "../bottom-sheet";
 import { ChooseLocation } from "../choose-location";
 import { Chevron } from "../chevron";
 import { IpuPill } from "../ipu-pill";
@@ -145,7 +147,7 @@ export function LokasiScreen() {
               <h2 className="text-muted text-sm font-bold tracking-wide">
                 {t("LOKASI SEMASA")}
               </h2>
-              {prefs.current && !changing ? (
+              {prefs.current ? (
                 <div className="border-line flex flex-col gap-3 rounded-[18px] border-[1.5px] p-3.5 sm:flex-row sm:items-center">
                   <LocationReading
                     location={prefs.current}
@@ -177,17 +179,18 @@ export function LokasiScreen() {
                 </div>
               ) : (
                 <div className="border-line rounded-[18px] border-[1.5px] p-4">
-                  <ChooseLocation onChosen={() => setChanging(false)} />
-                  {prefs.current && (
-                    <button
-                      type="button"
-                      onClick={() => setChanging(false)}
-                      className="mt-3 min-h-11 text-sm font-semibold underline"
-                    >
-                      {t("Batal")}
-                    </button>
-                  )}
+                  <ChooseLocation />
                 </div>
+              )}
+              {changing && (
+                <BottomSheet
+                  title={t("Tukar lokasi semasa")}
+                  testId="change-sheet"
+                  onClose={() => setChanging(false)}
+                  className="h-[85svh]"
+                >
+                  <SheetChooseLocation />
+                </BottomSheet>
               )}
             </section>
 
@@ -278,41 +281,64 @@ export function LokasiScreen() {
                 )}
               />
 
-              {prefs.favourites.length < MAX_FAVOURITES &&
-                (adding ? (
-                  <div className="border-line rounded-[18px] border-[1.5px] p-4">
-                    <LocationSearch
-                      autoFocus
-                      onPick={(area) => {
-                        updatePrefs((p) =>
-                          addFavourite(p, areaToLocation(area)),
-                        );
-                        setAdding(false);
-                      }}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setAdding(false)}
-                      className="mt-3 min-h-11 text-sm font-semibold underline"
-                    >
-                      {t("Batal")}
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => setAdding(true)}
-                    className="border-line text-muted min-h-14 rounded-[18px] border-2 border-dashed font-semibold"
-                  >
-                    {t("+ Tambah lokasi kegemaran")}
-                  </button>
-                ))}
+              {prefs.favourites.length < MAX_FAVOURITES && (
+                <button
+                  type="button"
+                  onClick={() => setAdding(true)}
+                  aria-haspopup="dialog"
+                  className="border-line text-muted min-h-14 rounded-[18px] border-2 border-dashed font-semibold"
+                >
+                  {t("+ Tambah lokasi kegemaran")}
+                </button>
+              )}
+              {adding && prefs.favourites.length < MAX_FAVOURITES && (
+                <BottomSheet
+                  title={t("Tambah kegemaran")}
+                  testId="add-sheet"
+                  onClose={() => {
+                    setAdding(false);
+                    // `#tambah` sudah digunakan: jangan buka semula helaian bila kembali.
+                    if (window.location.hash === "#tambah") {
+                      window.history.replaceState(null, "", "#senarai");
+                    }
+                  }}
+                  className="h-[85svh]"
+                >
+                  <SheetAddFavourite />
+                </BottomSheet>
+              )}
             </section>
           </>
         )}
       </div>
     </>
   );
+}
+
+/** GPS + carian dalam helaian Tukar; helaian ditutup (dengan animasi) selepas memilih. */
+function SheetChooseLocation() {
+  const dismiss = useSheetDismiss();
+  return <ChooseLocation onChosen={dismiss} />;
+}
+
+/** Carian dalam helaian Tambah kegemaran. */
+function SheetAddFavourite() {
+  const dismiss = useSheetDismiss();
+  return (
+    <LocationSearch
+      onPick={(area) => {
+        updatePrefs((p) => addFavourite(p, areaToLocation(area)));
+        dismiss();
+      }}
+    />
+  );
+}
+
+/** Keterangan lokasi; lokasi GPS memaparkan negeri, bukan "Lokasi semasa" (tanda SEMASA cukup). */
+function locationDetail(location: SavedLocation): string | undefined {
+  return location.source === "gps"
+    ? nearestArea(location.lat, location.lon).state
+    : location.detail;
 }
 
 /** Nama lokasi + IPU semasa; klik untuk jadikan lokasi semasa. */
@@ -341,7 +367,7 @@ function LocationReading({
         </span>
         <span className="text-muted flex min-w-0 items-center gap-1.5 text-xs font-medium">
           <span className="truncate">
-            {location.detail && t(location.detail)}
+            {locationDetail(location) && t(locationDetail(location)!)}
           </span>
           {isCurrent && (
             <span className="bg-ink text-page shrink-0 rounded-full px-1.5 py-px text-[10px] font-bold tracking-wide">

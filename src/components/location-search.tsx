@@ -48,7 +48,7 @@ export function LocationSearch({
           onChange={(e) => setQuery(e.target.value)}
           placeholder={t("Cari kawasan atau negeri")}
           autoFocus={autoFocus}
-          className="placeholder:text-muted min-w-0 flex-1 bg-transparent text-[15px] font-medium outline-none"
+          className="placeholder:text-muted min-w-0 flex-1 bg-transparent text-base font-medium outline-none"
         />
       </div>
       {query.trim() && (

@@ -432,3 +432,8 @@ html[data-scrolled] .sky-header-strip {
       color-mix(in srgb, var(--sky) 28%, #121316)
     );
 }
+
+/* Peta skrin penuh (v0.7.7): atribusi Leaflet di atas penunjuk rumah iPhone. */
+[data-full] .leaflet-bottom {
+  bottom: env(safe-area-inset-bottom);
+}

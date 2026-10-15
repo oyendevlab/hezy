@@ -147,6 +147,16 @@ Buka **https://hezy.my** pada telefon.
 - [ ] Trend → Sejarah 12 minggu: kotak memenuhi lebar hingga tepi kanan (sama lebar dengan kad hari), kekal segi empat sama
 - [ ] Di tablet/desktop: lebih banyak minggu dipaparkan dan tajuk berubah (contoh "Sejarah 20 minggu")
 
+## Ciri baharu v0.7.7
+
+- [ ] Lokasi → Peta: satu butang **Lapisan** (dengan bilangan aktif) di kiri atas; ketik → helaian suis; ⓘ memaparkan penerangan
+- [ ] Tiada lagi perenggan teks di bawah peta; pil angin kecil di kiri bawah peta
+- [ ] Butang skrin penuh (di bawah zum): peta memenuhi skrin; ✕, Escape atau gerak isyarat kembali menutupnya
+- [ ] Buka Lokasi: peta dan jubin muncul segera; titik panas dan angin menyusul tanpa tersekat
+- [ ] Lokasi → Senarai (halaman pendek): bar navigasi bawah kekal di bawah skrin, tidak terangkat
+- [ ] **Tukar** dan **+ Tambah lokasi kegemaran** membuka helaian carian; hanya satu carian pada satu masa
+- [ ] Kegemaran yang disimpan dari GPS memaparkan negeri (bukan "Lokasi semasa")
+
 ## Jika ada masalah
 
 Ambil tangkapan skrin dan catat model telefon serta versi OS, kemudian buka isu di
