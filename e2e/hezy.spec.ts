@@ -1727,6 +1727,15 @@ test.describe("trend rasmi APIMS", () => {
       name: "Heatmap IPU harian, 12 minggu",
     });
     await expect(grid.getByRole("button")).toHaveCount(84);
+    // Telefon: grid memenuhi lebar hingga tepi kanan kad butiran (v0.7.6).
+    // Desktop menambah minggu, tetapi fixture hanya 84 hari, jadi kotak dihadkan.
+    if (test.info().project.name === "telefon") {
+      const gridBox = await grid.boundingBox();
+      const cardBox = await page.getByTestId("history-day").boundingBox();
+      expect(
+        Math.abs(gridBox!.x + gridBox!.width - (cardBox!.x + cardBox!.width)),
+      ).toBeLessThan(8);
+    }
     // Lalai: hari ini.
     const today = grid.getByRole("button", { name: /^Isn 12 Okt/ });
     await expect(today).toHaveAttribute("aria-pressed", "true");

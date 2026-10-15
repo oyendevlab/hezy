@@ -1,9 +1,14 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { CATEGORY_STYLE } from "@/lib/category-style";
 import { formatLongDate, formatMonth, formatShortDate } from "@/lib/format";
-import { monthLabelWeeks, toWeeks, type HistoryDay } from "@/lib/history";
+import {
+  HEATMAP_DAYS,
+  monthLabelWeeks,
+  toWeeks,
+  type HistoryDay,
+} from "@/lib/history";
 import { IPU_CATEGORIES, ipuCategory, type IpuCategoryKey } from "@/lib/ipu";
 import { useI18n } from "@/lib/use-i18n";
 import { CalendarCheck, ChartBar, Palette } from "@phosphor-icons/react";
@@ -19,6 +24,32 @@ type HistoryResponse = {
 };
 
 const cache = new Map<string, HistoryResponse>();
+
+/** Jarak antara kotak (px). */
+const GAP = 3;
+/** Kotak terbesar (px): skrin lebar menambah minggu, bukan membesarkan kotak. */
+const MAX_CELL = 28;
+/** Had atas kotak apabila data tidak cukup untuk mengisi lebar. */
+const CAP_CELL = 32;
+
+/**
+ * Bilangan hari dipaparkan dan saiz kotak supaya grid memenuhi `width` (v0.7.6).
+ * Telefon: 12 minggu, kotak melebar. Skrin lebar: minggu ditambah hingga kotak ≤ {@link MAX_CELL}.
+ */
+function layout(days: readonly HistoryDay[], width: number) {
+  const base = days.slice(-HEATMAP_DAYS);
+  const baseCols = toWeeks(base).length;
+  const fit = Math.floor((width + GAP) / (MAX_CELL + GAP));
+  const extra = Math.min(
+    Math.max(fit - baseCols, 0),
+    Math.floor((days.length - base.length) / 7),
+  );
+  const shown = days.slice(-(HEATMAP_DAYS + extra * 7));
+  const cols = baseCols + extra;
+  const cell =
+    width > 0 ? Math.min(CAP_CELL, (width - (cols - 1) * GAP) / cols) : 18;
+  return { shown, cell };
+}
 
 /** Julat IPU setiap kategori untuk keamatan warna dalam kategori (v0.7.5). */
 const RANGE: Record<IpuCategoryKey, [number, number]> = {
@@ -50,7 +81,7 @@ const LEGEND = IPU_CATEGORIES.flatMap((c) => {
   }));
 });
 
-/** Heatmap gaya GitHub: IPU maksimum harian stesen APIMS bagi 12 minggu. */
+/** Heatmap gaya GitHub: IPU maksimum harian stesen APIMS (12 minggu atau lebih di skrin lebar). */
 export function HistoryHeatmap({
   stationId,
   stationName,
@@ -65,6 +96,19 @@ export function HistoryHeatmap({
   const [failed, setFailed] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
   const grid = useRef<HTMLDivElement>(null);
+  const area = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState(0);
+
+  // Ukur lebar sebelum dilukis supaya kotak tidak melompat saiz.
+  useLayoutEffect(() => {
+    const el = area.current;
+    if (!el) return;
+    const measure = () => setWidth(el.clientWidth);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [data]);
 
   useEffect(() => {
     let cancelled = false;
@@ -92,12 +136,13 @@ export function HistoryHeatmap({
     return failed ? null : <Skeleton className="h-56" />;
   }
 
-  const days = data.days;
+  const { shown: days, cell } = layout(data.days, width);
+  const weekCount = days.length / 7;
   const weeks = toWeeks(days);
   const months = monthLabelWeeks(weeks);
   const current = selected ?? data.today;
   const day = days.find((d) => d.date === current) ?? days[days.length - 1];
-  const withData = days.filter((d) => d.max !== null).length;
+  const withData = data.days.filter((d) => d.max !== null).length;
 
   const move = (delta: number) => {
     const i = days.findIndex((d) => d.date === day.date);
@@ -139,11 +184,11 @@ export function HistoryHeatmap({
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <div className="flex items-center gap-1">
           <h2 id="sejarah-ipu" className="font-display text-xl font-bold">
-            {t("Sejarah 12 minggu")}
+            {t("Sejarah {n} minggu", { n: weekCount })}
           </h2>
           <InfoSheetButton
-            title={t("Sejarah 12 minggu")}
-            label={t("Tentang sejarah 12 minggu")}
+            title={t("Sejarah {n} minggu", { n: weekCount })}
+            label={t("Tentang sejarah {n} minggu", { n: weekCount })}
             testId="info-history"
             rows={[
               {
@@ -176,7 +221,8 @@ export function HistoryHeatmap({
       <div className="flex gap-1.5">
         <div
           aria-hidden="true"
-          className="text-muted grid grid-rows-[14px_repeat(7,18px)] gap-[3px] text-[10px] font-semibold"
+          className="text-muted grid text-[10px] font-semibold"
+          style={{ gridTemplateRows: `14px repeat(7, ${cell}px)`, gap: GAP }}
         >
           <span />
           {[t("Isn"), "", t("Rab"), "", t("Jum"), "", ""].map((d, i) => (
@@ -185,54 +231,58 @@ export function HistoryHeatmap({
             </span>
           ))}
         </div>
-        <div
-          ref={grid}
-          role="group"
-          aria-label={t("Heatmap IPU harian, 12 minggu")}
-          onKeyDown={onKeyDown}
-          // Kotak kecil 18 px (ala GitHub), bukan sel yang melebar memenuhi lebar skrin.
-          className="grid min-w-0 grid-flow-col grid-rows-[14px_repeat(7,18px)] gap-[3px]"
-          style={{
-            gridTemplateColumns: `repeat(${weeks.length}, 18px)`,
-          }}
-        >
-          {weeks.map((week, w) => {
-            return [
-              <span
-                key={`m${w}`}
-                aria-hidden="true"
-                className="text-muted overflow-visible text-[10px] leading-none font-semibold whitespace-nowrap"
-              >
-                {months[w] ? formatMonth(months[w], lang) : ""}
-              </span>,
-              ...week.map((d, i) =>
-                d ? (
-                  <button
-                    key={d.date}
-                    type="button"
-                    data-date={d.date}
-                    tabIndex={d.date === day.date ? 0 : -1}
-                    aria-pressed={d.date === day.date}
-                    aria-label={label(d)}
-                    onClick={() => setSelected(d.date)}
-                    className={`size-[18px] rounded-[4px] ${
-                      d.date === day.date
-                        ? "outline-ink outline-2 outline-offset-1"
-                        : ""
-                    }`}
-                    style={{
-                      background:
-                        d.max === null
-                          ? "color-mix(in srgb, var(--line) 55%, transparent)"
-                          : cellColor(d.max),
-                    }}
-                  />
-                ) : (
-                  <span key={`e${w}-${i}`} aria-hidden="true" />
+        <div ref={area} className="min-w-0 flex-1">
+          <div
+            ref={grid}
+            role="group"
+            aria-label={t("Heatmap IPU harian, {n} minggu", { n: weekCount })}
+            onKeyDown={onKeyDown}
+            // Kotak segi empat sama yang memenuhi lebar (v0.7.6); saiz dikira daripada lebar sebenar.
+            className="grid w-fit grid-flow-col"
+            style={{
+              gap: GAP,
+              gridTemplateRows: `14px repeat(7, ${cell}px)`,
+              gridTemplateColumns: `repeat(${weeks.length}, ${cell}px)`,
+            }}
+          >
+            {weeks.map((week, w) => {
+              return [
+                <span
+                  key={`m${w}`}
+                  aria-hidden="true"
+                  className="text-muted overflow-visible text-[10px] leading-none font-semibold whitespace-nowrap"
+                >
+                  {months[w] ? formatMonth(months[w], lang) : ""}
+                </span>,
+                ...week.map((d, i) =>
+                  d ? (
+                    <button
+                      key={d.date}
+                      type="button"
+                      data-date={d.date}
+                      tabIndex={d.date === day.date ? 0 : -1}
+                      aria-pressed={d.date === day.date}
+                      aria-label={label(d)}
+                      onClick={() => setSelected(d.date)}
+                      className={`size-full rounded-[4px] ${
+                        d.date === day.date
+                          ? "outline-ink outline-2 outline-offset-1"
+                          : ""
+                      }`}
+                      style={{
+                        background:
+                          d.max === null
+                            ? "color-mix(in srgb, var(--line) 55%, transparent)"
+                            : cellColor(d.max),
+                      }}
+                    />
+                  ) : (
+                    <span key={`e${w}-${i}`} aria-hidden="true" />
+                  ),
                 ),
-              ),
-            ];
-          })}
+              ];
+            })}
+          </div>
         </div>
       </div>
 
