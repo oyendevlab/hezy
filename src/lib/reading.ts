@@ -26,6 +26,18 @@ export const STALE_AFTER_HOURS = 3;
 /** Ramalan satu hari: purata dan maksimum IPU sejam. */
 export type DayForecast = { date: string; averageIpu: number; maxIpu: number };
 
+/** Satu jam dalam ramalan per jam. */
+export type HourForecast = {
+  time: string;
+  ipu: number | null;
+  temperature?: number | null;
+  code?: number | null;
+  isDay?: boolean;
+  /** Angin permukaan km/j dan arah datang (darjah). */
+  windSpeed?: number | null;
+  windDir?: number | null;
+};
+
 /** Jam minimum dengan data untuk mengira ramalan sehari. */
 const MIN_HOURS_PER_DAY = 12;
 
@@ -64,8 +76,10 @@ export type Reading = {
   today: HourPoint[];
   /** Tetingkap 3 jam terbaik untuk keluar dalam 24 jam akan datang, berdasarkan IPU sejam (ramalan). */
   bestWindow: BestWindow | null;
-  /** Ramalan harian bagi 3 hari selepas hari ini, daripada IPU sejam model. */
+  /** Ramalan harian bagi hari-hari selepas hari ini (hingga 4), daripada IPU sejam model. */
   days: DayForecast[];
+  /** 24 jam akan datang (ramalan per jam, v0.7.4); cuaca dan angin permukaan diisi oleh route API. */
+  hourly?: HourForecast[];
   stale: boolean;
   /** Bacaan rasmi APIMS stesen terdekat (≤ 30 km, ≤ 3 jam); diisi oleh route API. */
   official: OfficialReading | null;
@@ -75,7 +89,7 @@ export type Reading = {
   schoolTwoPm?: (number | null)[];
   /** Cuaca semasa (langit hidup, ikon dan suhu); diisi oleh route API. */
   weather?: CurrentWeather | null;
-  /** Cuaca harian hari-hari akan datang (ikon ramalan 3 hari). */
+  /** Cuaca harian hari ini dan hari-hari akan datang (ramalan harian). */
   weatherDays?: DayWeather[];
   /** Angin 850 hPa semasa dan anggaran asal jerebu (item 1); diisi oleh route API. */
   wind?: Wind | null;
@@ -180,7 +194,7 @@ export function buildReading(
   }
   const days: DayForecast[] = [...byDate]
     .filter(([, values]) => values.length >= MIN_HOURS_PER_DAY)
-    .slice(0, 3)
+    .slice(0, 4)
     .map(([date, values]) => ({
       date,
       averageIpu: Math.round(values.reduce((a, b) => a + b, 0) / values.length),
@@ -196,6 +210,7 @@ export function buildReading(
     today,
     bestWindow,
     days,
+    hourly: upcoming,
     official: null,
     correction,
     stale:

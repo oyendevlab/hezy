@@ -38,7 +38,37 @@ export function fakeReading(official: Record<string, unknown> | null = null) {
       { date: "2026-10-12", averageIpu: 120, maxIpu: 150 },
       { date: "2026-10-13", averageIpu: 95, maxIpu: 110 },
       { date: "2026-10-14", averageIpu: 60, maxIpu: 75 },
+      { date: "2026-10-15", averageIpu: 55, maxIpu: 70 },
     ],
+    // Ramalan per jam (v0.7.4): 24 jam dari jam semasa, dengan cuaca dan angin permukaan.
+    hourly: Array.from({ length: 24 }, (_, i) => {
+      const hour = 10 + i;
+      const date = hour < 24 ? "2026-10-11" : "2026-10-12";
+      return {
+        time: `${date}T${String(hour % 24).padStart(2, "0")}:00`,
+        ipu: hourly[Math.min(10 + i, 23)],
+        temperature: 30 - (i % 6),
+        code: i % 4 === 0 ? 61 : 2,
+        isDay: hour % 24 >= 7 && hour % 24 < 19,
+        windSpeed: 12,
+        windDir: 135,
+      };
+    }),
+    weatherDays: [
+      "2026-10-11",
+      "2026-10-12",
+      "2026-10-13",
+      "2026-10-14",
+      "2026-10-15",
+    ].map((date, i) => ({
+      date,
+      code: i === 0 ? 61 : 2,
+      max: 33 - i,
+      min: 25,
+      rainChance: i === 0 ? 90 : 20,
+      windMax: 8 + i,
+      windDir: 135,
+    })),
   };
 }
 

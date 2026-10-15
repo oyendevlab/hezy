@@ -129,6 +129,12 @@ Buka **https://hezy.my** pada telefon.
 - [ ] Ketik kad → helaian berikon: aktiviti luar, keputusan rasmi oleh sekolah/PPD/JPN, "Berdasarkan IPU rasmi …"
 - [ ] Bila IPU jam 2 petang kekal tinggi dua hari: "Bacaan tinggi berterusan · Pantau pengumuman sekolah" dan notifikasi dari 3 petang (bergantung pada keadaan sebenar)
 
+## Ciri baharu v0.7.4
+
+- [ ] Trend: legenda graf satu baris (Lepas · Ramalan · Kini); petunjuk "tekan dan seret" hilang selepas graf disentuh
+- [ ] Trend: "Ramalan per jam" boleh dileret — IPU, ikon cuaca, suhu dan angin bagi 24 jam
+- [ ] Trend: "Ramalan harian" — togol 3 hari / 5 hari; ketik baris → puncak IPU
+
 ## Jika ada masalah
 
 Ambil tangkapan skrin dan catat model telefon serta versi OS, kemudian buka isu di

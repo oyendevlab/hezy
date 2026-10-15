@@ -26,6 +26,9 @@ const RAW = {
     weather_code: [95, 80],
     temperature_2m_max: [30.6, 31.6],
     temperature_2m_min: [23.9, 23.7],
+    precipitation_probability_max: [90, 40],
+    wind_speed_10m_max: [8.4, 12.6],
+    wind_direction_10m_dominant: [135, 180],
   },
 };
 
@@ -33,8 +36,24 @@ describe("parseWeather dan currentWeather", () => {
   it("membaca cuaca sejam, harian dan waktu matahari", () => {
     const s = parseWeather(RAW);
     expect(s.days).toEqual([
-      { date: "2026-10-12", code: 95, max: 31, min: 24 },
-      { date: "2026-10-13", code: 80, max: 32, min: 24 },
+      {
+        date: "2026-10-12",
+        code: 95,
+        max: 31,
+        min: 24,
+        rainChance: 90,
+        windMax: 8,
+        windDir: 135,
+      },
+      {
+        date: "2026-10-13",
+        code: 80,
+        max: 32,
+        min: 24,
+        rainChance: 40,
+        windMax: 13,
+        windDir: 180,
+      },
     ]);
     expect(currentWeather(s, "2026-10-12T16:00")).toEqual({
       time: "2026-10-12T16:00",

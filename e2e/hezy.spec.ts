@@ -192,10 +192,27 @@ test.describe("aliran utama", () => {
     await expect(
       page.getByRole("slider", { name: "Graf IPU hari ini, jam demi jam" }),
     ).toBeVisible();
+    // Ramalan per jam: 24 jam dengan IPU, cuaca dan angin.
     await expect(
-      page.getByRole("heading", { name: "Ramalan 3 hari" }),
+      page.getByRole("heading", { name: "Ramalan per jam" }),
     ).toBeVisible();
-    await expect(page.getByText("Esok")).toBeVisible();
+    await expect(page.getByTestId("hourly-strip").locator("li")).toHaveCount(
+      24,
+    );
+    // Ramalan harian: Hari ini + 2 hari, togol 5 hari, ketik untuk puncak.
+    await expect(
+      page.getByRole("heading", { name: "Ramalan harian" }),
+    ).toBeVisible();
+    const daily = page.getByTestId("daily-forecast");
+    await expect(daily.locator("li")).toHaveCount(3);
+    await expect(daily).toContainText("Hari ini");
+    await expect(daily).toContainText("Esok");
+    await expect(daily).toContainText("90%");
+    await page.getByRole("button", { name: "5 hari" }).click();
+    await expect(daily.locator("li")).toHaveCount(5);
+    await daily.getByRole("button", { name: /Esok/ }).click();
+    await expect(daily).toContainText("Puncak ~150 · Tidak Sihat");
+    await expect(page.getByText("PURATA RAMALAN HARI INI")).toBeVisible();
   });
 
   test("graf trend boleh dileret dan dikawal dengan papan kekunci", async ({
@@ -1624,10 +1641,10 @@ test.describe("trend rasmi APIMS", () => {
       route.fulfill({ json: reading }),
     );
     await page.goto("/trend");
-    await expect(page.getByText("Jam lepas: bacaan rasmi APIMS")).toBeVisible();
-    await expect(
-      page.getByText("Jam akan datang: ramalan model"),
-    ).toBeVisible();
+    const legend = page.getByTestId("hour-legend");
+    await expect(legend).toContainText("Lepas (rasmi)");
+    await expect(legend).toContainText("Ramalan");
+    await expect(legend).toContainText("Kini");
     await expect(
       page.getByRole("slider", { name: "Graf IPU hari ini, jam demi jam" }),
     ).toHaveAccessibleDescription(/Tertinggi 172/);
@@ -1652,7 +1669,9 @@ test.describe("trend rasmi APIMS", () => {
     );
     await page.goto("/trend");
     await expect(
-      page.getByText("Jam akan datang: ramalan dibetulkan dengan APIMS"),
+      page
+        .getByTestId("hour-legend")
+        .getByTitle("Ramalan dibetulkan dengan bacaan APIMS"),
     ).toBeVisible();
     await expect(
       page.getByText(/dibetulkan dengan bacaan itu: \+80/),
@@ -1742,7 +1761,7 @@ test.describe("trend rasmi APIMS", () => {
     ).toBeVisible();
     await page.goto("/trend");
     await expect(
-      page.getByText(/ramalan model \(biasanya ±19\)/),
+      page.getByTestId("hour-legend").getByText(/Ramalan \(biasanya ±19\)/),
     ).toBeVisible();
     await page.goto("/tetapan");
     await expect(page.getByText("±22 IPU", { exact: true })).toBeVisible();
@@ -1756,7 +1775,9 @@ test.describe("trend rasmi APIMS", () => {
   }) => {
     await seedLocation(page);
     await page.goto("/trend");
-    await expect(page.getByText("Jam lepas: anggaran model")).toBeVisible();
+    await expect(
+      page.getByTestId("hour-legend").getByText("Lepas (anggaran)"),
+    ).toBeVisible();
   });
 });
 
@@ -1872,7 +1893,9 @@ test.describe("Bahasa Inggeris", () => {
     ).toBeVisible();
 
     await page.goto("/trend");
-    await expect(page.getByText("Today, hour by hour")).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Today", exact: true }),
+    ).toBeVisible();
 
     await page.goto("/tetapan");
     await page.getByText("Bahasa Melayu", { exact: true }).click();
@@ -2069,7 +2092,7 @@ test.describe("bandingkan lokasi", () => {
     await page.goto("/trend");
     if (isMobile) {
       await expect(
-        page.getByRole("heading", { name: "Ramalan 3 hari" }),
+        page.getByRole("heading", { name: "Ramalan harian" }),
       ).toBeVisible();
       await expect(
         page.getByRole("heading", { name: "Bandingkan lokasi" }),

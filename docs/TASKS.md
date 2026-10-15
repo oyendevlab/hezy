@@ -483,3 +483,12 @@ Mulakan polish paparan satu demi satu (siri v0.8.0).
 2. ✅ Jalan tengah: ramalan KPM (180 / 150 × 3 hari) dibuang; isyarat neutral "Bacaan tinggi berterusan · Pantau pengumuman sekolah" bila IPU jam 2 petang > 150 dua hari berturut-turut; notifikasi "IPU di … kekal tinggi — semak pengumuman sekolah untuk esok"
 3. ✅ Helaian sekolah berikon (Prohibit, Warning, TrendUp, Megaphone) dan "Berdasarkan IPU rasmi … · masa"
 4. ✅ Versi 0.7.3, `UJIAN-TELEFON.md`, tag dan GitHub Release
+
+## Fasa 19 — v0.7.4 (Trend: ramalan; disahkan 15 Okt 2026)
+
+1. ✅ Legenda graf satu baris dengan contoh bar sebenar (Lepas (rasmi) · Ramalan · Kini); "Rasmi APIMS" di kanan dibuang; petunjuk "tekan dan seret" hanya sehingga graf pertama kali disentuh; tajuk "Hari ini"
+2. ✅ Tajuk "PURATA RAMALAN HARI INI" di atas Pagi/Petang/Malam
+3. ✅ **Ramalan per jam**: jalur 24 jam (IPU berwarna, ikon cuaca, suhu, angin permukaan dengan arah)
+4. ✅ **Ramalan harian** ala iqAir dengan togol 3 / 5 hari (purata IPU, % hujan, suhu maks/min, angin; ketik untuk puncak); menggantikan "Ramalan 3 hari"
+5. ✅ Data: ramalan kualiti udara dan cuaca 5 hari; angin 10 m sejam, kebarangkalian hujan harian, angin harian
+6. ✅ Versi 0.7.4, `UJIAN-TELEFON.md`, tag dan GitHub Release

@@ -56,9 +56,25 @@ export async function GET(request: Request) {
     wind.status === "fulfilled" ? windAt(wind.value, coords, nowKey) : null;
   if (wind.status === "fulfilled") {
     reading.weather = currentWeather(wind.value, nowKey);
-    reading.weatherDays = wind.value.days.filter(
-      (d) => d.date > nowKey.slice(0, 10),
+    const series = wind.value;
+    reading.weatherDays = series.days.filter(
+      (d) => d.date >= nowKey.slice(0, 10),
     );
+    // Ramalan per jam: cuaca dan angin permukaan bagi setiap jam akan datang.
+    reading.hourly = reading.hourly?.map((h) => {
+      const i = series.times.indexOf(h.time);
+      if (i < 0) return h;
+      const temp = series.temperature[i];
+      const speed = series.windSpeed10[i];
+      return {
+        ...h,
+        temperature: temp === null ? null : Math.round(temp),
+        code: series.code[i],
+        isDay: series.isDay[i] === 1,
+        windSpeed: speed === null ? null : Math.round(speed),
+        windDir: series.windDir10[i],
+      };
+    });
   }
   reading.state =
     stations.status === "fulfilled"
