@@ -1,5 +1,5 @@
 import { getDailyIndex } from "@/lib/data";
-import { HEATMAP_DAYS, firstDate, stationHistory } from "@/lib/history";
+import { HISTORY_FETCH_DAYS, firstDate, stationHistory } from "@/lib/history";
 import { localHourKey } from "@/lib/reading";
 
 /** GET /api/history?station=CA17W — ringkasan IPU harian stesen APIMS untuk heatmap. */
@@ -24,7 +24,7 @@ export async function GET(request: Request) {
       station,
       today,
       first: firstDate(index, station),
-      days: stationHistory(index, station, today, HEATMAP_DAYS),
+      days: stationHistory(index, station, today, HISTORY_FETCH_DAYS),
     },
     {
       headers: {

@@ -274,7 +274,7 @@ const EN: Record<string, string> = {
   "Tentang ramalan per jam": "About the hourly forecast",
   "Tentang ramalan harian": "About the daily forecast",
   "Tentang graf hari ini": "About today's chart",
-  "Tentang sejarah 12 minggu": "About the 12-week history",
+  "Tentang sejarah {n} minggu": "About the {n}-week history",
   "Pil berwarna ialah ramalan IPU bagi jam itu":
     "The coloured pill is the forecast API for that hour",
   "Ikon cuaca dan suhu daripada Open-Meteo":
@@ -468,12 +468,12 @@ const EN: Record<string, string> = {
   "Jam akan datang: ramalan model": "Coming hours: model forecast",
   ramalan: "forecast",
   Kini: "Now",
-  "Sejarah 12 minggu": "12-week history",
+  "Sejarah {n} minggu": "{n}-week history",
   "IPU maks harian · Stesen {station}": "Daily max API · {station} station",
   Isn: "Mon",
   Rab: "Wed",
   Jum: "Fri",
-  "Heatmap IPU harian, 12 minggu": "Daily API heatmap, 12 weeks",
+  "Heatmap IPU harian, {n} minggu": "Daily API heatmap, {n} weeks",
   "maks {max}, {label}": "max {max}, {label}",
   "(setakat ini)": "(so far)",
   Maks: "Max",

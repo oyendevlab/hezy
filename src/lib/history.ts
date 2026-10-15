@@ -23,8 +23,11 @@ export type DailyIndex = {
 /** Bilangan hari disimpan dalam indeks harian (~13 bulan). */
 export const KEEP_DAYS = 400;
 
-/** Bilangan hari untuk heatmap (12 minggu). */
+/** Bilangan hari minimum untuk heatmap (12 minggu, saiz telefon). */
 export const HEATMAP_DAYS = 84;
+
+/** Hari yang dihantar API: skrin lebar memaparkan lebih banyak minggu (hingga 26). */
+export const HISTORY_FETCH_DAYS = 182;
 
 /** Hari untuk heatmap: tarikh dan ringkasan (atau tiada data). */
 export type HistoryDay = {

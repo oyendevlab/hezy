@@ -142,6 +142,11 @@ Buka **https://hezy.my** pada telefon.
 - [ ] Buka Trend selepas lama tidak dibuka → Ramalan per jam memaparkan rangka kelabu dahulu, tanpa menolak bahagian lain
 - [ ] Sejarah 12 minggu: kotak kecil berwarna ikut tahap (lebih pekat = lebih tinggi); ketik kotak → kad "Khamis / 15 Oktober 2026", Maks dan Purata
 
+## Ciri baharu v0.7.6
+
+- [ ] Trend → Sejarah 12 minggu: kotak memenuhi lebar hingga tepi kanan (sama lebar dengan kad hari), kekal segi empat sama
+- [ ] Di tablet/desktop: lebih banyak minggu dipaparkan dan tajuk berubah (contoh "Sejarah 20 minggu")
+
 ## Jika ada masalah
 
 Ambil tangkapan skrin dan catat model telefon serta versi OS, kemudian buka isu di
