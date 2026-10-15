@@ -68,6 +68,7 @@ export function fakeReading(official: Record<string, unknown> | null = null) {
       rainChance: i === 0 ? 90 : 20,
       windMax: 8 + i,
       windDir: 135,
+      humidity: 80 - i,
     })),
   };
 }

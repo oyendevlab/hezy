@@ -135,6 +135,13 @@ Buka **https://hezy.my** pada telefon.
 - [ ] Trend: "Ramalan per jam" boleh dileret — IPU, ikon cuaca, suhu dan angin bagi 24 jam
 - [ ] Trend: "Ramalan harian" — togol 3 hari / 5 hari; ketik baris → puncak IPU
 
+## Ciri baharu v0.7.5
+
+- [ ] Trend → Ramalan harian: setiap hari baris berasingan; kepala lajur berikon; kelembapan dipaparkan
+- [ ] Ketik ⓘ di sebelah tajuk (Hari ini, Ramalan per jam, Ramalan harian, Sejarah) → helaian penerangan berikon
+- [ ] Buka Trend selepas lama tidak dibuka → Ramalan per jam memaparkan rangka kelabu dahulu, tanpa menolak bahagian lain
+- [ ] Sejarah 12 minggu: kotak kecil berwarna ikut tahap (lebih pekat = lebih tinggi); ketik kotak → kad "Khamis / 15 Oktober 2026", Maks dan Purata
+
 ## Jika ada masalah
 
 Ambil tangkapan skrin dan catat model telefon serta versi OS, kemudian buka isu di

@@ -270,6 +270,43 @@ const EN: Record<string, string> = {
   "Sentiasa dipaparkan untuk profil Kanak-kanak. Termasuk notifikasi bila bacaan kekal tinggi (bila amaran hidup).":
     "Always shown for the Children profile. Includes a notification when readings stay high (when alerts are on).",
   "Sumber bacaan": "Reading source",
+  // Trend (v0.7.5)
+  "Tentang ramalan per jam": "About the hourly forecast",
+  "Tentang ramalan harian": "About the daily forecast",
+  "Tentang graf hari ini": "About today's chart",
+  "Tentang sejarah 12 minggu": "About the 12-week history",
+  "Pil berwarna ialah ramalan IPU bagi jam itu":
+    "The coloured pill is the forecast API for that hour",
+  "Ikon cuaca dan suhu daripada Open-Meteo":
+    "Weather icon and temperature from Open-Meteo",
+  "Angin permukaan dalam km/j": "Surface wind in km/h",
+  "Anak panah menunjukkan arah angin bertiup":
+    "Arrows show where the wind blows",
+  "Ramalan per jam tidak tersedia buat masa ini.":
+    "The hourly forecast is not available right now.",
+  "Nombor ialah purata IPU hari itu; ketik baris untuk lihat puncak":
+    "The number is the day's average API; tap a row to see the peak",
+  "Ramalan model CAMS (Open-Meteo), hingga 5 hari":
+    "CAMS model forecast (Open-Meteo), up to 5 days",
+  "Peluang hujan tertinggi hari itu": "Highest chance of rain that day",
+  "Suhu maksimum / minimum": "Maximum / minimum temperature",
+  "Purata kelembapan udara": "Average humidity",
+  "Angin permukaan tertinggi (km/j) dan arahnya":
+    "Strongest surface wind (km/h) and its direction",
+  "purata IPU {ipu}": "average API {ipu}",
+  "hujan {n}%": "rain {n}%",
+  "kelembapan {n}%": "humidity {n}%",
+  "angin {n} km/j": "wind {n} km/h",
+  "Bar pekat: bacaan jam lepas (rasmi APIMS jika ada). Bar pudar: ramalan.":
+    "Solid bars: past hours (official APIMS when available). Faded bars: forecast.",
+  "Tekan dan seret graf untuk melihat jam lain":
+    "Press and drag the chart to see other hours",
+  "Setiap kotak ialah IPU maksimum satu hari di stesen APIMS terdekat":
+    "Each square is one day's maximum API at the nearest APIMS station",
+  "Warna ikut kategori APIMS (JAS); lebih pekat bila IPU lebih tinggi dalam kategori itu. IPU melebihi 500 ialah tahap Kecemasan.":
+    "Colours follow the APIMS (DOE) categories; deeper when the API is higher within that category. An API above 500 is an Emergency.",
+  "Purata {avg}": "Average {avg}",
+  "Petunjuk warna: Baik hingga Berbahaya": "Colour key: Good to Hazardous",
   // Trend (v0.7.4)
   "Lepas (rasmi)": "Past (official)",
   "Lepas (anggaran)": "Past (estimate)",

@@ -213,6 +213,29 @@ test.describe("aliran utama", () => {
     await daily.getByRole("button", { name: /Esok/ }).click();
     await expect(daily).toContainText("Puncak ~150 · Tidak Sihat");
     await expect(page.getByText("PURATA RAMALAN HARI INI")).toBeVisible();
+    // Kelembapan dan ⓘ ramalan harian.
+    await expect(daily).toContainText("%");
+    await page.getByRole("button", { name: "Tentang ramalan harian" }).click();
+    await expect(page.getByTestId("info-daily")).toContainText(
+      "Purata kelembapan udara",
+    );
+  });
+
+  test("ramalan per jam: rangka semasa bacaan lama (tanpa data per jam)", async ({
+    page,
+  }) => {
+    await seedLocation(page);
+    const reading = fakeReading();
+    // Bacaan versi lama dalam cache: tiada `hourly` atau `weatherDays`.
+    const { hourly: _h, weatherDays: _w, ...old } = reading;
+    await page.route("**/api/aqi?**", (route) => route.fulfill({ json: old }));
+    await page.goto("/trend");
+    const strip = page.getByTestId("hourly-strip");
+    await expect(strip).toHaveAttribute("data-state", "loading");
+    await expect(strip.locator("li")).toHaveCount(6);
+    await expect(
+      page.getByRole("heading", { name: "Ramalan per jam" }),
+    ).toBeVisible();
   });
 
   test("graf trend boleh dileret dan dikawal dengan papan kekunci", async ({
@@ -1673,9 +1696,13 @@ test.describe("trend rasmi APIMS", () => {
         .getByTestId("hour-legend")
         .getByTitle("Ramalan dibetulkan dengan bacaan APIMS"),
     ).toBeVisible();
-    await expect(
-      page.getByText(/dibetulkan dengan bacaan itu: \+80/),
-    ).toBeVisible();
+    // Penerangan kaedah kini dalam helaian ⓘ "Hari ini".
+    await page.getByRole("button", { name: "Tentang graf hari ini" }).click();
+    await expect(page.getByTestId("info-today")).toContainText(
+      /dibetulkan dengan bacaan itu: \+80/,
+    );
+    await page.keyboard.press("Escape");
+    await expect(page.getByTestId("info-today")).toHaveCount(0);
     const chart = page.getByRole("slider", {
       name: "Graf IPU hari ini, jam demi jam",
     });
@@ -1703,13 +1730,18 @@ test.describe("trend rasmi APIMS", () => {
     // Lalai: hari ini.
     const today = grid.getByRole("button", { name: /^Isn 12 Okt/ });
     await expect(today).toHaveAttribute("aria-pressed", "true");
-    await expect(page.getByText("Isn 12 Okt (setakat ini)")).toBeVisible();
-    await expect(page.getByText("Purata 133 · 13 jam data")).toBeVisible();
+    // Kad butiran: hari penuh, tarikh penuh di bawah, maks dan purata di kanan.
+    const detail = page.getByTestId("history-day");
+    await expect(detail).toContainText("Isnin");
+    await expect(detail).toContainText("12 Oktober 2026 (setakat ini)");
+    await expect(detail).toContainText("Purata 133");
+    await expect(detail).not.toContainText("jam data");
 
     await grid
       .getByRole("button", { name: "Jum 9 Okt: maks 99, Sederhana" })
       .click();
-    await expect(page.getByText("Purata 79 · 24 jam data")).toBeVisible();
+    await expect(detail).toContainText("Jumaat");
+    await expect(detail).toContainText("Purata 79");
 
     // Papan kekunci: anak panah ke atas = hari sebelumnya.
     await page.keyboard.press("ArrowUp");
@@ -1718,11 +1750,15 @@ test.describe("trend rasmi APIMS", () => {
     ).toBeFocused();
 
     await expect(
-      page.getByRole("list", { name: "Petunjuk warna (kategori IPU APIMS)" }),
-    ).toContainText("Sangat Tidak Sihat 201–300");
-    await expect(
-      page.getByText("Data dikumpul sejak Sel 6 Okt (7 hari)."),
+      page.getByRole("img", { name: "Petunjuk warna: Baik hingga Berbahaya" }),
     ).toBeVisible();
+    await page
+      .getByRole("button", { name: "Tentang sejarah 12 minggu" })
+      .click();
+    await expect(page.getByTestId("info-history")).toContainText(
+      "Data dikumpul sejak Sel 6 Okt (7 hari).",
+    );
+    await page.keyboard.press("Escape");
     const results = await new AxeBuilder({ page })
       .include("#sejarah-ipu")
       .include('[aria-labelledby="sejarah-ipu"]')

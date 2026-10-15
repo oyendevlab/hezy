@@ -123,3 +123,59 @@ export function formatShortDate(date: string, lang: Lang = "ms"): string {
   const d = new Date(`${date}T00:00:00Z`);
   return `${DAY_NAMES[lang][d.getUTCDay()]} ${d.getUTCDate()} ${formatMonth(date, lang)}`;
 }
+
+const DAY_NAMES_LONG: Record<Lang, string[]> = {
+  ms: ["Ahad", "Isnin", "Selasa", "Rabu", "Khamis", "Jumaat", "Sabtu"],
+  en: [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ],
+};
+
+const MONTH_NAMES_LONG: Record<Lang, string[]> = {
+  ms: [
+    "Januari",
+    "Februari",
+    "Mac",
+    "April",
+    "Mei",
+    "Jun",
+    "Julai",
+    "Ogos",
+    "September",
+    "Oktober",
+    "November",
+    "Disember",
+  ],
+  en: [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ],
+};
+
+/** "2026-10-15" → { weekday: "Khamis", date: "15 Oktober 2026" } (v0.7.5). */
+export function formatLongDate(
+  date: string,
+  lang: Lang = "ms",
+): { weekday: string; date: string } {
+  const d = new Date(`${date}T00:00:00Z`);
+  return {
+    weekday: DAY_NAMES_LONG[lang][d.getUTCDay()],
+    date: `${d.getUTCDate()} ${MONTH_NAMES_LONG[lang][d.getUTCMonth()]} ${d.getUTCFullYear()}`,
+  };
+}

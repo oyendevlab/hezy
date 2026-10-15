@@ -492,3 +492,12 @@ Mulakan polish paparan satu demi satu (siri v0.8.0).
 4. ✅ **Ramalan harian** ala iqAir dengan togol 3 / 5 hari (purata IPU, % hujan, suhu maks/min, angin; ketik untuk puncak); menggantikan "Ramalan 3 hari"
 5. ✅ Data: ramalan kualiti udara dan cuaca 5 hari; angin 10 m sejam, kebarangkalian hujan harian, angin harian
 6. ✅ Versi 0.7.4, `UJIAN-TELEFON.md`, tag dan GitHub Release
+
+## Fasa 20 — v0.7.5 (Trend kemas; disahkan 15 Okt 2026)
+
+1. ✅ Ramalan harian: setiap hari dalam baris lutsinar sendiri; kepala lajur berikon (IPU · hujan · suhu · kelembapan · angin); kelembapan purata harian ditambah
+2. ✅ Teks penerangan dibuang; ⓘ di sebelah tajuk (Hari ini, Ramalan per jam, Ramalan harian, Sejarah 12 minggu) membuka helaian berikon
+3. ✅ Rangka (skeleton) untuk Ramalan per jam dan sel cuaca harian bila bacaan dalam cache belum ada data baharu; ketinggian tetap supaya tiada anjakan
+4. ✅ Heatmap: kotak 18 px, warna kategori dengan keamatan ikut nilai, legenda jalur satu baris
+5. ✅ Kad butiran hari: hari penuh ("Khamis"), tarikh penuh di bawah, Maks + tahap dan Purata di kanan ("jam data" dibuang)
+6. ✅ Versi 0.7.5, `UJIAN-TELEFON.md`, tag dan GitHub Release

@@ -29,6 +29,7 @@ const RAW = {
     precipitation_probability_max: [90, 40],
     wind_speed_10m_max: [8.4, 12.6],
     wind_direction_10m_dominant: [135, 180],
+    relative_humidity_2m_mean: [82.4, 77.6],
   },
 };
 
@@ -44,6 +45,7 @@ describe("parseWeather dan currentWeather", () => {
         rainChance: 90,
         windMax: 8,
         windDir: 135,
+        humidity: 82,
       },
       {
         date: "2026-10-13",
@@ -53,6 +55,7 @@ describe("parseWeather dan currentWeather", () => {
         rainChance: 40,
         windMax: 13,
         windDir: 180,
+        humidity: 78,
       },
     ]);
     expect(currentWeather(s, "2026-10-12T16:00")).toEqual({
