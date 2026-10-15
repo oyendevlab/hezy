@@ -502,7 +502,14 @@ Mulakan polish paparan satu demi satu (siri v0.8.0).
 5. ✅ Kad butiran hari: hari penuh ("Khamis"), tarikh penuh di bawah, Maks + tahap dan Purata di kanan ("jam data" dibuang)
 6. ✅ Versi 0.7.5, `UJIAN-TELEFON.md`, tag dan GitHub Release
 
-## Fasa 21 — v0.7.7 (polish Lokasi; disahkan 15 Okt 2026)
+## Fasa 21 — v0.7.6 (heatmap penuh; disahkan 15 Okt 2026)
+
+1. ✅ Heatmap Sejarah memenuhi lebar: kotak segi empat sama, saiz dikira daripada lebar sebenar (ResizeObserver) supaya grid sampai ke tepi kanan, sama lebar dengan kad hari
+2. ✅ Telefon: 12 minggu (~21 px sekotak); skrin lebar: minggu ditambah hingga kotak ≤ 28 px, tajuk ikut bilangan minggu (cth. "Sejarah 20 minggu")
+3. ✅ `/api/history` menghantar 182 hari (`HISTORY_FETCH_DAYS`) untuk skrin lebar
+4. ✅ Versi 0.7.6, `UJIAN-TELEFON.md`, tag dan GitHub Release
+
+## Fasa 22 — v0.7.7 (polish Lokasi; disahkan 15 Okt 2026)
 
 Mockup: https://claude.ai/artifact/3R4rdhx2k8QwRwKkuH6zr6. Peta kekal OpenStreetMap.
 
