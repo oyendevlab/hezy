@@ -1,7 +1,14 @@
 "use client";
 
 import { shownError } from "@/lib/accuracy";
-import { Moon, Sun, SunHorizon } from "@phosphor-icons/react";
+import {
+  ChartBar,
+  HandPointing,
+  Moon,
+  Sliders,
+  Sun,
+  SunHorizon,
+} from "@phosphor-icons/react";
 import { CATEGORY_STYLE } from "@/lib/category-style";
 import { formatWindow } from "@/lib/format";
 import { ipuCategory } from "@/lib/ipu";
@@ -10,6 +17,7 @@ import type { HourPoint, Reading } from "@/lib/reading";
 import { useI18n } from "@/lib/use-i18n";
 import { HourBars } from "./hour-bars";
 import { DailyForecast, HourlyStrip } from "./forecast-lists";
+import { InfoSheetButton } from "./info-sheet";
 
 function average(hours: HourPoint[], from: number, to: number): number | null {
   const values = hours
@@ -95,7 +103,38 @@ export function TrendPanel({
 
       <div>
         <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="font-display text-xl font-bold">{t("Hari ini")}</h2>
+          <div className="flex items-center gap-1">
+            <h2 className="font-display text-xl font-bold">{t("Hari ini")}</h2>
+            <InfoSheetButton
+              title={t("Hari ini")}
+              label={t("Tentang graf hari ini")}
+              testId="info-today"
+              rows={[
+                {
+                  icon: ChartBar,
+                  text: "Bar pekat: bacaan jam lepas (rasmi APIMS jika ada). Bar pudar: ramalan.",
+                },
+                {
+                  icon: HandPointing,
+                  text: "Tekan dan seret graf untuk melihat jam lain",
+                },
+                {
+                  icon: Sliders,
+                  text: reading.correction
+                    ? t(
+                        "Jam lepas menggunakan bacaan rasmi APIMS stesen {station}. Ramalan model (PM2.5, formula JAS) dibetulkan dengan bacaan itu: {offset} µg/m³ pada jam semasa, berkurang ke model dalam 48 jam.",
+                        {
+                          station: reading.official?.stationName ?? "terdekat",
+                          offset: `${reading.correction.offsetPm25 >= 0 ? "+" : ""}${Math.round(reading.correction.offsetPm25)}`,
+                        },
+                      )
+                    : t(
+                        "Jam lepas dan purata menggunakan bacaan rasmi APIMS stesen terdekat jika ada. Ramalan dan masa terbaik menggunakan IPU sejam daripada PM2.5 model (formula JAS).",
+                      ),
+                },
+              ]}
+            />
+          </div>
         </div>
         <div className="mt-3">
           <HourBars
@@ -146,28 +185,15 @@ export function TrendPanel({
         </div>
       </section>
 
-      <HourlyStrip hours={reading.hourly ?? []} />
+      {/* Tiada = bacaan lama dalam cache (dimuatkan semula): rangka, bukan bahagian yang hilang. */}
+      <HourlyStrip hours={reading.hourly} />
 
       <DailyForecast
         todayDate={todayDate}
         today={todaySummary}
         days={days}
-        weatherDays={reading.weatherDays ?? []}
+        weatherDays={reading.weatherDays}
       />
-
-      <p className="text-muted text-xs">
-        {reading.correction
-          ? t(
-              "Jam lepas menggunakan bacaan rasmi APIMS stesen {station}. Ramalan model (PM2.5, formula JAS) dibetulkan dengan bacaan itu: {offset} µg/m³ pada jam semasa, berkurang ke model dalam 48 jam.",
-              {
-                station: reading.official?.stationName ?? "terdekat",
-                offset: `${reading.correction.offsetPm25 >= 0 ? "+" : ""}${Math.round(reading.correction.offsetPm25)}`,
-              },
-            )
-          : t(
-              "Jam lepas dan purata menggunakan bacaan rasmi APIMS stesen terdekat jika ada. Ramalan dan masa terbaik menggunakan IPU sejam daripada PM2.5 model (formula JAS).",
-            )}
-      </p>
     </div>
   );
 }

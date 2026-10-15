@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  formatLongDate,
   formatShortDate,
   formatChange,
   formatClock,
@@ -83,5 +84,18 @@ describe("formatShortDate", () => {
   it("memaparkan hari, tarikh dan bulan", () => {
     expect(formatShortDate("2026-10-12")).toBe("Isn 12 Okt");
     expect(formatShortDate("2026-08-02", "en")).toBe("Sun 2 Aug");
+  });
+});
+
+describe("formatLongDate", () => {
+  it("hari dan tarikh penuh dalam BM dan EN", () => {
+    expect(formatLongDate("2026-10-15")).toEqual({
+      weekday: "Khamis",
+      date: "15 Oktober 2026",
+    });
+    expect(formatLongDate("2026-08-02", "en")).toEqual({
+      weekday: "Sunday",
+      date: "2 August 2026",
+    });
   });
 });

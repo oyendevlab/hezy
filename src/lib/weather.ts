@@ -33,6 +33,8 @@ export type DayWeather = {
   /** Angin permukaan maksimum (km/j) dan arah dominan (darjah datang). */
   windMax?: number | null;
   windDir?: number | null;
+  /** Purata kelembapan relatif hari itu (%), v0.7.5. */
+  humidity?: number | null;
 };
 
 export type CurrentWeather = {
@@ -57,7 +59,7 @@ export function weatherUrl(lat: number, lon: number): string {
     hourly:
       "wind_speed_850hPa,wind_direction_850hPa,cloud_cover,visibility,temperature_2m,weather_code,is_day,precipitation,wind_speed_10m,wind_direction_10m",
     daily:
-      "sunrise,sunset,weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max,wind_direction_10m_dominant",
+      "sunrise,sunset,weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max,wind_direction_10m_dominant,relative_humidity_2m_mean",
     wind_speed_unit: "kmh",
     timezone: "Asia/Kuala_Lumpur",
     past_days: "1",
@@ -105,6 +107,7 @@ export function parseWeather(json: unknown): WeatherSeries {
     if (code !== null && max !== null && min !== null) {
       const rain = num(dCol("precipitation_probability_max")[i]);
       const windMax = num(dCol("wind_speed_10m_max")[i]);
+      const humidity = num(dCol("relative_humidity_2m_mean")[i]);
       days.push({
         date,
         code,
@@ -113,6 +116,7 @@ export function parseWeather(json: unknown): WeatherSeries {
         rainChance: rain === null ? null : Math.round(rain),
         windMax: windMax === null ? null : Math.round(windMax),
         windDir: num(dCol("wind_direction_10m_dominant")[i]),
+        humidity: humidity === null ? null : Math.round(humidity),
       });
     }
     const rise = dCol("sunrise")[i];
