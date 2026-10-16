@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { jasAnchor, jasForecast } from "./forecast-jas";
+import { JAS_DECAY_HOURS, jasAnchor, jasForecast } from "./forecast-jas";
 import { pm25ToIpu } from "./ipu";
 
 /** Siri sejam bermula 14 Okt 2026 00:00 waktu Malaysia. */
@@ -55,11 +55,21 @@ describe("jasForecast (model E)", () => {
     expect(ipu[i + 1]).toBeGreaterThan(145);
   });
 
-  it("kembali kepada model selepas offset reput (72 jam + tetingkap 24 jam)", () => {
-    const { times, pm25 } = series(168, () => 40);
+  it("kembali kepada model selepas offset reput (168 jam + tetingkap 24 jam)", () => {
+    const { times, pm25 } = series(300, () => 40);
     const { ipu } = jasForecast(times, pm25, HISTORY, NOW_KEY);
     const i = at(times, "2026-10-16T12:00");
-    expect(ipu[i + 100]).toBe(pm25ToIpu(40));
+    expect(ipu[i + JAS_DECAY_HOURS + 24]).toBe(pm25ToIpu(40));
+  });
+
+  it("pembetulan masih bertahan pada hari ke-3 hingga ke-5 (v0.8.8)", () => {
+    const { times, pm25 } = series(300, () => 40);
+    const { ipu } = jasForecast(times, pm25, HISTORY, NOW_KEY);
+    const i = at(times, "2026-10-16T12:00");
+    // Asas 150, model mentah ~73: pada 72 jam masih hampir separuh jalan, bukan model mentah.
+    expect(ipu[i + 72]).toBeGreaterThan(110);
+    expect(ipu[i + 120]).toBeGreaterThan(90);
+    expect(ipu[i + 120]).toBeLessThan(ipu[i + 72] as number);
   });
 
   it("tanpa bacaan rasmi: purata 24 jam model mentah", () => {

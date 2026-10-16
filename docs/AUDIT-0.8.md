@@ -47,7 +47,7 @@ Pembetulan v0.8.0 membandingkan IPU rasmi (purata PM2.5 **24 jam**) dengan PM2.5
 | **Cadangan E**                      | **4.1 / 96%** | **15.4 / 84%** | **24.2 / 80%** | **29.8 / 75%** |
 | Pengurangan ralat berbanding v0.8.0 | −61%          | −37%           | −26%           | −24%           |
 
-**Cadangan E:** (1) offset supaya purata 24 jam model sama dengan IPU rasmi terakhir; (2) ramal IPU sebagai purata bergerak 24 jam (unit JAS) — ramalan bermula tepat pada nombor rasmi dan berubah lancar; (3) campur dengan bacaan rasmi terakhir, berat e^(−jam/12).
+**Cadangan E:** (1) offset supaya purata 24 jam model sama dengan IPU rasmi terakhir; (2) ramal IPU sebagai purata bergerak 24 jam (unit JAS) — ramalan bermula tepat pada nombor rasmi dan berubah lancar; (3) campur dengan bacaan rasmi terakhir, berat e^(−jam/12). Offset reput ke 0 dalam 72 jam pada asalnya; sejak v0.8.8 dalam 168 jam (backtest: hari ke-3–5 MAE 25–30 berbanding 30–43).
 
 Kaveat: data model lepas ialah analisis terbaik Open-Meteo (bukan ramalan sebenar pada masa itu) dan minggu ini musim jerebu. Oleh itu kaedah baharu dijalankan dahulu dalam **mod bayang** (disimpan bersama ramalan lama dalam saluran ketepatan malam sedia ada) selama 7–14 hari sebelum ditukar.
 

@@ -13,6 +13,15 @@ export type Release = {
 
 export const CHANGELOG: readonly Release[] = [
   {
+    version: "0.8.8",
+    date: "2026-10-17",
+    title: "Ramalan beberapa hari lebih tepat",
+    items: [
+      "Pembetulan dengan bacaan rasmi kini bertahan hingga 7 hari, bukan 3",
+      "Ramalan hari ke-3 hingga ke-5 tidak lagi jatuh terlalu rendah semasa jerebu",
+    ],
+  },
+  {
     version: "0.8.7",
     date: "2026-10-17",
     title: "Graf dan ramalan per jam sepadan dengan bacaan rasmi",

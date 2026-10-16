@@ -5,21 +5,24 @@
  * (kaedah v0.8.0 meramal IPU sejam yang turun naik mengikut kitaran harian):
  * 1. Offset PM2.5 supaya purata 24 jam model pada jam rasmi terakhir sama dengan IPU rasmi.
  *    Offset dikenakan pada semua jam sehingga jam itu, jadi tetingkap 24 jam tidak bias.
- * 2. Selepas jam itu offset berkurang secara linear ke 0 dalam 72 jam; model tidak dibiar
+ * 2. Selepas jam itu offset berkurang secara linear ke 0 dalam 168 jam (7 hari, v0.8.8; dahulu
+ *    72 jam sehingga ramalan hari ke-3–5 jatuh kepada model mentah yang bias); model tidak dibiar
  *    jatuh di bawah 30% nilai asalnya bila offset negatif.
  * 3. IPU = purata bergerak 24 jam PM2.5 yang dibetulkan (bermula tepat pada nombor rasmi).
  * 4. Dicampur dengan bacaan rasmi terakhir, berat e^(−jam/12): IPU rasmi berubah perlahan.
  * Tanpa bacaan rasmi yang baru: purata 24 jam model mentah.
  *
  * Backtest 7 hari, 68 stesen (MAE IPU): 4.1 / 15.4 / 24.2 / 29.8 bagi 1–6 / 7–24 / 25–48 /
- * 49–72 jam, berbanding 10.6 / 24.3 / 32.7 / 39.3 untuk kaedah v0.8.0.
+ * 49–72 jam, berbanding 10.6 / 24.3 / 32.7 / 39.3 untuk kaedah v0.8.0. Reput 168 jam (v0.8.8):
+ * 23.4 / 25.3 / 26.7 / 30.2 bagi 25–48 / 49–72 / 73–96 / 97–120 jam, berbanding 24.2 / 29.8 /
+ * 36.8 / 42.8 dengan reput 72 jam; jam awal tidak berubah.
  */
 
 import type { HourlyOfficial } from "./apims";
 import { MAX_OFFSET } from "./forecast-correction";
 import { ipuToPm25, pm25ToIpu, rolling24hAverage } from "./ipu";
 
-export const JAS_DECAY_HOURS = 72;
+export const JAS_DECAY_HOURS = 168;
 export const JAS_PERSISTENCE_TAU_HOURS = 12;
 export const JAS_MODEL_FLOOR = 0.3;
 /** Bacaan rasmi lebih lama daripada ini (jam) tidak dijadikan asas. */

@@ -7,7 +7,7 @@
  * 2. Purata berwajaran jarak (IDW, w = 1/d², d ≥ 5 km) bagi ≤ 5 stesen dalam 150 km.
  * 3. Dipudarkan secara linear ke 0 pada 200 km dari stesen terdekat.
  * 4. Siri model dibetulkan sebelum bacaan dibina; selepas jam bias, pembetulan reput ke 0
- *    dalam 72 jam (seperti model E); model tidak dibiar jatuh di bawah 30%.
+ *    dalam 168 jam (seperti model E sejak v0.8.8); model tidak dibiar jatuh di bawah 30%.
  * Backtest tinggal-satu-keluar (7 hari, 68 stesen): ralat 26–42 → 10–18 IPU.
  */
 
@@ -19,7 +19,7 @@ export const SPATIAL_MAX_STATIONS = 5;
 export const SPATIAL_MAX_KM = 150;
 export const SPATIAL_FADE_KM = 200;
 export const SPATIAL_MIN_KM = 5;
-export const SPATIAL_DECAY_HOURS = 72;
+export const SPATIAL_DECAY_HOURS = 168;
 export const SPATIAL_MODEL_FLOOR = 0.3;
 /** Bacaan rasmi lebih lama daripada ini (jam) tidak digunakan. */
 export const SPATIAL_MAX_AGE_HOURS = 3;

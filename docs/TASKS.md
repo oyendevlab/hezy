@@ -678,3 +678,20 @@ Laporan pengguna 17 Okt 2026: graf Trend 160 tetapi ramalan per jam "Kini" 155. 
 4. ✅ Label "Ramalan dibetulkan" ikut asas model E (atau bias stesen berdekatan); teks ⓘ graf dan ramalan per jam dikemas kini (BM/EN)
 5. ✅ Legenda graf dan Tetapan memaparkan ralat model E (`forecastJas`, selepas ≥ 3 hari data), bukan ralat kaedah lama
 6. ✅ Ujian (311 unit, 190 E2E), versi 0.8.7, Apa yang baharu (BM/EN), tag dan GitHub Release; data sebenar 05:28: KL graf 160 = Kini 160 (dahulu Kini 151 untuk 6 AM), Melaka 171 = 171, Mersing 92 = 92, Lawas 54 = 54; mod bayang diteruskan untuk rekod
+
+## Fasa 39 — v0.8.8 (pembetulan model E bertahan 7 hari; 17 Okt 2026)
+
+Soalan pengguna 17 Okt 2026: adakah ramalan per jam dan harian guna data yang sama dan tepat? Ya — kedua-duanya model E. Tetapi hari ke-3 hingga ke-5 cenderung terlalu rendah: contoh KL 06:53, rasmi 160, Hezy 141 → 102 → 93 → 88, manakala model CAMS mentah ~77–88 setiap hari (tidak meramal pemulihan, cuma bias rendah). Penurunan itu datang daripada pembetulan yang hilang sepenuhnya dalam 72 jam.
+
+Backtest (7 hari, 68 stesen; MAE / % tahap betul):
+
+| Reput         | 1–24 j     | 25–48 j    | 49–72 j    | 73–96 j    | 97–120 j   |
+| ------------- | ---------- | ---------- | ---------- | ---------- | ---------- |
+| 72 j (v0.8.7) | 12.4 / 87% | 24.2 / 80% | 29.8 / 75% | 36.8 / 69% | 42.8 / 68% |
+| **168 j**     | 12.4 / 87% | 23.4 / 78% | 25.3 / 79% | 26.7 / 80% | 30.2 / 81% |
+
+1. ✅ `JAS_DECAY_HOURS` 72 → 168 (`forecast-jas.ts`); `SPATIAL_DECAY_HOURS` 72 → 168 (`spatial-bias.ts`) supaya kawasan tanpa stesen konsisten
+2. ✅ Ujian dikemas kini (kembali ke model selepas 168 + 24 jam; reput bias ruang)
+3. ✅ Dokumen kaedah (komen kod, AUDIT-0.8.md) dikemas kini
+4. ✅ Semakan data sebenar (06:57; purata harian Esok → hari ke-4): KL 141→102→93→88 menjadi 154→133→135→123, Melaka 135→88→70→73 menjadi 149→116→106→107, Mersing 83→74→67→67 menjadi 88→85→84→84; jam awal tidak berubah. Versi 0.8.8, Apa yang baharu (BM/EN), tag dan GitHub Release
+5. ⬜ Pantau: perbandingan malam `forecastJas`; kaveat — bila jerebu reda dengan cepat, reput perlahan boleh terlebih anggar (backtest hanya satu minggu musim jerebu)
