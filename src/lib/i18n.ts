@@ -977,6 +977,11 @@ const EN: Record<string, string> = {
   "Kad kongsi IPU lebih kemas": "Tidier API share card",
   "Masa AM/PM yang seragam": "Consistent AM/PM times",
   "Masa AM/PM dan kad kongsi": "AM/PM times and share card",
+  "Hezy 0.8: semua paparan dipolish": "Hezy 0.8: every screen polished",
+  "Utama, Trend, Lokasi dan Tetapan direka semula":
+    "Home, Trend, Locations and Settings redesigned",
+  "Ikon baharu, notifikasi lebih ringkas, kad kongsi lebih kemas":
+    "New icon, simpler notifications, tidier share card",
 };
 
 /** Corak untuk teks yang disimpan dengan nama tempat, cth. nama lokasi GPS. */

@@ -212,6 +212,12 @@ Buka **https://hezy.my** pada telefon.
 - [ ] Kongsi gambar: Hezy tebal, masa dijana di kanan atas; bendera + nama di kiri; IPU, tahap, APIMS (JAS), Bacaan … di kanan
 - [ ] Graf kad: "Bacaan IPU per jam" dengan legenda Rasmi · Ramalan · Kini dan garis putus jam semasa
 
+## v0.8.0 — semakan akhir siri polish
+
+- [ ] Lalui semua bahagian v0.7.1–v0.7.15 di atas pada iPhone (PWA) dan Android
+- [ ] Pasang semula Hezy untuk ikon baharu; semak skrin pembuka terang dan gelap
+- [ ] Mod gelap: Utama, Trend, Lokasi, Tetapan, helaian
+
 ## Jika ada masalah
 
 Ambil tangkapan skrin dan catat model telefon serta versi OS, kemudian buka isu di

@@ -583,3 +583,16 @@ Mockup: https://claude.ai/artifact/K2kQkrY8zYtUjBwb9AVE4J (papan kiri).
 3. ✅ Graf kad: "Bacaan IPU per jam", legenda Rasmi/Ramalan/Kini, garis putus jam semasa
 4. ✅ Fon Plus Jakarta Sans (OFL) untuk imej next/og (`public/fonts`, `og-fonts.ts`) — huruf tebal kini dirender
 5. ✅ Versi 0.7.15, Apa yang baharu, tag dan GitHub Release
+
+## Fasa 31 — v0.8.0 (siri polish paparan siap; 16 Okt 2026)
+
+Penanda siri polish v0.7.1–v0.7.15:
+
+- **Utama** (0.7.1–0.7.3): langit penuh hingga bar status, ayat nasihat ikut konteks, kad elastik, helaian bersama, status sekolah ringkas
+- **Trend** (0.7.4–0.7.6): ramalan per jam dan harian, ⓘ, rangka muat, heatmap penuh
+- **Lokasi** (0.7.7): butang Lapisan, skrin penuh, helaian carian, bar navigasi iOS
+- **Tetapan** (0.7.8–0.7.14): notifikasi dan amaran, nombor pada ikon, kad Tentang, kredit, penafian, warna suis
+- **Identiti** (0.7.12, 0.7.15): ikon awan baharu, AM/PM, kad kongsi baharu dengan fon Plus Jakarta Sans
+
+1. ✅ Versi 0.8.0, Apa yang baharu, tag dan GitHub Release
+2. ⬜ Ujian telefon penuh (`UJIAN-TELEFON.md` v0.7.1–v0.7.15) oleh pengguna; pembetulan sebagai 0.8.x

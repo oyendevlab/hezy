@@ -13,6 +13,15 @@ export type Release = {
 
 export const CHANGELOG: readonly Release[] = [
   {
+    version: "0.8.0",
+    date: "2026-10-16",
+    title: "Hezy 0.8: semua paparan dipolish",
+    items: [
+      "Utama, Trend, Lokasi dan Tetapan direka semula",
+      "Ikon baharu, notifikasi lebih ringkas, kad kongsi lebih kemas",
+    ],
+  },
+  {
     version: "0.7.15",
     date: "2026-10-16",
     title: "Masa AM/PM dan kad kongsi",
