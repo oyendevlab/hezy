@@ -478,7 +478,11 @@ function Headline({
   // Perubahan 3 jam dikira daripada model, jadi hanya dipaparkan bila nombor utama ialah anggaran model.
   const change =
     current.source === "model" ? formatChange(reading.change3h, lang) : null;
-  const estimateError = shownError(reading.accuracy, "estimate");
+  // Anggaran dibetulkan IDW mempunyai ralat sendiri (tinggal-satu-keluar, v0.8.5).
+  const estimateError = shownError(
+    reading.accuracy,
+    reading.spatial ? "estimateSpatial" : "estimate",
+  );
   const big = size === "desktop" ? "text-[112px]" : "text-[84px]";
   return (
     <>
@@ -514,7 +518,9 @@ function Headline({
                 />
                 {current.source === "apims"
                   ? t("Rasmi · APIMS")
-                  : t("Anggaran model")}
+                  : reading.spatial
+                    ? t("Anggaran dibetulkan")
+                    : t("Anggaran model")}
               </span>
               {change && (
                 <span className="text-muted text-[13px] font-semibold">
@@ -599,8 +605,27 @@ function SourceLine({
           : []),
       ]
     : [
-        [t("Sumber"), t("Anggaran daripada PM2.5 (Open-Meteo, model CAMS)")],
-        [t("Stesen"), t("Tiada stesen APIMS dalam 30 km")],
+        [
+          t("Sumber"),
+          reading.spatial
+            ? t(
+                "Anggaran PM2.5 (model CAMS) dibetulkan dengan {n} stesen APIMS berdekatan",
+                { n: reading.spatial.stations },
+              )
+            : t("Anggaran daripada PM2.5 (Open-Meteo, model CAMS)"),
+        ],
+        [
+          t("Stesen"),
+          reading.spatial
+            ? t(
+                "Tiada stesen APIMS dalam 30 km · terdekat {station} ({km} km)",
+                {
+                  station: reading.spatial.nearestName,
+                  km: reading.spatial.nearestKm,
+                },
+              )
+            : t("Tiada stesen APIMS dalam 30 km"),
+        ],
         [t("Masa bacaan"), formatClock(current.time, lang)],
         ...(estimateError !== null
           ? ([
@@ -623,9 +648,12 @@ function SourceLine({
                 km: official.distanceKm,
                 time: formatClock(official.time, lang),
               })
-            : t("Anggaran model · dikemas kini {time}", {
-                time: formatClock(current.time, lang),
-              })}
+            : t(
+                reading.spatial
+                  ? "Anggaran dibetulkan · dikemas kini {time}"
+                  : "Anggaran model · dikemas kini {time}",
+                { time: formatClock(current.time, lang) },
+              )}
         </span>
         <button
           type="button"
@@ -659,7 +687,9 @@ function SourceLine({
             {t(
               official
                 ? "Nombor utama ialah bacaan rasmi stesen APIMS terdekat. Anggaran model dikira daripada PM2.5 di koordinat anda dan boleh berbeza daripada bacaan rasmi."
-                : "Tiada stesen APIMS berdekatan, jadi nombor utama ialah anggaran daripada PM2.5 (model CAMS) di koordinat anda.",
+                : reading.spatial
+                  ? "Tiada stesen APIMS dalam 30 km, jadi nombor utama ialah anggaran model CAMS di koordinat anda yang dibetulkan dengan bacaan rasmi stesen berdekatan. Ketepatan berkurang bila stesen lebih jauh."
+                  : "Tiada stesen APIMS berdekatan, jadi nombor utama ialah anggaran daripada PM2.5 (model CAMS) di koordinat anda.",
             )}
           </p>
         </BottomSheet>

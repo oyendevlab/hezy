@@ -1,3 +1,4 @@
+import { stationsDue } from "@/lib/apims-schedule";
 import { getStations } from "@/lib/data";
 
 /** GET /api/stations — semua stesen APIMS dengan bacaan IPU terkini (untuk peta). */
@@ -8,7 +9,10 @@ export async function GET() {
       { source: "apims", stations },
       {
         headers: {
-          "Cache-Control": "public, s-maxage=300, stale-while-revalidate=900",
+          // Bacaan jam semasa dijangka terbit: cache CDN pendek (v0.8.5).
+          "Cache-Control": stationsDue(stations, new Date())
+            ? "public, s-maxage=60, stale-while-revalidate=120"
+            : "public, s-maxage=300, stale-while-revalidate=900",
         },
       },
     );

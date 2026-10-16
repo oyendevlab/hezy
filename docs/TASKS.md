@@ -646,3 +646,24 @@ Penemuan 16 Okt 2026: GitHub Actions menggugurkan dan melewatkan larian berjadua
 6. ✅ Selepas deployment: 5 cron Vercel didaftarkan pada URL deployment (bukan alias `hezy.vercel.app` yang mengubah hala), query `?back=1` dikekalkan; ujian `vercel crons run /api/history/collect?back=1` → 200 (melepasi perlindungan deployment, `CRON_SECRET` sah)
 7. ⬜ Semak 17 Okt: bilangan larian `push-check.yml` dan jurang terbesar dalam 24 jam (laporan `pantau.yml`), serta larian cron Vercel pertama dalam log
 8. ⬜ Jika jurang masih > 2 jam selepas seminggu: pertimbangkan penjadual luar (cron-job.org/QStash) atau Vercel Pro
+
+## Fasa 36 — v0.8.5 (anggaran kawasan tanpa stesen, cache ikut jadual APIMS; 16 Okt 2026)
+
+Kerja malam 16–17 Okt 2026 (dipersetujui pengguna). Rujukan: [AUDIT-0.8.md](AUDIT-0.8.md) D1, D2 (backtest tinggal-satu-keluar: ralat 26–42 → 10–18 IPU).
+
+1. ✅ `spatial-bias.ts`: bias PM2.5 setiap stesen (IPU rasmi ≤ 3 jam vs purata 24 jam model di lokasi stesen), purata berwajaran jarak (IDW, ≤ 5 stesen dalam 150 km, w = 1/d²), pudar ke 0 pada 200 km
+2. ✅ `getStationModels()`: model di lokasi 68 stesen (3 permintaan berbilang lokasi serentak, cache 1 jam)
+3. ✅ `loadReading`: bila tiada bacaan rasmi dalam 30 km, siri model dibetulkan dengan bias IDW sebelum bacaan dibina — nombor utama, graf, jalur per jam dan ramalan harian konsisten; had masa sama seperti sejarah APIMS
+4. ✅ UI: label anggaran "dibetulkan dengan N stesen berdekatan" (BM/EN)
+5. ✅ Ketepatan malam: ralat anggaran IDW tinggal-satu-keluar (`es`) untuk 7 hari lepas; `/api/accuracy` → `estimateSpatial`
+6. ✅ Cache stesen ikut jadual APIMS: semak setiap 2 minit bila jam semasa belum diterbitkan, jika tidak hingga ~8 minit selepas jam berikutnya; CDN `/api/stations` ikut
+7. ✅ Ujian (303 unit, E2E), versi 0.8.5, Apa yang baharu (BM/EN), tag dan GitHub Release; data sebenar: Mersing 54 → 92 (Rompin 72 km, IPU 94), Kuala Lipis 60 → 81, Lawas 34 → 53
+8. ⬜ Jalankan `ketepatan.yml` selepas deployment supaya `estimateSpatial` dikira (ralat IDW 7 hari lepas)
+
+## Fasa 37 — v0.8.6 (MetMalaysia dan proksi WAQI; dirancang)
+
+1. ⬜ `metmalaysia.ts`: amaran (`/weather/warning`) dan ramalan 7 hari (`/weather/forecast`) daripada api.data.gov.my, disahkan bentuknya, dicache (amaran ~15 min, ramalan ~1 jam)
+2. ⬜ Padanan lokasi pengguna dengan negeri/daerah dalam teks amaran dan lokasi ramalan MetMalaysia terdekat
+3. ⬜ Kad amaran cuaca rasmi di Utama bila lokasi terlibat (dalam app sahaja, tiada notifikasi push baharu); ramalan rasmi MetMalaysia dalam Trend; sumber dalam kredit
+4. ⬜ Proksi WAQI: `/api/waqi` di pelayan (token tidak lagi `NEXT_PUBLIC_`, cache CDN 10 min); CSP `connect-src` tanpa api.waqi.info
+5. ⬜ Ujian, versi 0.8.6, Apa yang baharu (BM/EN), tag dan GitHub Release

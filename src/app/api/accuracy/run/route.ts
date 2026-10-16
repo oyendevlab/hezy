@@ -4,6 +4,7 @@ import {
   forecastErrors,
   forecastHours,
   mergeAccuracy,
+  spatialEstimateErrors,
   type ForecastSnapshot,
   type StationAccuracy,
 } from "@/lib/accuracy";
@@ -117,8 +118,11 @@ export async function GET(request: Request) {
       estimates[s.id] = estimateHours(series[i], date);
     });
     const errors = estimateErrors(estimates, actual);
+    // Anggaran IDW tinggal-satu-keluar (v0.8.5): ketepatan bagi kawasan tanpa stesen.
+    const spatial = spatialEstimateErrors(stations, series, actual, date);
     const patch: Record<string, StationAccuracy> = {};
-    for (const [id, e] of Object.entries(errors)) patch[id] = { e };
+    for (const [id, e] of Object.entries(errors))
+      patch[id] = { e, ...(spatial[id] ? { es: spatial[id] } : {}) };
     index = mergeAccuracy(index, date, patch, now);
     report[`estimate:${date}`] = Object.keys(errors).length;
   }

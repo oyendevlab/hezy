@@ -11,7 +11,8 @@ import { jasForecast } from "./forecast-jas";
 import type { DayHours, HourlyDay } from "./history";
 import { addDays } from "./history";
 import type { HourlyOfficial } from "./apims";
-import { pm25ToIpu, rolling24hAverage } from "./ipu";
+import { ipuToPm25, pm25ToIpu, rolling24hAverage } from "./ipu";
+import { idwBias, type StationBias } from "./spatial-bias";
 import type { AirQualitySeries } from "./openmeteo";
 
 /** Tempoh purata yang dipaparkan kepada pengguna. */
@@ -25,11 +26,12 @@ export const MIN_DISPLAY_DAYS = 3;
 /** Ralat untuk dipaparkan, atau null jika data belum cukup. */
 export function shownError(
   summary: AccuracySummary | null | undefined,
-  key: "estimate" | "forecast",
+  key: "estimate" | "estimateSpatial" | "forecast",
 ): number | null {
   if (!summary) return null;
   if (key === "forecast" && summary.days < MIN_DISPLAY_DAYS) return null;
-  return summary[key];
+  // Ringkasan lama (sebelum v0.8.5) tiada estimateSpatial.
+  return summary[key] ?? null;
 }
 
 /** Ralat terkumpul: [jumlah ralat mutlak, bilangan jam]. */
@@ -49,6 +51,8 @@ export type ForecastSnapshot = {
 export type StationAccuracy = {
   /** Anggaran model berbanding rasmi. */
   e?: ErrorSum;
+  /** Anggaran dibetulkan bias IDW stesen lain (tinggal-satu-keluar, v0.8.5). */
+  es?: ErrorSum;
   /** Ramalan model asal. */
   fr?: ErrorSum;
   /** Ramalan dibetulkan (kaedah v0.8.0). */
@@ -65,6 +69,8 @@ export type AccuracyIndex = {
 export type AccuracySummary = {
   /** MAE anggaran (IPU), atau null jika tiada data. */
   estimate: number | null;
+  /** MAE anggaran IDW bagi kawasan tanpa stesen (tinggal-satu-keluar, v0.8.5). */
+  estimateSpatial: number | null;
   /** MAE ramalan dibetulkan. */
   forecast: number | null;
   /** MAE ramalan model asal (untuk perbandingan). */
@@ -140,6 +146,48 @@ export function forecastHours(
   return { raw, corrected, jas };
 }
 
+/**
+ * Ralat anggaran IDW tinggal-satu-keluar bagi satu hari: setiap jam, stesen disembunyikan dan
+ * IPU-nya dianggar daripada model di lokasinya + bias IDW stesen lain (spatial-bias.ts).
+ * `series[i]` ialah siri model bagi `stations[i]`.
+ */
+export function spatialEstimateErrors(
+  stations: readonly { id: string; name: string; lat: number; lon: number }[],
+  series: readonly AirQualitySeries[],
+  actual: HourlyDay,
+  date: string,
+): Record<string, ErrorSum> {
+  const averages = series.map((s) => rolling24hAverage(s.pm25));
+  const out: Record<string, ErrorSum> = {};
+  for (let h = 0; h < 24; h++) {
+    const time = `${date}T${String(h).padStart(2, "0")}:00`;
+    const biases: (StationBias & { average: number; ipu: number })[] = [];
+    stations.forEach((s, k) => {
+      const ipu = actual.stations[s.id]?.[h];
+      const index = series[k]?.times.indexOf(time) ?? -1;
+      const average = index < 0 ? null : averages[k][index];
+      if (ipu == null || average == null) return;
+      biases.push({
+        ...s,
+        time,
+        biasPm25: ipuToPm25(ipu) - average,
+        average,
+        ipu,
+      });
+    });
+    for (const b of biases) {
+      const near = idwBias(b, biases, b.id);
+      if (!near) continue;
+      const estimate = pm25ToIpu(
+        Math.max(b.average * 0.3, b.average + near.biasPm25),
+      );
+      const [sum, n] = out[b.id] ?? [0, 0];
+      out[b.id] = [sum + Math.abs(estimate - b.ipu), n + 1];
+    }
+  }
+  return out;
+}
+
 /** Ralat anggaran bagi satu hari, ikut stesen. */
 export function estimateErrors(
   estimates: Record<string, DayHours>,
@@ -194,10 +242,13 @@ function pool(
   today: string,
   stationIds: readonly string[] | null,
 ) {
-  const total = { e: [0, 0], fr: [0, 0], fc: [0, 0], fj: [0, 0] } as Record<
-    "e" | "fr" | "fc" | "fj",
-    ErrorSum
-  >;
+  const total = {
+    e: [0, 0],
+    es: [0, 0],
+    fr: [0, 0],
+    fc: [0, 0],
+    fj: [0, 0],
+  } as Record<"e" | "es" | "fr" | "fc" | "fj", ErrorSum>;
   const forecastDays = new Set<string>();
   const jasDays = new Set<string>();
   const from = addDays(today, -ACCURACY_WINDOW_DAYS);
@@ -205,7 +256,7 @@ function pool(
     if (date < from || date >= today) continue;
     for (const [id, acc] of Object.entries(stations)) {
       if (stationIds && !stationIds.includes(id)) continue;
-      for (const key of ["e", "fr", "fc", "fj"] as const) {
+      for (const key of ["e", "es", "fr", "fc", "fj"] as const) {
         const s = acc[key];
         if (!s) continue;
         total[key][0] += s[0];
@@ -232,6 +283,7 @@ export function summarizeAccuracy(
   const all = pool(index, today, null);
   const national = {
     estimate: round(mae(all.total.e)),
+    estimateSpatial: round(mae(all.total.es)),
     forecast: round(mae(all.total.fc)),
     forecastRaw: round(mae(all.total.fr)),
     forecastJas: round(mae(all.total.fj)),
@@ -250,6 +302,7 @@ export function summarizeAccuracy(
       const enoughJas = local.jasDays >= MIN_STATION_DAYS;
       return {
         estimate: round(mae(local.total.e)),
+        estimateSpatial: round(mae(local.total.es)) ?? national.estimateSpatial,
         forecast: enough ? round(mae(local.total.fc)) : national.forecast,
         forecastRaw: enough ? round(mae(local.total.fr)) : national.forecastRaw,
         forecastJas: enoughJas

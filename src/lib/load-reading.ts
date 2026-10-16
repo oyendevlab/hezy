@@ -5,11 +5,18 @@ import type { Coords } from "./coords";
 import {
   getAirQualityResilient,
   getStateHistory,
+  getStationModels,
   getTwoPmReadings,
 } from "./data";
 import { addDays } from "./history";
 import { officialFor, withOfficialHistory } from "./official";
 import { buildReading, localHourKey, type Reading } from "./reading";
+import {
+  applySpatialBias,
+  idwBias,
+  stationBiases,
+  type SpatialBias,
+} from "./spatial-bias";
 import {
   SCHOOL_DECISION_HOUR,
   SCHOOL_PROLONGED_DAYS,
@@ -26,8 +33,8 @@ export function modelCell({ lat, lon }: Coords): Coords {
 
 export type LoadOptions = {
   /**
-   * Had menunggu sejarah APIMS (ms). Tanpanya sejarah ditunggu sepenuhnya (semakan amaran);
-   * dengan had, bacaan dipulangkan tanpa sejarah dan ditandakan `partial`.
+   * Had menunggu sejarah APIMS dan model stesen (ms). Tanpanya ditunggu sepenuhnya (semakan
+   * amaran); dengan had, bacaan dipulangkan tanpanya dan ditandakan `partial`.
    */
   historyBudgetMs?: number;
 };
@@ -47,7 +54,7 @@ export async function loadReading(
 ): Promise<{
   reading: Reading;
   station: Station | undefined;
-  /** Sebahagian data (sejarah rasmi) belum sempat diambil. */
+  /** Sebahagian data (sejarah rasmi atau model stesen) belum sempat diambil. */
   partial: boolean;
 }> {
   const cell = modelCell(coords);
@@ -58,28 +65,62 @@ export async function loadReading(
   const station = official
     ? list?.find((s) => s.id === official.stationId)
     : undefined;
-  const [series, history] = await Promise.all([
+  // Tiada bacaan rasmi dalam 30 km: betulkan model dengan bias stesen berdekatan (v0.8.5).
+  const spatialPending =
+    !official && list && list.length > 0
+      ? getStationModels(
+          list.map((s) => ({ id: s.id, lat: s.lat, lon: s.lon })),
+        ).then((models) => idwBias(coords, stationBiases(list, models, nowKey)))
+      : null;
+  const historyPending =
+    station?.stateId != null
+      ? getStateHistory(station.stateId, nowKey).then(
+          (byStation) => byStation[station.id] ?? [],
+        )
+      : null;
+  const [series, history, spatial] = await Promise.all([
     seriesPromise,
-    officialHistory(station, nowKey, options.historyBudgetMs),
+    settle(historyPending, options.historyBudgetMs, "APIMS sejarah"),
+    settle(spatialPending, options.historyBudgetMs, "model stesen"),
   ]);
-  let reading = buildReading(series, now, history.hours);
+  const hours = history.value ?? [];
+  const bias = spatial.value;
+  let reading = buildReading(
+    bias ? applySpatialBias(series, bias) : series,
+    now,
+    hours,
+  );
   reading.official = official;
-  reading = withOfficialHistory(reading, history.hours);
+  reading = withOfficialHistory(reading, hours);
+  if (bias) reading = withSpatial(reading, bias);
   if (station)
-    reading.schoolTwoPm = await schoolTwoPm(station.id, history.hours, nowKey);
-  return { reading, station, partial: history.late };
+    reading.schoolTwoPm = await schoolTwoPm(station.id, hours, nowKey);
+  return { reading, station, partial: history.late || spatial.late };
 }
 
-/** Sejarah 25 jam stesen; bila melepasi had, dibiar siap selepas respons untuk mengisi cache. */
-async function officialHistory(
-  station: Station | undefined,
-  nowKey: string,
+/** Tandakan bacaan yang dibetulkan dengan bias ruang (label "dibetulkan" dalam graf). */
+function withSpatial(reading: Reading, bias: SpatialBias): Reading {
+  return {
+    ...reading,
+    today: reading.today.map((h) => ({ ...h, corrected: true })),
+    spatial: {
+      stations: bias.stations,
+      nearestName: bias.nearestName,
+      nearestKm: bias.nearestKm,
+    },
+  };
+}
+
+/**
+ * Tunggu sumber tambahan, paling lama `budgetMs` (tanpa had: tunggu sepenuhnya). Yang lambat
+ * dibiar siap selepas respons untuk mengisi cache; yang gagal dilog dan diabaikan.
+ */
+async function settle<T>(
+  pending: Promise<T> | null,
   budgetMs: number | undefined,
-): Promise<{ hours: HourlyOfficial[]; late: boolean }> {
-  if (station?.stateId == null) return { hours: [], late: false };
-  const pending = getStateHistory(station.stateId, nowKey).then(
-    (byStation) => byStation[station.id] ?? [],
-  );
+  label: string,
+): Promise<{ value: T | null; late: boolean }> {
+  if (!pending) return { value: null, late: false };
   const result =
     budgetMs === undefined
       ? await pending.then(
@@ -87,13 +128,13 @@ async function officialHistory(
           (error: unknown) => ({ status: "error" as const, error }),
         )
       : await withinBudget(pending, budgetMs);
-  if (result.status === "ok") return { hours: result.value, late: false };
+  if (result.status === "ok") return { value: result.value, late: false };
   if (result.status === "late") {
     after(() => pending.catch(() => undefined));
-    return { hours: [], late: true };
+    return { value: null, late: true };
   }
-  console.error("[loadReading] APIMS sejarah", result.error);
-  return { hours: [], late: false };
+  console.error(`[loadReading] ${label}`, result.error);
+  return { value: null, late: false };
 }
 
 /**

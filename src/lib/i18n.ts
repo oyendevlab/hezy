@@ -995,6 +995,20 @@ const EN: Record<string, string> = {
   "Ramalan harian lebih tepat": "More accurate daily forecast",
   "Ramalan harian kini dikira seperti IPU rasmi JAS (purata 24 jam) dan bermula daripada bacaan rasmi terkini":
     "The daily forecast is now calculated like the official DOE API (24-hour average) and starts from the latest official reading",
+  "Anggaran PM2.5 (model CAMS) dibetulkan dengan {n} stesen APIMS berdekatan":
+    "PM2.5 estimate (CAMS model) corrected with {n} nearby APIMS stations",
+  "Tiada stesen APIMS dalam 30 km · terdekat {station} ({km} km)":
+    "No APIMS station within 30 km · nearest {station} ({km} km)",
+  "Anggaran dibetulkan · dikemas kini {time}":
+    "Corrected estimate · updated {time}",
+  "Tiada stesen APIMS dalam 30 km, jadi nombor utama ialah anggaran model CAMS di koordinat anda yang dibetulkan dengan bacaan rasmi stesen berdekatan. Ketepatan berkurang bila stesen lebih jauh.":
+    "There is no APIMS station within 30 km, so the main number is the CAMS model estimate at your coordinates, corrected with official readings from nearby stations. Accuracy drops as stations get further away.",
+  "Anggaran lebih tepat di kawasan tanpa stesen":
+    "More accurate estimates where there is no station",
+  "Kawasan jauh dari stesen APIMS kini dibetulkan dengan bacaan rasmi stesen berdekatan":
+    "Areas far from APIMS stations are now corrected with official readings from nearby stations",
+  "Bacaan rasmi terbaharu muncul lebih cepat selepas JAS menerbitkannya":
+    "The latest official reading appears sooner after the DOE publishes it",
   "Amaran lebih tepat pada masanya": "More timely alerts",
   "Semakan amaran IPU dijalankan lebih kerap supaya notifikasi tidak lewat":
     "API alert checks run more often so notifications are not late",
