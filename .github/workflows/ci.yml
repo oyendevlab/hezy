@@ -5,6 +5,10 @@ on:
   push:
     branches: [main]
 
+# Token GITHUB_TOKEN baca sahaja (v0.8.1).
+permissions:
+  contents: read
+
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true

@@ -6,6 +6,9 @@ on:
     - cron: "50 12 * * *"
   workflow_dispatch:
 
+# Hanya memanggil hezy.my dengan CRON_SECRET; tidak perlu akses repo (v0.8.1).
+permissions: {}
+
 jobs:
   run:
     runs-on: ubuntu-latest

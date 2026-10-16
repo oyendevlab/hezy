@@ -23,6 +23,7 @@ import {
   type AirQualitySeries,
 } from "@/lib/openmeteo";
 import { localHourKey } from "@/lib/reading";
+import { isCronAuthorized } from "@/lib/request-guard";
 
 /** Hari lepas yang dinilai untuk ketepatan anggaran (data sejarah APIMS ~7 hari). */
 const ESTIMATE_BACK_DAYS = 7;
@@ -80,7 +81,7 @@ export async function GET(request: Request) {
   if (!secret) {
     return Response.json({ error: "Belum dikonfigurasi." }, { status: 503 });
   }
-  if (request.headers.get("authorization") !== `Bearer ${secret}`) {
+  if (!isCronAuthorized(request.headers.get("authorization"), secret)) {
     return Response.json({ error: "Tidak dibenarkan." }, { status: 401 });
   }
 

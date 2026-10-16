@@ -104,6 +104,36 @@ export type SubscribeInput = {
 
 const BASE64URL = /^[A-Za-z0-9_-]+={0,2}$/;
 
+/**
+ * Hos perkhidmatan Web Push pelayar (Chrome/Edge/Samsung/Opera → FCM, Firefox → Mozilla,
+ * Safari → Apple, Edge lama → WNS). Pelayan menghantar POST ke endpoint langganan, jadi
+ * endpoint lain ditolak supaya Hezy tidak boleh dijadikan alat menghantar permintaan ke
+ * alamat sebarangan (SSRF).
+ */
+const PUSH_HOSTS = ["fcm.googleapis.com", "android.googleapis.com"];
+const PUSH_HOST_SUFFIXES = [
+  ".push.services.mozilla.com",
+  ".push.apple.com",
+  ".notify.windows.com",
+];
+
+export function isPushServiceEndpoint(endpoint: unknown): endpoint is string {
+  if (typeof endpoint !== "string" || endpoint.length > 1000) return false;
+  let url: URL;
+  try {
+    url = new URL(endpoint);
+  } catch {
+    return false;
+  }
+  if (url.protocol !== "https:" || url.port || url.username || url.password)
+    return false;
+  const host = url.hostname.toLowerCase();
+  return (
+    PUSH_HOSTS.includes(host) ||
+    PUSH_HOST_SUFFIXES.some((suffix) => host.endsWith(suffix))
+  );
+}
+
 function parseLocation(raw: unknown, fallbackId: string): AlertLocation | null {
   const r = raw as {
     id?: unknown;
@@ -152,11 +182,7 @@ export function parseSubscribeBody(
   } | null;
   const sub = b?.subscription;
   const endpoint = sub?.endpoint;
-  if (
-    typeof endpoint !== "string" ||
-    !/^https:\/\/[^\s]+$/.test(endpoint) ||
-    endpoint.length > 1000
-  ) {
+  if (!isPushServiceEndpoint(endpoint)) {
     return { ok: false, error: "Langganan notifikasi tidak sah." };
   }
   const p256dh = sub?.keys?.p256dh;

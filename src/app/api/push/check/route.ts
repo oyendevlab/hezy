@@ -3,7 +3,9 @@ import { getStations } from "@/lib/data";
 import { loadReading } from "@/lib/load-reading";
 import { applySent, planNotifications } from "@/lib/push-plan";
 import { allRecords, deleteRecord, saveRecord } from "@/lib/push-store";
+import { isPushServiceEndpoint } from "@/lib/push-validate";
 import type { Reading } from "@/lib/reading";
+import { isCronAuthorized } from "@/lib/request-guard";
 
 /**
  * GET /api/push/check — dipanggil setiap jam oleh GitHub Actions (Authorization: Bearer CRON_SECRET).
@@ -20,7 +22,7 @@ export async function GET(request: Request) {
       { status: 503 },
     );
   }
-  if (request.headers.get("authorization") !== `Bearer ${secret}`) {
+  if (!isCronAuthorized(request.headers.get("authorization"), secret)) {
     return Response.json({ error: "Tidak dibenarkan." }, { status: 401 });
   }
   webpush.setVapidDetails(
@@ -48,6 +50,12 @@ export async function GET(request: Request) {
   const summary = { checked: 0, sent: 0, removed: 0, failed: 0 };
   records: for (const original of await allRecords()) {
     summary.checked++;
+    // Rekod sebelum v0.8.1 mungkin ada endpoint sebarangan: jangan hantar, buang terus.
+    if (!isPushServiceEndpoint(original.subscription.endpoint)) {
+      await deleteRecord(original.subscription.endpoint);
+      summary.removed++;
+      continue;
+    }
     let record = original;
     const list = await Promise.all(
       record.locations.map((l) => readingFor(l.lat, l.lon)),

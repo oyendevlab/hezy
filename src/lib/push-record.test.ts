@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { mergeRecord, normalizeRecord, type PushRecord } from "./push-record";
-import { parseSubscribeBody } from "./push-validate";
+import { isPushServiceEndpoint, parseSubscribeBody } from "./push-validate";
 
 const subscription = {
-  endpoint: "https://fcm.example/p/1",
+  endpoint: "https://fcm.googleapis.com/fcm/send/p1",
   keys: { p256dh: "BAbc", auth: "xyz" },
 };
 const NOW = new Date("2026-10-12T02:00:00Z");
@@ -139,5 +139,45 @@ describe("mergeRecord", () => {
       "tidak-sihat",
       null,
     ]);
+  });
+});
+
+describe("isPushServiceEndpoint (v0.8.1)", () => {
+  it("menerima perkhidmatan push pelayar utama", () => {
+    for (const endpoint of [
+      "https://fcm.googleapis.com/fcm/send/abc:def",
+      "https://web.push.apple.com/QAbc",
+      "https://updates.push.services.mozilla.com/wpush/v2/gAAA",
+      "https://wns2-bl2p.notify.windows.com/w/?token=abc",
+    ])
+      expect(isPushServiceEndpoint(endpoint)).toBe(true);
+  });
+
+  it("menolak alamat lain supaya pelayan tidak menghantar ke URL sebarangan", () => {
+    for (const endpoint of [
+      "http://fcm.googleapis.com/fcm/send/abc",
+      "https://fcm.googleapis.com:8443/fcm/send/abc",
+      "https://user:pw@fcm.googleapis.com/fcm/send/abc",
+      "https://fcm.googleapis.com.jahat.example/x",
+      "https://pushapple.com/x",
+      "https://169.254.169.254/latest/meta-data",
+      "https://localhost/x",
+      "bukan url",
+      42,
+    ])
+      expect(isPushServiceEndpoint(endpoint)).toBe(false);
+  });
+
+  it("parseSubscribeBody menolak endpoint bukan perkhidmatan push", () => {
+    expect(
+      parseSubscribeBody({
+        subscription: {
+          endpoint: "https://jahat.example/hook",
+          keys: { p256dh: "BAbc", auth: "xyz" },
+        },
+        lat: 3.07,
+        lon: 101.52,
+      }),
+    ).toEqual({ ok: false, error: "Langganan notifikasi tidak sah." });
   });
 });

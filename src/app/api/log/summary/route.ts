@@ -1,6 +1,7 @@
 import { addDays } from "@/lib/history";
 import { errorsFor, pruneErrors } from "@/lib/history-store";
 import { localHourKey } from "@/lib/reading";
+import { isCronAuthorized } from "@/lib/request-guard";
 
 /** Log disimpan 14 hari. */
 const KEEP_DAYS = 14;
@@ -14,7 +15,7 @@ export async function GET(request: Request) {
   if (!secret) {
     return Response.json({ error: "Belum dikonfigurasi." }, { status: 503 });
   }
-  if (request.headers.get("authorization") !== `Bearer ${secret}`) {
+  if (!isCronAuthorized(request.headers.get("authorization"), secret)) {
     return Response.json({ error: "Tidak dibenarkan." }, { status: 401 });
   }
   const today = localHourKey(new Date()).slice(0, 10);

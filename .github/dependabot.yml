@@ -1,0 +1,22 @@
+# Kemas kini kebergantungan automatik (v0.8.1): satu PR berkumpulan seminggu supaya tampalan
+# keselamatan (cth. Next.js 16.4.1) tidak terlepas.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: Asia/Kuala_Lumpur
+    open-pull-requests-limit: 5
+    groups:
+      patch-dan-minor:
+        update-types: [minor, patch]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      actions:
+        patterns: ["*"]
