@@ -813,9 +813,7 @@ test.describe("rutin amaran", () => {
     ).toBeChecked();
     await expect(early).toBeChecked();
     await expect(page.getByRole("switch", { name: /Lonjakan/ })).toBeChecked();
-    await expect(page.getByTestId("alert-settings")).not.toHaveAttribute(
-      "inert",
-    );
+    await expect(page.getByTestId("alert-settings")).toBeVisible();
 
     await morning.check();
     await early.uncheck();
@@ -861,11 +859,8 @@ test.describe("rutin amaran", () => {
   }) => {
     await seedLocation(page);
     await page.goto("/tetapan");
-    // Belum melanggan: tetapan amaran dimalapkan (inert).
-    await expect(page.getByTestId("alert-settings")).toHaveAttribute(
-      "inert",
-      "",
-    );
+    // Belum melanggan: tetapan amaran tidak dipaparkan (v0.7.13).
+    await expect(page.getByTestId("alert-settings")).toHaveCount(0);
     await page
       .getByRole("button", { name: "Tentang nombor IPU pada ikon" })
       .click();
@@ -2516,7 +2511,7 @@ test.describe("Tentang Hezy v0.7.9", () => {
 
     const credit = page.getByRole("region", { name: "Pembangun" });
     await expect(credit).toContainText("Syafiq");
-    await expect(credit).toContainText("Build. Create. Live");
+    await expect(credit).toContainText("Learn. Build. Repeat");
     await expect(credit.getByRole("img", { name: "Syafiq" })).toBeVisible();
 
     const results = await new AxeBuilder({ page })

@@ -561,3 +561,11 @@ Mockup: https://claude.ai/artifact/K2kQkrY8zYtUjBwb9AVE4J (papan kiri).
 2. ✅ Skrin alu-aluan: baris "Dengan meneruskan, anda bersetuju dengan Privasi dan Penafian" → helaian berikon
 3. ✅ Penafian (bukan aplikasi rasmi JAS; data boleh lewat; bukan nasihat perubatan; status sekolah panduan; budi bicara sendiri) — juga dalam kad Tentang di Tetapan
 4. ✅ Versi 0.7.12, Apa yang baharu, tag dan GitHub Release
+
+## Fasa 28 — v0.7.13 (notifikasi dan amaran digabung; disahkan 16 Okt 2026)
+
+1. ✅ Satu bahagian "Notifikasi dan Amaran": Nombor pada ikon → Banner notifikasi → (bila banner hidup) Waktu hantaran, Ambang, Amaran awal, Lonjakan, Waktu senyap, Lokasi amaran, Notifikasi ujian
+2. ✅ Notifikasi ujian: butang pil "Hantar" di kanan, status dalam keterangan
+3. ✅ Padam data dipindah ke kad Tentang (bawah Privasi); helaian pengesahan berikon
+4. ✅ Kredit: "Learn. Build. Repeat"
+5. ✅ Versi 0.7.13, Apa yang baharu, tag dan GitHub Release

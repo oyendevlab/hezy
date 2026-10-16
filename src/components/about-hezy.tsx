@@ -6,6 +6,8 @@ import {
   ShareNetwork,
   ShieldCheck,
   Sparkle,
+  Trash,
+  WarningCircle,
   type Icon,
 } from "@phosphor-icons/react";
 import Image from "next/image";
@@ -15,7 +17,9 @@ import { CHANGELOG } from "@/lib/changelog";
 import { formatLongDate } from "@/lib/format";
 import { useI18n } from "@/lib/use-i18n";
 import { APP_VERSION } from "@/lib/version";
-import { BottomSheet } from "./bottom-sheet";
+import { DEFAULT_PREFS, updatePrefs } from "@/lib/prefs";
+import { disablePush, pushSupport } from "@/lib/push-client";
+import { BottomSheet, useSheetDismiss } from "./bottom-sheet";
 import { Chevron } from "./chevron";
 import { LegalSheetView } from "./legal-sheets";
 import { Logo } from "./logo";
@@ -56,6 +60,7 @@ export function AboutHezy() {
   const { t, lang } = useI18n();
   const [whatsNew, setWhatsNew] = useState(false);
   const [disclaimer, setDisclaimer] = useState(false);
+  const [confirmClear, setConfirmClear] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
 
   async function share() {
@@ -149,6 +154,22 @@ export function AboutHezy() {
             {t("Privasi dan data anda")}
           </Row>
         </Link>
+        <button
+          type="button"
+          onClick={() => setConfirmClear(true)}
+          aria-haspopup="dialog"
+          className="flex min-h-14 w-full items-center gap-3 py-2 text-left"
+        >
+          <span
+            aria-hidden="true"
+            className="flex size-9 shrink-0 items-center justify-center rounded-[11px] bg-[#fbe0dd] text-[#a3261f]"
+          >
+            <Trash size={19} weight="bold" />
+          </span>
+          <span className="text-ipu-berbahaya-ink dark:text-ipu-berbahaya-tint min-w-0 flex-1 text-[15px] font-bold">
+            {t("Padam data di peranti ini")}
+          </span>
+        </button>
       </div>
       <p
         role="status"
@@ -157,6 +178,16 @@ export function AboutHezy() {
         {status ?? ""}
       </p>
 
+      {confirmClear && (
+        <BottomSheet
+          title={t("Padam data?")}
+          testId="clear-sheet"
+          onClose={() => setConfirmClear(false)}
+          bare
+        >
+          <ClearDataConfirm />
+        </BottomSheet>
+      )}
       {disclaimer && (
         <LegalSheetView sheet="penafian" onClose={() => setDisclaimer(false)} />
       )}
@@ -219,9 +250,61 @@ export function DeveloperCredit() {
           <span className="text-ink font-bold">Syafiq</span>
         </span>
         <span className="text-muted font-mono text-[11px]">
-          Build. Create. Live
+          Learn. Build. Repeat
         </span>
       </div>
     </section>
+  );
+}
+
+/** Pengesahan padam data (v0.7.13): ikon amaran, penerangan, Batal / Padam. */
+function ClearDataConfirm() {
+  const { t } = useI18n();
+  const dismiss = useSheetDismiss();
+  function clearData() {
+    // Amaran push juga dimatikan supaya langganan dipadam daripada pelayan.
+    if (pushSupport() === "supported")
+      void disablePush().catch(() => undefined);
+    try {
+      Object.keys(window.localStorage)
+        .filter((key) => key.startsWith("hezy:"))
+        .forEach((key) => window.localStorage.removeItem(key));
+    } catch {
+      // Storan tidak tersedia.
+    }
+    updatePrefs(() => DEFAULT_PREFS);
+    dismiss();
+  }
+  return (
+    <div className="flex flex-col items-center gap-3 pt-2 text-center">
+      <span
+        aria-hidden="true"
+        className="flex size-16 items-center justify-center rounded-full bg-[#fbe0dd] text-[#a3261f]"
+      >
+        <WarningCircle size={34} weight="duotone" />
+      </span>
+      <p className="font-display text-xl font-bold">{t("Padam data?")}</p>
+      <p className="text-muted text-sm leading-relaxed">
+        {t(
+          "Lokasi, kegemaran dan tetapan di peranti ini akan dipadam. Amaran juga dimatikan.",
+        )}
+      </p>
+      <div className="mt-1 grid w-full grid-cols-2 gap-2">
+        <button
+          type="button"
+          onClick={dismiss}
+          className="bg-surface min-h-12 rounded-2xl font-bold"
+        >
+          {t("Batal")}
+        </button>
+        <button
+          type="button"
+          onClick={clearData}
+          className="min-h-12 rounded-2xl bg-[#b42323] font-bold text-white"
+        >
+          {t("Padam")}
+        </button>
+      </div>
+    </div>
   );
 }
