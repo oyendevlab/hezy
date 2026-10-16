@@ -157,6 +157,10 @@ export function TetapanScreen() {
                   value={t("APIMS (JAS), stesen ≤ 30 km")}
                 />
                 <Row label={t("Ramalan")} value="Open-Meteo (CAMS)" />
+                <Row
+                  label={t("Cuaca rasmi")}
+                  value="MetMalaysia (data.gov.my)"
+                />
                 <AccuracyRows />
               </div>
             </section>

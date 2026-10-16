@@ -37,11 +37,8 @@ import {
 } from "@/lib/prefs";
 import { useI18n } from "@/lib/use-i18n";
 import {
-  WAQI_TOKEN,
   parseRegionSensors,
   parseSensors,
-  waqiBoundsUrl,
-  waqiRegionUrl,
   type RegionPoint,
   type Sensor,
 } from "@/lib/waqi";
@@ -345,13 +342,16 @@ export function StationMap() {
     };
   }, [mapReady, showWind, windGrid]);
 
-  // Luar Malaysia: sensor WAQI (AQI AS → IPU) untuk taburan IPU; diambil terus dari pelayar
+  // Luar Malaysia: sensor WAQI (AQI AS → IPU) untuk taburan IPU; melalui /api/waqi tanpa cache
   // (terma WAQI) dan hanya bila lapisan dihidupkan.
   useEffect(() => {
-    if (!showHeat || regionPoints || !WAQI_TOKEN) return;
+    if (!showHeat || regionPoints) return;
     let cancelled = false;
-    fetch(waqiRegionUrl(WAQI_TOKEN))
-      .then((res) => res.json())
+    fetch("/api/waqi?scope=region")
+      .then((res) => {
+        if (!res.ok) throw new Error(`Status ${res.status}`);
+        return res.json();
+      })
       .then((body: unknown) => {
         if (!cancelled) setRegionPoints(parseRegionSensors(body, new Date()));
       })
@@ -422,12 +422,16 @@ export function StationMap() {
     return () => document.removeEventListener("keydown", onKey);
   }, [selectedId, sensorUid]);
 
-  // Sensor tambahan WAQI: diambil terus dari pelayar selepas stesen APIMS (untuk buang pendua).
+  // Sensor tambahan WAQI melalui /api/waqi selepas stesen APIMS (untuk buang pendua); tiada
+  // lapisan bila sensor tidak dikonfigurasi atau gagal.
   useEffect(() => {
-    if (!stations || !WAQI_TOKEN) return;
+    if (!stations) return;
     let cancelled = false;
-    fetch(waqiBoundsUrl(WAQI_TOKEN))
-      .then((res) => res.json())
+    fetch("/api/waqi?scope=malaysia")
+      .then((res) => {
+        if (!res.ok) throw new Error(`Status ${res.status}`);
+        return res.json();
+      })
       .then((body: unknown) => {
         if (!cancelled) setSensors(parseSensors(body, stations, new Date()));
       })
@@ -627,8 +631,7 @@ export function StationMap() {
         on: showFires,
         set: setShowFires,
       },
-    !!WAQI_TOKEN &&
-      sensors !== null &&
+    sensors !== null &&
       sensors.length > 0 && {
         key: "sensors",
         icon: Broadcast,

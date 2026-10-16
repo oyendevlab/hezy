@@ -13,6 +13,15 @@ export type Release = {
 
 export const CHANGELOG: readonly Release[] = [
   {
+    version: "0.8.6",
+    date: "2026-10-16",
+    title: "Amaran dan ramalan rasmi MetMalaysia",
+    items: [
+      "Amaran ribut petir dan hujan lebat MetMalaysia untuk negeri anda di Utama",
+      "Ramalan cuaca rasmi negeri di Trend; sensor peta kini melalui pelayan Hezy",
+    ],
+  },
+  {
     version: "0.8.5",
     date: "2026-10-16",
     title: "Anggaran lebih tepat di kawasan tanpa stesen",

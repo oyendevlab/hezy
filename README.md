@@ -32,4 +32,5 @@ Buat cabang `feat/*`, buka PR ke `main`. Vercel akan menghasilkan preview untuk 
 
 - **APIMS (Jabatan Alam Sekitar)**: IPU rasmi stesen, nombor utama dan amaran
 - **Open-Meteo (CAMS)**: anggaran dan ramalan PM2.5 bila tiada stesen APIMS berdekatan
-- **[World Air Quality Index Project](https://waqi.info/)**: lapisan sensor tambahan pada peta (skala AQI AS), diambil terus dari pelayar. Perlukan `NEXT_PUBLIC_WAQI_TOKEN`; tanpa token, lapisan ini tidak dipaparkan
+- **[World Air Quality Index Project](https://waqi.info/)**: lapisan sensor tambahan pada peta (skala AQI AS), melalui `/api/waqi` tanpa cache (terma WAQI). Token di pelayan: `WAQI_TOKEN` (atau `NEXT_PUBLIC_WAQI_TOKEN` lama); tanpa token, lapisan ini tidak dipaparkan
+- **MetMalaysia ([data.gov.my](https://data.gov.my/))**: amaran cuaca rasmi dan ramalan negeri (tanpa kunci), dicache di pelayan

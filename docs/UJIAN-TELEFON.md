@@ -252,6 +252,13 @@ Buka **https://hezy.my** pada telefon.
 - [ ] Lokasi dengan stesen dalam 30 km masih memaparkan "Rasmi · APIMS"
 - [ ] Selepas minit ke-10–40 setiap jam, bacaan rasmi jam baharu muncul dalam beberapa minit (tarik untuk muat semula)
 
+## v0.8.6 — MetMalaysia dan sensor melalui pelayan
+
+- [ ] Bila MetMalaysia mengeluarkan amaran ribut petir/hujan lebat untuk negeri anda: kad "Amaran cuaca MetMalaysia" di Utama dengan daerah terlibat dan "Sehingga …"
+- [ ] Trend: bahagian "Ramalan rasmi MetMalaysia" (3 hari: ringkasan, pagi/petang/malam, suhu)
+- [ ] Bahasa Inggeris: tajuk amaran dan frasa ramalan diterjemah
+- [ ] Lokasi → Peta: pin sensor WAQI bergaris putus dan taburan IPU luar Malaysia masih dipaparkan
+
 ## Jika ada masalah
 
 Ambil tangkapan skrin dan catat model telefon serta versi OS, kemudian buka isu di

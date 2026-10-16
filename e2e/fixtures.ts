@@ -238,7 +238,8 @@ export const test = base.extend<{ mockApi: void }>({
       await page.route("**/api/history?**", (route) =>
         route.fulfill({ json: FAKE_HISTORY() }),
       );
-      await page.route("https://api.waqi.info/**", (route) =>
+      // Sensor WAQI melalui proksi pelayan tanpa cache (v0.8.6).
+      await page.route("**/api/waqi?**", (route) =>
         route.fulfill({ json: FAKE_WAQI() }),
       );
       // Jubin peta luaran tidak diperlukan dalam ujian.

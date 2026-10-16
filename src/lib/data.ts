@@ -2,6 +2,14 @@ import { cacheLife } from "next/cache";
 import { stationsRevalidateSeconds } from "./apims-schedule";
 import { createLastGoodStore } from "./budget";
 import {
+  MET_FORECAST_URL,
+  MET_WARNING_URL,
+  parseForecasts,
+  parseWarnings,
+  type MetDay,
+  type MetWarningRaw,
+} from "./metmalaysia";
+import {
   APIMS_STATIONS_URL,
   apimsHourlyUrl,
   parseHourly,
@@ -258,4 +266,28 @@ export async function getHotspots(): Promise<{
     updatedAt: new Date().toISOString(),
     cells: aggregate(lists.flat()),
   };
+}
+
+/** Amaran cuaca rasmi MetMalaysia (api.data.gov.my), dicache 15 minit. */
+export async function getMetWarnings(): Promise<MetWarningRaw[]> {
+  "use cache";
+  cacheLife({ stale: 300, revalidate: 900, expire: 3600 });
+  const res = await fetch(MET_WARNING_URL, {
+    signal: AbortSignal.timeout(8000),
+  });
+  if (!res.ok)
+    throw new Error(`MetMalaysia (amaran) memulangkan status ${res.status}`);
+  return parseWarnings(await res.json());
+}
+
+/** Ramalan rasmi MetMalaysia peringkat negeri (7 hari), dicache 1 jam. */
+export async function getMetForecasts(): Promise<Record<string, MetDay[]>> {
+  "use cache";
+  cacheLife({ stale: 600, revalidate: 3600, expire: 21600 });
+  const res = await fetch(MET_FORECAST_URL, {
+    signal: AbortSignal.timeout(8000),
+  });
+  if (!res.ok)
+    throw new Error(`MetMalaysia (ramalan) memulangkan status ${res.status}`);
+  return parseForecasts(await res.json());
 }

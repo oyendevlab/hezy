@@ -727,10 +727,10 @@ const EN: Record<string, string> = {
   "Hezy menggunakan Vercel Web Analytics tanpa kuki untuk mengira paparan halaman, jenis peranti dan negara secara keseluruhan. Pengguna individu tidak dikenal pasti.":
     "Hezy uses cookie-free Vercel Web Analytics to count page views, device types and countries in aggregate. Individual users are not identified.",
   "Pihak ketiga": "Third parties",
-  "Bacaan IPU daripada APIMS (Jabatan Alam Sekitar), cuaca dan anggaran daripada Open-Meteo, dan titik panas daripada NASA FIRMS diambil oleh pelayan Hezy; maklumat peranti anda tidak dihantar kepada mereka.":
-    "API readings from APIMS (Department of Environment), weather and estimates from Open-Meteo, and fire hotspots from NASA FIRMS are fetched by Hezy's server; your device information is not sent to them.",
-  "Jubin peta (OpenStreetMap) dan sensor tambahan (WAQI) dimuat terus oleh pelayar anda bila anda membuka Peta, jadi mereka boleh melihat alamat IP anda seperti mana-mana laman web.":
-    "Map tiles (OpenStreetMap) and extra sensors (WAQI) are loaded directly by your browser when you open the Map, so they can see your IP address like any website.",
+  "Bacaan IPU daripada APIMS (Jabatan Alam Sekitar), cuaca dan anggaran daripada Open-Meteo, amaran dan ramalan MetMalaysia (data.gov.my), titik panas daripada NASA FIRMS dan sensor tambahan WAQI diambil oleh pelayan Hezy; maklumat peranti anda tidak dihantar kepada mereka.":
+    "API readings from APIMS (Department of Environment), weather and estimates from Open-Meteo, MetMalaysia warnings and forecasts (data.gov.my), NASA FIRMS hotspots and extra WAQI sensors are fetched by the Hezy server; your device information is not sent to them.",
+  "Jubin peta (OpenStreetMap) dimuat terus oleh pelayar anda bila anda membuka Peta, jadi OpenStreetMap boleh melihat alamat IP anda seperti mana-mana laman web.":
+    "Map tiles (OpenStreetMap) are loaded directly by your browser when you open the Map, so OpenStreetMap can see your IP address like any website.",
   "Memadam data anda": "Deleting your data",
   "Tetapan → “Padam data di peranti ini” memadam semua data Hezy dalam peranti dan mematikan amaran (langganan dipadam daripada pelayan).":
     "Settings → “Delete data on this device” deletes all Hezy data on the device and turns off alerts (the subscription is deleted from the server).",
@@ -1009,6 +1009,44 @@ const EN: Record<string, string> = {
     "Areas far from APIMS stations are now corrected with official readings from nearby stations",
   "Bacaan rasmi terbaharu muncul lebih cepat selepas JAS menerbitkannya":
     "The latest official reading appears sooner after the DOE publishes it",
+  "Amaran dan ramalan rasmi MetMalaysia":
+    "Official MetMalaysia warnings and forecast",
+  "Amaran ribut petir dan hujan lebat MetMalaysia untuk negeri anda di Utama":
+    "MetMalaysia thunderstorm and heavy rain warnings for your state on Home",
+  "Ramalan cuaca rasmi negeri di Trend; sensor peta kini melalui pelayan Hezy":
+    "Official state weather forecast in Trend; map sensors now go through the Hezy server",
+  "Sehingga {time}": "Until {time}",
+  "Cuaca rasmi": "Official weather",
+  "Amaran cuaca MetMalaysia": "MetMalaysia weather warning",
+  "Sumber: MetMalaysia melalui data.gov.my":
+    "Source: MetMalaysia via data.gov.my",
+  "Ramalan rasmi MetMalaysia": "Official MetMalaysia forecast",
+  "Negeri {state} · sumber data.gov.my": "{state} · source data.gov.my",
+  // Frasa ramalan MetMalaysia (api.data.gov.my, teks BM tetap).
+  "Tiada Hujan": "No rain",
+  Jerebu: "Haze",
+  "Ribut petir menyeluruh": "Widespread thunderstorms",
+  "Hujan menyeluruh": "Widespread rain",
+  "Ribut petir di beberapa tempat": "Thunderstorms in some places",
+  "Ribut petir di kebanyakan tempat": "Thunderstorms in most places",
+  "Ribut petir di satu dua tempat": "Isolated thunderstorms",
+  "Hujan di beberapa tempat": "Rain in some places",
+  "Hujan di kebanyakan tempat": "Rain in most places",
+  "Hujan di satu dua tempat": "Isolated rain",
+  "Ribut petir di beberapa tempat di kawasan pantai":
+    "Thunderstorms in some coastal areas",
+  "Ribut petir di beberapa tempat di kawasan pedalaman":
+    "Thunderstorms in some inland areas",
+  "Ribut petir di kebanyakan tempat di kawasan pantai":
+    "Thunderstorms in most coastal areas",
+  "Ribut petir di kebanyakan tempat di kawasan pedalaman":
+    "Thunderstorms in most inland areas",
+  "Hujan di beberapa tempat di kawasan pantai": "Rain in some coastal areas",
+  "Hujan di beberapa tempat di kawasan pedalaman": "Rain in some inland areas",
+  "Sepanjang Hari": "All day",
+  "Pagi dan Petang": "Morning and afternoon",
+  "Petang dan Malam": "Afternoon and night",
+  "Pagi dan Malam": "Morning and night",
   "Amaran lebih tepat pada masanya": "More timely alerts",
   "Semakan amaran IPU dijalankan lebih kerap supaya notifikasi tidak lewat":
     "API alert checks run more often so notifications are not late",
