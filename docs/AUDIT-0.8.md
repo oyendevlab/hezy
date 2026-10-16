@@ -135,12 +135,13 @@ Kaveat: data model lepas ialah analisis terbaik Open-Meteo (bukan ramalan sebena
 
 ## 6. Pelan keluaran dicadangkan
 
-| Versi  | Fokus                                                                             |
-| ------ | --------------------------------------------------------------------------------- |
-| v0.8.1 | ✅ Keselamatan                                                                    |
-| v0.8.2 | Laju & stabil: S1–S3, S5, S6                                                      |
-| v0.8.3 | Model ramalan E dalam mod bayang (M1, M2) + kad harian unit JAS (M3)              |
-| v0.8.4 | Tukar ke model E selepas 7–14 hari data bayang; julat ketidakpastian (M4)         |
-| v0.8.5 | Anggaran kawasan tanpa stesen (D1) + pra-panas (S4), cache ikut jadual APIMS (D2) |
-| v0.8.6 | MetMalaysia: amaran dan ramalan rasmi (D3), proksi WAQI (D4)                      |
-| v0.9.0 | Penanda siri data & logik siap                                                    |
+| Versi  | Fokus                                                                                           |
+| ------ | ----------------------------------------------------------------------------------------------- |
+| v0.8.1 | ✅ Keselamatan                                                                                  |
+| v0.8.2 | ✅ Laju & stabil: S1–S3, S5, S6                                                                 |
+| v0.8.3 | ✅ Model ramalan E dalam mod bayang (M1, M2) + kad harian unit JAS (M3)                         |
+| v0.8.4 | Kestabilan jadual (Fasa 35): Vercel Cron harian, GitHub kerap, pemantauan jurang amaran         |
+| v0.8.5 | Tukar graf dan jalur per jam ke model E selepas ≥ 7 hari data bayang; julat ketidakpastian (M4) |
+| v0.8.6 | Anggaran kawasan tanpa stesen (D1) + pra-panas (S4), cache ikut jadual APIMS (D2)               |
+| v0.8.7 | MetMalaysia: amaran dan ramalan rasmi (D3), proksi WAQI (D4)                                    |
+| v0.9.0 | Penanda siri data & logik siap                                                                  |

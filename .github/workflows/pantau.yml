@@ -9,6 +9,8 @@ on:
 permissions:
   contents: read
   issues: write
+  # Senarai larian push-check.yml untuk semakan jurang amaran (v0.8.4).
+  actions: read
 
 jobs:
   pantau:
@@ -24,6 +26,7 @@ jobs:
         env:
           MONITOR_REPORT: ${{ runner.temp }}/laporan.md
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: node scripts/monitor.mjs
       - name: Buka atau kemas kini issue
         if: failure() && steps.semak.outcome == 'failure'

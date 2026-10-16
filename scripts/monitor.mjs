@@ -3,6 +3,17 @@
 
 const BASE = process.env.HEZY_URL ?? "https://hezy.my";
 const MAX_AGE_HOURS = 6;
+/** Jurang maksimum antara semakan amaran (push-check.yml) dalam 24 jam lepas (v0.8.4). */
+const MAX_ALERT_GAP_HOURS = 2;
+
+/** Jurang terbesar (jam) antara masa larian dalam tempoh [start, end], termasuk kedua-dua hujung. */
+function maxGapHours(times, start, end) {
+  const points = [start, ...times.filter((t) => t >= start && t <= end), end];
+  let gap = 0;
+  for (let i = 1; i < points.length; i++)
+    gap = Math.max(gap, points[i] - points[i - 1]);
+  return gap / 3_600_000;
+}
 
 /** Jam semasa waktu Malaysia, `YYYY-MM-DDTHH:00`. */
 function malaysiaHourKey(now = new Date()) {
@@ -81,7 +92,7 @@ const checks = [
       if (age > 30)
         return `indeks ketepatan tidak dikemas kini sejak ${Math.round(age)} jam`;
       console.log(
-        `   anggaran ±${body.estimate ?? "–"} · ramalan ±${body.forecast ?? "–"} (asal ±${body.forecastRaw ?? "–"}) · ${body.days} hari`,
+        `   anggaran ±${body.estimate ?? "–"} · ramalan ±${body.forecast ?? "–"} (asal ±${body.forecastRaw ?? "–"}) · ${body.days} hari · model E (bayang) ±${body.forecastJas ?? "–"} · ${body.jasDays ?? 0} hari`,
       );
       return null;
     },
@@ -125,6 +136,47 @@ const checks = [
           .slice(0, 3)
           .map((e) => `${e.count}× ${e.message}`)
           .join("; ")}`;
+      return null;
+    },
+  },
+  {
+    name: "Jadual: semakan amaran (push-check.yml, 24 jam)",
+    async run() {
+      const token = process.env.GITHUB_TOKEN;
+      if (!token) {
+        console.log("   (dilangkau: GITHUB_TOKEN tiada)");
+        return null;
+      }
+      const repo = process.env.GITHUB_REPOSITORY ?? "oyendevlab/hezy";
+      const end = Date.now();
+      const start = end - 24 * 3_600_000;
+      const params = new URLSearchParams({
+        per_page: "100",
+        created: `>=${new Date(start).toISOString()}`,
+      });
+      const res = await fetch(
+        `https://api.github.com/repos/${repo}/actions/workflows/push-check.yml/runs?${params}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/vnd.github+json",
+          },
+          signal: AbortSignal.timeout(30_000),
+        },
+      );
+      if (!res.ok) return `API GitHub memulangkan status ${res.status}`;
+      const { workflow_runs: runs = [] } = await res.json();
+      // Larian yang selesai (berjaya atau ada notifikasi gagal) bermakna semakan berlaku.
+      const times = runs
+        .filter((r) => r.conclusion === "success" || r.conclusion === "failure")
+        .map((r) => Date.parse(r.run_started_at ?? r.created_at))
+        .sort((a, b) => a - b);
+      const gap = maxGapHours(times, start, end);
+      console.log(
+        `   ${times.length} larian dalam 24 jam, jurang terbesar ${gap.toFixed(1)} jam`,
+      );
+      if (gap > MAX_ALERT_GAP_HOURS)
+        return `jurang ${gap.toFixed(1)} jam antara semakan amaran (had ${MAX_ALERT_GAP_HOURS} jam; ${times.length} larian dalam 24 jam) — amaran IPU mungkin lewat`;
       return null;
     },
   },
