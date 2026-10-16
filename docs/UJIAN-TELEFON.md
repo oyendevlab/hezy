@@ -224,6 +224,12 @@ Buka **https://hezy.my** pada telefon.
 - [ ] Tetapan → Notifikasi: hidupkan banner, tukar pilihan, **Hantar** notifikasi ujian → notifikasi diterima
 - [ ] Kongsi gambar dari Utama dan negeri → pratonton dan helaian kongsi berfungsi
 
+## v0.8.2 — laju dan stabil
+
+- [ ] Pilih lokasi baharu (cth. bandar yang belum pernah dibuka): nombor IPU muncul dalam beberapa saat
+- [ ] Jika ikon cuaca atau baris angin tiada pada mulanya, ia muncul sendiri dalam ~1–2 minit (tanpa tarik untuk muat semula)
+- [ ] Utama, Trend dan Lokasi masih memaparkan bacaan rasmi APIMS, graf dan ramalan seperti biasa
+
 ## Jika ada masalah
 
 Ambil tangkapan skrin dan catat model telefon serta versi OS, kemudian buka isu di

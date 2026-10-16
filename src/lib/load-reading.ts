@@ -1,6 +1,12 @@
+import { after } from "next/server";
 import type { HourlyOfficial, Station } from "./apims";
+import { handled, withinBudget } from "./budget";
 import type { Coords } from "./coords";
-import { getAirQuality, getStateHistory, getTwoPmReadings } from "./data";
+import {
+  getAirQualityResilient,
+  getStateHistory,
+  getTwoPmReadings,
+} from "./data";
 import { addDays } from "./history";
 import { officialFor, withOfficialHistory } from "./official";
 import { buildReading, localHourKey, type Reading } from "./reading";
@@ -11,35 +17,83 @@ import {
 } from "./school";
 
 /**
+ * Sel model 0.1°: Open-Meteo mengambil titik grid 0.1° terdekat, jadi nilainya sama untuk
+ * semua koordinat dalam sel dan cache boleh dikongsi (v0.8.2).
+ */
+export function modelCell({ lat, lon }: Coords): Coords {
+  return { lat: Math.round(lat * 10) / 10, lon: Math.round(lon * 10) / 10 };
+}
+
+export type LoadOptions = {
+  /**
+   * Had menunggu sejarah APIMS (ms). Tanpanya sejarah ditunggu sepenuhnya (semakan amaran);
+   * dengan had, bacaan dipulangkan tanpa sejarah dan ditandakan `partial`.
+   */
+  historyBudgetMs?: number;
+};
+
+type StationList = readonly Station[] | null;
+
+/**
  * Bacaan lengkap bagi koordinat: model Open-Meteo, bacaan rasmi APIMS stesen terdekat,
  * sejarah sejam (graf) dan ramalan yang dibetulkan. Digunakan oleh /api/aqi dan semakan amaran.
+ * Model diminta serta-merta, selari dengan senarai stesen dan sejarah rasmi.
  */
 export async function loadReading(
   coords: Coords,
   now: Date,
-  stations: readonly Station[] | null,
-): Promise<{ reading: Reading; station: Station | undefined }> {
-  const series = await getAirQuality(coords.lat, coords.lon);
+  stations: StationList | Promise<StationList>,
+  options: LoadOptions = {},
+): Promise<{
+  reading: Reading;
+  station: Station | undefined;
+  /** Sebahagian data (sejarah rasmi) belum sempat diambil. */
+  partial: boolean;
+}> {
+  const cell = modelCell(coords);
+  const seriesPromise = handled(getAirQualityResilient(cell.lat, cell.lon));
   const nowKey = localHourKey(now);
-  const official = stations ? officialFor([...stations], coords, nowKey) : null;
+  const list = await stations;
+  const official = list ? officialFor([...list], coords, nowKey) : null;
   const station = official
-    ? stations?.find((s) => s.id === official.stationId)
+    ? list?.find((s) => s.id === official.stationId)
     : undefined;
-  let history: HourlyOfficial[] = [];
-  if (station?.stateId != null) {
-    try {
-      history =
-        (await getStateHistory(station.stateId, nowKey))[station.id] ?? [];
-    } catch (error) {
-      console.error("[loadReading] APIMS sejarah", error);
-    }
-  }
-  let reading = buildReading(series, now, history);
+  const [series, history] = await Promise.all([
+    seriesPromise,
+    officialHistory(station, nowKey, options.historyBudgetMs),
+  ]);
+  let reading = buildReading(series, now, history.hours);
   reading.official = official;
-  reading = withOfficialHistory(reading, history);
+  reading = withOfficialHistory(reading, history.hours);
   if (station)
-    reading.schoolTwoPm = await schoolTwoPm(station.id, history, nowKey);
-  return { reading, station };
+    reading.schoolTwoPm = await schoolTwoPm(station.id, history.hours, nowKey);
+  return { reading, station, partial: history.late };
+}
+
+/** Sejarah 25 jam stesen; bila melepasi had, dibiar siap selepas respons untuk mengisi cache. */
+async function officialHistory(
+  station: Station | undefined,
+  nowKey: string,
+  budgetMs: number | undefined,
+): Promise<{ hours: HourlyOfficial[]; late: boolean }> {
+  if (station?.stateId == null) return { hours: [], late: false };
+  const pending = getStateHistory(station.stateId, nowKey).then(
+    (byStation) => byStation[station.id] ?? [],
+  );
+  const result =
+    budgetMs === undefined
+      ? await pending.then(
+          (value) => ({ status: "ok" as const, value }),
+          (error: unknown) => ({ status: "error" as const, error }),
+        )
+      : await withinBudget(pending, budgetMs);
+  if (result.status === "ok") return { hours: result.value, late: false };
+  if (result.status === "late") {
+    after(() => pending.catch(() => undefined));
+    return { hours: [], late: true };
+  }
+  console.error("[loadReading] APIMS sejarah", result.error);
+  return { hours: [], late: false };
 }
 
 /**

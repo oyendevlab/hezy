@@ -1,4 +1,5 @@
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Plus_Jakarta_Sans } from "next/font/google";
 import { BottomNav, TopNav } from "@/components/app-nav";
@@ -66,6 +67,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <main className="flex-1 pb-28 md:pb-12">{children}</main>
         <BottomNav />
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
