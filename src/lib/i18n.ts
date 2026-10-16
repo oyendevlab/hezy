@@ -954,6 +954,15 @@ const EN: Record<string, string> = {
   "Ikon awan baharu yang lebih comel": "A new, cuter cloud icon",
   "Privasi dan Penafian di skrin alu-aluan":
     "Privacy and Disclaimer on the welcome screen",
+  "NOTIFIKASI DAN AMARAN": "NOTIFICATIONS AND ALERTS",
+  "Notifikasi ujian": "Test notification",
+  Hantar: "Send",
+  "Hantar lagi": "Send again",
+  "Notifikasi dan amaran digabung": "Notifications and alerts combined",
+  "Tetapan amaran muncul bila banner dihidupkan":
+    "Alert settings appear when banners are on",
+  "Padam data kini dalam kad Tentang": "Clear data now in the About card",
+  "Notifikasi lebih ringkas": "Simpler notifications",
 };
 
 /** Corak untuk teks yang disimpan dengan nama tempat, cth. nama lokasi GPS. */

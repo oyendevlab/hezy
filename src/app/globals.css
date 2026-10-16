@@ -451,3 +451,19 @@ html[data-scrolled] .sky-header-strip {
 [data-full] .leaflet-bottom {
   bottom: env(safe-area-inset-bottom);
 }
+
+/* Tetapan amaran muncul bila banner dihidupkan (v0.7.13). */
+@keyframes reveal-down {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+.sheet-reveal {
+  animation: reveal-down 240ms ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sheet-reveal {
+    animation: none;
+  }
+}

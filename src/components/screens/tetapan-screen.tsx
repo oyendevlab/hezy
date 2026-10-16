@@ -6,6 +6,7 @@ import {
   Baby,
   BellRinging,
   BellSlash,
+  Check,
   CheckCircle,
   CircleHalf,
   Clock,
@@ -20,7 +21,6 @@ import {
   PersonSimpleWalk,
   Student,
   Target,
-  Trash,
   TrendUp,
   User,
   WifiSlash,
@@ -35,7 +35,6 @@ import { formatHour } from "@/lib/format";
 import { LANGUAGES } from "@/lib/i18n";
 import { promptInstall, useInstallStatus } from "@/lib/install";
 import {
-  DEFAULT_PREFS,
   alertLocations,
   effectiveThreshold,
   pushOptions,
@@ -99,7 +98,6 @@ const CARD = "bg-surface divide-line divide-y rounded-[20px] px-4";
 export function TetapanScreen() {
   const prefs = usePrefs();
   const { t } = useI18n();
-  const [confirmClear, setConfirmClear] = useState(false);
 
   return (
     <>
@@ -166,27 +164,9 @@ export function TetapanScreen() {
             <AboutHezy />
             <DeveloperCredit />
 
-            <button
-              type="button"
-              onClick={() => setConfirmClear(true)}
-              aria-haspopup="dialog"
-              className="text-ipu-berbahaya-ink dark:text-ipu-berbahaya-tint hover:bg-surface flex min-h-11 items-center gap-2 self-center rounded-xl px-4 text-sm font-bold"
-            >
-              <Trash aria-hidden="true" size={18} weight="bold" />
-              {t("Padam data di peranti ini")}
-            </button>
-            <p className="text-muted -mt-4 text-center text-[11px]">
+            <p className="text-muted text-center text-[11px]">
               {t("© 2026 Hezy · Data rasmi APIMS (JAS)")}
             </p>
-            {confirmClear && (
-              <BottomSheet
-                title={t("Padam data?")}
-                testId="clear-sheet"
-                onClose={() => setConfirmClear(false)}
-              >
-                <ClearDataConfirm />
-              </BottomSheet>
-            )}
           </>
         )}
       </div>
@@ -502,50 +482,6 @@ function Row({ label, value }: { label: string; value: string }) {
   );
 }
 
-function ClearDataConfirm() {
-  const { t } = useI18n();
-  const dismiss = useSheetDismiss();
-  function clearData() {
-    // Amaran push juga dimatikan supaya langganan dipadam daripada pelayan.
-    if (pushSupport() === "supported")
-      void disablePush().catch(() => undefined);
-    try {
-      Object.keys(window.localStorage)
-        .filter((key) => key.startsWith("hezy:"))
-        .forEach((key) => window.localStorage.removeItem(key));
-    } catch {
-      // Storan tidak tersedia.
-    }
-    updatePrefs(() => DEFAULT_PREFS);
-    dismiss();
-  }
-  return (
-    <>
-      <p className="text-sm leading-relaxed">
-        {t(
-          "Lokasi, kegemaran dan tetapan di peranti ini akan dipadam. Amaran juga dimatikan.",
-        )}
-      </p>
-      <div className="grid grid-cols-2 gap-2">
-        <button
-          type="button"
-          onClick={dismiss}
-          className="bg-surface min-h-12 rounded-2xl font-bold"
-        >
-          {t("Batal")}
-        </button>
-        <button
-          type="button"
-          onClick={clearData}
-          className="min-h-12 rounded-2xl bg-[#b42323] font-bold text-white"
-        >
-          {t("Padam")}
-        </button>
-      </div>
-    </>
-  );
-}
-
 const INSTALL_HELP = {
   manual:
     "Buka menu pelayar dan pilih “Pasang aplikasi” atau “Tambah ke skrin utama”.",
@@ -690,7 +626,6 @@ function NotificationSections({ prefs }: { prefs: Prefs }) {
     formatHour(`2026-01-01T${String(h).padStart(2, "0")}:00`, prefs.lang);
   const quiet = prefs.quietHours;
   const early = prefs.forecastAlert || prefs.expectedAlert;
-  const alertsOff = enabled !== true;
 
   let banner: React.ReactNode;
   if (support === null) {
@@ -713,48 +648,50 @@ function NotificationSections({ prefs }: { prefs: Prefs }) {
     );
   } else {
     banner = (
-      <>
-        <SwitchRow
-          icon={BellRinging}
-          tone="bg-ink text-page"
-          title={t("Banner notifikasi")}
-          desc={`${t("Untuk {name}", { name: t(location.name) })}${
-            extraCount > 0
-              ? t(" dan {count} lokasi kegemaran", { count: extraCount })
-              : ""
-          }`}
-          checked={enabled === true}
-          disabled={busy || enabled === null}
-          onChange={() => void toggle()}
-        />
-        {enabled && (
-          <OptionBlock
-            title={t("Waktu hantaran")}
-            desc={t("Amaran bila perlu, atau tambah ringkasan pagi")}
-          >
-            <Segmented
-              name="kekerapan"
-              value={prefs.morningSummary ? "pagi" : "amaran"}
-              onChange={(v) =>
-                updatePrefs((x) => ({ ...x, morningSummary: v === "pagi" }))
-              }
-              options={[
-                { value: "amaran", label: t("Amaran sahaja") },
-                { value: "pagi", label: t("+ Ringkasan 7 pagi") },
-              ]}
-            />
-          </OptionBlock>
-        )}
-      </>
+      <SwitchRow
+        icon={BellRinging}
+        tone="bg-ink text-page"
+        title={t("Banner notifikasi")}
+        desc={`${t("Untuk {name}", { name: t(location.name) })}${
+          extraCount > 0
+            ? t(" dan {count} lokasi kegemaran", { count: extraCount })
+            : ""
+        }`}
+        checked={enabled === true}
+        disabled={busy || enabled === null}
+        onChange={() => void toggle()}
+      />
     );
   }
 
   return (
     <>
       <section>
-        <h2 className={SECTION_TITLE}>{t("NOTIFIKASI")}</h2>
+        <div className="mb-2 flex items-center justify-between">
+          <h2 className={`${SECTION_TITLE} mb-0`}>
+            {t("NOTIFIKASI DAN AMARAN")}
+          </h2>
+          {enabled && (
+            <InfoSheetButton
+              title={t("Ambang amaran")}
+              label={t("Tentang ambang amaran")}
+              testId="info-threshold"
+              rows={[
+                {
+                  icon: Target,
+                  text: "IPU 50: amaran awal, disyorkan untuk asma, kanak-kanak dan warga emas",
+                },
+                { icon: Target, text: "IPU 100: Tidak Sihat" },
+                { icon: Target, text: "IPU 200: Sangat Tidak Sihat" },
+                {
+                  icon: Clock,
+                  text: "Disemak setiap jam; paling kerap satu amaran setiap 6 jam bagi setiap lokasi",
+                },
+              ]}
+            />
+          )}
+        </div>
         <div className={CARD}>
-          {banner}
           <SwitchRow
             icon={BadgeIcon}
             tone="bg-page text-ink"
@@ -788,131 +725,125 @@ function NotificationSections({ prefs }: { prefs: Prefs }) {
               />
             }
           />
+          {banner}
+          {/* Tetapan amaran hanya dipaparkan bila banner hidup (v0.7.13). */}
+          {enabled && (
+            <div
+              data-testid="alert-settings"
+              className="sheet-reveal divide-line divide-y"
+            >
+              <OptionBlock
+                title={t("Waktu hantaran")}
+                desc={t("Amaran bila perlu, atau tambah ringkasan pagi")}
+              >
+                <Segmented
+                  name="kekerapan"
+                  value={prefs.morningSummary ? "pagi" : "amaran"}
+                  onChange={(v) =>
+                    updatePrefs((x) => ({ ...x, morningSummary: v === "pagi" }))
+                  }
+                  options={[
+                    { value: "amaran", label: t("Amaran sahaja") },
+                    { value: "pagi", label: t("+ Ringkasan 7 pagi") },
+                  ]}
+                />
+              </OptionBlock>
+              <OptionBlock
+                title={t("Ambang amaran")}
+                desc={
+                  prefs.alertThreshold === null
+                    ? t("Lalai untuk profil {profile}", {
+                        profile: profileLabel,
+                      })
+                    : t("Dipilih sendiri · lalai IPU {threshold}", {
+                        threshold: profileDefault,
+                      })
+                }
+              >
+                <Segmented
+                  name="ambang-amaran"
+                  value={threshold}
+                  onChange={(value) =>
+                    updatePrefs((x) => ({
+                      ...x,
+                      alertThreshold: value === profileDefault ? null : value,
+                    }))
+                  }
+                  options={([50, 100, 200] as const).map((value) => ({
+                    value,
+                    label: t("IPU {threshold}", { threshold: value }),
+                  }))}
+                />
+              </OptionBlock>
+              <SwitchRow
+                icon={ClockCountdown}
+                tone="bg-[#fde3dc] text-[#a33a17]"
+                title={t("Amaran awal")}
+                desc={t("Jerebu dijangka dalam 6 jam atau esok")}
+                checked={early}
+                onChange={(on) =>
+                  updatePrefs((x) => ({
+                    ...x,
+                    forecastAlert: on,
+                    expectedAlert: on,
+                  }))
+                }
+              />
+              <SwitchRow
+                icon={TrendUp}
+                tone="bg-[#fbebb8] text-[#6b4f00]"
+                title={t("Lonjakan mendadak")}
+                desc={t("Naik 30 atau lebih dalam 3 jam")}
+                checked={prefs.spikeAlert}
+                onChange={(on) =>
+                  updatePrefs((x) => ({ ...x, spikeAlert: on }))
+                }
+              />
+              <button
+                type="button"
+                onClick={() => setQuietOpen(true)}
+                aria-haspopup="dialog"
+                className="flex min-h-15 w-full items-center gap-3 py-2 text-left"
+              >
+                <IconBox icon={Moon} tone="bg-[#e6e2f5] text-[#4b3fa0]" />
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[15px] font-bold">
+                    {t("Waktu senyap")}
+                  </span>
+                  <span className="text-muted block text-xs">
+                    {quiet
+                      ? `${hourLabel(quiet.start)} – ${hourLabel(quiet.end)}`
+                      : t("Mati")}
+                  </span>
+                </span>
+                <Chevron />
+              </button>
+              <Link
+                href="/lokasi#senarai"
+                className="flex min-h-15 items-center gap-3 py-2"
+              >
+                <IconBox icon={MapPin} tone="bg-[#dff0d4] text-[#2f6b1f]" />
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[15px] font-bold">
+                    {t("Lokasi amaran")}
+                  </span>
+                  <span className="text-muted block truncate text-xs">
+                    {locations.length > 0
+                      ? locations.map((l) => t(l.name)).join(", ")
+                      : t("Belum dipilih")}
+                  </span>
+                </span>
+                <Chevron />
+              </Link>
+              <TestNotification />
+            </div>
+          )}
         </div>
         {message && (
           <p role="alert" className="mt-2 text-xs font-semibold">
             {message}
           </p>
         )}
-      </section>
-
-      <section>
-        <div className="mb-2 flex items-center justify-between">
-          <h2 className={`${SECTION_TITLE} mb-0`}>{t("AMARAN")}</h2>
-          <InfoSheetButton
-            title={t("Ambang amaran")}
-            label={t("Tentang ambang amaran")}
-            testId="info-threshold"
-            rows={[
-              {
-                icon: Target,
-                text: "IPU 50: amaran awal, disyorkan untuk asma, kanak-kanak dan warga emas",
-              },
-              { icon: Target, text: "IPU 100: Tidak Sihat" },
-              { icon: Target, text: "IPU 200: Sangat Tidak Sihat" },
-              {
-                icon: Clock,
-                text: "Disemak setiap jam; paling kerap satu amaran setiap 6 jam bagi setiap lokasi",
-              },
-            ]}
-          />
-        </div>
-        {alertsOff && support === "supported" && location && (
-          <p className="text-muted mb-2 flex items-center gap-1.5 text-xs">
-            <BellSlash aria-hidden="true" size={14} weight="bold" />
-            {t("Hidupkan banner notifikasi untuk menerima amaran")}
-          </p>
-        )}
-        <div
-          data-testid="alert-settings"
-          inert={alertsOff}
-          className={`${CARD} ${alertsOff ? "opacity-50" : ""}`}
-        >
-          <OptionBlock
-            title={t("Ambang amaran")}
-            desc={
-              prefs.alertThreshold === null
-                ? t("Lalai untuk profil {profile}", { profile: profileLabel })
-                : t("Dipilih sendiri · lalai IPU {threshold}", {
-                    threshold: profileDefault,
-                  })
-            }
-          >
-            <Segmented
-              name="ambang-amaran"
-              value={threshold}
-              onChange={(value) =>
-                updatePrefs((x) => ({
-                  ...x,
-                  alertThreshold: value === profileDefault ? null : value,
-                }))
-              }
-              options={([50, 100, 200] as const).map((value) => ({
-                value,
-                label: t("IPU {threshold}", { threshold: value }),
-              }))}
-            />
-          </OptionBlock>
-          <SwitchRow
-            icon={ClockCountdown}
-            tone="bg-[#fde3dc] text-[#a33a17]"
-            title={t("Amaran awal")}
-            desc={t("Jerebu dijangka dalam 6 jam atau esok")}
-            checked={early}
-            onChange={(on) =>
-              updatePrefs((x) => ({
-                ...x,
-                forecastAlert: on,
-                expectedAlert: on,
-              }))
-            }
-          />
-          <SwitchRow
-            icon={TrendUp}
-            tone="bg-[#fbebb8] text-[#6b4f00]"
-            title={t("Lonjakan mendadak")}
-            desc={t("Naik 30 atau lebih dalam 3 jam")}
-            checked={prefs.spikeAlert}
-            onChange={(on) => updatePrefs((x) => ({ ...x, spikeAlert: on }))}
-          />
-          <button
-            type="button"
-            onClick={() => setQuietOpen(true)}
-            aria-haspopup="dialog"
-            className="flex min-h-15 w-full items-center gap-3 py-2 text-left"
-          >
-            <IconBox icon={Moon} tone="bg-[#e6e2f5] text-[#4b3fa0]" />
-            <span className="min-w-0 flex-1">
-              <span className="block text-[15px] font-bold">
-                {t("Waktu senyap")}
-              </span>
-              <span className="text-muted block text-xs">
-                {quiet
-                  ? `${hourLabel(quiet.start)} – ${hourLabel(quiet.end)}`
-                  : t("Mati")}
-              </span>
-            </span>
-            <Chevron />
-          </button>
-          <Link
-            href="/lokasi#senarai"
-            className="flex min-h-15 items-center gap-3 py-2"
-          >
-            <IconBox icon={MapPin} tone="bg-[#dff0d4] text-[#2f6b1f]" />
-            <span className="min-w-0 flex-1">
-              <span className="block text-[15px] font-bold">
-                {t("Lokasi amaran")}
-              </span>
-              <span className="text-muted block truncate text-xs">
-                {locations.length > 0
-                  ? locations.map((l) => t(l.name)).join(", ")
-                  : t("Belum dipilih")}
-              </span>
-            </span>
-            <Chevron />
-          </Link>
-          {enabled && <TestNotification />}
-        </div>
       </section>
 
       {quietOpen && (
@@ -1083,34 +1014,36 @@ function TestNotification() {
     }
   }
 
+  const sent = state.status === "sent";
   return (
-    <div className="py-2">
+    <div className="flex min-h-15 items-center gap-3 py-2">
+      <IconBox icon={PaperPlaneTilt} tone="bg-page text-ink" />
+      <span className="min-w-0 flex-1">
+        <span className="block text-[15px] font-bold">
+          {t("Notifikasi ujian")}
+        </span>
+        <span role="status" className="text-muted block text-xs">
+          {sent
+            ? t("Dihantar. Notifikasi sepatutnya muncul dalam beberapa saat.")
+            : state.status === "error"
+              ? state.message
+              : t("Semak amaran sampai ke peranti ini")}
+        </span>
+      </span>
       <button
         type="button"
         onClick={() => void send()}
         disabled={state.status === "busy"}
-        className="flex min-h-12 w-full items-center gap-3 text-left disabled:opacity-60"
+        aria-label={t("Hantar notifikasi ujian")}
+        className="bg-pick text-pick-ink flex min-h-9 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-[13px] font-bold disabled:opacity-60"
       >
-        <IconBox icon={PaperPlaneTilt} tone="bg-page text-ink" />
-        <span className="min-w-0 flex-1">
-          <span className="block text-[15px] font-bold">
-            {state.status === "busy"
-              ? t("Menghantar…")
-              : t("Hantar notifikasi ujian")}
-          </span>
-          <span className="text-muted block text-xs">
-            {t("Semak amaran sampai ke peranti ini")}
-          </span>
-        </span>
-        <Chevron />
+        {sent && <Check aria-hidden="true" size={14} weight="bold" />}
+        {state.status === "busy"
+          ? t("Menghantar…")
+          : sent
+            ? t("Hantar lagi")
+            : t("Hantar")}
       </button>
-      <p role="status" className="text-muted pt-1 pl-12 text-xs empty:hidden">
-        {state.status === "sent"
-          ? t("Dihantar. Notifikasi sepatutnya muncul dalam beberapa saat.")
-          : state.status === "error"
-            ? state.message
-            : ""}
-      </p>
     </div>
   );
 }

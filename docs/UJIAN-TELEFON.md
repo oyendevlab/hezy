@@ -193,6 +193,14 @@ Buka **https://hezy.my** pada telefon.
 - [ ] Tetapan → kad Tentang → Penafian
 - [ ] Gambar kongsi (kad) memaparkan logo baharu
 
+## Ciri baharu v0.7.13
+
+- [ ] Tetapan: satu bahagian **Notifikasi dan Amaran** — Nombor pada ikon dahulu, kemudian Banner notifikasi
+- [ ] Banner mati → tetapan amaran tersembunyi; hidupkan → Waktu hantaran, Ambang, Amaran awal, Lonjakan, Waktu senyap, Lokasi amaran, Notifikasi ujian muncul
+- [ ] Notifikasi ujian: butang pil **Hantar** (bukan anak panah); selepas dihantar → "✓ Hantar lagi"
+- [ ] Kad Tentang: **Padam data di peranti ini** di bawah Privasi → helaian dengan ikon amaran, Batal / Padam
+- [ ] Kredit: "Learn. Build. Repeat"
+
 ## Jika ada masalah
 
 Ambil tangkapan skrin dan catat model telefon serta versi OS, kemudian buka isu di
