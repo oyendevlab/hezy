@@ -13,6 +13,15 @@ export type Release = {
 
 export const CHANGELOG: readonly Release[] = [
   {
+    version: "0.8.7",
+    date: "2026-10-17",
+    title: "Graf dan ramalan per jam sepadan dengan bacaan rasmi",
+    items: [
+      "Ramalan per jam bermula pada jam semasa, sama seperti graf",
+      "Graf dan ramalan kini dikira seperti IPU rasmi JAS (purata 24 jam), tanpa jatuh mendadak",
+    ],
+  },
+  {
     version: "0.8.6",
     date: "2026-10-16",
     title: "Amaran dan ramalan rasmi MetMalaysia",

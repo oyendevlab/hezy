@@ -632,7 +632,7 @@ Rujukan: [AUDIT-0.8.md](AUDIT-0.8.md) §2 (backtest: E mengurangkan ralat 24–6
 6. ✅ Ujian unit model E, mod bayang, kad harian dan `dayIpu` (294 lulus); E2E 186 lulus; data sebenar KL: esok 142 (dahulu 105) dengan rasmi semasa 155
 7. ✅ Versi 0.8.3, Apa yang baharu, tag dan GitHub Release
 8. ✅ `ketepatan.yml` dijalankan selepas deployment: snapshot 17 Okt mengandungi model E untuk 68/68 stesen (cth. Cheras v0.8.0 150→95→90→121, model E 154→152→139→124); penilaian pertama selepas 17 Okt berlalu
-9. ⬜ Keluaran berasingan (selepas ≥ 7 hari data bayang, iaitu ~24 Okt): tukar graf, jalur per jam dan masa terbaik ke model E jika `forecastJas` < `forecast` (v0.8.4 digunakan untuk kestabilan jadual, Fasa 35)
+9. ✅ Dibuat lebih awal atas pilihan pengguna (17 Okt) — lihat Fasa 38 (v0.8.7); perbandingan bayang diteruskan untuk rekod
 
 ## Fasa 35 — v0.8.4 (kestabilan jadual, pilihan percuma; 16 Okt 2026)
 
@@ -667,3 +667,14 @@ Kerja malam 16–17 Okt 2026 (dipersetujui pengguna). Rujukan: [AUDIT-0.8.md](AU
 3. ✅ Kad amaran cuaca rasmi di Utama bila lokasi terlibat (dalam app sahaja, tiada notifikasi push baharu); ramalan rasmi MetMalaysia dalam Trend; sumber dalam kredit
 4. ✅ Proksi WAQI: `/api/waqi?scope=malaysia|region` di pelayan, **tanpa sebarang cache** (terma WAQI: "The data can not be redistributed as cached or archived data"), hanya dua kotak tetap, tolak rentas laman, had kadar; token tidak lagi dalam bundle pelayar dan WAQI tidak melihat IP pengguna; CSP `connect-src 'self'` sahaja; teks privasi dikemas kini
 5. ✅ Ujian (unit: penghurai dan padanan MetMalaysia dengan format sebenar; E2E: kad amaran, ramalan Trend, proksi WAQI), versi 0.8.6, Apa yang baharu (BM/EN), tag dan GitHub Release
+
+## Fasa 38 — v0.8.7 (graf dan ramalan per jam guna model E; 17 Okt 2026)
+
+Laporan pengguna 17 Okt 2026: graf Trend 160 tetapi ramalan per jam "Kini" 155. Punca: (1) "Kini" sebenarnya jam seterusnya (jalur bermula pada jam ramalan pertama); (2) jalur dan graf masih kaedah v0.8.0 (IPU sejam ikut kitaran harian model, cth. rasmi 160 → ramalan 151 → 143 → 138). Pengguna memilih menukar ke model E sekarang tanpa menunggu 7 hari data bayang.
+
+1. ✅ `displayIpu` satu sumber untuk semua paparan per jam: rasmi bagi jam lepas, model E bagi jam belum diterbitkan (graf Trend, bar mini Utama, kad kongsi, banding lokasi, purata pagi/petang/malam, perubahan 3 jam, amaran lonjakan dan jerebu dijangka)
+2. ✅ Ramalan per jam bermula pada jam semasa ("Kini" = sama seperti graf; rasmi jika sudah terbit), 23 jam seterusnya model E
+3. ✅ Masa terbaik keluar: jam dipilih ikut PM2.5 sejam paling rendah (pendedahan), IPU dipaparkan daripada model E
+4. ✅ Label "Ramalan dibetulkan" ikut asas model E (atau bias stesen berdekatan); teks ⓘ graf dan ramalan per jam dikemas kini (BM/EN)
+5. ✅ Legenda graf dan Tetapan memaparkan ralat model E (`forecastJas`, selepas ≥ 3 hari data), bukan ralat kaedah lama
+6. ✅ Ujian (311 unit, 190 E2E), versi 0.8.7, Apa yang baharu (BM/EN), tag dan GitHub Release; data sebenar 05:28: KL graf 160 = Kini 160 (dahulu Kini 151 untuk 6 AM), Melaka 171 = 171, Mersing 92 = 92, Lawas 54 = 54; mod bayang diteruskan untuk rekod

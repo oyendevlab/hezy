@@ -259,6 +259,13 @@ Buka **https://hezy.my** pada telefon.
 - [ ] Bahasa Inggeris: tajuk amaran dan frasa ramalan diterjemah
 - [ ] Lokasi → Peta: pin sensor WAQI bergaris putus dan taburan IPU luar Malaysia masih dipaparkan
 
+## v0.8.7 — graf dan ramalan per jam sepadan
+
+- [ ] Trend: nilai "Kini" dalam Ramalan per jam sama dengan bar jam semasa dalam graf
+- [ ] Jam ramalan berubah beransur-ansur dari bacaan rasmi (tiada jatuh mendadak pada waktu malam)
+- [ ] Masa terbaik keluar: IPU yang dipaparkan hampir dengan bacaan rasmi (bukan jauh lebih rendah)
+- [ ] Lokasi tanpa stesen (cth. Mersing): "Kini" juga sama dengan graf
+
 ## Jika ada masalah
 
 Ambil tangkapan skrin dan catat model telefon serta versi OS, kemudian buka isu di

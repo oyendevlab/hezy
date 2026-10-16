@@ -77,7 +77,7 @@ export function HourlyStrip({ hours }: { hours: HourForecast[] | undefined }) {
             rows={[
               {
                 icon: ChartBar,
-                text: "Pil berwarna ialah ramalan IPU bagi jam itu",
+                text: "Kini ialah bacaan jam semasa (rasmi APIMS jika sudah terbit); jam lain ialah ramalan IPU dikira seperti JAS (purata 24 jam)",
               },
               {
                 icon: CloudSun,

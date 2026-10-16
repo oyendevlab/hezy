@@ -275,8 +275,8 @@ const EN: Record<string, string> = {
   "Tentang ramalan harian": "About the daily forecast",
   "Tentang graf hari ini": "About today's chart",
   "Tentang sejarah {n} minggu": "About the {n}-week history",
-  "Pil berwarna ialah ramalan IPU bagi jam itu":
-    "The coloured pill is the forecast API for that hour",
+  "Kini ialah bacaan jam semasa (rasmi APIMS jika sudah terbit); jam lain ialah ramalan IPU dikira seperti JAS (purata 24 jam)":
+    "Now is the current hour's reading (official APIMS once published); other hours are API forecasts calculated like the DOE (24-hour average)",
   "Ikon cuaca dan suhu daripada Open-Meteo":
     "Weather icon and temperature from Open-Meteo",
   "Angin permukaan dalam km/j": "Surface wind in km/h",
@@ -457,8 +457,8 @@ const EN: Record<string, string> = {
   "Ramalan 3 hari": "3-day forecast",
   Anggaran: "Estimate",
   "Purata · maks {max}": "Average · max {max}",
-  "Jam lepas dan purata menggunakan bacaan rasmi APIMS stesen terdekat jika ada. Ramalan dan masa terbaik menggunakan IPU sejam daripada PM2.5 model (formula JAS).":
-    "Past hours and averages use official APIMS readings from the nearest station when available. Forecasts and the best time use hourly API from model PM2.5 (DOE formula).",
+  "Ramalan dikira seperti JAS (purata 24 jam) daripada PM2.5 model, dibetulkan dengan stesen APIMS berdekatan jika ada. Masa terbaik dipilih ikut jam PM2.5 paling rendah.":
+    "The forecast is calculated like the DOE (24-hour average) from model PM2.5, corrected with nearby APIMS stations where available. The best time is chosen from the hours with the lowest PM2.5.",
   "Graf IPU hari ini. Tertinggi {max} pada {maxTime}, terendah {min} pada {minTime}.":
     "Today's API chart. Highest {max} at {maxTime}, lowest {min} at {minTime}.",
   "Graf IPU hari ini. Data tidak mencukupi.":
@@ -691,8 +691,8 @@ const EN: Record<string, string> = {
     "Average 14-day error against official APIMS readings (all stations). Forecasts are checked nightly: tomorrow's forecast is saved, then compared with actual readings.",
   "Jam akan datang: ramalan dibetulkan dengan APIMS":
     "Coming hours: forecast corrected with APIMS",
-  "Jam lepas menggunakan bacaan rasmi APIMS stesen {station}. Ramalan model (PM2.5, formula JAS) dibetulkan dengan bacaan itu: {offset} µg/m³ pada jam semasa, berkurang ke model dalam 48 jam.":
-    "Past hours use official APIMS readings from the {station} station. The model forecast (PM2.5, DOE formula) is corrected with those readings: {offset} µg/m³ at the current hour, fading back to the model over 48 hours.",
+  "Jam lepas menggunakan bacaan rasmi APIMS stesen {station}. Ramalan dikira seperti JAS (purata 24 jam), bermula pada bacaan rasmi terkini dan berubah beransur-ansur. Masa terbaik dipilih ikut jam PM2.5 paling rendah.":
+    "Past hours use official APIMS readings from the {station} station. The forecast is calculated like the DOE (24-hour average), starting from the latest official reading and changing gradually. The best time is chosen from the hours with the lowest PM2.5.",
   "Padam data di peranti ini": "Delete data on this device",
   "Padam lokasi, kegemaran dan tetapan yang disimpan di peranti ini?":
     "Delete the locations, favourites and settings saved on this device?",
@@ -1009,6 +1009,12 @@ const EN: Record<string, string> = {
     "Areas far from APIMS stations are now corrected with official readings from nearby stations",
   "Bacaan rasmi terbaharu muncul lebih cepat selepas JAS menerbitkannya":
     "The latest official reading appears sooner after the DOE publishes it",
+  "Graf dan ramalan per jam sepadan dengan bacaan rasmi":
+    "Chart and hourly forecast match the official reading",
+  "Ramalan per jam bermula pada jam semasa, sama seperti graf":
+    "The hourly forecast starts at the current hour, same as the chart",
+  "Graf dan ramalan kini dikira seperti IPU rasmi JAS (purata 24 jam), tanpa jatuh mendadak":
+    "The chart and forecast are now calculated like the official DOE API (24-hour average), without sudden drops",
   "Amaran dan ramalan rasmi MetMalaysia":
     "Official MetMalaysia warnings and forecast",
   "Amaran ribut petir dan hujan lebat MetMalaysia untuk negeri anda di Utama":
