@@ -1,3 +1,4 @@
+import { OG_FONT_FAMILY, ogFonts } from "@/lib/og-fonts";
 import { LOGO_DATA_URL } from "@/lib/logo-art";
 import { ImageResponse } from "next/og";
 import { adviceFor } from "@/lib/advice";
@@ -42,6 +43,7 @@ export async function GET(request: Request) {
     ? `${formatHour(summary.time, lang)} · ${formatShortDate(summary.time.slice(0, 10), lang)}`
     : null;
 
+  const fonts = await ogFonts(request.url);
   return new ImageResponse(
     <div
       style={{
@@ -53,7 +55,7 @@ export async function GET(request: Request) {
         padding: story ? "120px 64px 96px" : "60px 68px",
         background: style.sky.sky,
         color: INK,
-        fontFamily: "sans-serif",
+        fontFamily: `${OG_FONT_FAMILY}, sans-serif`,
       }}
     >
       <div
@@ -228,6 +230,7 @@ export async function GET(request: Request) {
       </div>
     </div>,
     {
+      fonts,
       ...CARD_SIZE[format],
       headers: {
         "Cache-Control": "public, max-age=600, s-maxage=900",

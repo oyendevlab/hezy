@@ -7,7 +7,7 @@ import { shownError } from "@/lib/accuracy";
 import { HEALTH_PROFILES, adviceFor, type QuickTone } from "@/lib/advice";
 import { CATEGORY_STYLE } from "@/lib/category-style";
 import { useMediaQuery } from "@/lib/use-media-query";
-import { formatChange, formatClock } from "@/lib/format";
+import { formatChange, formatClock, formatStamp } from "@/lib/format";
 import { displayIpu, primaryReading } from "@/lib/official";
 import type { Prefs, SavedLocation } from "@/lib/prefs";
 import type { Reading } from "@/lib/reading";
@@ -250,6 +250,7 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
             hours: reading.today.map(displayIpu),
             now: reading.today.findLastIndex((h) => !h.forecast),
             time: formatClock(current.time, lang),
+            made: formatStamp(new Date(), lang),
             lang,
             format,
             state: flagState,

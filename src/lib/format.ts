@@ -4,35 +4,29 @@ import type { Lang } from "./i18n";
 
 const hourOf = (time: string) => Number(time.slice(11, 13));
 
-type Period = "pagi" | "tengah hari" | "petang" | "malam" | "tengah malam";
-
-function period(hour: number, lang: Lang): string {
-  if (lang === "en") return hour < 12 ? "am" : "pm";
-  let p: Period;
-  if (hour === 0) p = "tengah malam";
-  else if (hour < 12) p = "pagi";
-  else if (hour === 12) p = "tengah hari";
-  else if (hour < 19) p = "petang";
-  else p = "malam";
-  return p;
+/** AM/PM dalam kedua-dua bahasa (v0.7.15): pendek dan seragam lebarnya. */
+function period(hour: number): string {
+  return hour < 12 ? "AM" : "PM";
 }
 
 const clockHour = (hour: number) => (hour % 12 === 0 ? 12 : hour % 12);
 
-/** "2026-10-11T22:00" → "10 malam" / "10 pm" */
-export function formatHour(time: string, lang: Lang = "ms"): string {
+/** "2026-10-11T22:00" → "10 PM" */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- API kekal; format sama dalam kedua-dua bahasa.
+export function formatHour(time: string, _lang: Lang = "ms"): string {
   const hour = hourOf(time);
-  return `${clockHour(hour)} ${period(hour, lang)}`;
+  return `${clockHour(hour)} ${period(hour)}`;
 }
 
-/** "2026-10-11T22:00" → "10:00 malam" / "10:00 pm" */
-export function formatClock(time: string, lang: Lang = "ms"): string {
+/** "2026-10-11T22:00" → "10:00 PM" */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- API kekal; format sama dalam kedua-dua bahasa.
+export function formatClock(time: string, _lang: Lang = "ms"): string {
   const hour = hourOf(time);
-  return `${clockHour(hour)}:${time.slice(14, 16)} ${period(hour, lang)}`;
+  return `${clockHour(hour)}:${time.slice(14, 16)} ${period(hour)}`;
 }
 
 /**
- * Julat jam, cth. "5 – 7 pagi" atau "11 malam – 1 pagi". Hujung julat ialah
+ * Julat jam, cth. "5 – 7 AM" atau "11 PM – 1 AM". Hujung julat ialah
  * jam terakhir tetingkap; `today` (YYYY-MM-DD) menambah "esok" bila perlu.
  */
 export function formatWindow(
@@ -44,8 +38,8 @@ export function formatWindow(
   const a = hourOf(start);
   const b = hourOf(end);
   const range =
-    period(a, lang) === period(b, lang)
-      ? `${clockHour(a)} – ${clockHour(b)} ${period(b, lang)}`
+    period(a) === period(b)
+      ? `${clockHour(a)} – ${clockHour(b)} ${period(b)}`
       : `${formatHour(start, lang)} – ${formatHour(end, lang)}`;
   if (start.slice(0, 10) === today) return range;
   return `${lang === "en" ? "Tomorrow" : "Esok"}, ${range}`;
@@ -178,4 +172,23 @@ export function formatLongDate(
     weekday: DAY_NAMES_LONG[lang][d.getUTCDay()],
     date: `${d.getUTCDate()} ${MONTH_NAMES_LONG[lang][d.getUTCMonth()]} ${d.getUTCFullYear()}`,
   };
+}
+
+/** Cap masa waktu Malaysia, cth. "16 Okt · 2:15 PM" (masa imej kongsi dijana, v0.7.15). */
+export function formatStamp(date: Date, lang: Lang = "ms"): string {
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat("en-GB", {
+      timeZone: "Asia/Kuala_Lumpur",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hourCycle: "h23",
+    })
+      .formatToParts(date)
+      .map((p) => [p.type, p.value]),
+  );
+  const iso = `${parts.year}-${parts.month}-${parts.day}T${parts.hour}:${parts.minute}`;
+  return `${Number(parts.day)} ${formatMonth(iso.slice(0, 10), lang)} · ${formatClock(iso, lang)}`;
 }

@@ -206,7 +206,7 @@ test.describe("aliran utama", () => {
     await seedLocation(page);
     await page.goto("/trend");
     await expect(page.getByText("MASA TERBAIK UNTUK KELUAR")).toBeVisible();
-    await expect(page.getByText("8 – 10 malam")).toBeVisible();
+    await expect(page.getByText("8 – 10 PM")).toBeVisible();
     await expect(
       page.getByRole("slider", { name: "Graf IPU hari ini, jam demi jam" }),
     ).toBeVisible();
@@ -264,10 +264,10 @@ test.describe("aliran utama", () => {
     const chart = page.getByRole("slider", {
       name: "Graf IPU hari ini, jam demi jam",
     });
-    // Lalai: jam semasa (10 pagi, anggaran model 156).
+    // Lalai: jam semasa (10 AM, anggaran model 156).
     await expect(chart).toHaveAttribute(
       "aria-valuetext",
-      "10 pagi: IPU 156, Tidak Sihat · Anggaran model",
+      "10 AM: IPU 156, Tidak Sihat · Anggaran model",
     );
     await expect(page.getByText("KINI", { exact: true })).toBeVisible();
 
@@ -275,28 +275,25 @@ test.describe("aliran utama", () => {
     await page.keyboard.press("ArrowRight");
     await expect(chart).toHaveAttribute(
       "aria-valuetext",
-      "11 pagi: IPU 160, Tidak Sihat · Ramalan model",
+      "11 AM: IPU 160, Tidak Sihat · Ramalan model",
     );
     await page.keyboard.press("End");
-    await expect(chart).toHaveAttribute("aria-valuetext", /^11 malam: IPU 80/);
+    await expect(chart).toHaveAttribute("aria-valuetext", /^11 PM: IPU 80/);
 
     // Fokus beralih → kembali ke jam semasa.
     await chart.blur();
-    await expect(chart).toHaveAttribute("aria-valuetext", /^10 pagi/);
+    await expect(chart).toHaveAttribute("aria-valuetext", /^10 AM/);
 
-    // Tekan dan seret ke hujung kiri → tengah malam; lepas → kembali ke jam semasa.
+    // Tekan dan seret ke hujung kiri → 12 AM; lepas → kembali ke jam semasa.
     const box = (await chart.boundingBox())!;
     const y = box.y + box.height / 2;
     await page.mouse.move(box.x + box.width / 2, y);
     await page.mouse.down();
     await page.mouse.move(box.x + 3, y, { steps: 5 });
-    await expect(chart).toHaveAttribute(
-      "aria-valuetext",
-      /^12 tengah malam: IPU 70/,
-    );
+    await expect(chart).toHaveAttribute("aria-valuetext", /^12 AM: IPU 70/);
     await expect(page.getByText("JAM LAIN", { exact: true })).toBeVisible();
     await page.mouse.up();
-    await expect(chart).toHaveAttribute("aria-valuetext", /^10 pagi/);
+    await expect(chart).toHaveAttribute("aria-valuetext", /^10 AM/);
     await expect(page.getByText("KINI", { exact: true })).toBeVisible();
     await expect(
       page.getByRole("button", { name: "Kembali ke jam semasa" }),
@@ -806,7 +803,7 @@ test.describe("rutin amaran", () => {
       });
     });
     await page.goto("/tetapan");
-    const morning = page.getByRole("radio", { name: "+ Ringkasan 7 pagi" });
+    const morning = page.getByRole("radio", { name: "+ Ringkasan 7 AM" });
     const early = page.getByRole("switch", { name: /Amaran awal/ });
     await expect(
       page.getByRole("radio", { name: "Amaran sahaja" }),
@@ -828,7 +825,7 @@ test.describe("rutin amaran", () => {
       .selectOption("7");
     await page.keyboard.press("Escape");
     await expect(sheet).toHaveCount(0);
-    await expect(quietButton).toContainText("10 malam – 7 pagi");
+    await expect(quietButton).toContainText("10 PM – 7 AM");
 
     await page.reload();
     await expect(morning).toBeChecked();
@@ -2224,10 +2221,10 @@ test.describe("bandingkan lokasi", () => {
       name: "Graf perbandingan IPU hari ini",
     });
     await expect(compare).toBeVisible();
-    await expect(compare).toHaveAttribute("aria-valuetext", "10 pagi");
+    await expect(compare).toHaveAttribute("aria-valuetext", "10 AM");
     await compare.focus();
     await page.keyboard.press("ArrowRight");
-    await expect(compare).toHaveAttribute("aria-valuetext", "11 pagi");
+    await expect(compare).toHaveAttribute("aria-valuetext", "11 AM");
     await page.getByRole("button", { name: "Klang", pressed: true }).click();
     await expect(
       page.getByRole("button", { name: "Klang", pressed: false }),

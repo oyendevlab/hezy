@@ -1,3 +1,4 @@
+import { OG_FONT_FAMILY, ogFonts } from "@/lib/og-fonts";
 import { LOGO_DATA_URL } from "@/lib/logo-art";
 import { ImageResponse } from "next/og";
 import { CATEGORY_STYLE } from "@/lib/category-style";
@@ -11,6 +12,7 @@ export async function GET(request: Request) {
   const style = CATEGORY_STYLE[data?.category ?? "sederhana"];
   const flag = await flagDataUrl(data?.state, request.url);
 
+  const fonts = await ogFonts(request.url);
   return new ImageResponse(
     <div
       style={{
@@ -22,7 +24,7 @@ export async function GET(request: Request) {
         padding: "64px 72px",
         background: style.sky.sky,
         color: "#1c1a16",
-        fontFamily: "sans-serif",
+        fontFamily: `${OG_FONT_FAMILY}, sans-serif`,
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
@@ -123,6 +125,7 @@ export async function GET(request: Request) {
       </div>
     </div>,
     {
+      fonts,
       width: 1200,
       height: 630,
       headers: { "Cache-Control": "public, max-age=3600, s-maxage=86400" },

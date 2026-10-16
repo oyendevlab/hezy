@@ -13,6 +13,12 @@ export type Release = {
 
 export const CHANGELOG: readonly Release[] = [
   {
+    version: "0.7.15",
+    date: "2026-10-16",
+    title: "Masa AM/PM dan kad kongsi",
+    items: ["Masa AM/PM yang seragam", "Kad kongsi IPU lebih kemas"],
+  },
+  {
     version: "0.7.14",
     date: "2026-10-16",
     title: "Kemas kini kecil",

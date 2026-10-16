@@ -967,6 +967,16 @@ const EN: Record<string, string> = {
   "Apa yang baharu kini 3 keluaran terkini sahaja":
     "What's new now shows the 3 latest releases only",
   "Butang Padam di sebelah Padam data": "Delete button next to Clear data",
+  "+ Ringkasan 7 AM": "+ 7 AM summary",
+  "Bacaan {time}": "Reading {time}",
+  "Bacaan IPU per jam": "Hourly API readings",
+  "Anggaran PM2.5": "PM2.5 estimate",
+  "APIMS (JAS)": "APIMS (DOE)",
+  Rasmi: "Official",
+  "Format masa AM/PM": "AM/PM time format",
+  "Kad kongsi IPU lebih kemas": "Tidier API share card",
+  "Masa AM/PM yang seragam": "Consistent AM/PM times",
+  "Masa AM/PM dan kad kongsi": "AM/PM times and share card",
 };
 
 /** Corak untuk teks yang disimpan dengan nama tempat, cth. nama lokasi GPS. */

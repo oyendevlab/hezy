@@ -201,11 +201,11 @@ export function HourBars({
           {summary}
         </p>
         <div className="text-muted mt-1.5 flex justify-between text-[11px] font-semibold md:text-xs">
-          <span>{t("12 pg")}</span>
-          <span>{t("6 pg")}</span>
-          <span>{t("12 tgh")}</span>
-          <span>{t("6 ptg")}</span>
-          <span>{t("11 mlm")}</span>
+          <span>12 AM</span>
+          <span>6 AM</span>
+          <span>12 PM</span>
+          <span>6 PM</span>
+          <span>11 PM</span>
         </div>
         <div
           data-testid="hour-legend"

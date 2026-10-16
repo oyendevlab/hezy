@@ -185,14 +185,14 @@ export function CompareLocations({ prefs }: { prefs: Prefs }) {
               >
                 {t(
                   h === 0
-                    ? "12 pg"
+                    ? "12 AM"
                     : h === 6
-                      ? "6 pg"
+                      ? "6 AM"
                       : h === 12
-                        ? "12 tgh"
+                        ? "12 PM"
                         : h === 18
-                          ? "6 ptg"
-                          : "11 mlm",
+                          ? "6 PM"
+                          : "11 PM",
                 )}
               </text>
             ))}

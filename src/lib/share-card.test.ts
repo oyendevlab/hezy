@@ -12,7 +12,8 @@ describe("kad kongsi", () => {
       source: "apims",
       hours: [88, null, 153, ...Array(21).fill(150)],
       now: 2,
-      time: "12:00 tengah hari",
+      time: "12:00 PM",
+      made: "16 Oct · 2:15 PM",
       lang: "en",
       format: "story",
     });
@@ -24,7 +25,8 @@ describe("kad kongsi", () => {
       category: "tidak-sihat",
       source: "apims",
       now: 2,
-      time: "12:00 tengah hari",
+      time: "12:00 PM",
+      made: "16 Oct · 2:15 PM",
       lang: "en",
       format: "story",
     });
