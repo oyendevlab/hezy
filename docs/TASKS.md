@@ -569,3 +569,9 @@ Mockup: https://claude.ai/artifact/K2kQkrY8zYtUjBwb9AVE4J (papan kiri).
 3. ✅ Padam data dipindah ke kad Tentang (bawah Privasi); helaian pengesahan berikon
 4. ✅ Kredit: "Learn. Build. Repeat"
 5. ✅ Versi 0.7.13, Apa yang baharu, tag dan GitHub Release
+
+## Fasa 29 — v0.7.14 (kemas kini kecil; disahkan 16 Okt 2026)
+
+1. ✅ Apa yang baharu: 3 keluaran terkini sahaja
+2. ✅ Butang pil "Padam" di kanan baris Padam data
+3. ✅ Versi 0.7.14, tag dan GitHub Release

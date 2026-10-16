@@ -25,6 +25,8 @@ import { LegalSheetView } from "./legal-sheets";
 import { Logo } from "./logo";
 
 const SITE_URL = "https://hezy.my";
+/** Bilangan keluaran dalam "Apa yang baharu" (v0.7.14: 3 terkini sahaja). */
+const WHATS_NEW_COUNT = 3;
 const FEEDBACK_EMAIL = "oyendevlab@gmail.com";
 
 function Row({
@@ -154,12 +156,7 @@ export function AboutHezy() {
             {t("Privasi dan data anda")}
           </Row>
         </Link>
-        <button
-          type="button"
-          onClick={() => setConfirmClear(true)}
-          aria-haspopup="dialog"
-          className="flex min-h-14 w-full items-center gap-3 py-2 text-left"
-        >
+        <div className="flex min-h-14 w-full items-center gap-3 py-2">
           <span
             aria-hidden="true"
             className="flex size-9 shrink-0 items-center justify-center rounded-[11px] bg-[#fbe0dd] text-[#a3261f]"
@@ -169,7 +166,16 @@ export function AboutHezy() {
           <span className="text-ipu-berbahaya-ink dark:text-ipu-berbahaya-tint min-w-0 flex-1 text-[15px] font-bold">
             {t("Padam data di peranti ini")}
           </span>
-        </button>
+          <button
+            type="button"
+            onClick={() => setConfirmClear(true)}
+            aria-haspopup="dialog"
+            aria-label={t("Padam data di peranti ini")}
+            className="min-h-9 shrink-0 rounded-full bg-[#fbe0dd] px-3.5 text-[13px] font-bold text-[#a3261f]"
+          >
+            {t("Padam")}
+          </button>
+        </div>
       </div>
       <p
         role="status"
@@ -198,7 +204,7 @@ export function AboutHezy() {
           onClose={() => setWhatsNew(false)}
         >
           <ol className="flex flex-col gap-4">
-            {CHANGELOG.map((r) => (
+            {CHANGELOG.slice(0, WHATS_NEW_COUNT).map((r) => (
               <li key={r.version} className="flex flex-col gap-2">
                 <div className="flex items-baseline gap-2">
                   <span className="bg-ink text-page rounded-full px-2 py-0.5 text-xs font-extrabold">

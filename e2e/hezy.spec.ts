@@ -2493,6 +2493,8 @@ test.describe("Tentang Hezy v0.7.9", () => {
       .getByText(/^Versi \d+\.\d+\.\d+$/)
       .textContent())!.replace("Versi ", "");
     await expect(sheet.locator("li").first()).toContainText(version);
+    // Tiga keluaran terkini sahaja (v0.7.14).
+    await expect(sheet.locator("ol > li")).toHaveCount(3);
     await page.keyboard.press("Escape");
     await expect(sheet).toHaveCount(0);
 
