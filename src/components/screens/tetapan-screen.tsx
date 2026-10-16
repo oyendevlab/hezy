@@ -231,7 +231,7 @@ function Switch({
       />
       <span
         aria-hidden="true"
-        className="bg-muted/40 peer-checked:bg-ink peer-focus-visible:outline-ink peer-checked:after:bg-page relative h-7 w-12 rounded-full transition-colors peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-disabled:opacity-50 after:absolute after:top-[3px] after:left-[3px] after:size-[22px] after:rounded-full after:bg-white after:shadow after:transition-transform peer-checked:after:translate-x-5"
+        className="bg-muted/40 peer-checked:bg-toggle peer-focus-visible:outline-ink relative h-7 w-12 rounded-full transition-colors peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-disabled:opacity-50 after:absolute after:top-[3px] after:left-[3px] after:size-[22px] after:rounded-full after:bg-white after:shadow after:transition-transform peer-checked:after:translate-x-5"
       />
     </span>
   );
@@ -319,7 +319,7 @@ function Segmented<T extends string | number>({
           lang={o.lang}
           className={`has-focus-visible:outline-ink relative flex cursor-pointer items-center justify-center rounded-[10px] text-center font-bold has-focus-visible:outline-2 ${
             compact ? "min-h-9 px-2.5 text-xs" : "min-h-11 px-1.5 text-[13px]"
-          } ${value === o.value ? "bg-ink text-page" : "text-muted"}`}
+          } ${value === o.value ? "bg-pick text-pick-ink" : "text-muted"}`}
         >
           <input
             type="radio"

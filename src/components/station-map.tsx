@@ -884,7 +884,7 @@ export function StationMap() {
                     />
                     <span
                       aria-hidden="true"
-                      className="bg-line peer-checked:bg-ink peer-focus-visible:outline-ink relative h-7 w-12 shrink-0 rounded-full transition-colors peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 after:absolute after:top-[3px] after:left-[3px] after:size-[22px] after:rounded-full after:bg-white after:shadow after:transition-transform peer-checked:after:translate-x-5"
+                      className="bg-muted/40 peer-checked:bg-toggle peer-focus-visible:outline-ink relative h-7 w-12 shrink-0 rounded-full transition-colors peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 after:absolute after:top-[3px] after:left-[3px] after:size-[22px] after:rounded-full after:bg-white after:shadow after:transition-transform peer-checked:after:translate-x-5"
                     />
                   </label>
                 </li>

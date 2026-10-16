@@ -7,6 +7,11 @@
   --muted: #5a564e;
   --surface: #f5f3ef;
   --line: #ece9e3;
+  /* Suis hidup dan pilihan segmen terpilih (v0.7.11): hijau lembut, bukan hitam
+     seperti ikon. */
+  --toggle: #3d8b63;
+  --pick: #d9eee0;
+  --pick-ink: #1f5c3c;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -16,6 +21,9 @@
     --muted: #a6a29a;
     --surface: #1e1f22;
     --line: #2c2d31;
+    --toggle: #4fa877;
+    --pick: #23402f;
+    --pick-ink: #c4ead2;
   }
 }
 
@@ -25,6 +33,9 @@
   --muted: #a6a29a;
   --surface: #1e1f22;
   --line: #2c2d31;
+  --toggle: #4fa877;
+  --pick: #23402f;
+  --pick-ink: #c4ead2;
 }
 
 @theme inline {
@@ -33,6 +44,9 @@
   --color-muted: var(--muted);
   --color-surface: var(--surface);
   --color-line: var(--line);
+  --color-toggle: var(--toggle);
+  --color-pick: var(--pick);
+  --color-pick-ink: var(--pick-ink);
 
   --font-sans: var(--font-jakarta), system-ui, sans-serif;
   --font-display: var(--font-bricolage), var(--font-jakarta), sans-serif;
