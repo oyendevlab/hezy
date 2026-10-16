@@ -927,6 +927,33 @@ const EN: Record<string, string> = {
   "Warna lebih lembut": "Softer colours",
   "Suis dan pilihan kini hijau lembut, berbeza daripada ikon":
     "Switches and selections are now a soft green, distinct from icons",
+  // v0.7.12: ikon, privasi, penafian
+  "Hezy bukan aplikasi rasmi Jabatan Alam Sekitar (JAS) atau kerajaan. IPU rasmi datang daripada APIMS (JAS).":
+    "Hezy is not an official app of the Department of Environment (DOE) or the government. Official API comes from APIMS (DOE).",
+  "Data boleh lewat atau tiada. Anggaran dan ramalan mungkin berbeza daripada bacaan sebenar.":
+    "Data may be delayed or missing. Estimates and forecasts may differ from actual readings.",
+  "Nasihat kesihatan adalah umum, bukan nasihat perubatan. Dapatkan rawatan jika anda bergejala.":
+    "Health advice is general, not medical advice. Seek treatment if you have symptoms.",
+  "Status sekolah hanya panduan. Keputusan rasmi dibuat oleh sekolah, PPD atau JPN.":
+    "School status is guidance only. Official decisions are made by schools, district or state education offices.",
+  "Gunakan atas budi bicara sendiri. Hezy tidak bertanggungjawab atas keputusan yang dibuat berdasarkan aplikasi ini.":
+    "Use at your own discretion. Hezy is not responsible for decisions made based on this app.",
+  "Tiada akaun dan tiada kuki pengiklanan.":
+    "No account and no advertising cookies.",
+  "Lokasi dan tetapan disimpan dalam peranti anda. Untuk bacaan, koordinat dibundarkan ~1 km dan tidak disimpan.":
+    "Location and settings stay on your device. For readings, coordinates are rounded to ~1 km and not stored.",
+  "Bila amaran dihidupkan, langganan notifikasi disimpan sehingga anda mematikannya.":
+    "When alerts are on, your notification subscription is stored until you turn them off.",
+  "Statistik penggunaan tanpa kuki; pengguna individu tidak dikenal pasti.":
+    "Cookie-free usage statistics; individual users aren't identified.",
+  Penafian: "Disclaimer",
+  "Baca dasar privasi penuh": "Read the full privacy policy",
+  "Dengan meneruskan, anda bersetuju dengan": "By continuing, you agree to the",
+  dan: "and",
+  "Ikon baharu dan penafian": "New icon and disclaimer",
+  "Ikon awan baharu yang lebih comel": "A new, cuter cloud icon",
+  "Privasi dan Penafian di skrin alu-aluan":
+    "Privacy and Disclaimer on the welcome screen",
 };
 
 /** Corak untuk teks yang disimpan dengan nama tempat, cth. nama lokasi GPS. */

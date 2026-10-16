@@ -186,6 +186,13 @@ Buka **https://hezy.my** pada telefon.
 - [ ] Suis yang hidup berwarna hijau lembut (Tetapan dan helaian Lapisan), berbeza daripada ikon hitam
 - [ ] Pilihan segmen terpilih (Waktu hantaran, Ambang, Tema, Bahasa) berlatar hijau pucat, mod terang dan gelap
 
+## Ciri baharu v0.7.12
+
+- [ ] Ikon baharu di skrin utama (pasang semula Hezy jika ikon lama masih kelihatan), skrin pembuka dan logo dalam aplikasi
+- [ ] Skrin alu-aluan: "Dengan meneruskan, anda bersetuju dengan Privasi dan Penafian" → helaian
+- [ ] Tetapan → kad Tentang → Penafian
+- [ ] Gambar kongsi (kad) memaparkan logo baharu
+
 ## Jika ada masalah
 
 Ambil tangkapan skrin dan catat model telefon serta versi OS, kemudian buka isu di

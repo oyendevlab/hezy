@@ -12,6 +12,7 @@ import type { NationalSummary } from "@/lib/national";
 import { updatePrefs } from "@/lib/prefs";
 import { useI18n } from "@/lib/use-i18n";
 import { IpuPill } from "./ipu-pill";
+import { LegalSheetView, type LegalSheet } from "./legal-sheets";
 import { LocationSearch } from "./location-search";
 import { Logo } from "./logo";
 
@@ -51,6 +52,7 @@ export function WelcomeScreen({
   const { t, lang } = useI18n();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [legal, setLegal] = useState<LegalSheet | null>(null);
 
   useEffect(() => {
     if (!active) return;
@@ -210,6 +212,33 @@ export function WelcomeScreen({
             }
           />
         </div>
+        <p
+          data-testid="welcome-legal"
+          className="text-muted mt-auto pt-4 text-center text-xs leading-relaxed md:text-left"
+        >
+          {t("Dengan meneruskan, anda bersetuju dengan")}{" "}
+          <button
+            type="button"
+            onClick={() => setLegal("privasi")}
+            aria-haspopup="dialog"
+            className="text-ink font-semibold underline"
+          >
+            {t("Privasi")}
+          </button>{" "}
+          {t("dan")}{" "}
+          <button
+            type="button"
+            onClick={() => setLegal("penafian")}
+            aria-haspopup="dialog"
+            className="text-ink font-semibold underline"
+          >
+            {t("Penafian")}
+          </button>
+          .
+        </p>
+        {legal && (
+          <LegalSheetView sheet={legal} onClose={() => setLegal(null)} />
+        )}
       </section>
     </div>
   );

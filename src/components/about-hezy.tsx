@@ -2,6 +2,7 @@
 
 import {
   EnvelopeSimple,
+  Scales,
   ShareNetwork,
   ShieldCheck,
   Sparkle,
@@ -16,6 +17,7 @@ import { useI18n } from "@/lib/use-i18n";
 import { APP_VERSION } from "@/lib/version";
 import { BottomSheet } from "./bottom-sheet";
 import { Chevron } from "./chevron";
+import { LegalSheetView } from "./legal-sheets";
 import { Logo } from "./logo";
 
 const SITE_URL = "https://hezy.my";
@@ -53,6 +55,7 @@ const ROW = "flex min-h-14 w-full items-center gap-3 py-2 text-left";
 export function AboutHezy() {
   const { t, lang } = useI18n();
   const [whatsNew, setWhatsNew] = useState(false);
+  const [disclaimer, setDisclaimer] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
 
   async function share() {
@@ -131,6 +134,16 @@ export function AboutHezy() {
             {t("Hantar maklum balas")}
           </Row>
         </a>
+        <button
+          type="button"
+          onClick={() => setDisclaimer(true)}
+          aria-haspopup="dialog"
+          className={ROW}
+        >
+          <Row icon={Scales} tone="bg-[#fbe3d6] text-[#8a3a12]">
+            {t("Penafian")}
+          </Row>
+        </button>
         <Link href="/privasi" transitionTypes={["nav-forward"]} className={ROW}>
           <Row icon={ShieldCheck} tone="bg-[#dff0d4] text-[#2f6b1f]">
             {t("Privasi dan data anda")}
@@ -144,6 +157,9 @@ export function AboutHezy() {
         {status ?? ""}
       </p>
 
+      {disclaimer && (
+        <LegalSheetView sheet="penafian" onClose={() => setDisclaimer(false)} />
+      )}
       {whatsNew && (
         <BottomSheet
           title={t("Apa yang baharu")}

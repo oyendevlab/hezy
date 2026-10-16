@@ -1,3 +1,4 @@
+import { LOGO_DATA_URL } from "@/lib/logo-art";
 import { ImageResponse } from "next/og";
 import { CATEGORY_STYLE } from "@/lib/category-style";
 import { flagDataUrl } from "@/lib/flag-image";
@@ -25,17 +26,8 @@ export async function GET(request: Request) {
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-        <svg width="72" height="72" viewBox="0 0 512 512">
-          <rect width="512" height="512" rx="120" fill="#bfe0f5" />
-          <circle cx="175" cy="290" r="85" fill="#fff" />
-          <circle cx="262" cy="225" r="112" fill="#fff" />
-          <circle cx="350" cy="292" r="82" fill="#fff" />
-          <ellipse cx="262" cy="332" rx="172" ry="62" fill="#fff" />
-          <ellipse cx="228" cy="295" rx="15" ry="20" fill="#1e2430" />
-          <ellipse cx="298" cy="295" rx="15" ry="20" fill="#1e2430" />
-          <circle cx="196" cy="324" r="15" fill="#f7b5b5" />
-          <circle cx="330" cy="324" r="15" fill="#f7b5b5" />
-        </svg>
+        {/* eslint-disable-next-line @next/next/no-img-element -- imej next/og */}
+        <img src={LOGO_DATA_URL} width={72} height={72} alt="" />
         <div style={{ display: "flex", fontSize: 44, fontWeight: 800 }}>
           Hezy
         </div>
