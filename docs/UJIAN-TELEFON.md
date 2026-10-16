@@ -166,6 +166,14 @@ Buka **https://hezy.my** pada telefon.
 - [ ] Amaran dimalapkan bila banner mati; Amaran awal dan Lonjakan mendadak sebagai suis; Lokasi amaran membuka Lokasi
 - [ ] Padam data: helaian pengesahan (Batal / Padam), bukan dialog pelayar
 
+## Ciri baharu v0.7.9
+
+- [ ] Tetapan (bawah): kad **Tentang Hezy** dengan logo, nama dan versi
+- [ ] **Apa yang baharu** → helaian 5 keluaran terakhir
+- [ ] **Kongsi Hezy** → helaian kongsi telefon (atau "Pautan disalin")
+- [ ] **Hantar maklum balas** → aplikasi e-mel dibuka ke oyendevlab@gmail.com dengan subjek dan versi
+- [ ] Kad pembangun: gambar dalam bingkai bulat, "Syafiq", "Build. Create. Live"
+
 ## Jika ada masalah
 
 Ambil tangkapan skrin dan catat model telefon serta versi OS, kemudian buka isu di

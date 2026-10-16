@@ -52,7 +52,7 @@ import {
   pushSupport,
 } from "@/lib/push-client";
 import { useI18n } from "@/lib/use-i18n";
-import { APP_VERSION } from "@/lib/version";
+import { AboutHezy, DeveloperCredit } from "../about-hezy";
 import { BottomSheet, useSheetDismiss } from "../bottom-sheet";
 import { Chevron } from "../chevron";
 import { InfoSheetButton } from "../info-sheet";
@@ -160,17 +160,11 @@ export function TetapanScreen() {
                 />
                 <Row label={t("Ramalan")} value="Open-Meteo (CAMS)" />
                 <AccuracyRows />
-                <Row label={t("Versi")} value={APP_VERSION} />
-                <Link
-                  href="/privasi"
-                  transitionTypes={["nav-forward"]}
-                  className="flex min-h-12 items-center justify-between gap-3 font-semibold"
-                >
-                  {t("Privasi dan data anda")}
-                  <Chevron />
-                </Link>
               </div>
             </section>
+
+            <AboutHezy />
+            <DeveloperCredit />
 
             <button
               type="button"
@@ -181,6 +175,9 @@ export function TetapanScreen() {
               <Trash aria-hidden="true" size={18} weight="bold" />
               {t("Padam data di peranti ini")}
             </button>
+            <p className="text-muted -mt-4 text-center text-[11px]">
+              {t("© 2026 Hezy · Data rasmi APIMS (JAS)")}
+            </p>
             {confirmClear && (
               <BottomSheet
                 title={t("Padam data?")}

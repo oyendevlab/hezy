@@ -2477,3 +2477,52 @@ test.describe("Lokasi v0.7.7", () => {
     ).toBeVisible();
   });
 });
+
+test.describe("Tentang Hezy v0.7.9", () => {
+  test("kad Tentang: apa yang baharu, kongsi, maklum balas, kredit", async ({
+    page,
+    context,
+  }) => {
+    await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+    await seedLocation(page);
+    await page.addInitScript(() => {
+      Object.defineProperty(navigator, "share", { value: undefined });
+    });
+    await page.goto("/tetapan");
+    const about = page.getByRole("region", { name: "Hezy" });
+    await expect(about).toContainText(/Versi \d+\.\d+\.\d+/);
+
+    await about.getByRole("button", { name: /Apa yang baharu/ }).click();
+    const sheet = page.getByTestId("whats-new");
+    const version = (await about.locator("p").first().textContent())!.match(
+      /\d+\.\d+\.\d+/,
+    )![0];
+    await expect(sheet.locator("li").first()).toContainText(version);
+    await page.keyboard.press("Escape");
+    await expect(sheet).toHaveCount(0);
+
+    // Tanpa Web Share: pautan disalin.
+    await about.getByRole("button", { name: "Kongsi Hezy" }).click();
+    await expect(about.getByRole("status")).toHaveText("Pautan disalin");
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toContain(
+      "https://hezy.my",
+    );
+
+    const mail = about.getByRole("link", { name: "Hantar maklum balas" });
+    await expect(mail).toHaveAttribute(
+      "href",
+      new RegExp(`^mailto:oyendevlab@gmail\\.com\\?subject=.*${version}`),
+    );
+
+    const credit = page.getByRole("region", { name: "Pembangun" });
+    await expect(credit).toContainText("Syafiq");
+    await expect(credit).toContainText("Build. Create. Live");
+    await expect(credit.getByRole("img", { name: "Syafiq" })).toBeVisible();
+
+    const results = await new AxeBuilder({ page })
+      .include("[aria-labelledby=tentang-hezy]")
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+      .analyze();
+    expect(results.violations.map((v) => v.id)).toEqual([]);
+  });
+});

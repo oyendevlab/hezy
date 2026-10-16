@@ -877,6 +877,38 @@ const EN: Record<string, string> = {
   "Belum dipilih": "None chosen",
   "Hidupkan waktu senyap": "Turn on quiet hours",
   Hingga: "Until",
+  // v0.7.9: Tentang Hezy
+  "Semak jerebu di kawasan anda dengan Hezy":
+    "Check the haze in your area with Hezy",
+  "Tidak dapat berkongsi. Salin pautan: hezy.my":
+    "Couldn't share. Copy the link: hezy.my",
+  "Maklum balas Hezy {version}": "Hezy feedback {version}",
+  Peranti: "Device",
+  "Versi {version} · Semak jerebu di Malaysia":
+    "Version {version} · Haze checker for Malaysia",
+  "Apa yang baharu": "What's new",
+  "Kongsi Hezy": "Share Hezy",
+  "Hantar maklum balas": "Send feedback",
+  Pembangun: "Developer",
+  "DIBANGUNKAN OLEH": "MADE BY",
+  "© 2026 Hezy · Data rasmi APIMS (JAS)":
+    "© 2026 Hezy · Official data from APIMS (DOE)",
+  "Tentang Hezy": "About Hezy",
+  "Kongsi Hezy dan hantar maklum balas": "Share Hezy and send feedback",
+  "Kad pembangun dan senarai Apa yang baharu":
+    "Developer card and What's new list",
+  "Tetapan lebih kemas": "Tidier Settings",
+  "Notifikasi dan amaran diasingkan": "Notifications and alerts separated",
+  "Nombor IPU pada ikon aplikasi": "API number on the app icon",
+  "Peta lebih besar": "Bigger map",
+  "Butang Lapisan dan skrin penuh": "Layers button and full screen",
+  "Bar navigasi tidak lagi terangkat di iPhone":
+    "Navigation bar no longer lifts on iPhone",
+  "Sejarah IPU": "API history",
+  "Heatmap memenuhi lebar skrin": "Heatmap fills the screen width",
+  "Trend lebih kemas": "Tidier Trend",
+  "Ramalan harian dengan kelembapan": "Daily forecast with humidity",
+  "Penerangan ringkas dalam ⓘ": "Short explanations in ⓘ",
 };
 
 /** Corak untuk teks yang disimpan dengan nama tempat, cth. nama lokasi GPS. */
