@@ -1,6 +1,7 @@
 import { after } from "next/server";
 import { summarizeAccuracy } from "@/lib/accuracy";
 import { nearestStation } from "@/lib/apims";
+import { stationsDue } from "@/lib/apims-schedule";
 import { handled, withinBudget } from "@/lib/budget";
 import { parseCoords } from "@/lib/coords";
 import {
@@ -24,6 +25,8 @@ const HISTORY_BUDGET_MS = 3000;
 const FULL_CACHE = "public, s-maxage=300, stale-while-revalidate=900";
 /** Respons tanpa sumber yang lambat dicache sebentar sahaja supaya permintaan seterusnya lengkap. */
 const PARTIAL_CACHE = "public, s-maxage=60, stale-while-revalidate=120";
+/** Bacaan rasmi jam semasa dijangka terbit: cache CDN lebih pendek (v0.8.5). */
+const DUE_CACHE = "public, s-maxage=120, stale-while-revalidate=300";
 
 /**
  * GET /api/aqi?lat=3.07&lon=101.52
@@ -142,7 +145,11 @@ export async function GET(request: Request) {
   if (late.length) after(() => Promise.allSettled(late));
   return Response.json(reading, {
     headers: {
-      "Cache-Control": partial ? PARTIAL_CACHE : FULL_CACHE,
+      "Cache-Control": partial
+        ? PARTIAL_CACHE
+        : stations && stationsDue(stations, now)
+          ? DUE_CACHE
+          : FULL_CACHE,
       "Server-Timing": `app;dur=${Date.now() - started}${partial ? ', partial;desc="separa"' : ""}`,
     },
   });

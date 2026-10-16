@@ -6,6 +6,7 @@ import {
   forecastHours,
   mergeAccuracy,
   shownError,
+  spatialEstimateErrors,
   summarizeAccuracy,
   type AccuracyIndex,
 } from "./accuracy";
@@ -100,7 +101,13 @@ describe("summarizeAccuracy", () => {
       index,
       addDays("2026-10-12", -back),
       {
-        A: { e: [240, 24], fr: [960, 24], fc: [360, 24], fj: [192, 24] },
+        A: {
+          e: [240, 24],
+          es: [144, 24],
+          fr: [960, 24],
+          fc: [360, 24],
+          fj: [192, 24],
+        },
         B: { e: [720, 24] },
       },
       NOW,
@@ -112,6 +119,7 @@ describe("summarizeAccuracy", () => {
   it("nilai stesen bila cukup hari", () => {
     expect(summarizeAccuracy(index, "2026-10-12", "A")).toEqual({
       estimate: 10,
+      estimateSpatial: 6,
       forecast: 15,
       forecastRaw: 40,
       forecastJas: 8,
@@ -132,6 +140,7 @@ describe("summarizeAccuracy", () => {
   it("nilai kebangsaan bila stesen tiada data", () => {
     expect(summarizeAccuracy(index, "2026-10-12", "TIADA")).toEqual({
       estimate: 20,
+      estimateSpatial: 6,
       forecast: 15,
       forecastRaw: 40,
       forecastJas: 8,
@@ -162,5 +171,37 @@ describe("summarizeAccuracy", () => {
       NOW,
     );
     expect(old.days["2026-01-01"]).toBeUndefined();
+  });
+});
+
+describe("spatialEstimateErrors (IDW tinggal-satu-keluar, v0.8.5)", () => {
+  it("menganggar stesen tersembunyi daripada bias stesen lain", () => {
+    const stations = [
+      { id: "A", name: "A", lat: 3.0, lon: 101.5 },
+      { id: "B", name: "B", lat: 3.1, lon: 101.6 },
+      { id: "C", name: "C", lat: 3.2, lon: 101.5 },
+      { id: "JAUH", name: "Jauh", lat: 6.0, lon: 116.0 },
+    ];
+    // Model malar 70 IPU di semua stesen; rasmi 150 di semua (bias sama).
+    const model = series(70);
+    const errors = spatialEstimateErrors(
+      stations,
+      stations.map(() => model),
+      {
+        date: "2026-10-12",
+        stations: {
+          A: hours(150),
+          B: hours(150),
+          C: hours(150),
+          JAUH: hours(150),
+        },
+      },
+      "2026-10-12",
+    );
+    expect(errors.A[1]).toBe(24);
+    // Model mentah tersasar 80; bias IDW (dipudar ikut jarak ~15 km) menghampiri rasmi.
+    expect(errors.A[0] / errors.A[1]).toBeLessThan(10);
+    // Tiada stesen lain dalam 150 km: tiada anggaran.
+    expect(errors.JAUH).toBeUndefined();
   });
 });

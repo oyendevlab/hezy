@@ -13,6 +13,15 @@ export type Release = {
 
 export const CHANGELOG: readonly Release[] = [
   {
+    version: "0.8.5",
+    date: "2026-10-16",
+    title: "Anggaran lebih tepat di kawasan tanpa stesen",
+    items: [
+      "Kawasan jauh dari stesen APIMS kini dibetulkan dengan bacaan rasmi stesen berdekatan",
+      "Bacaan rasmi terbaharu muncul lebih cepat selepas JAS menerbitkannya",
+    ],
+  },
+  {
     version: "0.8.4",
     date: "2026-10-16",
     title: "Amaran lebih tepat pada masanya",

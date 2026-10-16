@@ -104,6 +104,11 @@ export type Reading = {
   /** Pembetulan ramalan dengan bacaan APIMS; tiada dalam bacaan lama tersimpan. */
   correction?: Correction | null;
   /**
+   * Tiada bacaan rasmi dalam 30 km: anggaran dibetulkan dengan bias stesen APIMS berdekatan
+   * (IDW, v0.8.5). Diisi oleh route API.
+   */
+  spatial?: { stations: number; nearestName: string; nearestKm: number } | null;
+  /**
    * Sumber pilihan (cuaca, titik panas, ketepatan, sejarah rasmi) lambat dan ditinggalkan;
    * klien mengambil semula tidak lama kemudian (v0.8.2). Diisi oleh route API.
    */

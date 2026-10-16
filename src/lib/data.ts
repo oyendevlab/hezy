@@ -1,4 +1,5 @@
 import { cacheLife } from "next/cache";
+import { stationsRevalidateSeconds } from "./apims-schedule";
 import { createLastGoodStore } from "./budget";
 import {
   APIMS_STATIONS_URL,
@@ -22,8 +23,10 @@ import { parseWindGrid, windGridUrl, type WindGrid } from "./wind-grid";
 import { readAccuracy, readHourlyDay, readIndex } from "./history-store";
 import { SCHOOL_DECISION_HOUR } from "./school";
 import {
+  airQualityMultiUrl,
   airQualityUrl,
   parseAirQuality,
+  parseAirQualityMulti,
   type AirQualitySeries,
 } from "./openmeteo";
 
@@ -77,11 +80,43 @@ export async function getAirQualityResilient(
   }
 }
 
-/** Senarai stesen APIMS dengan bacaan terkini, dicache 15 minit (satu permintaan ke JAS bagi semua pengguna). */
+/** Titik per permintaan berbilang lokasi Open-Meteo. */
+const MULTI_CHUNK = 25;
+
+/**
+ * Siri model di lokasi stesen APIMS untuk pembetulan bias ruang (v0.8.5). Koordinat dihantar
+ * sebagai argumen (bukan dibaca daripada getStations) supaya tempoh cache model 1 jam tidak
+ * dipendekkan oleh cache stesen. Permintaan berbilang lokasi dibuat serentak.
+ */
+export async function getStationModels(
+  points: readonly { id: string; lat: number; lon: number }[],
+): Promise<Record<string, AirQualitySeries>> {
+  "use cache";
+  cacheLife({ stale: 600, revalidate: 3600, expire: 21600 });
+  const chunks: (typeof points)[] = [];
+  for (let i = 0; i < points.length; i += MULTI_CHUNK)
+    chunks.push(points.slice(i, i + MULTI_CHUNK));
+  const lists = await Promise.all(
+    chunks.map(async (chunk) => {
+      const res = await fetch(airQualityMultiUrl(chunk, 2, 1), {
+        signal: AbortSignal.timeout(15_000),
+      });
+      if (!res.ok)
+        throw new Error(`Open-Meteo (stesen) memulangkan status ${res.status}`);
+      const series = parseAirQualityMulti(await res.json());
+      return chunk.map((p, i) => [p.id, series[i]] as const);
+    }),
+  );
+  return Object.fromEntries(lists.flat());
+}
+
+/**
+ * Senarai stesen APIMS dengan bacaan terkini (satu permintaan ke JAS bagi semua pengguna).
+ * Tempoh cache ikut jadual terbitan APIMS (v0.8.5): 2 minit bila bacaan jam semasa dijangka,
+ * jika tidak hingga beberapa minit selepas jam berikutnya.
+ */
 export async function getStations(): Promise<Station[]> {
   "use cache";
-  cacheLife({ stale: 300, revalidate: 900, expire: 3600 });
-
   const res = await fetch(APIMS_STATIONS_URL, {
     headers: { "User-Agent": "Hezy (+https://hezy.my)" },
     signal: AbortSignal.timeout(8000),
@@ -89,7 +124,13 @@ export async function getStations(): Promise<Station[]> {
   if (!res.ok) {
     throw new Error(`APIMS memulangkan status ${res.status}`);
   }
-  return parseStations(await res.json());
+  const stations = parseStations(await res.json());
+  cacheLife({
+    stale: 60,
+    revalidate: stationsRevalidateSeconds(stations, new Date()),
+    expire: 3600,
+  });
+  return stations;
 }
 
 /** Sejarah IPU rasmi 25 jam bagi semua stesen dalam negeri, dicache 15 minit. */

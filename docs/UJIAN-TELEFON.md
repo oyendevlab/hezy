@@ -244,6 +244,14 @@ Buka **https://hezy.my** pada telefon.
 - [ ] Amaran ramalan esok (jika dipilih) tiba antara 8–10 malam
 - [ ] Tiada notifikasi berganda untuk bacaan yang sama
 
+## v0.8.5 — anggaran kawasan tanpa stesen
+
+- [ ] Pilih lokasi jauh dari stesen (cth. Mersing, Kuala Lipis, Lawas): label "Anggaran dibetulkan" di bawah nombor
+- [ ] ⓘ sumber bacaan: "dibetulkan dengan N stesen APIMS berdekatan" dan nama stesen terdekat dengan jarak
+- [ ] Nombor anggaran hampir dengan IPU stesen berdekatan (tidak jauh lebih rendah seperti sebelum ini)
+- [ ] Lokasi dengan stesen dalam 30 km masih memaparkan "Rasmi · APIMS"
+- [ ] Selepas minit ke-10–40 setiap jam, bacaan rasmi jam baharu muncul dalam beberapa minit (tarik untuk muat semula)
+
 ## Jika ada masalah
 
 Ambil tangkapan skrin dan catat model telefon serta versi OS, kemudian buka isu di
