@@ -266,6 +266,11 @@ Buka **https://hezy.my** pada telefon.
 - [ ] Masa terbaik keluar: IPU yang dipaparkan hampir dengan bacaan rasmi (bukan jauh lebih rendah)
 - [ ] Lokasi tanpa stesen (cth. Mersing): "Kini" juga sama dengan graf
 
+## v0.8.8 — ramalan beberapa hari
+
+- [ ] Trend → Ramalan harian (5 hari): semasa jerebu, hari ke-3 hingga ke-5 tidak jatuh mendadak ke tahap Sederhana tanpa sebab
+- [ ] Ramalan per jam beberapa jam akan datang tidak berubah (masih bermula pada bacaan rasmi)
+
 ## Jika ada masalah
 
 Ambil tangkapan skrin dan catat model telefon serta versi OS, kemudian buka isu di

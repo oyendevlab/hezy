@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { Station } from "./apims";
 import { ipuToPm25 } from "./ipu";
 import {
+  SPATIAL_DECAY_HOURS,
   applySpatialBias,
   idwBias,
   stationBiases,
@@ -95,13 +96,16 @@ describe("idwBias", () => {
 });
 
 describe("applySpatialBias", () => {
-  it("penuh hingga jam bias, reput 72 jam selepasnya, lantai 30% model", () => {
+  it("penuh hingga jam bias, reput 168 jam selepasnya, lantai 30% model", () => {
     const s = series(40);
     const up = applySpatialBias(s, { biasPm25: 60, time: "2026-10-16T00:00" });
     const at = (t: string) => up.pm25[s.times.indexOf(t)];
     expect(at("2026-10-15T12:00")).toBe(100);
     expect(at("2026-10-16T00:00")).toBe(100);
-    expect(at("2026-10-16T18:00")).toBeCloseTo(40 + 60 * (1 - 18 / 72), 5);
+    expect(at("2026-10-16T18:00")).toBeCloseTo(
+      40 + 60 * (1 - 18 / SPATIAL_DECAY_HOURS),
+      5,
+    );
     const down = applySpatialBias(s, {
       biasPm25: -100,
       time: "2026-10-16T00:00",

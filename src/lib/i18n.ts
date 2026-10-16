@@ -1009,6 +1009,11 @@ const EN: Record<string, string> = {
     "Areas far from APIMS stations are now corrected with official readings from nearby stations",
   "Bacaan rasmi terbaharu muncul lebih cepat selepas JAS menerbitkannya":
     "The latest official reading appears sooner after the DOE publishes it",
+  "Ramalan beberapa hari lebih tepat": "More accurate multi-day forecast",
+  "Pembetulan dengan bacaan rasmi kini bertahan hingga 7 hari, bukan 3":
+    "The correction with official readings now lasts up to 7 days, not 3",
+  "Ramalan hari ke-3 hingga ke-5 tidak lagi jatuh terlalu rendah semasa jerebu":
+    "Day 3 to day 5 forecasts no longer drop too low during haze",
   "Graf dan ramalan per jam sepadan dengan bacaan rasmi":
     "Chart and hourly forecast match the official reading",
   "Ramalan per jam bermula pada jam semasa, sama seperti graf":
