@@ -92,8 +92,8 @@ export type Planned = {
   urgency: "normal" | "high";
   update: PlannedUpdate;
   /**
-   * Lencana ikon aplikasi (item 12): nombor IPU bila amaran lokasi semasa aktif,
-   * `null` untuk padam (udara pulih); tiada = tidak diubah.
+   * Lencana ikon aplikasi: IPU semasa lokasi pertama bila pilihan "Nombor IPU pada ikon"
+   * hidup (v0.7.8); tiada = tidak diubah.
    */
   badge?: number | null;
 };
@@ -146,9 +146,6 @@ export function planNotifications(
           tag: `hezy-ipu-${location.id}`,
           urgency: primary.ipu > 200 ? "high" : "normal",
           update: { kind: "alert", index, next: decision.next },
-          ...(index === 0
-            ? { badge: decision.next.lastAlertKey ? primary.ipu : null }
-            : {}),
         });
       }
     }
@@ -293,7 +290,11 @@ export function planNotifications(
     });
   }
 
-  return planned;
+  // Setiap notifikasi mengemas kini nombor pada ikon (iOS tidak membenarkan push senyap).
+  const badge = primaryReading(readings[0] ?? undefined)?.ipu;
+  return options.badge && badge !== undefined
+    ? planned.map((p) => ({ ...p, badge }))
+    : planned;
 }
 
 /** Simpan kesan notifikasi yang berjaya dihantar ke dalam rekod. */

@@ -51,6 +51,7 @@ describe("parsePrefs", () => {
       spikeAlert: true,
       expectedAlert: true,
       quietHours: { start: 23, end: 6 },
+      iconBadge: true,
     });
     expect(
       parsePrefs(

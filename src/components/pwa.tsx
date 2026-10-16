@@ -67,22 +67,23 @@ export function PwaSetup() {
     );
   }, [prefs]);
 
-  // Lencana ikon aplikasi (item 12): IPU lokasi semasa bila melebihi ambang amaran.
+  // Nombor IPU pada ikon aplikasi (v0.7.8): IPU semasa bila pilihan hidup, padam bila mati.
   const { entry } = useReading(prefs?.current ?? null);
   const badgeIpu = primaryReading(entry?.reading)?.ipu ?? null;
-  const threshold = prefs ? effectiveThreshold(prefs) : null;
+  const badgeOn = prefs?.iconBadge ?? null;
   useEffect(() => {
-    if (badgeIpu === null || threshold === null) return;
+    // Bacaan belum dimuat: jangan padam nombor sedia ada.
+    if (badgeOn === null || (badgeOn && badgeIpu === null)) return;
     const nav = navigator as Navigator & {
       setAppBadge?: (n: number) => Promise<void>;
       clearAppBadge?: () => Promise<void>;
     };
     const task =
-      badgeIpu > threshold
+      badgeOn && badgeIpu !== null && badgeIpu > 0
         ? nav.setAppBadge?.(badgeIpu)
         : nav.clearAppBadge?.();
     task?.catch(() => undefined);
-  }, [badgeIpu, threshold]);
+  }, [badgeIpu, badgeOn]);
 
   return null;
 }

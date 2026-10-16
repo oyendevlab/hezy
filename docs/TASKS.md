@@ -520,3 +520,22 @@ Mockup: https://claude.ai/artifact/3R4rdhx2k8QwRwKkuH6zr6. Peta kekal OpenStreet
 5. ✅ Bar navigasi terangkat di iOS 26: halaman lebih pendek daripada skrin diletakkan pada viewport kecil (100svh, tanpa bar status ~62 pt); disahkan di simulator dan dibetulkan dengan `min-h-lvh` pada `body`
 6. ✅ Senarai: **Tukar** dan **+ Tambah** membuka helaian carian (satu carian pada satu masa); kegemaran dari GPS memaparkan negeri, bukan "Lokasi semasa"
 7. ✅ Versi 0.7.7, `UJIAN-TELEFON.md`, tag dan GitHub Release
+
+## Fasa 23 — v0.7.8 (Tetapan: notifikasi dan amaran; disahkan 16 Okt 2026)
+
+Mockup: https://claude.ai/artifact/K2kQkrY8zYtUjBwb9AVE4J (papan kiri).
+
+1. ✅ Susunan ikut kepentingan: Profil → Notifikasi → Amaran → Paparan (Tema + Bahasa) → Aplikasi → Tentang data
+2. ✅ Profil kesihatan: satu baris berikon membuka helaian 4 profil (ikon + keterangan); status sekolah sebagai suis
+3. ✅ **Notifikasi** diasingkan daripada **Amaran**: banner (suis), "Bila dihantar" (amaran sahaja / + ringkasan 7 pagi), waktu senyap dalam helaian, notifikasi ujian
+4. ✅ **Nombor pada ikon** (pilihan `iconBadge`): IPU semasa pada ikon aplikasi; pelayan menyertakan nombor bersama setiap notifikasi; ⓘ had peranti berikon
+5. ✅ Amaran diringkaskan: ambang, **Amaran awal** (gabungan jerebu dijangka 6 jam + ramalan esok), **Lonjakan mendadak**, Lokasi amaran; dimalapkan bila banner mati
+6. ✅ Teks panjang ke ⓘ (ambang, tentang data, luar talian); "✓ Hezy dipasang" bila sudah dipasang
+7. ✅ Padam data melalui helaian pengesahan
+8. ✅ Versi 0.7.8, `UJIAN-TELEFON.md`, tag dan GitHub Release
+
+## Fasa 24 — v0.7.9 (Tentang Hezy; dirancang)
+
+1. ⬜ Kad Tentang Hezy: logo, nama, versi; Apa yang baharu (helaian 3–5 keluaran, `changelog.ts`)
+2. ⬜ Kongsi Hezy (helaian kongsi / salin pautan) dan Hantar maklum balas (e-mel oyendevlab@gmail.com, subjek + versi)
+3. ⬜ Kredit pembangun: gambar dalam bingkai bulat, "Syafiq", "Build. Create. Live"
