@@ -607,3 +607,15 @@ Audit siri 0.8.x (data, logik, stabil, laju, keselamatan) — laporan penuh dan 
 4. ✅ Pengepala: CSP (tanpa nonce, halaman kekal statik), X-Frame-Options, HSTS `includeSubDomains`, Permissions-Policy, COOP; `X-Powered-By` dibuang
 5. ✅ GitHub Actions dengan kebenaran minimum; Dependabot mingguan (npm berkumpulan) dan bulanan (actions)
 6. ✅ Versi 0.8.1, Apa yang baharu, tag dan GitHub Release
+
+## Fasa 33 — v0.8.2 (laju dan stabil; 16 Okt 2026)
+
+Punca: selepas deployment v0.8.1, cache miss `/api/aqi` mengambil ~10 s kerana cuaca Open-Meteo tamat masa (8 s) dan `/api/aqi` menunggu cuaca sebelum memuat bacaan IPU; `use cache` lalai hanya dalam memori setiap instans.
+
+1. ✅ Rantau fungsi `sin1` (`vercel.json`) — sama dengan pengguna, APIMS dan stor Blob `hezy-push`
+2. ✅ `/api/aqi`: semua sumber dimulakan serentak; cuaca, titik panas dan ketepatan ditunggu ≤ 2.5 s, sejarah APIMS ≤ 3 s (`budget.ts`); yang lambat dibiar siap dengan `after()` untuk mengisi cache; respons separa dicache 60 s (bukan 5 min) dan ditanda `partial`
+3. ✅ Klien mengambil semula bacaan separa selepas 75 s bila tab aktif
+4. ✅ Model dan cuaca ikut sel 0.1° (grid Open-Meteo) supaya cache dikongsi; model disegarkan setiap jam, disimpan 6 jam (CAMS dikemas kini 2×/hari)
+5. ✅ Sandaran: siri model terakhir yang berjaya (≤ 24 jam) bila Open-Meteo gagal; had masa 10 s untuk Open-Meteo kualiti udara (sebelum ini tiada); FIRMS dua satelit serentak
+6. ✅ `@vercel/speed-insights` dipasang (Core Web Vitals pengguna sebenar)
+7. ✅ Versi 0.8.2, Apa yang baharu, tag dan GitHub Release

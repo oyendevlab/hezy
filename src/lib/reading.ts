@@ -97,6 +97,11 @@ export type Reading = {
   accuracy?: AccuracySummary | null;
   /** Pembetulan ramalan dengan bacaan APIMS; tiada dalam bacaan lama tersimpan. */
   correction?: Correction | null;
+  /**
+   * Sumber pilihan (cuaca, titik panas, ketepatan, sejarah rasmi) lambat dan ditinggalkan;
+   * klien mengambil semula tidak lama kemudian (v0.8.2). Diisi oleh route API.
+   */
+  partial?: boolean;
 };
 
 /** Jam semasa dalam waktu Malaysia, format `YYYY-MM-DDTHH:00` (sama seperti Open-Meteo). */

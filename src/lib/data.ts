@@ -1,4 +1,5 @@
 import { cacheLife } from "next/cache";
+import { createLastGoodStore } from "./budget";
 import {
   APIMS_STATIONS_URL,
   apimsHourlyUrl,
@@ -26,19 +27,54 @@ import {
   type AirQualitySeries,
 } from "./openmeteo";
 
-/** Ambil siri PM2.5 untuk koordinat, dicache 15 minit di pelayan. */
+/**
+ * Siri PM2.5 untuk koordinat. Model CAMS dikemas kini dua kali sehari, jadi entri disegarkan
+ * setiap jam dan nilai lama dikekalkan hingga 6 jam (dipaparkan sementara sumber disegarkan).
+ */
 export async function getAirQuality(
   lat: number,
   lon: number,
 ): Promise<AirQualitySeries> {
   "use cache";
-  cacheLife({ stale: 300, revalidate: 900, expire: 3600 });
+  cacheLife({ stale: 600, revalidate: 3600, expire: 21600 });
 
-  const res = await fetch(airQualityUrl(lat, lon));
+  const res = await fetch(airQualityUrl(lat, lon), {
+    signal: AbortSignal.timeout(10_000),
+  });
   if (!res.ok) {
     throw new Error(`Open-Meteo memulangkan status ${res.status}`);
   }
   return parseAirQuality(await res.json());
+}
+
+/**
+ * Siri model terakhir yang berjaya bagi setiap sel (setiap instans). Siri merangkumi 2 hari
+ * lepas + 5 hari ramalan, jadi salinan sehari masih sah untuk jam semasa.
+ */
+const lastGoodAirQuality = createLastGoodStore<AirQualitySeries>(
+  500,
+  24 * 3600_000,
+);
+
+/**
+ * {@link getAirQuality} dengan sandaran: bila Open-Meteo gagal, guna siri terakhir yang
+ * berjaya bagi sel yang sama (≤ 24 jam) supaya pengguna tidak melihat ralat.
+ */
+export async function getAirQualityResilient(
+  lat: number,
+  lon: number,
+): Promise<AirQualitySeries> {
+  const key = `${lat},${lon}`;
+  try {
+    const series = await getAirQuality(lat, lon);
+    lastGoodAirQuality.remember(key, series);
+    return series;
+  } catch (error) {
+    const saved = lastGoodAirQuality.recall(key);
+    if (!saved) throw error;
+    console.error("[data] Open-Meteo gagal; guna siri terakhir", error);
+    return saved;
+  }
 }
 
 /** Senarai stesen APIMS dengan bacaan terkini, dicache 15 minit (satu permintaan ke JAS bagi semua pengguna). */
@@ -130,9 +166,11 @@ export async function getWeather(
 ): Promise<WeatherSeries> {
   "use cache";
   cacheLife({ stale: 600, revalidate: 1800, expire: 7200 });
+  // /api/aqi tidak menunggu lebih 2.5 s; had panjang ini supaya fetch lambat masih sempat
+  // mengisi cache di latar belakang (v0.8.2).
   const res = await fetch(
     weatherUrl(Math.round(lat * 10) / 10, Math.round(lon * 10) / 10),
-    { signal: AbortSignal.timeout(8000) },
+    { signal: AbortSignal.timeout(15_000) },
   );
   if (!res.ok)
     throw new Error(`Open-Meteo (cuaca) memulangkan status ${res.status}`);
@@ -160,18 +198,23 @@ export async function getHotspots(): Promise<{
   cacheLife({ stale: 1800, revalidate: 3600, expire: 10800 });
   const key = process.env.FIRMS_MAP_KEY;
   if (!key) throw new Error("FIRMS_MAP_KEY belum ditetapkan.");
-  const points = [];
-  for (const source of FIRMS_SOURCES) {
-    const res = await fetch(firmsUrl(key, source), {
-      signal: AbortSignal.timeout(20_000),
-    });
-    if (!res.ok) throw new Error(`FIRMS memulangkan status ${res.status}`);
-    const text = await res.text();
-    // FIRMS memulangkan teks ralat (bukan CSV) bila kunci tidak sah atau had dicapai.
-    if (!text.startsWith("latitude")) {
-      throw new Error(`Respons FIRMS tidak dijangka: ${text.slice(0, 80)}`);
-    }
-    points.push(...parseFirmsCsv(text));
-  }
-  return { updatedAt: new Date().toISOString(), cells: aggregate(points) };
+  // Kedua-dua satelit diminta serentak (v0.8.2).
+  const lists = await Promise.all(
+    FIRMS_SOURCES.map(async (source) => {
+      const res = await fetch(firmsUrl(key, source), {
+        signal: AbortSignal.timeout(20_000),
+      });
+      if (!res.ok) throw new Error(`FIRMS memulangkan status ${res.status}`);
+      const text = await res.text();
+      // FIRMS memulangkan teks ralat (bukan CSV) bila kunci tidak sah atau had dicapai.
+      if (!text.startsWith("latitude")) {
+        throw new Error(`Respons FIRMS tidak dijangka: ${text.slice(0, 80)}`);
+      }
+      return parseFirmsCsv(text);
+    }),
+  );
+  return {
+    updatedAt: new Date().toISOString(),
+    cells: aggregate(lists.flat()),
+  };
 }

@@ -3,6 +3,11 @@ import type { Reading } from "./reading";
 
 /** Bacaan dianggap segar selama 10 minit; selepas itu diambil semula. */
 const FRESH_MS = 10 * 60 * 1000;
+/** Bacaan separa diambil semula selepas cache CDN separa (60 s) tamat (v0.8.2). */
+const PARTIAL_FRESH_MS = 75 * 1000;
+
+const freshFor = (entry: ReadingEntry) =>
+  entry.reading?.partial ? PARTIAL_FRESH_MS : FRESH_MS;
 const STORAGE_PREFIX = "hezy:reading:";
 
 export type ReadingEntry = {
@@ -16,6 +21,7 @@ export type ReadingEntry = {
 const entries = new Map<string, ReadingEntry>();
 const listeners = new Set<() => void>();
 const inFlight = new Map<string, Promise<void>>();
+const retryScheduled = new Set<string>();
 
 const keyOf = (lat: number, lon: number) =>
   `${lat.toFixed(2)},${lon.toFixed(2)}`;
@@ -49,7 +55,11 @@ function load(key: string, force = false): Promise<void> {
 
 async function fetchEntry(key: string, force: boolean) {
   let entry = entries.get(key) ?? restore(key);
-  if (!force && entry?.fetchedAt && Date.now() - entry.fetchedAt < FRESH_MS) {
+  if (
+    !force &&
+    entry?.fetchedAt &&
+    Date.now() - entry.fetchedAt < freshFor(entry)
+  ) {
     if (!entries.has(key)) setEntry(key, entry);
     return;
   }
@@ -65,6 +75,7 @@ async function fetchEntry(key: string, force: boolean) {
     }
     const fetchedAt = Date.now();
     setEntry(key, { status: "ready", reading: body, fetchedAt });
+    if (body.partial) scheduleRetry(key);
     try {
       window.localStorage.setItem(
         STORAGE_PREFIX + key,
@@ -83,6 +94,16 @@ async function fetchEntry(key: string, force: boolean) {
     // Kekalkan bacaan lama (jika ada) supaya skrin tidak kosong.
     setEntry(key, { ...entry, status: "error", error: message });
   }
+}
+
+/** Ambil semula bacaan separa sekali, bila cache separa sudah tamat dan tab masih aktif. */
+function scheduleRetry(key: string) {
+  if (retryScheduled.has(key)) return;
+  retryScheduled.add(key);
+  setTimeout(() => {
+    retryScheduled.delete(key);
+    if (document.visibilityState === "visible") void load(key);
+  }, PARTIAL_FRESH_MS);
 }
 
 /** Muat semula semua bacaan yang sedang dipaparkan (tarik untuk muat semula, butang ⟳). */
