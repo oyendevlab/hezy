@@ -193,6 +193,7 @@ export function TrendPanel({
         today={todaySummary}
         days={days}
         weatherDays={reading.weatherDays}
+        met={reading.met?.forecast}
       />
 
       <MetForecast met={reading.met} todayDate={todayDate} />

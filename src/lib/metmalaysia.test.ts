@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
+  metCondition,
+  metDayFor,
   metFor,
   parseForecasts,
   parseWarnings,
@@ -138,5 +140,56 @@ describe("metFor", () => {
       when: "Petang",
     });
     expect(metFor("tiada", warnings, forecasts, "2026-10-17T00:30")).toBeNull();
+  });
+});
+
+describe("metCondition (v0.8.9)", () => {
+  it("memecah frasa kepada jenis, label pendek dan kelayakan", () => {
+    expect(
+      metCondition("Ribut petir di kebanyakan tempat di kawasan pedalaman"),
+    ).toEqual({
+      kind: "storm",
+      main: "Ribut petir",
+      qualifiers: ["kebanyakan tempat", "pedalaman"],
+    });
+    expect(metCondition("Hujan di beberapa tempat")).toEqual({
+      kind: "rain",
+      main: "Hujan",
+      qualifiers: ["beberapa tempat"],
+    });
+    expect(metCondition("Ribut petir menyeluruh")).toMatchObject({
+      kind: "storm",
+      qualifiers: ["menyeluruh"],
+    });
+    expect(metCondition("Tiada Hujan")).toEqual({
+      kind: "dry",
+      main: "Tiada hujan",
+      qualifiers: [],
+    });
+    expect(metCondition("Jerebu")).toEqual({
+      kind: "haze",
+      main: "Jerebu",
+      qualifiers: [],
+    });
+    expect(metCondition("Berangin")).toEqual({
+      kind: "other",
+      main: "Berangin",
+      qualifiers: [],
+    });
+  });
+
+  it("metDayFor mencari hari ikut tarikh", () => {
+    const days = parseForecasts([
+      {
+        location: { location_id: "St010" },
+        date: "2026-10-18",
+        summary_forecast: "Jerebu",
+        min_temp: 25,
+        max_temp: 33,
+      },
+    ]).St010;
+    expect(metDayFor(days, "2026-10-18")?.max).toBe(33);
+    expect(metDayFor(days, "2026-10-19")).toBeUndefined();
+    expect(metDayFor(undefined, "2026-10-18")).toBeUndefined();
   });
 });

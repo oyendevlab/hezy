@@ -225,7 +225,9 @@ test.describe("aliran utama", () => {
     await expect(daily.locator("li")).toHaveCount(3);
     await expect(daily).toContainText("Hari ini");
     await expect(daily).toContainText("Esok");
-    await expect(daily).toContainText("90%");
+    // Hari ke-3 "Lusa"; lajur peluang hujan Open-Meteo dibuang (v0.8.9).
+    await expect(daily).toContainText("Lusa");
+    await expect(daily).not.toContainText("90%");
     await page.getByRole("button", { name: "5 hari" }).click();
     await expect(daily.locator("li")).toHaveCount(5);
     await daily.getByRole("button", { name: /Esok/ }).click();
@@ -2354,8 +2356,21 @@ test.describe("API", () => {
     await page.goto("/trend");
     const forecast = page.getByTestId("met-forecast");
     await expect(forecast).toContainText("Ramalan rasmi MetMalaysia");
-    await expect(forecast).toContainText("Ribut petir di beberapa tempat");
-    await expect(forecast).toContainText("33°");
+    // Kad ringkas (v0.8.9): label pendek + kelayakan, pagi/petang/malam berikon.
+    await expect(forecast).toContainText("Hari ini");
+    await expect(forecast).toContainText("Ribut petir");
+    await expect(forecast).toContainText("beberapa tempat");
+    await expect(forecast).toContainText("Jerebu");
+    // Suhu rasmi MetMalaysia kini dalam Ramalan harian, bukan dalam kad.
+    await expect(forecast).not.toContainText("33°");
+    await expect(
+      page.getByTestId("daily-forecast").locator("li").first(),
+    ).toContainText("33°/24°");
+    // Negeri dan sumber dalam helaian ⓘ.
+    await page
+      .getByRole("button", { name: "Tentang ramalan rasmi MetMalaysia" })
+      .click();
+    await expect(page.getByTestId("info-met")).toContainText("data.gov.my");
   });
 
   test("proksi WAQI: hanya skop tetap dan asal yang sama", async ({

@@ -271,6 +271,14 @@ Buka **https://hezy.my** pada telefon.
 - [ ] Trend → Ramalan harian (5 hari): semasa jerebu, hari ke-3 hingga ke-5 tidak jatuh mendadak ke tahap Sederhana tanpa sebab
 - [ ] Ramalan per jam beberapa jam akan datang tidak berubah (masih bermula pada bacaan rasmi)
 
+## v0.8.9 — Ramalan harian guna MetMalaysia
+
+- [ ] Trend → Ramalan harian: lajur kedua kini ikon keadaan cuaca (ribut petir, hujan, jerebu, tiada hujan), bukan peratus hujan
+- [ ] Suhu harian sama dengan ramalan rasmi MetMalaysia; hari ke-3 dilabel "Lusa"
+- [ ] Ketik baris hari: puncak IPU dan ringkasan MetMalaysia
+- [ ] Ramalan rasmi MetMalaysia: tajuk tanpa ikon, ⓘ memaparkan negeri dan sumber; kad Hari ini / Esok / Lusa dengan ikon pagi, petang, malam
+- [ ] Bahasa Inggeris: frasa dan kelayakan (cth. "most places", "inland") diterjemah
+
 ## Jika ada masalah
 
 Ambil tangkapan skrin dan catat model telefon serta versi OS, kemudian buka isu di

@@ -256,3 +256,49 @@ export function metStateFor(
   }
   return best?.id ?? null;
 }
+
+export type MetKind = "storm" | "rain" | "dry" | "haze" | "other";
+
+export type MetCondition = {
+  kind: MetKind;
+  /** Label pendek (kunci terjemahan BM), cth. "Ribut petir". */
+  main: string;
+  /** Kelayakan (kunci terjemahan BM), cth. ["kebanyakan tempat", "pedalaman"]. */
+  qualifiers: string[];
+};
+
+/**
+ * Frasa ramalan MetMalaysia → jenis, label pendek dan kelayakan (v0.8.9), cth.
+ * "Ribut petir di kebanyakan tempat di kawasan pedalaman" → ribut petir, ["kebanyakan tempat",
+ * "pedalaman"]. Frasa yang tidak dikenali dipaparkan seperti asal.
+ */
+export function metCondition(phrase: string): MetCondition {
+  const text = phrase.trim();
+  const lower = text.toLowerCase();
+  const qualifiers: string[] = [];
+  if (lower.includes("menyeluruh")) qualifiers.push("menyeluruh");
+  if (lower.includes("kebanyakan tempat")) qualifiers.push("kebanyakan tempat");
+  else if (lower.includes("beberapa tempat"))
+    qualifiers.push("beberapa tempat");
+  else if (lower.includes("satu dua tempat"))
+    qualifiers.push("satu dua tempat");
+  if (lower.includes("kawasan pantai")) qualifiers.push("pantai");
+  if (lower.includes("kawasan pedalaman")) qualifiers.push("pedalaman");
+  if (lower.startsWith("ribut petir"))
+    return { kind: "storm", main: "Ribut petir", qualifiers };
+  if (lower.startsWith("tiada hujan"))
+    return { kind: "dry", main: "Tiada hujan", qualifiers: [] };
+  if (lower.startsWith("hujan"))
+    return { kind: "rain", main: "Hujan", qualifiers };
+  if (lower.startsWith("jerebu") || lower.startsWith("berjerebu"))
+    return { kind: "haze", main: "Jerebu", qualifiers };
+  return { kind: "other", main: text, qualifiers: [] };
+}
+
+/** Ramalan MetMalaysia bagi tarikh `date`, jika ada. */
+export function metDayFor(
+  forecast: readonly MetDay[] | undefined,
+  date: string,
+): MetDay | undefined {
+  return forecast?.find((d) => d.date === date);
+}
