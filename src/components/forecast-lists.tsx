@@ -238,7 +238,7 @@ export function DailyForecast({
             rows={[
               {
                 icon: ChartBar,
-                text: "Nombor ialah purata IPU hari itu; ketik baris untuk lihat puncak",
+                text: "Nombor ialah purata IPU hari itu, dikira seperti JAS (purata 24 jam) dan bermula daripada bacaan rasmi terkini; ketik baris untuk lihat puncak",
               },
               {
                 icon: CalendarDots,

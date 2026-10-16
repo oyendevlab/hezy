@@ -284,8 +284,8 @@ const EN: Record<string, string> = {
     "Arrows show where the wind blows",
   "Ramalan per jam tidak tersedia buat masa ini.":
     "The hourly forecast is not available right now.",
-  "Nombor ialah purata IPU hari itu; ketik baris untuk lihat puncak":
-    "The number is the day's average API; tap a row to see the peak",
+  "Nombor ialah purata IPU hari itu, dikira seperti JAS (purata 24 jam) dan bermula daripada bacaan rasmi terkini; ketik baris untuk lihat puncak":
+    "The number is the day's average API, calculated like the DOE (24-hour average) and starting from the latest official reading; tap a row to see the peak",
   "Ramalan model CAMS (Open-Meteo), hingga 5 hari":
     "CAMS model forecast (Open-Meteo), up to 5 days",
   "Peluang hujan tertinggi hari itu": "Highest chance of rain that day",
@@ -982,6 +982,21 @@ const EN: Record<string, string> = {
     "Home, Trend, Locations and Settings redesigned",
   "Ikon baharu, notifikasi lebih ringkas, kad kongsi lebih kemas":
     "New icon, simpler notifications, tidier share card",
+  "Keselamatan diperkukuh": "Stronger security",
+  "Kemas kini keselamatan penting untuk pelayan Hezy":
+    "Important security update for the Hezy server",
+  "Perlindungan tambahan untuk notifikasi dan halaman aplikasi":
+    "Extra protection for notifications and app pages",
+  "Lebih laju dan stabil": "Faster and more stable",
+  "Bacaan IPU dimuatkan lebih cepat, terutama lokasi baharu":
+    "API readings load faster, especially for new locations",
+  "Bacaan tetap dipaparkan walaupun data cuaca lambat atau sumber terganggu":
+    "Readings still show when weather data is slow or a source is down",
+  "Ramalan harian lebih tepat": "More accurate daily forecast",
+  "Ramalan harian kini dikira seperti IPU rasmi JAS (purata 24 jam) dan bermula daripada bacaan rasmi terkini":
+    "The daily forecast is now calculated like the official DOE API (24-hour average) and starts from the latest official reading",
+  "Model ramalan baharu diuji di latar belakang sebelum digunakan sepenuhnya":
+    "A new forecast model is being tested in the background before full use",
 };
 
 /** Corak untuk teks yang disimpan dengan nama tempat, cth. nama lokasi GPS. */

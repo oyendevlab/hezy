@@ -57,17 +57,50 @@ describe("forecastHours dan forecastErrors", () => {
     expect(errors.A.fr[0] / errors.A.fr[1]).toBe(80);
     expect(errors.A.fc[0] / errors.A.fc[1]).toBeLessThan(40);
   });
+
+  it("model E (unit JAS) disimpan dan dinilai dalam mod bayang (v0.8.3)", () => {
+    const history = Array.from({ length: 6 }, (_, i) => ({
+      time: `2026-10-12T${String(15 + i).padStart(2, "0")}:00`,
+      ipu: 150,
+    }));
+    const f = forecastHours(
+      series(70),
+      history,
+      "2026-10-12T20:00",
+      "2026-10-13",
+    );
+    // Bermula hampir pada bacaan rasmi dan berubah perlahan (purata 24 jam).
+    expect(f.jas[0]!).toBeGreaterThan(140);
+    expect(f.jas[8]!).toBeGreaterThan(f.raw[8]!);
+    const errors = forecastErrors(
+      { date: "2026-10-13", madeAt: "", stations: { A: f } },
+      { date: "2026-10-13", stations: { A: hours(150) } },
+    );
+    expect(errors.A.fj![0] / errors.A.fj![1]).toBeLessThan(
+      errors.A.fr[0] / errors.A.fr[1],
+    );
+  });
+
+  it("snapshot lama tanpa model E masih dinilai", () => {
+    const old = { raw: hours(70), corrected: hours(140) };
+    const errors = forecastErrors(
+      { date: "2026-10-13", madeAt: "", stations: { A: old } },
+      { date: "2026-10-13", stations: { A: hours(150) } },
+    );
+    expect(errors.A.fj).toBeUndefined();
+    expect(errors.A.fc[0] / errors.A.fc[1]).toBe(10);
+  });
 });
 
 describe("summarizeAccuracy", () => {
   let index: AccuracyIndex | null = null;
-  // 5 hari lepas: stesen A ralat anggaran 10, ramalan asal 40 dan dibetulkan 15; B ralat 30.
+  // 5 hari lepas: stesen A ralat anggaran 10, ramalan asal 40, dibetulkan 15, model E 8; B ralat 30.
   for (let back = 1; back <= 5; back++) {
     index = mergeAccuracy(
       index,
       addDays("2026-10-12", -back),
       {
-        A: { e: [240, 24], fr: [960, 24], fc: [360, 24] },
+        A: { e: [240, 24], fr: [960, 24], fc: [360, 24], fj: [192, 24] },
         B: { e: [720, 24] },
       },
       NOW,
@@ -81,7 +114,9 @@ describe("summarizeAccuracy", () => {
       estimate: 10,
       forecast: 15,
       forecastRaw: 40,
+      forecastJas: 8,
       days: 5,
+      jasDays: 5,
       scope: "station",
     });
   });
@@ -99,7 +134,9 @@ describe("summarizeAccuracy", () => {
       estimate: 20,
       forecast: 15,
       forecastRaw: 40,
+      forecastJas: 8,
       days: 5,
+      jasDays: 5,
       scope: "national",
     });
     expect(summarizeAccuracy(null, "2026-10-12")).toMatchObject({

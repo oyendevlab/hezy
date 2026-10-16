@@ -1,12 +1,13 @@
 /**
  * Ketepatan anggaran dan ramalan Hezy berbanding bacaan rasmi APIMS (item 4).
  * - Anggaran: IPU model (purata PM2.5 24 jam) berbanding IPU rasmi pada jam yang sama.
- * - Ramalan: ramalan esok yang disimpan setiap malam (model asal dan yang dibetulkan)
- *   berbanding IPU rasmi keesokan harinya.
+ * - Ramalan: ramalan esok yang disimpan setiap malam (model asal, kaedah v0.8.0 dan model E
+ *   unit JAS dalam mod bayang sejak v0.8.3) berbanding IPU rasmi keesokan harinya.
  * Ralat ialah ralat mutlak purata (MAE) dalam unit IPU.
  */
 
 import { applyCorrection, computeCorrection } from "./forecast-correction";
+import { jasForecast } from "./forecast-jas";
 import type { DayHours, HourlyDay } from "./history";
 import { addDays } from "./history";
 import type { HourlyOfficial } from "./apims";
@@ -38,7 +39,11 @@ export type ErrorSum = [sum: number, n: number];
 export type ForecastSnapshot = {
   date: string;
   madeAt: string;
-  stations: Record<string, { raw: DayHours; corrected: DayHours }>;
+  /** `jas`: model E (v0.8.3); tiada dalam snapshot lama. */
+  stations: Record<
+    string,
+    { raw: DayHours; corrected: DayHours; jas?: DayHours }
+  >;
 };
 
 export type StationAccuracy = {
@@ -46,8 +51,10 @@ export type StationAccuracy = {
   e?: ErrorSum;
   /** Ramalan model asal. */
   fr?: ErrorSum;
-  /** Ramalan dibetulkan. */
+  /** Ramalan dibetulkan (kaedah v0.8.0). */
   fc?: ErrorSum;
+  /** Ramalan model E unit JAS (v0.8.3, mod bayang). */
+  fj?: ErrorSum;
 };
 
 export type AccuracyIndex = {
@@ -62,8 +69,12 @@ export type AccuracySummary = {
   forecast: number | null;
   /** MAE ramalan model asal (untuk perbandingan). */
   forecastRaw: number | null;
+  /** MAE ramalan model E (mod bayang v0.8.3; belum dipaparkan kepada pengguna). */
+  forecastJas: number | null;
   /** Bilangan hari dengan data ramalan. */
   days: number;
+  /** Bilangan hari dengan data ramalan model E. */
+  jasDays: number;
   scope: "station" | "national";
 };
 
@@ -97,13 +108,13 @@ export function estimateHours(
   return hours;
 }
 
-/** Ramalan IPU sejam bagi `date` (model asal dan dibetulkan dengan sejarah rasmi). */
+/** Ramalan IPU bagi `date`: model asal dan kaedah v0.8.0 (sejam), serta model E (unit JAS). */
 export function forecastHours(
   series: AirQualitySeries,
   history: readonly HourlyOfficial[],
   nowKey: string,
   date: string,
-): { raw: DayHours; corrected: DayHours } {
+): { raw: DayHours; corrected: DayHours; jas: DayHours } {
   const correction = computeCorrection(
     series.times,
     series.pm25,
@@ -113,8 +124,10 @@ export function forecastHours(
   const fixed = correction
     ? applyCorrection(series.times, series.pm25, correction)
     : series.pm25;
+  const e = jasForecast(series.times, series.pm25, history, nowKey).ipu;
   const raw: DayHours = Array.from({ length: 24 }, () => null);
   const corrected: DayHours = Array.from({ length: 24 }, () => null);
+  const jas: DayHours = Array.from({ length: 24 }, () => null);
   series.times.forEach((t, i) => {
     if (t.slice(0, 10) !== date) return;
     const h = Number(t.slice(11, 13));
@@ -122,8 +135,9 @@ export function forecastHours(
     const c = fixed[i];
     raw[h] = r === null ? null : pm25ToIpu(r);
     corrected[h] = c === null ? null : pm25ToIpu(c);
+    jas[h] = e[i];
   });
-  return { raw, corrected };
+  return { raw, corrected, jas };
 }
 
 /** Ralat anggaran bagi satu hari, ikut stesen. */
@@ -143,13 +157,14 @@ export function estimateErrors(
 export function forecastErrors(
   snapshot: ForecastSnapshot,
   actual: HourlyDay,
-): Record<string, { fr: ErrorSum; fc: ErrorSum }> {
-  const out: Record<string, { fr: ErrorSum; fc: ErrorSum }> = {};
+): Record<string, { fr: ErrorSum; fc: ErrorSum; fj?: ErrorSum }> {
+  const out: Record<string, { fr: ErrorSum; fc: ErrorSum; fj?: ErrorSum }> = {};
   for (const [id, f] of Object.entries(snapshot.stations)) {
     const real = actual.stations[id] ?? [];
     const fr = errorSum(f.raw, real);
     const fc = errorSum(f.corrected, real);
-    if (fr && fc) out[id] = { fr, fc };
+    const fj = f.jas ? errorSum(f.jas, real) : undefined;
+    if (fr && fc) out[id] = { fr, fc, ...(fj ? { fj } : {}) };
   }
   return out;
 }
@@ -179,26 +194,28 @@ function pool(
   today: string,
   stationIds: readonly string[] | null,
 ) {
-  const total = { e: [0, 0], fr: [0, 0], fc: [0, 0] } as Record<
-    "e" | "fr" | "fc",
+  const total = { e: [0, 0], fr: [0, 0], fc: [0, 0], fj: [0, 0] } as Record<
+    "e" | "fr" | "fc" | "fj",
     ErrorSum
   >;
   const forecastDays = new Set<string>();
+  const jasDays = new Set<string>();
   const from = addDays(today, -ACCURACY_WINDOW_DAYS);
   for (const [date, stations] of Object.entries(index?.days ?? {})) {
     if (date < from || date >= today) continue;
     for (const [id, acc] of Object.entries(stations)) {
       if (stationIds && !stationIds.includes(id)) continue;
-      for (const key of ["e", "fr", "fc"] as const) {
+      for (const key of ["e", "fr", "fc", "fj"] as const) {
         const s = acc[key];
         if (!s) continue;
         total[key][0] += s[0];
         total[key][1] += s[1];
         if (key === "fc") forecastDays.add(date);
+        if (key === "fj") jasDays.add(date);
       }
     }
   }
-  return { total, days: forecastDays.size };
+  return { total, days: forecastDays.size, jasDays: jasDays.size };
 }
 
 const round = (v: number | null) => (v === null ? null : Math.round(v));
@@ -217,6 +234,7 @@ export function summarizeAccuracy(
     estimate: round(mae(all.total.e)),
     forecast: round(mae(all.total.fc)),
     forecastRaw: round(mae(all.total.fr)),
+    forecastJas: round(mae(all.total.fj)),
   };
   if (stationId) {
     const local = pool(index, today, [stationId]);
@@ -229,14 +247,24 @@ export function summarizeAccuracy(
     if (estimateDays >= MIN_STATION_DAYS) {
       // Ramalan stesen hanya digunakan bila cukup hari; jika tidak, nilai kebangsaan.
       const enough = local.days >= MIN_STATION_DAYS;
+      const enoughJas = local.jasDays >= MIN_STATION_DAYS;
       return {
         estimate: round(mae(local.total.e)),
         forecast: enough ? round(mae(local.total.fc)) : national.forecast,
         forecastRaw: enough ? round(mae(local.total.fr)) : national.forecastRaw,
+        forecastJas: enoughJas
+          ? round(mae(local.total.fj))
+          : national.forecastJas,
         days: enough ? local.days : all.days,
+        jasDays: enoughJas ? local.jasDays : all.jasDays,
         scope: "station",
       };
     }
   }
-  return { ...national, days: all.days, scope: "national" };
+  return {
+    ...national,
+    days: all.days,
+    jasDays: all.jasDays,
+    scope: "national",
+  };
 }

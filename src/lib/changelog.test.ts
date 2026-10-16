@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { CHANGELOG } from "./changelog";
+import { translate } from "./i18n";
 import { APP_VERSION } from "./version";
 
 describe("CHANGELOG", () => {
@@ -14,5 +15,15 @@ describe("CHANGELOG", () => {
     }
     const dates = CHANGELOG.map((r) => r.date);
     expect([...dates].sort().reverse()).toEqual(dates);
+  });
+});
+
+describe("CHANGELOG dalam Bahasa Inggeris", () => {
+  // "Apa yang baharu" memaparkan 3 keluaran terkini; setiap teks mesti ada dalam kamus EN.
+  it("tajuk dan perkara 3 keluaran terkini diterjemah", () => {
+    for (const r of CHANGELOG.slice(0, 3)) {
+      for (const text of [r.title, ...r.items])
+        expect(translate("en", text), text).not.toBe(text);
+    }
   });
 });

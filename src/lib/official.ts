@@ -97,6 +97,22 @@ export function withOfficialHistory(
   };
 }
 
+/**
+ * Nilai untuk ringkasan harian (unit JAS, v0.8.3): rasmi bagi jam lepas, model E bagi jam yang
+ * belum diterbitkan. Bacaan lama tersimpan (tanpa `jasIpu`) guna nilai seperti sebelum ini.
+ */
+export function dayIpu(h: {
+  forecast: boolean;
+  ipu: number | null;
+  hourlyIpu: number | null;
+  officialIpu?: number | null;
+  jasIpu?: number | null;
+}): number | null {
+  if (!h.forecast && h.officialIpu != null) return h.officialIpu;
+  if (h.jasIpu !== undefined) return h.jasIpu;
+  return h.forecast ? h.hourlyIpu : h.ipu;
+}
+
 /** Nilai yang dipaparkan dalam graf: rasmi untuk jam lepas jika ada, jika tidak IPU sejam model. */
 export function displayIpu(h: {
   forecast: boolean;

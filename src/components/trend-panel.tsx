@@ -12,7 +12,7 @@ import {
 import { CATEGORY_STYLE } from "@/lib/category-style";
 import { formatWindow } from "@/lib/format";
 import { ipuCategory } from "@/lib/ipu";
-import { displayIpu } from "@/lib/official";
+import { dayIpu, displayIpu } from "@/lib/official";
 import type { HourPoint, Reading } from "@/lib/reading";
 import { useI18n } from "@/lib/use-i18n";
 import { HourBars } from "./hour-bars";
@@ -46,10 +46,8 @@ export function TrendPanel({
   const days = reading.days ?? [];
   const todayDate = today[0]?.time.slice(0, 10) ?? "";
   const bestCategory = bestWindow ? ipuCategory(bestWindow.averageIpu) : null;
-  // Hari ini untuk ramalan harian: rasmi bagi jam lepas, ramalan bagi jam akan datang.
-  const todayValues = today
-    .map(displayIpu)
-    .filter((v): v is number => v !== null);
+  // Hari ini untuk ramalan harian (unit JAS): rasmi bagi jam lepas, model E bagi jam akan datang.
+  const todayValues = today.map(dayIpu).filter((v): v is number => v !== null);
   const todaySummary =
     todayValues.length > 0
       ? {

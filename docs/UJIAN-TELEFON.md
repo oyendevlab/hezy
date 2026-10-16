@@ -230,6 +230,13 @@ Buka **https://hezy.my** pada telefon.
 - [ ] Jika ikon cuaca atau baris angin tiada pada mulanya, ia muncul sendiri dalam ~1–2 minit (tanpa tarik untuk muat semula)
 - [ ] Utama, Trend dan Lokasi masih memaparkan bacaan rasmi APIMS, graf dan ramalan seperti biasa
 
+## v0.8.3 — ramalan harian unit JAS
+
+- [ ] Trend → Ramalan harian: nombor esok dekat dengan IPU rasmi semasa (tidak melompat tinggi/rendah tanpa sebab) dan berubah beransur-ansur dari hari ke hari
+- [ ] Ketik baris hari: puncak tidak lagi jauh melebihi purata (cth. tiada puncak 200+ bila purata ~100)
+- [ ] ⓘ Ramalan harian menerangkan "dikira seperti JAS (purata 24 jam)"
+- [ ] Amaran ramalan esok (jam 8 malam) hanya bila purata esok melepasi ambang
+
 ## Jika ada masalah
 
 Ambil tangkapan skrin dan catat model telefon serta versi OS, kemudian buka isu di

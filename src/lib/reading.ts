@@ -8,6 +8,7 @@ import {
   computeCorrection,
   type Correction,
 } from "./forecast-correction";
+import { jasForecast } from "./forecast-jas";
 import {
   ipuCategory,
   isEmergency,
@@ -23,7 +24,7 @@ export const TIME_ZONE = "Asia/Kuala_Lumpur";
 /** Bacaan dianggap lapuk jika jam terkini yang ada lebih 3 jam lebih awal daripada sekarang. */
 export const STALE_AFTER_HOURS = 3;
 
-/** Ramalan satu hari: purata dan maksimum IPU sejam. */
+/** Ramalan satu hari: purata dan maksimum IPU unit JAS (purata 24 jam, model E; v0.8.3). */
 export type DayForecast = { date: string; averageIpu: number; maxIpu: number };
 
 /** Satu jam dalam ramalan per jam. */
@@ -55,6 +56,11 @@ export type HourPoint = {
   forecast: boolean;
   /** Nilai model jam ini dibetulkan dengan bacaan rasmi APIMS (jam selepas bacaan rasmi terakhir). */
   corrected?: boolean;
+  /**
+   * IPU unit JAS daripada model E (purata 24 jam, bermula pada bacaan rasmi terakhir) bagi jam
+   * yang belum diterbitkan APIMS; untuk ringkasan harian (v0.8.3).
+   */
+  jasIpu?: number | null;
 };
 
 export type Reading = {
@@ -141,6 +147,8 @@ export function buildReading(
   const forecastPm25 = correction
     ? applyCorrection(series.times, series.pm25, correction)
     : series.pm25;
+  // Model E (unit JAS) untuk ramalan harian; graf dan jalur per jam masih kaedah v0.8.0.
+  const jas = jasForecast(series.times, series.pm25, history, nowKey);
   const averages = rolling24hAverage(series.pm25);
   const ipus = averages.map((avg) => (avg === null ? null : pm25ToIpu(avg)));
 
@@ -173,12 +181,14 @@ export function buildReading(
     // Jam selepas bacaan rasmi terakhir (termasuk jam semasa yang belum diterbitkan APIMS).
     const corrected = correction !== null && time > correction.anchorTime;
     const pm25 = corrected ? forecastPm25[i] : series.pm25[i];
+    const unpublished = jas.anchor ? time > jas.anchor.time : forecast;
     return {
       time,
       ipu: ipus[i],
       hourlyIpu: pm25 === null ? null : pm25ToIpu(pm25),
       forecast,
       ...(corrected ? { corrected: true } : {}),
+      ...(unpublished ? { jasIpu: jas.ipu[i] } : {}),
     };
   });
 
@@ -192,11 +202,12 @@ export function buildReading(
   const bestWindow = findBestWindow(upcoming, 0);
 
   const byDate = new Map<string, number[]>();
-  for (const h of hours) {
-    const date = h.time.slice(0, 10);
-    if (date <= todayDate || h.hourlyIpu === null) continue;
-    byDate.set(date, [...(byDate.get(date) ?? []), h.hourlyIpu]);
-  }
+  series.times.forEach((time, i) => {
+    const date = time.slice(0, 10);
+    const value = jas.ipu[i];
+    if (date <= todayDate || value === null) return;
+    byDate.set(date, [...(byDate.get(date) ?? []), value]);
+  });
   const days: DayForecast[] = [...byDate]
     .filter(([, values]) => values.length >= MIN_HOURS_PER_DAY)
     .slice(0, 4)
