@@ -963,6 +963,10 @@ const EN: Record<string, string> = {
     "Alert settings appear when banners are on",
   "Padam data kini dalam kad Tentang": "Clear data now in the About card",
   "Notifikasi lebih ringkas": "Simpler notifications",
+  "Kemas kini kecil": "Small update",
+  "Apa yang baharu kini 3 keluaran terkini sahaja":
+    "What's new now shows the 3 latest releases only",
+  "Butang Padam di sebelah Padam data": "Delete button next to Clear data",
 };
 
 /** Corak untuk teks yang disimpan dengan nama tempat, cth. nama lokasi GPS. */

@@ -201,6 +201,11 @@ Buka **https://hezy.my** pada telefon.
 - [ ] Kad Tentang: **Padam data di peranti ini** di bawah Privasi → helaian dengan ikon amaran, Batal / Padam
 - [ ] Kredit: "Learn. Build. Repeat"
 
+## Ciri baharu v0.7.14
+
+- [ ] Apa yang baharu: 3 keluaran terkini sahaja
+- [ ] Kad Tentang: butang pil **Padam** di kanan baris "Padam data di peranti ini" → helaian pengesahan
+
 ## Jika ada masalah
 
 Ambil tangkapan skrin dan catat model telefon serta versi OS, kemudian buka isu di
