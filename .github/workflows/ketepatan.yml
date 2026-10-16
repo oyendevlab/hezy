@@ -2,7 +2,8 @@ name: Ketepatan ramalan
 
 on:
   schedule:
-    # 20:50 waktu Malaysia: nilai anggaran 7 hari lepas dan ramalan semalam, simpan ramalan esok.
+    # Sandaran kepada Vercel Cron (v0.8.4; vercel.json, 20:xx waktu Malaysia). GitHub sering
+    # lewat 4–7 jam, jadi larian berjadual dilangkau jika indeks sudah dikemas kini.
     - cron: "50 12 * * *"
   workflow_dispatch:
 
@@ -18,8 +19,11 @@ jobs:
         env:
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
+          URL="https://hezy.my/api/accuracy/run"
+          # Larian manual sentiasa dijalankan; larian berjadual hanya jika Vercel Cron terlepas.
+          if [ "$GITHUB_EVENT_NAME" = "schedule" ]; then URL="$URL?ifStale=20"; fi
           RESULT=$(curl -fsS --max-time 280 \
             -H "Authorization: Bearer $CRON_SECRET" \
-            https://hezy.my/api/accuracy/run)
+            "$URL")
           echo "$RESULT" | jq .
           echo "### Ketepatan: \`$(echo "$RESULT" | jq -c .)\`" >> "$GITHUB_STEP_SUMMARY"

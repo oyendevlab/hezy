@@ -632,12 +632,16 @@ Rujukan: [AUDIT-0.8.md](AUDIT-0.8.md) §2 (backtest: E mengurangkan ralat 24–6
 6. ✅ Ujian unit model E, mod bayang, kad harian dan `dayIpu` (294 lulus); E2E 186 lulus; data sebenar KL: esok 142 (dahulu 105) dengan rasmi semasa 155
 7. ✅ Versi 0.8.3, Apa yang baharu, tag dan GitHub Release
 8. ✅ `ketepatan.yml` dijalankan selepas deployment: snapshot 17 Okt mengandungi model E untuk 68/68 stesen (cth. Cheras v0.8.0 150→95→90→121, model E 154→152→139→124); penilaian pertama selepas 17 Okt berlalu
-9. ⬜ v0.8.4: tukar paparan ramalan ke model E selepas ≥ 7 hari data bayang menunjukkan `forecastJas` < `forecast`
+9. ⬜ Keluaran berasingan (selepas ≥ 7 hari data bayang, iaitu ~24 Okt): tukar graf, jalur per jam dan masa terbaik ke model E jika `forecastJas` < `forecast` (v0.8.4 digunakan untuk kestabilan jadual, Fasa 35)
 
-## Fasa 35 — kestabilan jadual (cadangan; menunggu keputusan pengguna)
+## Fasa 35 — v0.8.4 (kestabilan jadual, pilihan percuma; 16 Okt 2026)
 
-Penemuan 16 Okt 2026: GitHub Actions menggugurkan dan melewatkan larian berjadual. `push-check.yml` (setiap jam) hanya berjalan 25 kali dalam 117 jam (~21%, kira-kira setiap 4–6 jam, lewat 1–59 min); `ketepatan.yml` (20:50 MYT) berjalan 01:00–05:30 pagi; `sejarah.yml` (setiap 3 jam) ~4 kali sehari. Amaran IPU boleh lewat beberapa jam.
+Penemuan 16 Okt 2026: GitHub Actions menggugurkan dan melewatkan larian berjadual. `push-check.yml` (setiap jam) hanya berjalan 25 kali dalam 117 jam (~21%, kira-kira setiap 4–6 jam, lewat 1–59 min); `ketepatan.yml` (20:50 MYT) berjalan 01:00–05:30 pagi; `sejarah.yml` (setiap 3 jam) ~4 kali sehari. Amaran IPU boleh lewat beberapa jam. Pengguna memilih pilihan percuma (bukan penjadual luar atau Vercel Pro).
 
-1. ⬜ Kerja harian ke Vercel Cron (Hobby: 100 cron, sekali sehari setiap satu, ketepatan ±59 min; `CRON_SECRET` dihantar automatik): ketepatan malam dan sejarah hari semalam yang lengkap; GitHub kekal sebagai sandaran
-2. ⬜ Semakan amaran setiap jam — perlu keputusan: (a) penjadual luar percuma (cron-job.org atau Upstash QStash; perlu akaun, rahsia khusus untuk `push/check`), (b) Vercel Pro (cron setiap minit), atau (c) sementara: jadual GitHub beberapa kali sejam pada minit ganjil
-3. ⬜ `pantau.yml` melaporkan bila semakan amaran terakhir lebih 2 jam
+1. ✅ Vercel Cron (Hobby: sekali sehari setiap cron, ±59 min, `CRON_SECRET` dihantar automatik) dalam `vercel.json`: ketepatan malam (20:00–20:59 MYT), sejarah semalam lengkap (00:00–00:59 MYT), dan semakan amaran pada tiga tetingkap notifikasi harian — ringkasan pagi (07:xx), status sekolah (15:xx), ramalan esok (20:xx)
+2. ✅ `push-check.yml` empat kali sejam pada minit ganjil (:07, :22, :37, :52) dengan `concurrency` supaya larian tidak bertindih; logik amaran sedia ada berasaskan keadaan, jadi tiada notifikasi berganda
+3. ✅ `ketepatan.yml` menjadi sandaran: `/api/accuracy/run?ifStale=20` dilangkau jika indeks sudah dikemas kini dalam 20 jam (larian manual tetap paksa)
+4. ✅ `scripts/monitor.mjs` (pantau harian): kira larian `push-check.yml` 24 jam lepas melalui API GitHub dan gagal (buka issue) bila jurang terbesar lebih 2 jam (diuji tempatan: 5 larian dalam 24 jam, jurang 5.8 jam → gagal); log ketepatan turut memaparkan model E (bayang)
+5. ✅ Ujian (294 unit, 186 E2E), versi 0.8.4, Apa yang baharu (dengan terjemahan EN), tag dan GitHub Release
+6. ⬜ Sahkan selepas deployment: cron Vercel disenaraikan dan sampai ke fungsi (bukan ubah hala 308 dari hezy.vercel.app); bilangan larian push-check selepas 24 jam
+7. ⬜ Jika jurang masih > 2 jam selepas seminggu: pertimbangkan penjadual luar (cron-job.org/QStash) atau Vercel Pro

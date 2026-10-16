@@ -2,9 +2,16 @@ name: Semak amaran IPU
 
 on:
   schedule:
-    # Setiap jam pada minit ke-12 (bacaan APIMS dikemas kini sekitar awal jam).
-    - cron: "12 * * * *"
+    # Empat kali sejam pada minit ganjil (v0.8.4): GitHub menggugurkan banyak larian berjadual,
+    # terutama pada awal jam (dahulu "12 * * * *" hanya ~21% berjalan). Logik amaran berasaskan
+    # keadaan, jadi larian tambahan tidak menghantar notifikasi berganda. Vercel Cron turut
+    # memanggil pada tetingkap ringkasan pagi, status sekolah dan ramalan esok.
+    - cron: "7,22,37,52 * * * *"
   workflow_dispatch:
+
+concurrency:
+  group: push-check
+  cancel-in-progress: false
 
 # Hanya memanggil hezy.my dengan CRON_SECRET; tidak perlu akses repo (v0.8.1).
 permissions: {}

@@ -995,6 +995,11 @@ const EN: Record<string, string> = {
   "Ramalan harian lebih tepat": "More accurate daily forecast",
   "Ramalan harian kini dikira seperti IPU rasmi JAS (purata 24 jam) dan bermula daripada bacaan rasmi terkini":
     "The daily forecast is now calculated like the official DOE API (24-hour average) and starts from the latest official reading",
+  "Amaran lebih tepat pada masanya": "More timely alerts",
+  "Semakan amaran IPU dijalankan lebih kerap supaya notifikasi tidak lewat":
+    "API alert checks run more often so notifications are not late",
+  "Ringkasan pagi, status sekolah dan ramalan esok mempunyai jadual sandaran":
+    "The morning summary, school status and tomorrow's forecast now have a backup schedule",
   "Model ramalan baharu diuji di latar belakang sebelum digunakan sepenuhnya":
     "A new forecast model is being tested in the background before full use",
 };

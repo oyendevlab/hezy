@@ -237,6 +237,13 @@ Buka **https://hezy.my** pada telefon.
 - [ ] ⓘ Ramalan harian menerangkan "dikira seperti JAS (purata 24 jam)"
 - [ ] Amaran ramalan esok (jam 8 malam) hanya bila purata esok melepasi ambang
 
+## v0.8.4 — amaran tepat pada masanya
+
+- [ ] Dengan amaran dihidupkan dan IPU melepasi ambang: notifikasi tiba dalam kira-kira 15–30 minit selepas bacaan APIMS baharu (bukan beberapa jam)
+- [ ] Ringkasan pagi (jika dipilih) tiba antara 7–9 pagi
+- [ ] Amaran ramalan esok (jika dipilih) tiba antara 8–10 malam
+- [ ] Tiada notifikasi berganda untuk bacaan yang sama
+
 ## Jika ada masalah
 
 Ambil tangkapan skrin dan catat model telefon serta versi OS, kemudian buka isu di

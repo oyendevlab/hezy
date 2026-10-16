@@ -71,7 +71,8 @@ async function officialHistory(
 }
 
 /**
- * GET /api/accuracy/run — sekali sehari (malam) oleh GitHub Actions (Bearer CRON_SECRET).
+ * GET /api/accuracy/run — sekali sehari (malam) oleh Vercel Cron (Bearer CRON_SECRET); GitHub
+ * Actions memanggil dengan `?ifStale=20` sebagai sandaran (dilangkau jika indeks sudah baru).
  * 1. Ketepatan anggaran 7 hari lepas (model vs sejarah APIMS yang disimpan).
  * 2. Ketepatan ramalan semalam (ramalan yang disimpan malam kelmarin vs bacaan sebenar).
  * 3. Simpan ramalan esok (model asal + dibetulkan) untuk dinilai lusa.
@@ -83,6 +84,17 @@ export async function GET(request: Request) {
   }
   if (!isCronAuthorized(request.headers.get("authorization"), secret)) {
     return Response.json({ error: "Tidak dibenarkan." }, { status: 401 });
+  }
+
+  const ifStale = Number(new URL(request.url).searchParams.get("ifStale"));
+  if (Number.isFinite(ifStale) && ifStale > 0) {
+    const current = await readAccuracy();
+    if (
+      current &&
+      Date.now() - Date.parse(current.updatedAt) < ifStale * 3_600_000
+    ) {
+      return Response.json({ skipped: true, updatedAt: current.updatedAt });
+    }
   }
 
   const now = new Date();
