@@ -596,3 +596,14 @@ Penanda siri polish v0.7.1–v0.7.15:
 
 1. ✅ Versi 0.8.0, Apa yang baharu, tag dan GitHub Release
 2. ⬜ Ujian telefon penuh (`UJIAN-TELEFON.md` v0.7.1–v0.7.15) oleh pengguna; pembetulan sebagai 0.8.x
+
+## Fasa 32 — v0.8.1 (keselamatan; 16 Okt 2026)
+
+Audit keselamatan siri 0.8.x (data, logik, stabil, laju, keselamatan):
+
+1. ✅ Next.js 16.4.0 → 16.4.2 dan React 19.3.1: tampalan GHSA-673q-mjm6-r5xr (RCE `use cache`), GHSA-2464-fhr4-w9xw (RCE pengoptimum imej SVG), GHSA-p3m5-59mp-jv5r (DoS Server Actions)
+2. ✅ Langganan push hanya untuk perkhidmatan push pelayar (FCM, Apple, Mozilla, WNS) — tutup SSRF melalui endpoint sebarangan; rekod lama yang tidak sah dibuang oleh `/api/push/check`
+3. ✅ Rahsia cron dibandingkan dalam masa tetap (`request-guard.ts`); permintaan rentas laman ke `/api/log` dan `/api/push/*` ditolak; had saiz badan dan had kadar langganan
+4. ✅ Pengepala: CSP (tanpa nonce, halaman kekal statik), X-Frame-Options, HSTS `includeSubDomains`, Permissions-Policy, COOP; `X-Powered-By` dibuang
+5. ✅ GitHub Actions dengan kebenaran minimum; Dependabot mingguan (npm berkumpulan) dan bulanan (actions)
+6. ✅ Versi 0.8.1, Apa yang baharu, tag dan GitHub Release

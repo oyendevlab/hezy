@@ -14,6 +14,7 @@ import {
   writeIndex,
 } from "@/lib/history-store";
 import { localHourKey } from "@/lib/reading";
+import { isCronAuthorized } from "@/lib/request-guard";
 
 /** Had hari ke belakang: endpoint APIMS menyimpan ~7 hari. */
 const MAX_BACK = 7;
@@ -48,7 +49,7 @@ export async function GET(request: Request) {
       { status: 503 },
     );
   }
-  if (request.headers.get("authorization") !== `Bearer ${secret}`) {
+  if (!isCronAuthorized(request.headers.get("authorization"), secret)) {
     return Response.json({ error: "Tidak dibenarkan." }, { status: 401 });
   }
 

@@ -225,7 +225,7 @@ describe("ambang amaran", () => {
   it("menerima ambang sah dan menolak yang lain", () => {
     const base = {
       subscription: {
-        endpoint: "https://x.example/p",
+        endpoint: "https://web.push.apple.com/p",
         keys: { p256dh: "BA", auth: "a" },
       },
       lat: 3.07,

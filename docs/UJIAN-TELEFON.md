@@ -218,6 +218,12 @@ Buka **https://hezy.my** pada telefon.
 - [ ] Pasang semula Hezy untuk ikon baharu; semak skrin pembuka terang dan gelap
 - [ ] Mod gelap: Utama, Trend, Lokasi, Tetapan, helaian
 
+## v0.8.1 — keselamatan
+
+- [ ] Utama, Trend, Lokasi (peta, jubin, sensor WAQI, titik panas, angin) dan Tetapan masih berfungsi seperti biasa
+- [ ] Tetapan → Notifikasi: hidupkan banner, tukar pilihan, **Hantar** notifikasi ujian → notifikasi diterima
+- [ ] Kongsi gambar dari Utama dan negeri → pratonton dan helaian kongsi berfungsi
+
 ## Jika ada masalah
 
 Ambil tangkapan skrin dan catat model telefon serta versi OS, kemudian buka isu di

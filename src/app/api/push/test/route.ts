@@ -1,5 +1,7 @@
 import webpush, { WebPushError } from "web-push";
 import { deleteRecord, readRecord } from "@/lib/push-store";
+import { isPushServiceEndpoint } from "@/lib/push-validate";
+import { isCrossSite, readJsonBody } from "@/lib/request-guard";
 import {
   TEST_MAX_PER_MINUTE,
   cooldownSeconds,
@@ -8,6 +10,7 @@ import {
 
 // Had kadar dalam memori (setiap instans): kasar tetapi cukup untuk butang ujian.
 const lastSent = new Map<string, number>();
+const MAX_BODY_BYTES = 2048;
 let windowStart = 0;
 let windowCount = 0;
 
@@ -25,11 +28,14 @@ export async function POST(request: Request) {
       { status: 503 },
     );
   }
-  const body = (await request.json().catch(() => null)) as {
-    endpoint?: unknown;
-  } | null;
-  const endpoint = body?.endpoint;
-  if (typeof endpoint !== "string" || !endpoint.startsWith("https://")) {
+  if (isCrossSite(request)) {
+    return Response.json({ error: "Tidak dibenarkan." }, { status: 403 });
+  }
+  const body = await readJsonBody(request, MAX_BODY_BYTES);
+  const endpoint = body.ok
+    ? (body.value as { endpoint?: unknown } | null)?.endpoint
+    : undefined;
+  if (!isPushServiceEndpoint(endpoint)) {
     return Response.json({ error: "Endpoint tidak sah." }, { status: 400 });
   }
 

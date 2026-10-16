@@ -2277,6 +2277,36 @@ test.describe("API", () => {
     expect(bad.status()).toBe(400);
   });
 
+  test("push: menolak endpoint bukan perkhidmatan push (SSRF)", async ({
+    request,
+  }) => {
+    const res = await request.post("/api/push/subscribe", {
+      data: {
+        subscription: {
+          endpoint: "https://jahat.example/hook",
+          keys: { p256dh: "BAbc", auth: "xyz" },
+        },
+        lat: 3.07,
+        lon: 101.52,
+      },
+    });
+    expect(res.status()).toBe(400);
+    const cross = await request.post("/api/log", {
+      headers: { origin: "https://jahat.example" },
+      data: {},
+    });
+    expect(cross.status()).toBe(403);
+  });
+
+  test("keselamatan: pengepala CSP dan anti-bingkai", async ({ request }) => {
+    const headers = (await request.get("/")).headers();
+    expect(headers["content-security-policy"]).toContain(
+      "frame-ancestors 'none'",
+    );
+    expect(headers["x-frame-options"]).toBe("DENY");
+    expect(headers["x-powered-by"]).toBeUndefined();
+  });
+
   test("push: semakan berkala memerlukan rahsia", async ({ request }) => {
     const res = await request.get("/api/push/check");
     // 401 bila CRON_SECRET dikonfigurasi, 503 bila belum (cth. dalam CI).
