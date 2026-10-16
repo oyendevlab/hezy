@@ -643,5 +643,6 @@ Penemuan 16 Okt 2026: GitHub Actions menggugurkan dan melewatkan larian berjadua
 3. ✅ `ketepatan.yml` menjadi sandaran: `/api/accuracy/run?ifStale=20` dilangkau jika indeks sudah dikemas kini dalam 20 jam (larian manual tetap paksa)
 4. ✅ `scripts/monitor.mjs` (pantau harian): kira larian `push-check.yml` 24 jam lepas melalui API GitHub dan gagal (buka issue) bila jurang terbesar lebih 2 jam (diuji tempatan: 5 larian dalam 24 jam, jurang 5.8 jam → gagal); log ketepatan turut memaparkan model E (bayang)
 5. ✅ Ujian (294 unit, 186 E2E), versi 0.8.4, Apa yang baharu (dengan terjemahan EN), tag dan GitHub Release
-6. ⬜ Sahkan selepas deployment: cron Vercel disenaraikan dan sampai ke fungsi (bukan ubah hala 308 dari hezy.vercel.app); bilangan larian push-check selepas 24 jam
-7. ⬜ Jika jurang masih > 2 jam selepas seminggu: pertimbangkan penjadual luar (cron-job.org/QStash) atau Vercel Pro
+6. ✅ Selepas deployment: 5 cron Vercel didaftarkan pada URL deployment (bukan alias `hezy.vercel.app` yang mengubah hala), query `?back=1` dikekalkan; ujian `vercel crons run /api/history/collect?back=1` → 200 (melepasi perlindungan deployment, `CRON_SECRET` sah)
+7. ⬜ Semak 17 Okt: bilangan larian `push-check.yml` dan jurang terbesar dalam 24 jam (laporan `pantau.yml`), serta larian cron Vercel pertama dalam log
+8. ⬜ Jika jurang masih > 2 jam selepas seminggu: pertimbangkan penjadual luar (cron-job.org/QStash) atau Vercel Pro
