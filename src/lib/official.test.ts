@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Station } from "./apims";
 import {
-  dayIpu,
   displayIpu,
   officialFor,
   primaryReading,
@@ -97,23 +96,26 @@ describe("withOfficialHistory", () => {
       null,
       undefined,
     ]);
-    expect(merged.today.map(displayIpu)).toEqual([74, 62, 70]);
+    // Jam lepas tanpa rasmi: purata 24 jam model (unit JAS), bukan IPU sejam (v0.8.7).
+    expect(merged.today.map(displayIpu)).toEqual([74, 61, 70]);
   });
 });
 
-describe("dayIpu (ringkasan harian unit JAS, v0.8.3)", () => {
+describe("displayIpu (unit JAS di semua paparan, v0.8.7)", () => {
   const base = { ipu: 80, hourlyIpu: 120 };
   it("rasmi bagi jam lepas, model E bagi jam belum diterbitkan", () => {
-    expect(dayIpu({ ...base, forecast: false, officialIpu: 150 })).toBe(150);
-    expect(dayIpu({ ...base, forecast: true, jasIpu: 148 })).toBe(148);
+    expect(displayIpu({ ...base, forecast: false, officialIpu: 150 })).toBe(
+      150,
+    );
+    expect(displayIpu({ ...base, forecast: true, jasIpu: 148 })).toBe(148);
     // Jam semasa: APIMS belum terbit, model E sudah ada.
     expect(
-      dayIpu({ ...base, forecast: false, officialIpu: null, jasIpu: 149 }),
+      displayIpu({ ...base, forecast: false, officialIpu: null, jasIpu: 149 }),
     ).toBe(149);
   });
 
   it("bacaan lama tanpa jasIpu: IPU sejam untuk ramalan, purata 24 jam model untuk jam lepas", () => {
-    expect(dayIpu({ ...base, forecast: true })).toBe(120);
-    expect(dayIpu({ ...base, forecast: false })).toBe(80);
+    expect(displayIpu({ ...base, forecast: true })).toBe(120);
+    expect(displayIpu({ ...base, forecast: false })).toBe(80);
   });
 });

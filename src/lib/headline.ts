@@ -1,5 +1,6 @@
 import type { HealthProfile } from "./advice";
 import type { IpuCategoryKey } from "./ipu";
+import { displayIpu } from "./official";
 
 /**
  * Ayat nasihat di bawah nombor IPU, dipilih ikut keadaan supaya tidak terlalu generik
@@ -150,19 +151,14 @@ export function pickHeadline(ctx: {
 }
 
 /**
- * Perubahan IPU 3 jam terakhir daripada jam yang sudah berlalu (rasmi APIMS jika ada).
+ * Perubahan IPU 3 jam terakhir daripada jam yang sudah berlalu (rasmi APIMS jika ada; nilai sama
+ * seperti graf, v0.8.7).
  * `null` bila data tidak cukup.
  */
 export function recentChange(
-  today: readonly {
-    time: string;
-    forecast: boolean;
-    hourlyIpu: number | null;
-    officialIpu?: number | null;
-  }[],
+  today: readonly (Parameters<typeof displayIpu>[0] & { time: string })[],
 ): number | null {
-  const value = (h: (typeof today)[number]) =>
-    !h.forecast && h.officialIpu != null ? h.officialIpu : h.hourlyIpu;
+  const value = displayIpu;
   const past = today.filter((h) => !h.forecast && value(h) !== null);
   const last = past.at(-1);
   if (!last) return null;

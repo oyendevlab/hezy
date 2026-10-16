@@ -264,10 +264,11 @@ test.describe("aliran utama", () => {
     const chart = page.getByRole("slider", {
       name: "Graf IPU hari ini, jam demi jam",
     });
-    // Lalai: jam semasa (10 AM, anggaran model 156).
+    // Lalai: jam semasa (10 AM). Tanpa bacaan rasmi: purata 24 jam model (150), sama seperti
+    // "Kini" dalam ramalan per jam (v0.8.7), bukan IPU sejam (156).
     await expect(chart).toHaveAttribute(
       "aria-valuetext",
-      "10 AM: IPU 156, Tidak Sihat · Anggaran model",
+      "10 AM: IPU 150, Tidak Sihat · Anggaran model",
     );
     await expect(page.getByText("KINI", { exact: true })).toBeVisible();
 
@@ -290,7 +291,8 @@ test.describe("aliran utama", () => {
     await page.mouse.move(box.x + box.width / 2, y);
     await page.mouse.down();
     await page.mouse.move(box.x + 3, y, { steps: 5 });
-    await expect(chart).toHaveAttribute("aria-valuetext", /^12 AM: IPU 70/);
+    // Jam lepas tanpa rasmi: purata 24 jam model (unit JAS), bukan IPU sejam (70).
+    await expect(chart).toHaveAttribute("aria-valuetext", /^12 AM: IPU 150/);
     await expect(page.getByText("JAM LAIN", { exact: true })).toBeVisible();
     await page.mouse.up();
     await expect(chart).toHaveAttribute("aria-valuetext", /^10 AM/);
@@ -1762,7 +1764,7 @@ test.describe("trend rasmi APIMS", () => {
     // Penerangan kaedah kini dalam helaian ⓘ "Hari ini".
     await page.getByRole("button", { name: "Tentang graf hari ini" }).click();
     await expect(page.getByTestId("info-today")).toContainText(
-      /dibetulkan dengan bacaan itu: \+80/,
+      /Ramalan dikira seperti JAS \(purata 24 jam\), bermula pada bacaan rasmi terkini/,
     );
     await page.keyboard.press("Escape");
     await expect(page.getByTestId("info-today")).toHaveCount(0);
@@ -1848,7 +1850,9 @@ test.describe("trend rasmi APIMS", () => {
         estimate: 24,
         forecast: 19,
         forecastRaw: 50,
+        forecastJas: 15,
         days: 4,
+        jasDays: 4,
         scope: "station",
       },
     };
@@ -1869,12 +1873,13 @@ test.describe("trend rasmi APIMS", () => {
     ).toBeVisible();
     await page.goto("/trend");
     await expect(
-      page.getByTestId("hour-legend").getByText(/Ramalan \(biasanya ±19\)/),
+      // Ralat model E (yang dipaparkan sejak v0.8.7), bukan kaedah lama (±19).
+      page.getByTestId("hour-legend").getByText(/Ramalan \(biasanya ±15\)/),
     ).toBeVisible();
     await page.goto("/tetapan");
     await expect(page.getByText("±22 IPU", { exact: true })).toBeVisible();
     await expect(
-      page.getByText("±18 IPU (model asal ±47)", { exact: true }),
+      page.getByText("±12 IPU (model asal ±47)", { exact: true }),
     ).toBeVisible();
   });
 

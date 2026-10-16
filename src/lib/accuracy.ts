@@ -26,10 +26,13 @@ export const MIN_DISPLAY_DAYS = 3;
 /** Ralat untuk dipaparkan, atau null jika data belum cukup. */
 export function shownError(
   summary: AccuracySummary | null | undefined,
-  key: "estimate" | "estimateSpatial" | "forecast",
+  key: "estimate" | "estimateSpatial" | "forecast" | "forecastJas",
 ): number | null {
   if (!summary) return null;
   if (key === "forecast" && summary.days < MIN_DISPLAY_DAYS) return null;
+  // Ramalan yang dipaparkan sejak v0.8.7 ialah model E: tunjuk hanya bila cukup hari data.
+  if (key === "forecastJas" && (summary.jasDays ?? 0) < MIN_DISPLAY_DAYS)
+    return null;
   // Ringkasan lama (sebelum v0.8.5) tiada estimateSpatial.
   return summary[key] ?? null;
 }

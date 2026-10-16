@@ -85,7 +85,10 @@ export type Reading = {
   bestWindow: BestWindow | null;
   /** Ramalan harian bagi hari-hari selepas hari ini (hingga 4), daripada IPU sejam model. */
   days: DayForecast[];
-  /** 24 jam akan datang (ramalan per jam, v0.7.4); cuaca dan angin permukaan diisi oleh route API. */
+  /**
+   * Jam semasa + 23 jam akan datang (ramalan per jam; jam semasa dan unit JAS sejak v0.8.7);
+   * cuaca dan angin permukaan diisi oleh route API.
+   */
   hourly?: HourForecast[];
   stale: boolean;
   /** Bacaan rasmi APIMS stesen terdekat (≤ 30 km, ≤ 3 jam); diisi oleh route API. */
@@ -186,16 +189,17 @@ export function buildReading(
 
   const hours: HourPoint[] = series.times.map((time, i) => {
     const forecast = time > nowKey;
+    // IPU sejam kaedah v0.8.0 (masih untuk memilih masa terbaik dan mod bayang).
+    const oldCorrected = correction !== null && time > correction.anchorTime;
+    const pm25 = oldCorrected ? forecastPm25[i] : series.pm25[i];
     // Jam selepas bacaan rasmi terakhir (termasuk jam semasa yang belum diterbitkan APIMS).
-    const corrected = correction !== null && time > correction.anchorTime;
-    const pm25 = corrected ? forecastPm25[i] : series.pm25[i];
     const unpublished = jas.anchor ? time > jas.anchor.time : forecast;
     return {
       time,
       ipu: ipus[i],
       hourlyIpu: pm25 === null ? null : pm25ToIpu(pm25),
       forecast,
-      ...(corrected ? { corrected: true } : {}),
+      ...(jas.anchor && unpublished ? { corrected: true } : {}),
       ...(unpublished ? { jasIpu: jas.ipu[i] } : {}),
     };
   });
@@ -203,11 +207,53 @@ export function buildReading(
   const todayDate = nowKey.slice(0, 10);
   const today = hours.filter((h) => h.time.startsWith(todayDate));
 
-  const upcoming = hours
-    .filter((h) => h.forecast)
-    .slice(0, 24)
-    .map((h) => ({ time: h.time, ipu: h.hourlyIpu }));
-  const bestWindow = findBestWindow(upcoming, 0);
+  // Masa terbaik: jam dengan PM2.5 sejam paling rendah (pendedahan semasa di luar), tetapi IPU
+  // yang dipaparkan daripada model E supaya sama unit dengan bacaan rasmi (v0.8.7).
+  const future = hours.filter((h) => h.forecast).slice(0, 24);
+  const window = findBestWindow(
+    future.map((h) => ({ time: h.time, ipu: h.hourlyIpu })),
+    0,
+  );
+  const windowJas = window
+    ? future
+        .filter((h) => h.time >= window.start && h.time <= window.end)
+        .map((h) => h.jasIpu)
+        .filter((v): v is number => v != null)
+    : [];
+  const bestWindow =
+    window && windowJas.length > 0
+      ? {
+          ...window,
+          averageIpu: Math.round(
+            windowJas.reduce((a, b) => a + b, 0) / windowJas.length,
+          ),
+        }
+      : window;
+
+  // Ramalan per jam (v0.8.7): bermula pada jam semasa (rasmi jika sudah terbit, sama seperti
+  // graf), kemudian 23 jam model E.
+  const officialAt = new Map(
+    history.filter((h) => h.ipu !== null).map((h) => [h.time, h.ipu]),
+  );
+  const nowHour = hours.find((h) => h.time === nowKey);
+  const upcoming: HourForecast[] = [
+    ...(nowHour
+      ? [
+          {
+            time: nowKey,
+            // Sama seperti displayIpu bagi jam semasa: rasmi, model E, purata 24 jam model.
+            ipu:
+              officialAt.get(nowKey) ??
+              nowHour.jasIpu ??
+              nowHour.ipu ??
+              nowHour.hourlyIpu,
+          },
+        ]
+      : []),
+    ...future
+      .slice(0, nowHour ? 23 : 24)
+      .map((h) => ({ time: h.time, ipu: h.jasIpu ?? h.hourlyIpu })),
+  ];
 
   const byDate = new Map<string, number[]>();
   series.times.forEach((time, i) => {

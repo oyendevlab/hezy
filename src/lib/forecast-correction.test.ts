@@ -97,23 +97,21 @@ describe("buildReading dengan sejarah rasmi", () => {
     typeof buildReading
   >[0];
 
-  it("ramalan hari ini, masa terbaik dan ramalan harian dibetulkan", () => {
+  // Kaedah v0.8.0 (IPU sejam) masih digunakan untuk memilih masa terbaik dan mod bayang; paparan
+  // dan bendera "dibetulkan" ikut model E sejak v0.8.7 (reading.test.ts).
+  it("IPU sejam dibetulkan dengan bacaan rasmi selepas jam asas", () => {
     const raw = buildReading(series, NOW);
     const fixed = buildReading(series, NOW, HISTORY);
     expect(raw.correction).toBeNull();
     expect(fixed.correction?.anchorIpu).toBe(153);
     const at13 = fixed.today.find((h) => h.time === "2026-10-12T13:00")!;
-    expect(at13.corrected).toBe(true);
     expect(at13.hourlyIpu).toBeGreaterThan(140);
     expect(
       raw.today.find((h) => h.time === "2026-10-12T13:00")!.hourlyIpu,
     ).toBe(73);
-    expect(fixed.bestWindow!.averageIpu).toBeGreaterThan(
-      raw.bestWindow!.averageIpu,
-    );
-    // Jam sehingga bacaan rasmi terakhir tidak ditanda dibetulkan.
-    expect(fixed.today[5].corrected).toBeUndefined();
-    expect(fixed.today[12].corrected).toBeUndefined();
+    // Jam sehingga bacaan rasmi terakhir tidak berubah.
+    expect(fixed.today[5].hourlyIpu).toBe(raw.today[5].hourlyIpu);
+    expect(fixed.today[12].hourlyIpu).toBe(raw.today[12].hourlyIpu);
   });
 
   it("jam semasa tanpa bacaan rasmi turut dibetulkan", () => {
@@ -125,7 +123,6 @@ describe("buildReading dengan sejarah rasmi", () => {
     );
     const at13 = fixed.today.find((h) => h.time === "2026-10-12T13:00")!;
     expect(at13.forecast).toBe(false);
-    expect(at13.corrected).toBe(true);
     expect(at13.hourlyIpu).toBeGreaterThan(140);
   });
 });

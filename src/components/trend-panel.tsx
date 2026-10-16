@@ -12,7 +12,7 @@ import {
 import { CATEGORY_STYLE } from "@/lib/category-style";
 import { formatWindow } from "@/lib/format";
 import { ipuCategory } from "@/lib/ipu";
-import { dayIpu, displayIpu } from "@/lib/official";
+import { displayIpu } from "@/lib/official";
 import type { HourPoint, Reading } from "@/lib/reading";
 import { useI18n } from "@/lib/use-i18n";
 import { HourBars } from "./hour-bars";
@@ -48,7 +48,9 @@ export function TrendPanel({
   const todayDate = today[0]?.time.slice(0, 10) ?? "";
   const bestCategory = bestWindow ? ipuCategory(bestWindow.averageIpu) : null;
   // Hari ini untuk ramalan harian (unit JAS): rasmi bagi jam lepas, model E bagi jam akan datang.
-  const todayValues = today.map(dayIpu).filter((v): v is number => v !== null);
+  const todayValues = today
+    .map(displayIpu)
+    .filter((v): v is number => v !== null);
   const todaySummary =
     todayValues.length > 0
       ? {
@@ -119,16 +121,15 @@ export function TrendPanel({
                 },
                 {
                   icon: Sliders,
-                  text: reading.correction
+                  text: reading.official
                     ? t(
-                        "Jam lepas menggunakan bacaan rasmi APIMS stesen {station}. Ramalan model (PM2.5, formula JAS) dibetulkan dengan bacaan itu: {offset} µg/m³ pada jam semasa, berkurang ke model dalam 48 jam.",
+                        "Jam lepas menggunakan bacaan rasmi APIMS stesen {station}. Ramalan dikira seperti JAS (purata 24 jam), bermula pada bacaan rasmi terkini dan berubah beransur-ansur. Masa terbaik dipilih ikut jam PM2.5 paling rendah.",
                         {
-                          station: reading.official?.stationName ?? "terdekat",
-                          offset: `${reading.correction.offsetPm25 >= 0 ? "+" : ""}${Math.round(reading.correction.offsetPm25)}`,
+                          station: reading.official.stationName,
                         },
                       )
                     : t(
-                        "Jam lepas dan purata menggunakan bacaan rasmi APIMS stesen terdekat jika ada. Ramalan dan masa terbaik menggunakan IPU sejam daripada PM2.5 model (formula JAS).",
+                        "Ramalan dikira seperti JAS (purata 24 jam) daripada PM2.5 model, dibetulkan dengan stesen APIMS berdekatan jika ada. Masa terbaik dipilih ikut jam PM2.5 paling rendah.",
                       ),
                 },
               ]}
@@ -139,7 +140,7 @@ export function TrendPanel({
           <HourBars
             hours={today}
             height={barHeight}
-            forecastError={shownError(reading.accuracy, "forecast")}
+            forecastError={shownError(reading.accuracy, "forecastJas")}
           />
         </div>
       </div>

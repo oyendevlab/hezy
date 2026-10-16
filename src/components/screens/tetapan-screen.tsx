@@ -29,7 +29,7 @@ import {
 } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useEffect, useId, useState, useSyncExternalStore } from "react";
-import { MIN_DISPLAY_DAYS, type AccuracySummary } from "@/lib/accuracy";
+import { shownError, type AccuracySummary } from "@/lib/accuracy";
 import { HEALTH_PROFILES, type HealthProfile } from "@/lib/advice";
 import { formatHour } from "@/lib/format";
 import { LANGUAGES } from "@/lib/i18n";
@@ -1071,8 +1071,8 @@ function AccuracyRows() {
   }, []);
 
   if (!summary) return null;
-  const forecastReady =
-    summary.forecast !== null && summary.days >= MIN_DISPLAY_DAYS;
+  // Ramalan dipaparkan dengan model E sejak v0.8.7.
+  const forecast = shownError(summary, "forecastJas");
   return (
     <>
       <Row
@@ -1086,9 +1086,9 @@ function AccuracyRows() {
       <Row
         label={t("Ketepatan ramalan esok")}
         value={
-          forecastReady
+          forecast !== null
             ? t("±{n} IPU (model asal ±{raw})", {
-                n: summary.forecast!,
+                n: forecast,
                 raw: summary.forecastRaw ?? "–",
               })
             : t("Sedang dikumpul")
