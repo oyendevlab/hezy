@@ -10,6 +10,11 @@ updates:
       time: "09:00"
       timezone: Asia/Kuala_Lumpur
     open-pull-requests-limit: 5
+    # Versi major (cth. TypeScript 7, ESLint 10, @types/node melebihi enjin Node 22) dinaik
+    # taraf secara manual dengan semakan sendiri.
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     groups:
       patch-dan-minor:
         update-types: [minor, patch]
