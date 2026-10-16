@@ -534,8 +534,9 @@ Mockup: https://claude.ai/artifact/K2kQkrY8zYtUjBwb9AVE4J (papan kiri).
 7. ✅ Padam data melalui helaian pengesahan
 8. ✅ Versi 0.7.8, `UJIAN-TELEFON.md`, tag dan GitHub Release
 
-## Fasa 24 — v0.7.9 (Tentang Hezy; dirancang)
+## Fasa 24 — v0.7.9 (Tentang Hezy; disahkan 16 Okt 2026)
 
-1. ⬜ Kad Tentang Hezy: logo, nama, versi; Apa yang baharu (helaian 3–5 keluaran, `changelog.ts`)
-2. ⬜ Kongsi Hezy (helaian kongsi / salin pautan) dan Hantar maklum balas (e-mel oyendevlab@gmail.com, subjek + versi)
-3. ⬜ Kredit pembangun: gambar dalam bingkai bulat, "Syafiq", "Build. Create. Live"
+1. ✅ Kad Tentang Hezy: logo, nama, versi; Apa yang baharu (helaian, `src/lib/changelog.ts`, diuji sama dengan versi semasa)
+2. ✅ Kongsi Hezy (helaian kongsi / salin pautan) dan Hantar maklum balas (e-mel oyendevlab@gmail.com, subjek + versi)
+3. ✅ Kredit pembangun: gambar dalam bingkai bulat, "Syafiq", "Build. Create. Live"
+4. ✅ Versi 0.7.9, `UJIAN-TELEFON.md`, tag dan GitHub Release
