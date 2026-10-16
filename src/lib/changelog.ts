@@ -13,6 +13,15 @@ export type Release = {
 
 export const CHANGELOG: readonly Release[] = [
   {
+    version: "0.8.9",
+    date: "2026-10-17",
+    title: "Ramalan harian guna data rasmi MetMalaysia",
+    items: [
+      "Suhu dan keadaan cuaca harian kini daripada MetMalaysia",
+      "Bahagian Ramalan rasmi MetMalaysia lebih kemas dengan ikon pagi, petang dan malam",
+    ],
+  },
+  {
     version: "0.8.8",
     date: "2026-10-17",
     title: "Ramalan beberapa hari lebih tepat",

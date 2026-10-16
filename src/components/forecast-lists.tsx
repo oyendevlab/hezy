@@ -3,7 +3,6 @@
 import {
   CalendarDots,
   ChartBar,
-  CloudRain,
   CloudSun,
   Drop,
   NavigationArrow,
@@ -13,11 +12,14 @@ import {
 import { useState } from "react";
 import { CATEGORY_STYLE } from "@/lib/category-style";
 import { formatDay, formatHour } from "@/lib/format";
+import { addDays } from "@/lib/history";
 import { ipuCategory } from "@/lib/ipu";
 import type { DayForecast, HourForecast } from "@/lib/reading";
+import { metCondition, metDayFor, type MetDay } from "@/lib/metmalaysia";
 import { useI18n } from "@/lib/use-i18n";
 import type { DayWeather } from "@/lib/weather";
 import { InfoSheetButton } from "./info-sheet";
+import { MetIcon } from "./met-weather";
 import { weatherLook } from "./weather-icon";
 
 /** Anak panah arah angin bertiup (arah datang + 180°). */
@@ -186,12 +188,15 @@ export function DailyForecast({
   today,
   days,
   weatherDays,
+  met,
 }: {
   todayDate: string;
   /** Purata dan puncak IPU hari ini (rasmi untuk jam lepas, ramalan untuk jam akan datang). */
   today: { average: number; peak: number } | null;
   days: DayForecast[];
   weatherDays: DayWeather[] | undefined;
+  /** Ramalan rasmi MetMalaysia (v0.8.9): keadaan cuaca dan suhu min/maks bila ada. */
+  met?: readonly MetDay[];
 }) {
   const { t, lang } = useI18n();
   const [count, setCount] = useState<3 | 5>(3);
@@ -212,8 +217,11 @@ export function DailyForecast({
       : []),
     ...days.map((d) => ({
       date: d.date,
-      // "Sab 17/10" → "Sab 17" supaya muat dalam baris.
-      label: formatDay(d.date, todayDate, lang).replace(/\/\d+$/, ""),
+      // "Sab 17/10" → "Sab 17" supaya muat dalam baris; hari ke-3 "Lusa" seperti MetMalaysia.
+      label:
+        d.date === addDays(todayDate, 2)
+          ? t("Lusa")
+          : formatDay(d.date, todayDate, lang).replace(/\/\d+$/, ""),
       average: d.averageIpu,
       peak: d.maxIpu,
       weather: weatherFor(d.date),
@@ -242,14 +250,16 @@ export function DailyForecast({
               },
               {
                 icon: CalendarDots,
-                text: "Ramalan model CAMS (Open-Meteo), hingga 5 hari",
+                text: "IPU: model CAMS (Open-Meteo) dibetulkan dengan bacaan rasmi APIMS, hingga 5 hari",
               },
-              { icon: CloudRain, text: "Peluang hujan tertinggi hari itu" },
-              { icon: Thermometer, text: "Suhu maksimum / minimum" },
-              { icon: Drop, text: "Purata kelembapan udara" },
+              {
+                icon: CloudSun,
+                text: "Keadaan cuaca dan suhu maksimum / minimum: ramalan rasmi MetMalaysia",
+              },
+              { icon: Drop, text: "Purata kelembapan udara (Open-Meteo)" },
               {
                 icon: Wind,
-                text: "Angin permukaan tertinggi (km/j) dan arahnya",
+                text: "Angin permukaan tertinggi (km/j) dan arahnya (Open-Meteo)",
               },
             ]}
           />
@@ -282,7 +292,7 @@ export function DailyForecast({
         <span />
         <span className="text-center">IPU</span>
         <span className="flex justify-center">
-          <CloudRain size={15} weight="bold" />
+          <CloudSun size={15} weight="bold" />
         </span>
         <span className="flex justify-center">
           <Thermometer size={15} weight="bold" />
@@ -299,7 +309,19 @@ export function DailyForecast({
         {shown.map((r) => {
           const w = r.weather;
           const expanded = open === r.date;
+          // Keadaan dan suhu: MetMalaysia (rasmi) bila ada, jika tidak Open-Meteo.
+          const official = metDayFor(met, r.date);
+          const metSummary = official?.summary
+            ? metCondition(official.summary)
+            : null;
           const look = w ? weatherLook(w.code, true) : null;
+          const max = official?.max ?? w?.max ?? null;
+          const min = official?.min ?? w?.min ?? null;
+          const conditionLabel = metSummary
+            ? t(metSummary.main)
+            : look
+              ? t(look.label)
+              : null;
           return (
             <li key={r.date} className="bg-surface/70 rounded-2xl">
               <button
@@ -309,11 +331,8 @@ export function DailyForecast({
                 aria-label={[
                   r.label,
                   t("purata IPU {ipu}", { ipu: r.average }),
-                  look ? t(look.label) : null,
-                  w?.rainChance != null
-                    ? t("hujan {n}%", { n: w.rainChance })
-                    : null,
-                  w ? `${w.max}° / ${w.min}°` : null,
+                  conditionLabel,
+                  max !== null && min !== null ? `${max}° / ${min}°` : null,
                   w?.humidity != null
                     ? t("kelembapan {n}%", { n: w.humidity })
                     : null,
@@ -327,23 +346,30 @@ export function DailyForecast({
               >
                 <span className="truncate text-sm font-bold">{r.label}</span>
                 <IpuChip ipu={r.average} />
-                <span className="text-center tabular-nums">
-                  {loadingWeather ? (
-                    <Bone className="mx-auto h-3.5 w-7" />
-                  ) : w?.rainChance != null ? (
-                    `${w.rainChance}%`
+                <span className="flex justify-center">
+                  {metSummary ? (
+                    <MetIcon kind={metSummary.kind} size={20} />
+                  ) : loadingWeather ? (
+                    <Bone className="mx-auto h-4 w-5" />
+                  ) : look ? (
+                    <look.icon
+                      aria-hidden="true"
+                      size={20}
+                      weight="duotone"
+                      color={look.color}
+                    />
                   ) : (
                     "–"
                   )}
                 </span>
                 <span className="text-center whitespace-nowrap tabular-nums">
-                  {loadingWeather ? (
-                    <Bone className="mx-auto h-3.5 w-12" />
-                  ) : w ? (
+                  {max !== null && min !== null ? (
                     <>
-                      <b>{w.max}°</b>
-                      <span className="text-muted">/{w.min}°</span>
+                      <b>{max}°</b>
+                      <span className="text-muted">/{min}°</span>
                     </>
+                  ) : loadingWeather ? (
+                    <Bone className="mx-auto h-3.5 w-12" />
                   ) : (
                     "–"
                   )}
@@ -369,12 +395,23 @@ export function DailyForecast({
                 </span>
               </button>
               {expanded && (
-                <p className="text-muted px-3 pb-3 text-xs font-semibold">
-                  {t("Puncak ~{peak} · {label}", {
-                    peak: r.peak,
-                    label: t(ipuCategory(r.peak).label),
-                  })}
-                </p>
+                <div className="text-muted flex flex-col gap-0.5 px-3 pb-3 text-xs font-semibold">
+                  <p>
+                    {t("Puncak ~{peak} · {label}", {
+                      peak: r.peak,
+                      label: t(ipuCategory(r.peak).label),
+                    })}
+                  </p>
+                  {metSummary && (
+                    <p>
+                      {[
+                        `MetMalaysia: ${t(metSummary.main)}`,
+                        ...metSummary.qualifiers.map((q) => t(q)),
+                        ...(official?.when ? [t(official.when)] : []),
+                      ].join(" · ")}
+                    </p>
+                  )}
+                </div>
               )}
             </li>
           );

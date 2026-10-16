@@ -1009,6 +1009,12 @@ const EN: Record<string, string> = {
     "Areas far from APIMS stations are now corrected with official readings from nearby stations",
   "Bacaan rasmi terbaharu muncul lebih cepat selepas JAS menerbitkannya":
     "The latest official reading appears sooner after the DOE publishes it",
+  "Ramalan harian guna data rasmi MetMalaysia":
+    "Daily forecast uses official MetMalaysia data",
+  "Suhu dan keadaan cuaca harian kini daripada MetMalaysia":
+    "Daily temperatures and weather conditions now come from MetMalaysia",
+  "Bahagian Ramalan rasmi MetMalaysia lebih kemas dengan ikon pagi, petang dan malam":
+    "Tidier official MetMalaysia forecast with morning, afternoon and night icons",
   "Ramalan beberapa hari lebih tepat": "More accurate multi-day forecast",
   "Pembetulan dengan bacaan rasmi kini bertahan hingga 7 hari, bukan 3":
     "The correction with official readings now lasts up to 7 days, not 3",
@@ -1026,6 +1032,33 @@ const EN: Record<string, string> = {
     "MetMalaysia thunderstorm and heavy rain warnings for your state on Home",
   "Ramalan cuaca rasmi negeri di Trend; sensor peta kini melalui pelayan Hezy":
     "Official state weather forecast in Trend; map sensors now go through the Hezy server",
+  Lusa: "Day after tomorrow",
+  "Tentang ramalan rasmi MetMalaysia":
+    "About the official MetMalaysia forecast",
+  "Ramalan negeri {state}, ikut lokasi anda":
+    "{state} state forecast, based on your location",
+  "Sumber rasmi: Jabatan Meteorologi Malaysia (MetMalaysia) melalui data.gov.my":
+    "Official source: Malaysian Meteorological Department (MetMalaysia) via data.gov.my",
+  "Dikemas kini oleh MetMalaysia setiap hari":
+    "Updated by MetMalaysia every day",
+  "Suhu min/maks rasmi dipaparkan dalam Ramalan harian":
+    "Official min/max temperatures are shown in the Daily forecast",
+  "Amaran ribut petir dan hujan lebat dipaparkan di Utama":
+    "Thunderstorm and heavy rain warnings are shown on Home",
+  "Tiada hujan": "No rain",
+  menyeluruh: "widespread",
+  "kebanyakan tempat": "most places",
+  "beberapa tempat": "some places",
+  "satu dua tempat": "isolated",
+  pantai: "coastal",
+  pedalaman: "inland",
+  "IPU: model CAMS (Open-Meteo) dibetulkan dengan bacaan rasmi APIMS, hingga 5 hari":
+    "API: CAMS model (Open-Meteo) corrected with official APIMS readings, up to 5 days",
+  "Keadaan cuaca dan suhu maksimum / minimum: ramalan rasmi MetMalaysia":
+    "Weather conditions and max / min temperature: official MetMalaysia forecast",
+  "Purata kelembapan udara (Open-Meteo)": "Average humidity (Open-Meteo)",
+  "Angin permukaan tertinggi (km/j) dan arahnya (Open-Meteo)":
+    "Highest surface wind (km/h) and its direction (Open-Meteo)",
   "Sehingga {time}": "Until {time}",
   "Cuaca rasmi": "Official weather",
   "Amaran cuaca MetMalaysia": "MetMalaysia weather warning",

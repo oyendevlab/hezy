@@ -695,3 +695,16 @@ Backtest (7 hari, 68 stesen; MAE / % tahap betul):
 3. ✅ Dokumen kaedah (komen kod, AUDIT-0.8.md) dikemas kini
 4. ✅ Semakan data sebenar (06:57; purata harian Esok → hari ke-4): KL 141→102→93→88 menjadi 154→133→135→123, Melaka 135→88→70→73 menjadi 149→116→106→107, Mersing 83→74→67→67 menjadi 88→85→84→84; jam awal tidak berubah. Versi 0.8.8, Apa yang baharu (BM/EN), tag dan GitHub Release
 5. ⬜ Pantau: perbandingan malam `forecastJas`; kaveat — bila jerebu reda dengan cepat, reput perlahan boleh terlebih anggar (backtest hanya satu minggu musim jerebu)
+
+## Fasa 40 — v0.8.9 (Ramalan harian guna MetMalaysia, bahagian MetMalaysia diseragamkan; 17 Okt 2026)
+
+Permintaan pengguna 17 Okt 2026: guna data tempatan (MetMalaysia), semak sumber data Trend, dan kemaskan bahagian Ramalan rasmi MetMalaysia.
+
+Penemuan: peluang hujan dalam Ramalan harian datang daripada Open-Meteo (peluang tertinggi mana-mana jam, hampir sentiasa 84–100%; purata sebenar 33–53%) dan bercanggah dengan ramalan rasmi — Putrajaya 18–21 Okt: MetMalaysia "Tiada hujan" (pagi) dan "Jerebu" (petang/malam), Open-Meteo 84–100%. Suhu juga berbeza (Open-Meteo 29°/25°, MetMalaysia 33°/25°).
+
+1. ✅ `metCondition()`: frasa MetMalaysia → jenis (ribut petir, hujan, tiada hujan, jerebu), label pendek dan kelayakan (kebanyakan tempat, pedalaman…); diuji
+2. ✅ Ramalan harian: suhu min/maks dan keadaan cuaca (ikon) daripada MetMalaysia bila ada; lajur peluang hujan Open-Meteo dibuang; kelembapan dan angin kekal Open-Meteo (MetMalaysia tiada data ini); ketik baris → puncak IPU + ringkasan MetMalaysia
+3. ✅ Bahagian Ramalan rasmi MetMalaysia: tiada ikon tajuk, negeri dan sumber dalam helaian ⓘ; kad Hari ini / Esok / Lusa dengan ringkasan berikon dan pagi/petang/malam berikon; suhu dibuang dari kad (kini dalam Ramalan harian)
+4. ✅ Teks ⓘ Ramalan harian dikemas kini dengan sumber setiap lajur (BM/EN)
+5. ✅ Hari ke-3 dilabel "Lusa" dalam Ramalan harian juga (seragam dengan bahagian MetMalaysia)
+6. ✅ Ujian, semakan visual (Putrajaya: Hari ini ribut petir 33°/25°, Esok dan Lusa jerebu), versi 0.8.9, Apa yang baharu (BM/EN), tag dan GitHub Release
