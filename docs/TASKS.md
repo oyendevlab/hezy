@@ -619,3 +619,17 @@ Punca: selepas deployment v0.8.1, cache miss `/api/aqi` mengambil ~10 s kerana c
 5. ✅ Sandaran: siri model terakhir yang berjaya (≤ 24 jam) bila Open-Meteo gagal; had masa 10 s untuk Open-Meteo kualiti udara (sebelum ini tiada); FIRMS dua satelit serentak
 6. ✅ `@vercel/speed-insights` dipasang (Core Web Vitals pengguna sebenar)
 7. ✅ Versi 0.8.2, Apa yang baharu, tag dan GitHub Release
+
+## Fasa 34 — v0.8.3 (model ramalan E dalam mod bayang, kad harian unit JAS; 16 Okt 2026)
+
+Rujukan: [AUDIT-0.8.md](AUDIT-0.8.md) §2 (backtest: E mengurangkan ralat 24–61% berbanding v0.8.0).
+
+1. ✅ `forecast-jas.ts`: model E — offset supaya purata 24 j model = IPU rasmi terakhir, ramalan sebagai purata bergerak 24 j (unit JAS), dicampur bacaan rasmi terakhir dengan berat e^(−jam/12); tanpa stesen → purata 24 j model mentah
+2. ✅ Mod bayang: `/api/accuracy/run` simpan ramalan E (`jas`) bersama model asal dan v0.8.0 dalam snapshot malam; ralat `fj` dikira keesokan harinya
+3. ✅ `/api/accuracy` memaparkan `forecastJas` (MAE model E) untuk dibanding dengan `forecast` (v0.8.0)
+4. ✅ Kad Ramalan harian dan baris "Hari ini" dalam unit JAS (purata 24 j) menggunakan siri E — purata 24 j daripada pembetulan lama tidak sah kerana jam lepas dalam tetingkap belum dibetulkan; amaran ramalan esok ikut nilai yang sama. Graf, jalur per jam dan masa terbaik kekal kaedah v0.8.0 (dibanding dalam mod bayang)
+5. ✅ Terjemahan EN "Apa yang baharu" v0.8.1–v0.8.3 (terlepas dalam v0.8.1/v0.8.2) + ujian supaya 3 keluaran terkini sentiasa diterjemah
+6. ✅ Ujian unit model E, mod bayang, kad harian dan `dayIpu` (294 lulus); E2E 186 lulus; data sebenar KL: esok 142 (dahulu 105) dengan rasmi semasa 155
+7. ✅ Versi 0.8.3, Apa yang baharu, tag dan GitHub Release
+8. ⬜ Jalankan `ketepatan.yml` sekali selepas deployment supaya snapshot 17 Okt mengandungi model E (tanpanya data bayang bermula 18 Okt)
+9. ⬜ v0.8.4: tukar paparan ramalan ke model E selepas ≥ 7 hari data bayang menunjukkan `forecastJas` < `forecast`

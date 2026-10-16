@@ -109,17 +109,43 @@ describe("buildReading — IPU sejam", () => {
 });
 
 describe("buildReading — ramalan 3 hari", () => {
-  it("mengira purata dan maksimum IPU sejam bagi 3 hari selepas hari ini", () => {
-    // 9–14 Okt; hari selepas 11 Okt mempunyai PM2.5 malar berbeza.
+  it("mengira purata dan maksimum IPU unit JAS (purata 24 jam) bagi 3 hari selepas hari ini", () => {
+    // 9–14 Okt; hari selepas 11 Okt mempunyai PM2.5 malar berbeza. Purata 24 jam berubah
+    // perlahan, jadi IPU malar hari itu hanya dicapai pada jam terakhir (seperti IPU rasmi).
     const reading = buildReading(
       series((h) => (h < 72 ? 35 : h < 96 ? 12 : h < 120 ? 100 : 160), 6),
       NOW,
     );
     expect(reading.days).toEqual([
-      { date: "2026-10-12", averageIpu: 50, maxIpu: 50 },
-      { date: "2026-10-13", averageIpu: 133, maxIpu: 133 },
-      { date: "2026-10-14", averageIpu: 210, maxIpu: 210 },
+      { date: "2026-10-12", averageIpu: 59, maxIpu: 68 },
+      { date: "2026-10-13", averageIpu: 89, maxIpu: 133 },
+      { date: "2026-10-14", averageIpu: 175, maxIpu: 210 },
     ]);
+  });
+
+  it("lonjakan model sejam tidak menjadi puncak ramalan harian (v0.8.3)", () => {
+    // 3 jam PM2.5 300 pada 12 Okt (IPU sejam 350); hari lain 30.
+    const reading = buildReading(
+      series((h) => (h >= 84 && h < 87 ? 300 : 30), 5),
+      NOW,
+    );
+    const day = reading.days.find((d) => d.date === "2026-10-12")!;
+    expect(day.maxIpu).toBeLessThan(110);
+  });
+
+  it("jam ramalan membawa jasIpu untuk ringkasan harian", () => {
+    const reading = buildReading(
+      series(() => 35),
+      NOW,
+    );
+    const future = reading.today.filter((h) => h.forecast);
+    expect(future.length).toBeGreaterThan(0);
+    expect(future.every((h) => h.jasIpu !== undefined)).toBe(true);
+    expect(
+      reading.today
+        .filter((h) => !h.forecast)
+        .some((h) => h.jasIpu !== undefined),
+    ).toBe(false);
   });
 
   it("melangkau hari yang datanya tidak mencukupi", () => {
