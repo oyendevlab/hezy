@@ -93,9 +93,10 @@ export function AboutHezy() {
           Hezy
         </h2>
         <p className="text-muted text-[13px] font-semibold">
-          {t("Versi {version} · Semak jerebu di Malaysia", {
-            version: APP_VERSION,
-          })}
+          {t("Semak Jerebu di Malaysia")}
+        </p>
+        <p className="text-muted text-xs">
+          {t("Versi {version}", { version: APP_VERSION })}
         </p>
       </div>
       <div className="divide-line border-line divide-y border-t">
@@ -181,35 +182,27 @@ export function AboutHezy() {
   );
 }
 
-/** Kredit pembangun (v0.7.9). */
+/** Kredit pembangun (v0.7.9; dihalusi v0.7.10): kecil dan tenang di bawah kad Tentang. */
 export function DeveloperCredit() {
   const { t } = useI18n();
   return (
     <section
       aria-label={t("Pembangun")}
-      className="relative flex items-center gap-4 overflow-hidden rounded-3xl bg-[#1c1a16] p-5 text-white"
+      className="flex items-center justify-center gap-3 py-1"
     >
-      <div
-        aria-hidden="true"
-        className="absolute -top-10 -right-10 size-40 rounded-full bg-[radial-gradient(circle,rgba(232,149,47,0.35),transparent_70%)]"
+      <Image
+        src="/kredit/syafiq.png"
+        alt="Syafiq"
+        width={44}
+        height={44}
+        className="size-11 rounded-full object-cover ring-2 ring-[#e8952f]/60 ring-offset-2 ring-offset-[var(--page)] [image-rendering:pixelated]"
       />
-      <div className="relative size-[76px] shrink-0 rounded-full bg-[#e8952f] p-[3px]">
-        <Image
-          src="/kredit/syafiq.png"
-          alt="Syafiq"
-          width={70}
-          height={70}
-          className="size-full rounded-full border-[3px] border-[#1c1a16] object-cover [image-rendering:pixelated]"
-        />
-      </div>
-      <div className="relative flex min-w-0 flex-col gap-1">
-        <span className="text-[11px] font-bold tracking-[0.08em] text-[#d8d2c6]">
-          {t("DIBANGUNKAN OLEH")}
+      <div className="flex flex-col leading-tight">
+        <span className="text-muted text-[11px]">
+          {t("Dibangunkan oleh")}{" "}
+          <span className="text-ink font-bold">Syafiq</span>
         </span>
-        <span className="font-display text-[26px] leading-none font-extrabold">
-          Syafiq
-        </span>
-        <span className="font-mono text-xs text-[#f2b264]">
+        <span className="text-muted font-mono text-[11px]">
           Build. Create. Live
         </span>
       </div>

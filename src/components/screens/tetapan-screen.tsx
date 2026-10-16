@@ -728,47 +728,22 @@ function NotificationSections({ prefs }: { prefs: Prefs }) {
           onChange={() => void toggle()}
         />
         {enabled && (
-          <>
-            <fieldset className="py-3">
-              <legend className="text-muted mb-2 text-xs font-bold">
-                {t("Bila dihantar")}
-              </legend>
-              <Segmented
-                name="kekerapan"
-                value={prefs.morningSummary ? "pagi" : "amaran"}
-                onChange={(v) =>
-                  updatePrefs((x) => ({ ...x, morningSummary: v === "pagi" }))
-                }
-                options={[
-                  { value: "amaran", label: t("Amaran sahaja") },
-                  { value: "pagi", label: t("+ Ringkasan 7 pagi") },
-                ]}
-              />
-            </fieldset>
-            <button
-              type="button"
-              onClick={() => setQuietOpen(true)}
-              aria-haspopup="dialog"
-              className="flex min-h-15 w-full items-center gap-3 py-2 text-left"
-            >
-              <IconBox icon={Moon} tone="bg-[#e6e2f5] text-[#4b3fa0]" />
-              <span className="min-w-0 flex-1">
-                <span className="block text-[15px] font-bold">
-                  {t("Waktu senyap")}
-                </span>
-                <span className="text-muted block text-xs">
-                  {t("Kecuali IPU melebihi 300")}
-                </span>
-              </span>
-              <span className="text-sm font-bold">
-                {quiet
-                  ? `${hourLabel(quiet.start)} – ${hourLabel(quiet.end)}`
-                  : t("Mati")}
-              </span>
-              <Chevron />
-            </button>
-            <TestNotification />
-          </>
+          <OptionBlock
+            title={t("Waktu hantaran")}
+            desc={t("Amaran bila perlu, atau tambah ringkasan pagi")}
+          >
+            <Segmented
+              name="kekerapan"
+              value={prefs.morningSummary ? "pagi" : "amaran"}
+              onChange={(v) =>
+                updatePrefs((x) => ({ ...x, morningSummary: v === "pagi" }))
+              }
+              options={[
+                { value: "amaran", label: t("Amaran sahaja") },
+                { value: "pagi", label: t("+ Ringkasan 7 pagi") },
+              ]}
+            />
+          </OptionBlock>
         )}
       </>
     );
@@ -853,15 +828,16 @@ function NotificationSections({ prefs }: { prefs: Prefs }) {
           inert={alertsOff}
           className={`${CARD} ${alertsOff ? "opacity-50" : ""}`}
         >
-          <fieldset className="py-3">
-            <legend className="text-muted mb-2 text-xs font-bold">
-              {t("Ambang amaran")}
-              {prefs.alertThreshold === null
-                ? t(" · lalai untuk profil {profile}", {
-                    profile: profileLabel,
+          <OptionBlock
+            title={t("Ambang amaran")}
+            desc={
+              prefs.alertThreshold === null
+                ? t("Lalai untuk profil {profile}", { profile: profileLabel })
+                : t("Dipilih sendiri · lalai IPU {threshold}", {
+                    threshold: profileDefault,
                   })
-                : ""}
-            </legend>
+            }
+          >
             <Segmented
               name="ambang-amaran"
               value={threshold}
@@ -876,7 +852,7 @@ function NotificationSections({ prefs }: { prefs: Prefs }) {
                 label: t("IPU {threshold}", { threshold: value }),
               }))}
             />
-          </fieldset>
+          </OptionBlock>
           <SwitchRow
             icon={ClockCountdown}
             tone="bg-[#fde3dc] text-[#a33a17]"
@@ -899,6 +875,25 @@ function NotificationSections({ prefs }: { prefs: Prefs }) {
             checked={prefs.spikeAlert}
             onChange={(on) => updatePrefs((x) => ({ ...x, spikeAlert: on }))}
           />
+          <button
+            type="button"
+            onClick={() => setQuietOpen(true)}
+            aria-haspopup="dialog"
+            className="flex min-h-15 w-full items-center gap-3 py-2 text-left"
+          >
+            <IconBox icon={Moon} tone="bg-[#e6e2f5] text-[#4b3fa0]" />
+            <span className="min-w-0 flex-1">
+              <span className="block text-[15px] font-bold">
+                {t("Waktu senyap")}
+              </span>
+              <span className="text-muted block text-xs">
+                {quiet
+                  ? `${hourLabel(quiet.start)} – ${hourLabel(quiet.end)}`
+                  : t("Mati")}
+              </span>
+            </span>
+            <Chevron />
+          </button>
           <Link
             href="/lokasi#senarai"
             className="flex min-h-15 items-center gap-3 py-2"
@@ -916,6 +911,7 @@ function NotificationSections({ prefs }: { prefs: Prefs }) {
             </span>
             <Chevron />
           </Link>
+          {enabled && <TestNotification />}
         </div>
       </section>
 
@@ -932,6 +928,28 @@ function NotificationSections({ prefs }: { prefs: Prefs }) {
         </BottomSheet>
       )}
     </>
+  );
+}
+
+/** Kumpulan pilihan dengan tajuk dan keterangan (Waktu hantaran, Ambang amaran). */
+function OptionBlock({
+  title,
+  desc,
+  children,
+}: {
+  title: string;
+  desc?: string;
+  children: React.ReactNode;
+}) {
+  const id = useId();
+  return (
+    <div role="radiogroup" aria-labelledby={id} className="py-3">
+      <div id={id} className="mb-2.5">
+        <span className="block text-[15px] font-bold">{title}</span>
+        {desc && <span className="text-muted block text-xs">{desc}</span>}
+      </div>
+      {children}
+    </div>
   );
 }
 
@@ -1066,19 +1084,27 @@ function TestNotification() {
   }
 
   return (
-    <div className="flex flex-col items-start gap-1.5 py-3">
+    <div className="py-2">
       <button
         type="button"
         onClick={() => void send()}
         disabled={state.status === "busy"}
-        className="bg-page hover:bg-line flex min-h-10 items-center gap-2 rounded-xl px-3.5 text-[13px] font-bold disabled:opacity-60"
+        className="flex min-h-12 w-full items-center gap-3 text-left disabled:opacity-60"
       >
-        <PaperPlaneTilt aria-hidden="true" size={16} weight="bold" />
-        {state.status === "busy"
-          ? t("Menghantar…")
-          : t("Hantar notifikasi ujian")}
+        <IconBox icon={PaperPlaneTilt} tone="bg-page text-ink" />
+        <span className="min-w-0 flex-1">
+          <span className="block text-[15px] font-bold">
+            {state.status === "busy"
+              ? t("Menghantar…")
+              : t("Hantar notifikasi ujian")}
+          </span>
+          <span className="text-muted block text-xs">
+            {t("Semak amaran sampai ke peranti ini")}
+          </span>
+        </span>
+        <Chevron />
       </button>
-      <p role="status" className="text-muted text-xs empty:hidden">
+      <p role="status" className="text-muted pt-1 pl-12 text-xs empty:hidden">
         {state.status === "sent"
           ? t("Dihantar. Notifikasi sepatutnya muncul dalam beberapa saat.")
           : state.status === "error"

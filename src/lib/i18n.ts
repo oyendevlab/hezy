@@ -909,6 +909,21 @@ const EN: Record<string, string> = {
   "Trend lebih kemas": "Tidier Trend",
   "Ramalan harian dengan kelembapan": "Daily forecast with humidity",
   "Penerangan ringkas dalam ⓘ": "Short explanations in ⓘ",
+  // v0.7.10: Tetapan kemas
+  "Waktu hantaran": "Delivery",
+  "Amaran bila perlu, atau tambah ringkasan pagi":
+    "Alerts when needed, or add a morning summary",
+  "Lalai untuk profil {profile}": "Default for the {profile} profile",
+  "Dipilih sendiri · lalai IPU {threshold}": "Custom · default API {threshold}",
+  "Semak amaran sampai ke peranti ini": "Check that alerts reach this device",
+  "Semak Jerebu di Malaysia": "Haze checker for Malaysia",
+  "Versi {version}": "Version {version}",
+  "Dibangunkan oleh": "Made by",
+  "Tetapan lebih tersusun": "Better organised Settings",
+  "Waktu senyap dan notifikasi ujian kini di bawah Amaran":
+    "Quiet hours and test notification now under Alerts",
+  "Kad Tentang dan kredit pembangun lebih ringkas":
+    "Simpler About card and developer credit",
 };
 
 /** Corak untuk teks yang disimpan dengan nama tempat, cth. nama lokasi GPS. */
