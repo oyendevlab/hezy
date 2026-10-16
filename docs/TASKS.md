@@ -540,3 +540,11 @@ Mockup: https://claude.ai/artifact/K2kQkrY8zYtUjBwb9AVE4J (papan kiri).
 2. ✅ Kongsi Hezy (helaian kongsi / salin pautan) dan Hantar maklum balas (e-mel oyendevlab@gmail.com, subjek + versi)
 3. ✅ Kredit pembangun: gambar dalam bingkai bulat, "Syafiq", "Build. Create. Live"
 4. ✅ Versi 0.7.9, `UJIAN-TELEFON.md`, tag dan GitHub Release
+
+## Fasa 25 — v0.7.10 (Tetapan kemas; disahkan 16 Okt 2026)
+
+1. ✅ Waktu senyap dan notifikasi ujian dipindah ke bawah Amaran; notifikasi ujian sebagai baris berikon
+2. ✅ "Bila dihantar" → **Waktu hantaran**; tajuk + keterangan untuk Waktu hantaran dan Ambang amaran
+3. ✅ Kad Tentang: Hezy / Semak Jerebu di Malaysia / Versi baris demi baris
+4. ✅ Kredit pembangun lebih halus (gambar 44 px, teks kecil, tiada latar gelap)
+5. ✅ Versi 0.7.10, `UJIAN-TELEFON.md`, Apa yang baharu, tag dan GitHub Release

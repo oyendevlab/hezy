@@ -174,6 +174,13 @@ Buka **https://hezy.my** pada telefon.
 - [ ] **Hantar maklum balas** → aplikasi e-mel dibuka ke oyendevlab@gmail.com dengan subjek dan versi
 - [ ] Kad pembangun: gambar dalam bingkai bulat, "Syafiq", "Build. Create. Live"
 
+## Ciri baharu v0.7.10
+
+- [ ] Notifikasi: hanya Banner, **Waktu hantaran** dan Nombor pada ikon
+- [ ] Amaran: Ambang (dengan keterangan lalai profil), Amaran awal, Lonjakan, **Waktu senyap**, Lokasi amaran, **Hantar notifikasi ujian** (baris berikon)
+- [ ] Kad Tentang: Hezy / Semak Jerebu di Malaysia / Versi, baris demi baris
+- [ ] Kredit pembangun kecil dan tenang di bawah kad Tentang
+
 ## Jika ada masalah
 
 Ambil tangkapan skrin dan catat model telefon serta versi OS, kemudian buka isu di

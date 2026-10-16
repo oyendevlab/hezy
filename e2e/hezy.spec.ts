@@ -2494,9 +2494,9 @@ test.describe("Tentang Hezy v0.7.9", () => {
 
     await about.getByRole("button", { name: /Apa yang baharu/ }).click();
     const sheet = page.getByTestId("whats-new");
-    const version = (await about.locator("p").first().textContent())!.match(
-      /\d+\.\d+\.\d+/,
-    )![0];
+    const version = (await about
+      .getByText(/^Versi \d+\.\d+\.\d+$/)
+      .textContent())!.replace("Versi ", "");
     await expect(sheet.locator("li").first()).toContainText(version);
     await page.keyboard.press("Escape");
     await expect(sheet).toHaveCount(0);
