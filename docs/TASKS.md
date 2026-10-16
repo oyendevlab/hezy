@@ -554,3 +554,10 @@ Mockup: https://claude.ai/artifact/K2kQkrY8zYtUjBwb9AVE4J (papan kiri).
 1. ✅ Token `--toggle`, `--pick`, `--pick-ink` (terang dan gelap): suis hidup hijau lembut, segmen terpilih hijau pucat — berbeza daripada ikon hitam
 2. ✅ Diguna di Tetapan dan helaian Lapisan peta
 3. ✅ Versi 0.7.11, Apa yang baharu, tag dan GitHub Release
+
+## Fasa 27 — v0.7.12 (ikon baharu, privasi dan penafian; disahkan 16 Okt 2026)
+
+1. ✅ Ikon baharu: kepul awan putih besar, langit biru cerah, mata memandang ke depan, senyum kecil (ikon PWA, maskable, Apple, favicon, skrin pembuka, logo dalam aplikasi, kad kongsi)
+2. ✅ Skrin alu-aluan: baris "Dengan meneruskan, anda bersetuju dengan Privasi dan Penafian" → helaian berikon
+3. ✅ Penafian (bukan aplikasi rasmi JAS; data boleh lewat; bukan nasihat perubatan; status sekolah panduan; budi bicara sendiri) — juga dalam kad Tentang di Tetapan
+4. ✅ Versi 0.7.12, Apa yang baharu, tag dan GitHub Release

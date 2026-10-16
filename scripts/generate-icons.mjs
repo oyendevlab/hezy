@@ -3,33 +3,48 @@
 import sharp from "sharp";
 import { mkdir, readFile } from "node:fs/promises";
 
-const SKY = "#bfe0f5";
+const SKY = "#a3d8f7";
 
-/** Awan bermata dalam kotak 512×512. Semua bentuk berada dalam bulatan selamat r=205. */
-const cloud = `
-  <ellipse cx="262" cy="412" rx="120" ry="14" fill="#000" opacity="0.08"/>
-  <g fill="#fff">
-    <circle cx="175" cy="290" r="85"/>
-    <circle cx="262" cy="225" r="112"/>
-    <circle cx="350" cy="292" r="82"/>
-    <ellipse cx="262" cy="332" rx="172" ry="62"/>
+/**
+ * Ikon v0.7.12: kepul awan putih besar mengisi bahagian bawah, langit biru cerah, mata bujur
+ * memandang ke depan dan senyum kecil. Seni penuh 512×512 (OS memotong bucu); mata dan senyum
+ * dalam bulatan selamat r=205 untuk ikon maskable. Sama seperti src/components/logo.tsx.
+ */
+const art = `
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="512" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#c2e8fd"/><stop offset="1" stop-color="#78c3ef"/>
+    </linearGradient>
+    <linearGradient id="cloud" x1="120" y1="90" x2="400" y2="512" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff"/><stop offset="0.55" stop-color="#f3f7fa"/><stop offset="1" stop-color="#d3e0ea"/>
+    </linearGradient>
+    <radialGradient id="gloss" cx="200" cy="170" r="190" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.9"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#sky)"/>
+  <g fill="#5aa9d8" opacity="0.25">
+    <circle cx="110" cy="345" r="140"/><circle cx="256" cy="260" r="168"/><circle cx="402" cy="345" r="140"/>
   </g>
-  <ellipse cx="228" cy="295" rx="15" ry="20" fill="#1e2430"/>
-  <ellipse cx="298" cy="295" rx="15" ry="20" fill="#1e2430"/>
-  <circle cx="233" cy="287" r="5" fill="#fff"/>
-  <circle cx="303" cy="287" r="5" fill="#fff"/>
-  <circle cx="196" cy="324" r="15" fill="#f7b5b5"/>
-  <circle cx="330" cy="324" r="15" fill="#f7b5b5"/>
-  <path d="M247 322 Q263 338 279 322" fill="none" stroke="#1e2430" stroke-width="8" stroke-linecap="round"/>
+  <g fill="url(#cloud)">
+    <circle cx="110" cy="335" r="140"/><circle cx="256" cy="250" r="168"/><circle cx="402" cy="335" r="140"/>
+    <rect x="-30" y="335" width="572" height="200"/>
+  </g>
+  <ellipse cx="215" cy="175" rx="120" ry="70" fill="url(#gloss)"/>
+  <rect x="196" y="230" width="38" height="80" rx="19" fill="#1e2430"/>
+  <rect x="278" y="230" width="38" height="80" rx="19" fill="#1e2430"/>
+  <rect x="205" y="240" width="12" height="20" rx="6" fill="#fff" opacity="0.85"/>
+  <rect x="287" y="240" width="12" height="20" rx="6" fill="#fff" opacity="0.85"/>
+  <path d="M232 340 Q256 360 280 340" fill="none" stroke="#1e2430" stroke-width="12" stroke-linecap="round"/>
 `;
 
-/** `scale` < 1 mengecilkan awan ke tengah (zon selamat ikon maskable). */
+/** `scale` < 1 mengecilkan muka ke tengah (zon selamat); langit dan awan tetap penuh. */
 function svg(scale = 1) {
   const offset = (512 * (1 - scale)) / 2;
   return Buffer.from(
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
       <rect width="512" height="512" fill="${SKY}"/>
-      <g transform="translate(${offset} ${offset}) scale(${scale})">${cloud}</g>
+      <g transform="translate(${offset} ${offset}) scale(${scale})">${art}</g>
     </svg>`,
   );
 }
@@ -37,8 +52,8 @@ function svg(scale = 1) {
 const outputs = [
   { file: "public/icons/icon-192.png", size: 192, scale: 1 },
   { file: "public/icons/icon-512.png", size: 512, scale: 1 },
-  { file: "public/icons/maskable-512.png", size: 512, scale: 0.86 },
-  { file: "public/icons/apple-touch-icon.png", size: 180, scale: 0.92 },
+  { file: "public/icons/maskable-512.png", size: 512, scale: 1 },
+  { file: "public/icons/apple-touch-icon.png", size: 180, scale: 1 },
   { file: "src/app/icon.png", size: 64, scale: 1 },
 ];
 
@@ -78,8 +93,8 @@ const screens = JSON.parse(
 await mkdir("public/splash", { recursive: true });
 for (const { w, h, dpr } of screens) {
   const [pw, ph] = [w * dpr, h * dpr];
-  // Awan ~38% lebar skrin terkecil, sedikit di atas tengah.
-  const size = Math.round(Math.min(pw, ph) * 0.38);
+  // Ikon ~30% lebar skrin terkecil, sedikit di atas tengah.
+  const size = Math.round(Math.min(pw, ph) * 0.3);
   const x = (pw - size) / 2;
   const y = ph * 0.45 - size / 2;
   for (const [theme, { top, bottom }] of Object.entries(SPLASH_THEME)) {
@@ -90,7 +105,8 @@ for (const { w, h, dpr } of screens) {
           <stop offset="0" stop-color="${top}"/><stop offset="1" stop-color="${bottom}"/>
         </linearGradient></defs>
         <rect width="${pw}" height="${ph}" fill="url(#g)"/>
-        <g transform="translate(${x} ${y}) scale(${size / 512})">${cloud}</g>
+        <defs><clipPath id="tile"><rect width="512" height="512" rx="115"/></clipPath></defs>
+        <g transform="translate(${x} ${y}) scale(${size / 512})"><g clip-path="url(#tile)">${art}</g></g>
       </svg>`,
     );
     await sharp(image).png({ palette: true, quality: 90 }).toFile(file);

@@ -2526,3 +2526,38 @@ test.describe("Tentang Hezy v0.7.9", () => {
     expect(results.violations.map((v) => v.id)).toEqual([]);
   });
 });
+
+test.describe("Privasi dan penafian v0.7.12", () => {
+  test("skrin alu-aluan: pautan Privasi dan Penafian membuka helaian", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const legal = page.getByTestId("welcome-legal");
+    await expect(legal).toContainText("Dengan meneruskan, anda bersetuju");
+    await legal.getByRole("button", { name: "Penafian" }).click();
+    const disclaimer = page.getByTestId("disclaimer-sheet");
+    await expect(disclaimer).toContainText("bukan aplikasi rasmi");
+    await expect(disclaimer).toContainText("bukan nasihat perubatan");
+    await page.keyboard.press("Escape");
+    await expect(disclaimer).toHaveCount(0);
+    await legal.getByRole("button", { name: "Privasi" }).click();
+    const privacy = page.getByTestId("privacy-sheet");
+    await expect(privacy).toContainText("Tiada akaun");
+    await privacy
+      .getByRole("link", { name: "Baca dasar privasi penuh" })
+      .click();
+    await expect(page).toHaveURL(/\/privasi$/);
+  });
+
+  test("Tetapan: Penafian dalam kad Tentang", async ({ page }) => {
+    await seedLocation(page);
+    await page.goto("/tetapan");
+    await page
+      .getByRole("region", { name: "Hezy" })
+      .getByRole("button", { name: "Penafian" })
+      .click();
+    await expect(page.getByTestId("disclaimer-sheet")).toContainText(
+      "Status sekolah hanya panduan",
+    );
+  });
+});
