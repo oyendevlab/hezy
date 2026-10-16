@@ -924,6 +924,9 @@ const EN: Record<string, string> = {
     "Quiet hours and test notification now under Alerts",
   "Kad Tentang dan kredit pembangun lebih ringkas":
     "Simpler About card and developer credit",
+  "Warna lebih lembut": "Softer colours",
+  "Suis dan pilihan kini hijau lembut, berbeza daripada ikon":
+    "Switches and selections are now a soft green, distinct from icons",
 };
 
 /** Corak untuk teks yang disimpan dengan nama tempat, cth. nama lokasi GPS. */

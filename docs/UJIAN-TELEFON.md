@@ -181,6 +181,11 @@ Buka **https://hezy.my** pada telefon.
 - [ ] Kad Tentang: Hezy / Semak Jerebu di Malaysia / Versi, baris demi baris
 - [ ] Kredit pembangun kecil dan tenang di bawah kad Tentang
 
+## Ciri baharu v0.7.11
+
+- [ ] Suis yang hidup berwarna hijau lembut (Tetapan dan helaian Lapisan), berbeza daripada ikon hitam
+- [ ] Pilihan segmen terpilih (Waktu hantaran, Ambang, Tema, Bahasa) berlatar hijau pucat, mod terang dan gelap
+
 ## Jika ada masalah
 
 Ambil tangkapan skrin dan catat model telefon serta versi OS, kemudian buka isu di
