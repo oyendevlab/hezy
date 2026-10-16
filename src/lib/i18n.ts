@@ -808,6 +808,75 @@ const EN: Record<string, string> = {
   "Ke lokasi saya": "Go to my location",
   "Tukar lokasi semasa": "Change current location",
   "Tambah kegemaran": "Add favourite",
+  // v0.7.8: Tetapan
+  Auto: "Auto",
+  "Dewasa sihat · ambang lalai 100": "Healthy adults · default threshold 100",
+  "Status sekolah dipaparkan · ambang 50": "School status shown · threshold 50",
+  "Nasihat lebih berhati-hati · ambang 50":
+    "More cautious advice · threshold 50",
+  "Tentang data": "About the data",
+  "Tentang data Hezy": "About Hezy's data",
+  "Stesen APIMS dalam 30 km (bacaan 3 jam terakhir): IPU rasmi, dan ramalan model dibetulkan dengan bacaan itu":
+    "APIMS station within 30 km (reading in the last 3 hours): official API, and the model forecast is corrected with it",
+  "Tiada stesen: anggaran daripada PM2.5 model (formula JAS), mungkin berbeza daripada bacaan rasmi":
+    "No station: estimate from model PM2.5 (DOE formula), may differ from official readings",
+  "Ketepatan: ralat purata 14 hari berbanding bacaan rasmi; ramalan esok dinilai setiap malam":
+    "Accuracy: 14-day mean error against official readings; tomorrow's forecast is scored every night",
+  "Luar talian: bacaan terakhir disimpan di peranti":
+    "Offline: the last reading is kept on your device",
+  "Padam data?": "Clear data?",
+  "Profil kesihatan: {profile}": "Health profile: {profile}",
+  "Sentiasa untuk profil Kanak-kanak": "Always on for the Children profile",
+  "Kad di Utama dan Trend": "Card on Home and Trend",
+  "Profil kesihatan": "Health profile",
+  PAPARAN: "DISPLAY",
+  Tema: "Theme",
+  "Lokasi, kegemaran dan tetapan di peranti ini akan dipadam. Amaran juga dimatikan.":
+    "Locations, favourites and settings on this device will be deleted. Alerts are turned off too.",
+  Padam: "Delete",
+  "Hezy dipasang": "Hezy installed",
+  "Skrin utama": "Home screen",
+  "Di iPhone atau iPad, pasang Hezy di skrin utama dahulu, kemudian buka Hezy dari ikon untuk menghidupkan notifikasi.":
+    "On iPhone or iPad, add Hezy to your Home Screen first, then open Hezy from its icon to turn on notifications.",
+  "Pilih lokasi dahulu untuk menerima notifikasi.":
+    "Choose a location first to receive notifications.",
+  "Banner notifikasi": "Notification banners",
+  "Bila dihantar": "When to send",
+  "Amaran sahaja": "Alerts only",
+  "+ Ringkasan 7 pagi": "+ 7 am summary",
+  "Kecuali IPU melebihi 300": "Except when API is above 300",
+  Mati: "Off",
+  NOTIFIKASI: "NOTIFICATIONS",
+  "Nombor IPU pada ikon": "API number on icon",
+  "Nombor pada ikon": "Number on icon",
+  "IPU semasa pada ikon Hezy": "Current API on the Hezy icon",
+  "Tentang nombor IPU pada ikon": "About the API number on the icon",
+  "iPhone: Hezy dipasang ke Skrin Utama (iOS 16.4 ke atas)":
+    "iPhone: Hezy added to the Home Screen (iOS 16.4 or later)",
+  "Dikemas kini bila Hezy dibuka atau notifikasi diterima":
+    "Updated when Hezy is opened or a notification arrives",
+  "Android: kebanyakan telefon menunjukkan titik, bukan nombor":
+    "Android: most phones show a dot, not a number",
+  "Komputer: Chrome dan Edge (aplikasi dipasang)":
+    "Computer: Chrome and Edge (installed app)",
+  "Tentang ambang amaran": "About the alert threshold",
+  "IPU 50: amaran awal, disyorkan untuk asma, kanak-kanak dan warga emas":
+    "API 50: early warning, recommended for asthma, children and older adults",
+  "IPU 100: Tidak Sihat": "API 100: Unhealthy",
+  "IPU 200: Sangat Tidak Sihat": "API 200: Very Unhealthy",
+  "Disemak setiap jam; paling kerap satu amaran setiap 6 jam bagi setiap lokasi":
+    "Checked hourly; at most one alert every 6 hours per location",
+  "Hidupkan banner notifikasi untuk menerima amaran":
+    "Turn on notification banners to receive alerts",
+  "Amaran awal": "Early warning",
+  "Jerebu dijangka dalam 6 jam atau esok":
+    "Haze expected within 6 hours or tomorrow",
+  "Lonjakan mendadak": "Sudden spike",
+  "Naik 30 atau lebih dalam 3 jam": "Rises 30 or more within 3 hours",
+  "Lokasi amaran": "Alert locations",
+  "Belum dipilih": "None chosen",
+  "Hidupkan waktu senyap": "Turn on quiet hours",
+  Hingga: "Until",
 };
 
 /** Corak untuk teks yang disimpan dengan nama tempat, cth. nama lokasi GPS. */

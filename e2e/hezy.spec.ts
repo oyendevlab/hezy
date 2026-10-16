@@ -10,6 +10,13 @@ import {
   test,
 } from "./fixtures";
 
+/** Pilih profil kesihatan melalui helaian Profil di Tetapan (v0.7.8). */
+async function chooseProfile(page: Page, name: string) {
+  await page.getByRole("button", { name: /^Profil kesihatan:/ }).click();
+  await page.getByTestId("profile-sheet").getByRole("radio", { name }).check();
+  await expect(page.getByTestId("profile-sheet")).toHaveCount(0);
+}
+
 /** Suis lapisan peta dalam helaian Lapisan (v0.7.7); buka helaian jika belum terbuka. */
 async function layerSwitch(page: Page, name: string) {
   const sheet = page.getByTestId("layers-sheet");
@@ -321,7 +328,7 @@ test.describe("aliran utama", () => {
     test.skip(isMobile, "Kad nasihat penuh hanya pada desktop");
     await seedLocation(page);
     await page.goto("/tetapan");
-    await page.getByLabel("Asma / paru-paru").check();
+    await chooseProfile(page, "Asma / paru-paru");
     await page.goto("/");
     await expect(
       page.getByRole("heading", { name: "Nasihat · Asma / paru-paru" }),
@@ -693,7 +700,7 @@ test.describe("pintasan dan lencana", () => {
     ).toBeVisible();
   });
 
-  test("lencana ikon menunjukkan IPU bila melebihi ambang", async ({
+  test("lencana ikon menunjukkan IPU semasa (Nombor pada ikon)", async ({
     page,
   }) => {
     await page.addInitScript(() => {
@@ -766,8 +773,8 @@ test.describe("rutin amaran", () => {
     ).toBeVisible();
     // Status amaran tidak berubah.
     await expect(
-      page.getByRole("switch", { name: /Amaran bila IPU/ }),
-    ).toHaveAttribute("aria-checked", "true");
+      page.getByRole("switch", { name: /Banner notifikasi/ }),
+    ).toBeChecked();
   });
 
   test("API notifikasi ujian menolak endpoint tidak sah", async ({
@@ -780,7 +787,7 @@ test.describe("rutin amaran", () => {
     expect([400, 503]).toContain(res.status());
   });
 
-  test("ringkasan pagi, amaran ramalan dan waktu senyap disimpan", async ({
+  test("ringkasan pagi, amaran awal dan waktu senyap disimpan", async ({
     page,
   }) => {
     test.skip(
@@ -788,60 +795,113 @@ test.describe("rutin amaran", () => {
       "Kunci VAPID ujian hanya dalam binaan tempatan",
     );
     await seedLocation(page);
+    // Peranti sudah melanggan (langganan rekaan): pilihan banner dipaparkan.
+    await page.addInitScript(() => {
+      const subscription = { endpoint: "https://push.example/hezy-ujian" };
+      const registration = {
+        pushManager: { getSubscription: async () => subscription },
+      };
+      Object.defineProperty(navigator.serviceWorker, "getRegistration", {
+        value: async () => registration,
+      });
+    });
     await page.goto("/tetapan");
-    const routine = page.getByRole("group", { name: "Rutin amaran" });
-    await expect(routine).toBeVisible();
-    const morning = routine.getByRole("checkbox", {
-      name: /Ringkasan pagi \(7 pagi\)/,
-    });
-    const forecast = routine.getByRole("checkbox", {
-      name: /Amaran ramalan esok \(8 malam\)/,
-    });
-    const quiet = routine.getByRole("checkbox", { name: /Waktu senyap/ });
-    await expect(morning).not.toBeChecked();
-    await expect(forecast).toBeChecked();
-    await expect(quiet).toBeChecked();
-
-    // Susun atur: setiap pilihan bermula di tepi kiri kumpulan, bertindan menegak.
-    const group = (await routine.boundingBox())!;
-    const boxes = await Promise.all(
-      [morning, forecast, quiet].map(async (c) => (await c.boundingBox())!),
+    const morning = page.getByRole("radio", { name: "+ Ringkasan 7 pagi" });
+    const early = page.getByRole("switch", { name: /Amaran awal/ });
+    await expect(
+      page.getByRole("radio", { name: "Amaran sahaja" }),
+    ).toBeChecked();
+    await expect(early).toBeChecked();
+    await expect(page.getByRole("switch", { name: /Lonjakan/ })).toBeChecked();
+    await expect(page.getByTestId("alert-settings")).not.toHaveAttribute(
+      "inert",
     );
-    for (const b of boxes) expect(b.x - group.x).toBeLessThan(24);
-    expect(boxes[0].y).toBeLessThan(boxes[1].y);
-    expect(boxes[1].y).toBeLessThan(boxes[2].y);
-    await routine.screenshot({
-      path: test.info().outputPath("rutin-amaran.png"),
-    });
 
     await morning.check();
-    await routine
+    await early.uncheck();
+    const quietButton = page.getByRole("button", { name: /Waktu senyap/ });
+    await quietButton.click();
+    const sheet = page.getByTestId("quiet-sheet");
+    await sheet
       .getByRole("combobox", { name: "Waktu senyap bermula" })
       .selectOption("22");
-    await routine
+    await sheet
       .getByRole("combobox", { name: "Waktu senyap tamat" })
       .selectOption("7");
+    await page.keyboard.press("Escape");
+    await expect(sheet).toHaveCount(0);
+    await expect(quietButton).toContainText("10 malam – 7 pagi");
+
     await page.reload();
     await expect(morning).toBeChecked();
-    await expect(
-      routine.getByRole("combobox", { name: "Waktu senyap bermula" }),
-    ).toHaveValue("22");
-    await expect(
-      routine.getByRole("combobox", { name: "Waktu senyap tamat" }),
-    ).toHaveValue("7");
+    await expect(early).not.toBeChecked();
     const saved = await page.evaluate(() =>
       JSON.parse(localStorage.getItem("hezy:prefs:v1") ?? "{}"),
     );
     expect(saved).toMatchObject({
       morningSummary: true,
-      forecastAlert: true,
+      forecastAlert: false,
+      expectedAlert: false,
       quietHours: { start: 22, end: 7 },
     });
 
-    await quiet.uncheck();
+    await quietButton.click();
+    await sheet
+      .getByRole("switch", { name: /Hidupkan waktu senyap/ })
+      .uncheck();
     await expect(
-      routine.getByRole("combobox", { name: "Waktu senyap bermula" }),
+      sheet.getByRole("combobox", { name: "Waktu senyap bermula" }),
     ).toHaveCount(0);
+    await page.keyboard.press("Escape");
+    await expect(quietButton).toContainText("Mati");
+  });
+
+  test("Tetapan v0.7.8: amaran dimalapkan tanpa banner; ⓘ dan padam data", async ({
+    page,
+  }) => {
+    await seedLocation(page);
+    await page.goto("/tetapan");
+    // Belum melanggan: tetapan amaran dimalapkan (inert).
+    await expect(page.getByTestId("alert-settings")).toHaveAttribute(
+      "inert",
+      "",
+    );
+    await page
+      .getByRole("button", { name: "Tentang nombor IPU pada ikon" })
+      .click();
+    await expect(page.getByTestId("info-badge")).toContainText("Android");
+    await page.keyboard.press("Escape");
+    await page.getByRole("button", { name: "Tentang data Hezy" }).click();
+    await expect(page.getByTestId("info-data")).toContainText("Luar talian");
+    await page.keyboard.press("Escape");
+    // Nombor pada ikon: pilihan disimpan.
+    const badge = page.getByRole("switch", { name: /Nombor pada ikon/ });
+    await expect(badge).toBeChecked();
+    await badge.uncheck();
+    const results = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+      .exclude("[data-testid=alert-settings]")
+      .analyze();
+    expect(results.violations.map((v) => v.id)).toEqual([]);
+
+    // Padam data: helaian pengesahan (bukan dialog pelayar); Batal tidak memadam.
+    await page
+      .getByRole("button", { name: "Padam data di peranti ini" })
+      .click();
+    const sheet = page.getByTestId("clear-sheet");
+    await sheet.getByRole("button", { name: "Batal" }).click();
+    await expect(sheet).toHaveCount(0);
+    expect(
+      await page.evaluate(() => localStorage.getItem("hezy:prefs:v1")),
+    ).toContain("Shah Alam");
+    await page
+      .getByRole("button", { name: "Padam data di peranti ini" })
+      .click();
+    await sheet.getByRole("button", { name: "Padam", exact: true }).click();
+    await expect(sheet).toHaveCount(0);
+    expect(
+      await page.evaluate(() => localStorage.getItem("hezy:prefs:v1") ?? ""),
+    ).not.toContain("Shah Alam");
   });
 });
 
@@ -1850,7 +1910,7 @@ test.describe("status sekolah", () => {
     page,
   }) => {
     await page.goto("/tetapan");
-    await page.getByRole("radio", { name: "Kanak-kanak" }).check();
+    await chooseProfile(page, "Kanak-kanak");
     await page.goto("/");
     const card = page.getByTestId("school-card").filter({ visible: true });
     await expect(card).toContainText("Aktiviti luar dihentikan");
@@ -1888,7 +1948,7 @@ test.describe("status sekolah", () => {
       }),
     );
     await page.goto("/tetapan");
-    await page.getByRole("radio", { name: "Kanak-kanak" }).check();
+    await chooseProfile(page, "Kanak-kanak");
     await page.goto("/");
     const card = page.getByTestId("school-card").filter({ visible: true });
     await expect(card).toHaveAttribute("data-persistent", "true");
@@ -1925,7 +1985,7 @@ test.describe("Bahasa Inggeris", () => {
       route.fulfill({ json: fakeReading(OFFICIAL_SHAH_ALAM) }),
     );
     await page.goto("/tetapan");
-    await page.getByText("English", { exact: true }).click();
+    await page.getByRole("radio", { name: "English" }).check();
     await expect(page.getByRole("heading", { name: "Settings" })).toBeVisible();
     await expect(page.locator("html")).toHaveAttribute("lang", "en");
 
@@ -1955,7 +2015,7 @@ test.describe("Bahasa Inggeris", () => {
     ).toBeVisible();
 
     await page.goto("/tetapan");
-    await page.getByText("Bahasa Melayu", { exact: true }).click();
+    await page.getByRole("radio", { name: "Bahasa Melayu" }).check();
     await expect(page.getByRole("heading", { name: "Tetapan" })).toBeVisible();
     await expect(page.locator("html")).toHaveAttribute("lang", "ms");
   });

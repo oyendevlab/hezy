@@ -42,6 +42,8 @@ export type Prefs = {
   expectedAlert: boolean;
   /** Waktu senyap (jam waktu Malaysia); `null` = mati (item 6). */
   quietHours: { start: number; end: number } | null;
+  /** Nombor IPU lokasi semasa pada ikon aplikasi (v0.7.8). */
+  iconBadge: boolean;
 };
 
 export const MAX_FAVOURITES = 5;
@@ -60,6 +62,7 @@ export const DEFAULT_PREFS: Prefs = {
   spikeAlert: true,
   expectedAlert: true,
   quietHours: { start: 23, end: 6 },
+  iconBadge: true,
 };
 
 const PROFILES: readonly HealthProfile[] = ["umum", "anak", "asma", "emas"];
@@ -93,6 +96,7 @@ export function pushOptions(prefs: Prefs): PushOptions {
     expected: prefs.expectedAlert,
     school: prefs.profile === "anak" || prefs.showSchool,
     quiet: prefs.quietHours,
+    badge: prefs.iconBadge,
   };
 }
 
@@ -142,6 +146,7 @@ export function parsePrefs(raw: string | null): Prefs {
           : isHourRange(v.quietHours)
             ? { start: v.quietHours.start, end: v.quietHours.end }
             : DEFAULT_PREFS.quietHours,
+      iconBadge: v.iconBadge !== false,
     };
   } catch {
     return DEFAULT_PREFS;

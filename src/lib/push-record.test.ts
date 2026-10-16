@@ -122,6 +122,7 @@ describe("mergeRecord", () => {
           expected: false,
           school: false,
           quiet: { start: 23, end: 6 },
+          badge: false,
         },
         locations: [
           { id: "area:shah-alam", name: "Shah Alam", lat: 3.07, lon: 101.52 },

@@ -157,6 +157,15 @@ Buka **https://hezy.my** pada telefon.
 - [ ] **Tukar** dan **+ Tambah lokasi kegemaran** membuka helaian carian; hanya satu carian pada satu masa
 - [ ] Kegemaran yang disimpan dari GPS memaparkan negeri (bukan "Lokasi semasa")
 
+## Ciri baharu v0.7.8
+
+- [ ] Tetapan disusun: Profil → Notifikasi → Amaran → Paparan → Aplikasi → Tentang data
+- [ ] Profil: ketik baris profil → helaian 4 profil berikon; pilih → helaian tertutup, ambang lalai berubah
+- [ ] Notifikasi: suis **Banner notifikasi**; bila hidup: "Bila dihantar" (Amaran sahaja / + Ringkasan 7 pagi), Waktu senyap (helaian), Hantar notifikasi ujian
+- [ ] **Nombor pada ikon**: ikon Hezy di skrin utama menunjukkan IPU semasa; matikan → nombor hilang; ⓘ menerangkan had peranti (iPhone/Android/komputer)
+- [ ] Amaran dimalapkan bila banner mati; Amaran awal dan Lonjakan mendadak sebagai suis; Lokasi amaran membuka Lokasi
+- [ ] Padam data: helaian pengesahan (Batal / Padam), bukan dialog pelayar
+
 ## Jika ada masalah
 
 Ambil tangkapan skrin dan catat model telefon serta versi OS, kemudian buka isu di

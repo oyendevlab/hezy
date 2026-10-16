@@ -125,6 +125,7 @@ describe("parseSubscribeBody", () => {
           expected: false,
           school: false,
           quiet: null,
+          badge: true,
         },
       },
     });
@@ -142,6 +143,7 @@ describe("parseSubscribeBody", () => {
       expected: false,
       school: false,
       quiet: { start: 23, end: 6 },
+      badge: false,
     });
     const bad = parseSubscribeBody({
       ...valid,
@@ -154,6 +156,7 @@ describe("parseSubscribeBody", () => {
       expected: false,
       school: false,
       quiet: null,
+      badge: false,
     });
   });
 

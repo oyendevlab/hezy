@@ -47,6 +47,8 @@ export type PushOptions = {
   school: boolean;
   /** Waktu senyap; `null` = tiada. Amaran ditangguh kecuali IPU > 300. */
   quiet: { start: number; end: number } | null;
+  /** Nombor IPU lokasi semasa pada ikon aplikasi bersama setiap notifikasi (v0.7.8). */
+  badge: boolean;
 };
 
 /** Rekod lama tanpa pilihan: tiada ringkasan, tiada amaran ramalan, tiada waktu senyap. */
@@ -57,6 +59,8 @@ export const LEGACY_OPTIONS: PushOptions = {
   expected: false,
   school: false,
   quiet: null,
+  // Rekod lama: lencana ikon seperti sebelum v0.7.8 (IPU dipaparkan bersama amaran).
+  badge: true,
 };
 
 const isHour = (v: unknown): v is number =>
@@ -69,6 +73,7 @@ export function parseOptions(raw: unknown): PushOptions {
     spike?: unknown;
     expected?: unknown;
     school?: unknown;
+    badge?: unknown;
     quiet?: { start?: unknown; end?: unknown } | null;
   } | null;
   const quiet =
@@ -85,6 +90,7 @@ export function parseOptions(raw: unknown): PushOptions {
     expected: r?.expected === true,
     school: r?.school === true,
     quiet,
+    badge: r?.badge === true,
   };
 }
 

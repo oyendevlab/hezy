@@ -8,6 +8,7 @@ import {
   planNotifications,
 } from "./push-plan";
 import type { PushRecord } from "./push-record";
+import { LEGACY_OPTIONS } from "./push-validate";
 import type { Reading } from "./reading";
 
 /** Waktu Malaysia (UTC+8) → Date. */
@@ -62,6 +63,7 @@ const record = (over: Partial<PushRecord> = {}): PushRecord => ({
     expected: false,
     school: false,
     quiet: { start: 23, end: 6 },
+    badge: false,
   },
   ...over,
 });
@@ -91,6 +93,7 @@ describe("planNotifications", () => {
         expected: false,
         school: false,
         quiet: { start: 23, end: 6 },
+        badge: false,
       },
     });
     expect(
@@ -101,7 +104,7 @@ describe("planNotifications", () => {
     expect(later[0].title).toBe("Jerebu di Shah Alam: IPU 150 (Tidak Sihat)");
   });
 
-  it("lencana ikon: IPU semasa amaran, padam bila udara pulih", () => {
+  it("lencana ikon: IPU semasa bersama setiap notifikasi (rekod lama = hidup)", () => {
     const r = record({ options: undefined });
     const [alert] = planNotifications(
       r,
@@ -116,7 +119,17 @@ describe("planNotifications", () => {
       at("2026-10-12T10:12"),
     );
     expect(recovered.title).toBe("Udara pulih di Shah Alam: IPU 60");
-    expect(recovered.badge).toBeNull();
+    expect(recovered.badge).toBe(60);
+  });
+
+  it("lencana ikon dimatikan: notifikasi tanpa nombor", () => {
+    const r = record({ options: { ...LEGACY_OPTIONS, badge: false } });
+    const [alert] = planNotifications(
+      r,
+      [reading(150)],
+      at("2026-10-12T09:12"),
+    );
+    expect(alert.badge).toBeUndefined();
   });
 
   it("IPU > 300 dihantar walaupun dalam waktu senyap", () => {
@@ -216,6 +229,7 @@ const on = (spike: boolean, expected: boolean, school = false) =>
       expected,
       school,
       quiet: { start: 23, end: 6 },
+      badge: false,
     },
   });
 
