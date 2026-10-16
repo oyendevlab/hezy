@@ -18,6 +18,7 @@ import { useI18n } from "@/lib/use-i18n";
 import { HourBars } from "./hour-bars";
 import { DailyForecast, HourlyStrip } from "./forecast-lists";
 import { InfoSheetButton } from "./info-sheet";
+import { MetForecast } from "./met-weather";
 
 function average(hours: HourPoint[], from: number, to: number): number | null {
   const values = hours
@@ -192,6 +193,8 @@ export function TrendPanel({
         days={days}
         weatherDays={reading.weatherDays}
       />
+
+      <MetForecast met={reading.met} todayDate={todayDate} />
     </div>
   );
 }

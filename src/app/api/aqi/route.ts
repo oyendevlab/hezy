@@ -7,9 +7,12 @@ import { parseCoords } from "@/lib/coords";
 import {
   getAccuracyIndex,
   getHotspots,
+  getMetForecasts,
+  getMetWarnings,
   getStations,
   getWeather,
 } from "@/lib/data";
+import { metFor, metStateFor } from "@/lib/metmalaysia";
 import { upwindHotspots } from "@/lib/hotspots";
 import { currentWeather } from "@/lib/weather";
 import { CALM_KMH, windAt } from "@/lib/wind";
@@ -54,6 +57,9 @@ export async function GET(request: Request) {
   const weatherPromise = handled(getWeather(cell.lat, cell.lon));
   const accuracyPromise = handled(getAccuracyIndex());
   const hotspotsPromise = handled(getHotspots());
+  const metPromise = handled(
+    Promise.all([getMetWarnings(), getMetForecasts()]),
+  );
 
   const now = new Date();
   const nowKey = localHourKey(now);
@@ -139,6 +145,13 @@ export async function GET(request: Request) {
       nowKey.slice(0, 10),
       near?.id ?? null,
     );
+  }
+
+  // Amaran dan ramalan rasmi MetMalaysia bagi negeri lokasi (v0.8.6).
+  const metState = stations ? metStateFor(stations, coords) : null;
+  if (metState) {
+    const met = await optional("MetMalaysia", metPromise);
+    if (met) reading.met = metFor(metState, met[0], met[1], nowKey);
   }
 
   if (partial) reading.partial = true;

@@ -8,7 +8,7 @@ const vercelLive =
 /**
  * CSP tanpa nonce (v0.8.1) supaya halaman kekal statik dan pantas. Skrip sebaris Next dan skrip
  * tema memerlukan 'unsafe-inline'; perlindungan utama ialah sekatan asal untuk sambungan, imej,
- * bingkai, borang dan objek. Hos luaran: jubin peta OSM dan lapisan sensor WAQI.
+ * bingkai, borang dan objek. Hos luaran: jubin peta OSM sahaja (WAQI melalui /api/waqi sejak v0.8.6).
  */
 const CSP = [
   "default-src 'self'",
@@ -16,7 +16,7 @@ const CSP = [
   "style-src 'self' 'unsafe-inline'",
   `img-src 'self' data: blob: https://tile.openstreetmap.org${vercelLive}`,
   `font-src 'self' data:${vercelLive}`,
-  `connect-src 'self' https://api.waqi.info${vercelLive}`,
+  `connect-src 'self'${vercelLive}`,
   "worker-src 'self'",
   "manifest-src 'self'",
   `frame-src ${vercelLive ? vercelLive.trim() : "'none'"}`,

@@ -30,6 +30,7 @@ import { WindLine } from "../wind-line";
 import { pickHeadline, recentChange } from "@/lib/headline";
 import { weatherKind } from "@/lib/weather";
 import { AdviceIcon } from "../advice-icon";
+import { MetWarningCard } from "../met-weather";
 import { BottomSheet } from "../bottom-sheet";
 import { WeatherNow } from "../weather-icon";
 import { InstallBanner } from "../install-banner";
@@ -318,6 +319,12 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
             {current && showSchool && (
               <SchoolCard reading={current} twoPm={reading?.schoolTwoPm} />
             )}
+            {reading && (
+              <MetWarningCard
+                met={reading.met}
+                todayDate={reading.today[0]?.time.slice(0, 10) ?? ""}
+              />
+            )}
             {!wide && current && <AlertCard prefs={prefs} ipu={current.ipu} />}
             <InstallBanner />
             {reading ? (
@@ -378,6 +385,12 @@ function HomeView({ prefs, location, entry, onRetry }: ViewProps) {
         <div className="relative mx-auto -mt-9 flex max-w-[1200px] flex-wrap gap-5 px-10">
           <div className="flex min-w-0 flex-[1_1_340px] flex-col gap-5">
             {entry && <ReadingNotices entry={entry} onRetry={onRetry} />}
+            {reading && (
+              <MetWarningCard
+                met={reading.met}
+                todayDate={reading.today[0]?.time.slice(0, 10) ?? ""}
+              />
+            )}
             {wide && current && <AlertCard prefs={prefs} ipu={current.ipu} />}
             <InstallBanner />
             {current && showSchool && (

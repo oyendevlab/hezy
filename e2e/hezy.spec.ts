@@ -1622,9 +1622,8 @@ test.describe("peta stesen", () => {
     const heat = await layerSwitch(page, "Taburan IPU");
     await expect(heat).not.toBeChecked();
     await expect(page.locator("canvas.hezy-heat")).toHaveCount(0);
-    const region = page.waitForRequest(
-      (r) =>
-        r.url().includes("api.waqi.info") && r.url().includes("-8,92,20,128"),
+    const region = page.waitForRequest((r) =>
+      r.url().includes("/api/waqi?scope=region"),
     );
     await heat.check();
     await expect(page.locator("canvas.hezy-heat")).toHaveCount(1);
@@ -2305,6 +2304,66 @@ test.describe("API", () => {
     );
     expect(headers["x-frame-options"]).toBe("DENY");
     expect(headers["x-powered-by"]).toBeUndefined();
+  });
+
+  test("MetMalaysia: kad amaran di Utama dan ramalan rasmi di Trend", async ({
+    page,
+  }) => {
+    await seedLocation(page);
+    const met = {
+      state: "selangor",
+      warnings: [
+        {
+          title: { ms: "Amaran Ribut Petir", en: "Thunderstorms Warning" },
+          issued: "2026-10-11T09:30",
+          validFrom: "2026-10-11T09:30",
+          validTo: "2026-10-11T13:00",
+          area: {
+            ms: "Selangor (Klang, Petaling dan Gombak)",
+            en: "Selangor (Klang, Petaling and Gombak)",
+          },
+        },
+      ],
+      forecast: [
+        {
+          date: "2026-10-11",
+          morning: "Jerebu",
+          afternoon: "Ribut petir di beberapa tempat",
+          night: "Tiada Hujan",
+          summary: "Ribut petir di beberapa tempat",
+          when: "Petang",
+          min: 24,
+          max: 33,
+        },
+      ],
+    };
+    await page.route("**/api/aqi?**", (route) =>
+      route.fulfill({ json: { ...fakeReading(), met } }),
+    );
+    await page.goto("/");
+    // Utama merender susun atur telefon dan desktop; pilih yang kelihatan.
+    const card = page.getByTestId("met-warning").filter({ visible: true });
+    await expect(card).toContainText("Amaran Ribut Petir");
+    await expect(card).toContainText("Selangor (Klang, Petaling dan Gombak)");
+    await expect(card).toContainText("Sehingga 1:00 PM");
+    await page.goto("/trend");
+    const forecast = page.getByTestId("met-forecast");
+    await expect(forecast).toContainText("Ramalan rasmi MetMalaysia");
+    await expect(forecast).toContainText("Ribut petir di beberapa tempat");
+    await expect(forecast).toContainText("33°");
+  });
+
+  test("proksi WAQI: hanya skop tetap dan asal yang sama", async ({
+    request,
+  }) => {
+    const bad = await request.get("/api/waqi?scope=https://jahat.example");
+    // 503 bila token tiada (binaan tanpa WAQI), 400 bila skop tidak sah.
+    expect([400, 503]).toContain(bad.status());
+    expect(bad.headers()["cache-control"]).toBe("no-store");
+    const cross = await request.get("/api/waqi?scope=malaysia", {
+      headers: { origin: "https://jahat.example" },
+    });
+    expect([403, 503]).toContain(cross.status());
   });
 
   test("push: semakan berkala memerlukan rahsia", async ({ request }) => {

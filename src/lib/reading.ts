@@ -16,6 +16,7 @@ import {
   rolling24hAverage,
   type IpuCategoryKey,
 } from "./ipu";
+import type { MetReading } from "./metmalaysia";
 import type { OfficialReading } from "./official";
 import type { AirQualitySeries } from "./openmeteo";
 
@@ -103,6 +104,8 @@ export type Reading = {
   accuracy?: AccuracySummary | null;
   /** Pembetulan ramalan dengan bacaan APIMS; tiada dalam bacaan lama tersimpan. */
   correction?: Correction | null;
+  /** Amaran dan ramalan rasmi MetMalaysia bagi negeri lokasi (v0.8.6); diisi oleh route API. */
+  met?: MetReading | null;
   /**
    * Tiada bacaan rasmi dalam 30 km: anggaran dibetulkan dengan bias stesen APIMS berdekatan
    * (IDW, v0.8.5). Diisi oleh route API.

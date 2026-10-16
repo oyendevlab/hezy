@@ -1,16 +1,15 @@
 /**
  * Lapisan sensor tambahan daripada World Air Quality Index Project (aqicn.org).
- * Ikut terma WAQI: diambil terus dari pelayar (tiada cache pelayan) dan dipaparkan
- * dengan atribusi. Nilai ialah AQI skala AS (bukan IPU), jadi hanya dipaparkan
- * sebagai lapisan berasingan; nombor utama dan amaran kekal guna IPU rasmi.
+ * Sejak v0.8.6 diambil melalui /api/waqi (token di pelayan sahaja) tanpa sebarang cache, ikut
+ * terma WAQI yang melarang data diedarkan semula sebagai cache; dipaparkan dengan atribusi.
+ * Nilai ialah AQI skala AS (bukan IPU), jadi hanya dipaparkan sebagai lapisan berasingan;
+ * nombor utama dan amaran kekal guna IPU rasmi.
  */
 
 import { distanceKm, type Station } from "./apims";
 import { MALAYSIA_BOUNDS, isInMalaysia } from "./coords";
 import { pm25ToIpu } from "./ipu";
 import { MAP_REGION } from "./wind-grid";
-
-export const WAQI_TOKEN = process.env.NEXT_PUBLIC_WAQI_TOKEN ?? "";
 
 /** Bacaan lebih lama daripada ini dianggap lapuk dan tidak dipaparkan. */
 export const MAX_SENSOR_AGE_HOURS = 3;

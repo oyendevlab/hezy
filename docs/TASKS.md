@@ -658,12 +658,12 @@ Kerja malam 16–17 Okt 2026 (dipersetujui pengguna). Rujukan: [AUDIT-0.8.md](AU
 5. ✅ Ketepatan malam: ralat anggaran IDW tinggal-satu-keluar (`es`) untuk 7 hari lepas; `/api/accuracy` → `estimateSpatial`
 6. ✅ Cache stesen ikut jadual APIMS: semak setiap 2 minit bila jam semasa belum diterbitkan, jika tidak hingga ~8 minit selepas jam berikutnya; CDN `/api/stations` ikut
 7. ✅ Ujian (303 unit, E2E), versi 0.8.5, Apa yang baharu (BM/EN), tag dan GitHub Release; data sebenar: Mersing 54 → 92 (Rompin 72 km, IPU 94), Kuala Lipis 60 → 81, Lawas 34 → 53
-8. ⬜ Jalankan `ketepatan.yml` selepas deployment supaya `estimateSpatial` dikira (ralat IDW 7 hari lepas)
+8. ✅ Jalankan `ketepatan.yml` selepas deployment supaya `estimateSpatial` dikira (ralat IDW 7 hari lepas) — hasil: **17 IPU** berbanding 36 untuk model mentah (−53%)
 
-## Fasa 37 — v0.8.6 (MetMalaysia dan proksi WAQI; dirancang)
+## Fasa 37 — v0.8.6 (MetMalaysia dan proksi WAQI; 16 Okt 2026)
 
-1. ⬜ `metmalaysia.ts`: amaran (`/weather/warning`) dan ramalan 7 hari (`/weather/forecast`) daripada api.data.gov.my, disahkan bentuknya, dicache (amaran ~15 min, ramalan ~1 jam)
-2. ⬜ Padanan lokasi pengguna dengan negeri/daerah dalam teks amaran dan lokasi ramalan MetMalaysia terdekat
-3. ⬜ Kad amaran cuaca rasmi di Utama bila lokasi terlibat (dalam app sahaja, tiada notifikasi push baharu); ramalan rasmi MetMalaysia dalam Trend; sumber dalam kredit
-4. ⬜ Proksi WAQI: `/api/waqi` di pelayan (token tidak lagi `NEXT_PUBLIC_`, cache CDN 10 min); CSP `connect-src` tanpa api.waqi.info
-5. ⬜ Ujian, versi 0.8.6, Apa yang baharu (BM/EN), tag dan GitHub Release
+1. ✅ `metmalaysia.ts`: amaran (`/weather/warning`) dan ramalan 7 hari (`/weather/forecast`) daripada api.data.gov.my, disahkan bentuknya, dicache (amaran ~15 min, ramalan ~1 jam)
+2. ✅ Padanan negeri pengguna (stesen APIMS terdekat dalam 150 km) dengan bahagian negeri dalam teks amaran (dipecah "•", dengan daerah) dan ramalan peringkat negeri (`?contains=St@location__location_id`, 40 KB)
+3. ✅ Kad amaran cuaca rasmi di Utama bila lokasi terlibat (dalam app sahaja, tiada notifikasi push baharu); ramalan rasmi MetMalaysia dalam Trend; sumber dalam kredit
+4. ✅ Proksi WAQI: `/api/waqi?scope=malaysia|region` di pelayan, **tanpa sebarang cache** (terma WAQI: "The data can not be redistributed as cached or archived data"), hanya dua kotak tetap, tolak rentas laman, had kadar; token tidak lagi dalam bundle pelayar dan WAQI tidak melihat IP pengguna; CSP `connect-src 'self'` sahaja; teks privasi dikemas kini
+5. ✅ Ujian (unit: penghurai dan padanan MetMalaysia dengan format sebenar; E2E: kad amaran, ramalan Trend, proksi WAQI), versi 0.8.6, Apa yang baharu (BM/EN), tag dan GitHub Release

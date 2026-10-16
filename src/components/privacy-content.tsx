@@ -45,8 +45,8 @@ const SECTIONS: { title: string; points: string[] }[] = [
   {
     title: "Pihak ketiga",
     points: [
-      "Bacaan IPU daripada APIMS (Jabatan Alam Sekitar), cuaca dan anggaran daripada Open-Meteo, dan titik panas daripada NASA FIRMS diambil oleh pelayan Hezy; maklumat peranti anda tidak dihantar kepada mereka.",
-      "Jubin peta (OpenStreetMap) dan sensor tambahan (WAQI) dimuat terus oleh pelayar anda bila anda membuka Peta, jadi mereka boleh melihat alamat IP anda seperti mana-mana laman web.",
+      "Bacaan IPU daripada APIMS (Jabatan Alam Sekitar), cuaca dan anggaran daripada Open-Meteo, amaran dan ramalan MetMalaysia (data.gov.my), titik panas daripada NASA FIRMS dan sensor tambahan WAQI diambil oleh pelayan Hezy; maklumat peranti anda tidak dihantar kepada mereka.",
+      "Jubin peta (OpenStreetMap) dimuat terus oleh pelayar anda bila anda membuka Peta, jadi OpenStreetMap boleh melihat alamat IP anda seperti mana-mana laman web.",
     ],
   },
   {
