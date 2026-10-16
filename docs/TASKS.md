@@ -599,7 +599,7 @@ Penanda siri polish v0.7.1–v0.7.15:
 
 ## Fasa 32 — v0.8.1 (keselamatan; 16 Okt 2026)
 
-Audit keselamatan siri 0.8.x (data, logik, stabil, laju, keselamatan):
+Audit siri 0.8.x (data, logik, stabil, laju, keselamatan) — laporan penuh dan pelan v0.8.2–v0.9.0: [AUDIT-0.8.md](AUDIT-0.8.md)
 
 1. ✅ Next.js 16.4.0 → 16.4.2 dan React 19.3.1: tampalan GHSA-673q-mjm6-r5xr (RCE `use cache`), GHSA-2464-fhr4-w9xw (RCE pengoptimum imej SVG), GHSA-p3m5-59mp-jv5r (DoS Server Actions)
 2. ✅ Langganan push hanya untuk perkhidmatan push pelayar (FCM, Apple, Mozilla, WNS) — tutup SSRF melalui endpoint sebarangan; rekod lama yang tidak sah dibuang oleh `/api/push/check`
