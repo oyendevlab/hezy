@@ -63,19 +63,19 @@ export function TrendPanel({
     {
       name: t("Pagi"),
       icon: SunHorizon,
-      span: t("6 pg – 12 tgh"),
+      span: "6 AM – 12 PM",
       value: average(today, 6, 12),
     },
     {
       name: t("Petang"),
       icon: Sun,
-      span: t("12 tgh – 6 ptg"),
+      span: "12 PM – 6 PM",
       value: average(today, 12, 18),
     },
     {
       name: t("Malam"),
       icon: Moon,
-      span: t("6 ptg – 12 mlm"),
+      span: "6 PM – 12 AM",
       value: average(today, 18, 24),
     },
   ];

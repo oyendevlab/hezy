@@ -575,3 +575,11 @@ Mockup: https://claude.ai/artifact/K2kQkrY8zYtUjBwb9AVE4J (papan kiri).
 1. ✅ Apa yang baharu: 3 keluaran terkini sahaja
 2. ✅ Butang pil "Padam" di kanan baris Padam data
 3. ✅ Versi 0.7.14, tag dan GitHub Release
+
+## Fasa 30 — v0.7.15 (AM/PM dan kad kongsi; disahkan 16 Okt 2026)
+
+1. ✅ Format masa AM/PM dalam BM dan EN (formatHour/formatClock/formatWindow, paksi graf, julat Pagi/Petang/Malam, notifikasi)
+2. ✅ Kad kongsi: Hezy tebal; masa dijana (`d`, formatStamp) di kanan atas; bendera sejajar atas nombor; IPU → tahap → APIMS (JAS) → Bacaan …; nama negeri di bawah lokasi
+3. ✅ Graf kad: "Bacaan IPU per jam", legenda Rasmi/Ramalan/Kini, garis putus jam semasa
+4. ✅ Fon Plus Jakarta Sans (OFL) untuk imej next/og (`public/fonts`, `og-fonts.ts`) — huruf tebal kini dirender
+5. ✅ Versi 0.7.15, Apa yang baharu, tag dan GitHub Release

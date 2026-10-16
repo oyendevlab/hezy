@@ -1,9 +1,11 @@
+import { OG_FONT_FAMILY, ogFonts } from "@/lib/og-fonts";
 import { LOGO_DATA_URL } from "@/lib/logo-art";
 import { ImageResponse } from "next/og";
 import { adviceFor } from "@/lib/advice";
 import { CATEGORY_STYLE } from "@/lib/category-style";
 import { translate } from "@/lib/i18n";
 import { ipuCategory } from "@/lib/ipu";
+import { findState } from "@/lib/areas";
 import { flagDataUrl } from "@/lib/flag-image";
 import { CARD_SIZE, parseCard } from "@/lib/share-card";
 
@@ -28,7 +30,9 @@ export async function GET(request: Request) {
   const darkPill = card.category === "baik" || card.category === "sederhana";
   const chartHeight = story ? 340 : 200;
   const flag = await flagDataUrl(card.state, request.url);
+  const stateName = card.state ? findState(card.state)?.name : undefined;
 
+  const fonts = await ogFonts(request.url);
   return new ImageResponse(
     <div
       style={{
@@ -40,7 +44,7 @@ export async function GET(request: Request) {
         padding: story ? "120px 72px" : "64px 72px",
         background: style.sky.sky,
         color: INK,
-        fontFamily: "sans-serif",
+        fontFamily: `${OG_FONT_FAMILY}, sans-serif`,
       }}
     >
       <div
@@ -57,9 +61,9 @@ export async function GET(request: Request) {
             Hezy
           </div>
         </div>
-        {card.time && (
-          <div style={{ display: "flex", fontSize: 30, fontWeight: 600 }}>
-            {card.time}
+        {card.made && (
+          <div style={{ display: "flex", fontSize: 28, fontWeight: 600 }}>
+            {card.made}
           </div>
         )}
       </div>
@@ -74,33 +78,62 @@ export async function GET(request: Request) {
           padding: story ? "56px 56px" : "44px 52px",
         }}
       >
-        <div style={{ display: "flex", flexDirection: "column" }}>
+        {/* Kiri: bendera (selari dengan atas nombor) dan nama; kanan: IPU, tahap, sumber, masa. */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            gap: 24,
+          }}
+        >
           <div
             style={{
               display: "flex",
-              alignItems: "center",
-              gap: 18,
-              fontSize: 40,
-              fontWeight: 700,
-              color: MUTED,
+              flexDirection: "column",
+              gap: 14,
+              paddingTop: story ? 30 : 22,
+              minWidth: 0,
+              flex: 1,
             }}
           >
             {flag && (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={flag}
-                width={72}
-                height={36}
+                width={84}
+                height={42}
                 alt=""
                 style={{
-                  borderRadius: 5,
+                  borderRadius: 6,
                   boxShadow: "0 0 0 2px rgba(0,0,0,0.12)",
                 }}
               />
             )}
-            {t(card.name)}
+            <div
+              style={{
+                display: "flex",
+                fontSize: story ? 60 : 52,
+                fontWeight: 800,
+                lineHeight: 1.1,
+              }}
+            >
+              {t(card.name)}
+            </div>
+            {stateName && stateName !== card.name && (
+              <div style={{ display: "flex", fontSize: 28, color: MUTED }}>
+                {t(stateName)}
+              </div>
+            )}
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 32 }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-end",
+              gap: 10,
+            }}
+          >
             <div
               style={{
                 display: "flex",
@@ -112,28 +145,27 @@ export async function GET(request: Request) {
             >
               {card.ipu}
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              <div
-                style={{
-                  display: "flex",
-                  fontSize: 42,
-                  fontWeight: 700,
-                  background: style.accent,
-                  color: darkPill ? "#fff" : INK,
-                  borderRadius: 999,
-                  padding: "8px 26px",
-                }}
-              >
-                {t(card.label)}
-              </div>
-              <div style={{ display: "flex", fontSize: 26, color: MUTED }}>
-                {t(
-                  card.source === "apims"
-                    ? "IPU rasmi APIMS (JAS)"
-                    : "Anggaran IPU daripada PM2.5",
-                )}
-              </div>
+            <div
+              style={{
+                display: "flex",
+                fontSize: 38,
+                fontWeight: 700,
+                background: style.accent,
+                color: darkPill ? "#fff" : INK,
+                borderRadius: 999,
+                padding: "6px 24px",
+              }}
+            >
+              {t(card.label)}
             </div>
+            <div style={{ display: "flex", fontSize: 24, color: MUTED }}>
+              {t(card.source === "apims" ? "APIMS (JAS)" : "Anggaran PM2.5")}
+            </div>
+            {card.time && (
+              <div style={{ display: "flex", fontSize: 24, color: MUTED }}>
+                {t("Bacaan {time}", { time: card.time })}
+              </div>
+            )}
           </div>
         </div>
 
@@ -153,12 +185,53 @@ export async function GET(request: Request) {
             <div
               style={{
                 display: "flex",
-                fontSize: 26,
-                fontWeight: 700,
+                justifyContent: "space-between",
+                alignItems: "center",
+                fontSize: 24,
                 color: MUTED,
               }}
             >
-              {t("Hari ini, jam demi jam")}
+              <div style={{ display: "flex", fontWeight: 700, color: INK }}>
+                {t("Bacaan IPU per jam")}
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      width: 12,
+                      height: 22,
+                      borderRadius: 3,
+                      background: style.accent,
+                    }}
+                  />
+                  {t(card.source === "apims" ? "Rasmi" : "Anggaran")}
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      width: 12,
+                      height: 22,
+                      borderRadius: 3,
+                      background: style.accent,
+                      opacity: 0.45,
+                    }}
+                  />
+                  {t("Ramalan")}
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      width: 0,
+                      height: 24,
+                      borderLeft: `3px dashed ${INK}`,
+                    }}
+                  />
+                  {t("Kini")}
+                </div>
+              </div>
             </div>
             <div
               style={{
@@ -166,6 +239,7 @@ export async function GET(request: Request) {
                 alignItems: "flex-end",
                 gap: 6,
                 height: chartHeight,
+                position: "relative",
               }}
             >
               {card.hours.map((v, i) => (
@@ -190,10 +264,22 @@ export async function GET(request: Request) {
                         ? "#e4e0d8"
                         : CATEGORY_STYLE[ipuCategory(v).key].accent,
                     opacity: card.now >= 0 && i > card.now ? 0.45 : 1,
-                    border: i === card.now ? `4px solid ${INK}` : "none",
                   }}
                 />
               ))}
+              {card.now >= 0 && (
+                <div
+                  style={{
+                    display: "flex",
+                    position: "absolute",
+                    top: -10,
+                    bottom: 0,
+                    left: `${((card.now + 0.5) / card.hours.length) * 100}%`,
+                    width: 0,
+                    borderLeft: `3px dashed ${INK}`,
+                  }}
+                />
+              )}
             </div>
             <div
               style={{
@@ -204,9 +290,9 @@ export async function GET(request: Request) {
                 color: MUTED,
               }}
             >
-              <div style={{ display: "flex" }}>{t("12 pg")}</div>
-              <div style={{ display: "flex" }}>{t("12 tgh")}</div>
-              <div style={{ display: "flex" }}>{t("11 mlm")}</div>
+              <div style={{ display: "flex" }}>12 AM</div>
+              <div style={{ display: "flex" }}>12 PM</div>
+              <div style={{ display: "flex" }}>11 PM</div>
             </div>
           </div>
         )}
@@ -228,6 +314,7 @@ export async function GET(request: Request) {
       </div>
     </div>,
     {
+      fonts,
       ...size,
       headers: { "Cache-Control": "public, max-age=600, s-maxage=3600" },
     },

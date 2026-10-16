@@ -744,7 +744,7 @@ function NotificationSections({ prefs }: { prefs: Prefs }) {
                   }
                   options={[
                     { value: "amaran", label: t("Amaran sahaja") },
-                    { value: "pagi", label: t("+ Ringkasan 7 pagi") },
+                    { value: "pagi", label: t("+ Ringkasan 7 AM") },
                   ]}
                 />
               </OptionBlock>

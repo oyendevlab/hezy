@@ -206,6 +206,12 @@ Buka **https://hezy.my** pada telefon.
 - [ ] Apa yang baharu: 3 keluaran terkini sahaja
 - [ ] Kad Tentang: butang pil **Padam** di kanan baris "Padam data di peranti ini" → helaian pengesahan
 
+## Ciri baharu v0.7.15
+
+- [ ] Semua masa dalam AM/PM (Ramalan per jam, paksi graf, masa terbaik, waktu senyap, notifikasi); "12 AM" tidak terbalut
+- [ ] Kongsi gambar: Hezy tebal, masa dijana di kanan atas; bendera + nama di kiri; IPU, tahap, APIMS (JAS), Bacaan … di kanan
+- [ ] Graf kad: "Bacaan IPU per jam" dengan legenda Rasmi · Ramalan · Kini dan garis putus jam semasa
+
 ## Jika ada masalah
 
 Ambil tangkapan skrin dan catat model telefon serta versi OS, kemudian buka isu di

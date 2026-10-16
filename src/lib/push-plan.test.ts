@@ -153,7 +153,7 @@ describe("planNotifications", () => {
       title: "Pagi ini di Shah Alam: IPU 80 (Sederhana)",
       tag: "hezy-pagi",
     });
-    expect(notes[0].body).toContain("Masa terbaik keluar: 8 – 10 pagi (~70).");
+    expect(notes[0].body).toContain("Masa terbaik keluar: 8 – 10 AM (~70).");
     const sent = applySent(record(), notes[0].update, at("2026-10-12T07:12"));
     expect(sent.lastMorning).toBe("2026-10-12");
     expect(
@@ -204,7 +204,7 @@ describe("planNotifications", () => {
       at("2026-10-12T07:12"),
     );
     expect(notes[0].title).toBe("This morning in Shah Alam: API 80 (Moderate)");
-    expect(notes[0].body).toContain("Best time to go out: 8 – 10 am (~70).");
+    expect(notes[0].body).toContain("Best time to go out: 8 – 10 AM (~70).");
   });
 });
 
@@ -383,7 +383,7 @@ describe("amaran lonjakan dan jerebu dijangka", () => {
     );
     expect(notes).toHaveLength(1);
     expect(notes[0]).toMatchObject({
-      title: "Jerebu dijangka di Shah Alam sekitar 4 petang",
+      title: "Jerebu dijangka di Shah Alam sekitar 4 PM",
       tag: "hezy-dijangka-semasa",
     });
     expect(
@@ -408,7 +408,7 @@ describe("amaran lonjakan dan jerebu dijangka", () => {
       [withToday(80, today)],
       at("2026-10-12T12:12"),
     );
-    expect(notes[0].title).toBe("Haze expected in Shah Alam around 4 pm");
+    expect(notes[0].title).toBe("Haze expected in Shah Alam around 4 PM");
   });
 });
 

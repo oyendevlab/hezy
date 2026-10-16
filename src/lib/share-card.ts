@@ -14,8 +14,10 @@ export type CardData = ShareData & {
   hours: (number | null)[];
   /** Indeks jam semasa dalam `hours`; selepasnya ialah ramalan. */
   now: number;
-  /** Masa bacaan, cth. "12:00 tengah hari". */
+  /** Masa bacaan, cth. "12:00 PM". */
   time: string;
+  /** Masa imej dijana, cth. "16 Okt · 2:15 PM" (v0.7.15); kosong = tiada. */
+  made: string;
   lang: Lang;
   format: CardFormat;
 };
@@ -28,6 +30,7 @@ export function buildCardPath(data: {
   hours: readonly (number | null)[];
   now: number;
   time: string;
+  made?: string;
   lang: Lang;
   format: CardFormat;
   state?: string | null;
@@ -46,6 +49,7 @@ export function buildCardPath(data: {
     f: data.format,
   });
   if (data.state) params.set("g", data.state);
+  if (data.made) params.set("d", data.made.slice(0, 30));
   return `/kongsi/kad?${params}`;
 }
 
@@ -72,6 +76,10 @@ export function parseCard(
     now: Number.isInteger(now) && now >= 0 && now < 24 ? now : -1,
     time: one(params.t)
       .replace(/[^\p{L}\p{N} :.]/gu, "")
+      .trim()
+      .slice(0, 30),
+    made: one(params.d)
+      .replace(/[^\p{L}\p{N} :.·]/gu, "")
       .trim()
       .slice(0, 30),
     lang: isLang(lang) ? lang : "ms",
