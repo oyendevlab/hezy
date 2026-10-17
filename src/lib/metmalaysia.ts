@@ -1,19 +1,23 @@
 /**
  * Amaran dan ramalan rasmi MetMalaysia (v0.8.6, docs/AUDIT-0.8.md D3) daripada api.data.gov.my
- * (data terbuka, tanpa kunci). Bentuk respons disahkan setiap kali dibaca.
+ * (data terbuka, tanpa kunci; had 4 permintaan/minit). Bentuk respons disahkan setiap kali dibaca.
  * - Amaran: hanya amaran darat yang masih sah (ribut petir, hujan lebat, dsb.); amaran laut dan
  *   "Tiada Nasihat" diabaikan. Teks disenaraikan ikut negeri dipisah "•", jadi hanya bahagian
  *   negeri pengguna (dengan daerahnya) dipaparkan.
- * - Ramalan: peringkat negeri (pagi, petang, malam, suhu min–maks) hingga 7 hari.
+ * - Ramalan (v0.8.11): kawasan tanah tinggi (pusat rekreasi), kemudian daerah (sempadan
+ *   `places.ts`), kemudian negeri — pagi, petang, malam, suhu min–maks hingga 7 hari.
  */
 
-import { distanceKm } from "./apims";
-import { findStateByApimsId } from "./areas";
+import { HIGHLANDS, highlandAt } from "./highlands";
+import type { Place } from "./places";
 
 export const MET_WARNING_URL = "https://api.data.gov.my/weather/warning/";
-/** Ramalan peringkat negeri sahaja (16 lokasi × 7 hari, ~40 KB). */
+/**
+ * Semua lokasi ramalan dalam satu permintaan (~3,100 baris, ~900 KB): negeri, daerah, bandar
+ * dan pusat rekreasi. Dibaca melalui /api/met (CDN 15 min) supaya had kadar tidak dilanggar.
+ */
 export const MET_FORECAST_URL =
-  "https://api.data.gov.my/weather/forecast/?contains=St@location__location_id&limit=200";
+  "https://api.data.gov.my/weather/forecast/?limit=5000";
 
 /** Negeri Hezy (id dalam areas.ts) → lokasi ramalan MetMalaysia dan nama dalam teks amaran. */
 export const MET_STATES: Readonly<
@@ -80,13 +84,93 @@ export type MetWarning = {
   area: { ms: string; en: string | null };
 };
 
+/** Amaran + ramalan yang digunakan, seperti dipulangkan oleh /api/met (v0.8.11). */
+export type MetBundle = {
+  warnings: MetWarningRaw[];
+  forecasts: Record<string, MetDay[]>;
+  /** Masa salinan dibina (ISO). */
+  fetchedAt: string;
+};
+
+/** Respons /api/met (milik Hezy, jadi semakan bentuk ringkas sahaja). */
+export function parseMetBundle(json: unknown): MetBundle {
+  const b = json as Partial<MetBundle> | null;
+  if (
+    !b ||
+    !Array.isArray(b.warnings) ||
+    typeof b.forecasts !== "object" ||
+    b.forecasts === null ||
+    typeof b.fetchedAt !== "string"
+  )
+    throw new Error("Respons /api/met tidak dijangka.");
+  return b as MetBundle;
+}
+
+/** Peringkat ramalan: kawasan tanah tinggi, daerah atau negeri. */
+export type MetAreaKind = "zone" | "district" | "state";
+
 export type MetReading = {
   /** Id negeri Hezy yang dipadankan. */
   state: string;
+  /** Lokasi ramalan yang digunakan (v0.8.11); tiada dalam bacaan lama = negeri. */
+  area?: { kind: MetAreaKind; name: string };
   warnings: MetWarning[];
-  /** Ramalan rasmi peringkat negeri, hari ini dan seterusnya. */
+  /** Ramalan rasmi, hari ini dan seterusnya. */
   forecast: MetDay[];
 };
+
+export type MetTarget = {
+  state: string;
+  /** Lokasi ramalan ikut keutamaan; yang pertama ada data digunakan. */
+  sources: readonly { id: string; kind: MetAreaKind; name: string }[];
+};
+
+/** Lokasi ramalan bagi titik: tanah tinggi terdekat, daerah, kemudian negeri. */
+export function metTargetFor(
+  point: { lat: number; lon: number },
+  place: Place,
+  stateName: string,
+): MetTarget | null {
+  const meta = MET_STATES[place.state];
+  if (!meta) return null;
+  const zone = highlandAt(point);
+  return {
+    state: place.state,
+    sources: [
+      ...(zone?.met
+        ? [{ id: zone.met, kind: "zone" as const, name: zone.name }]
+        : []),
+      ...(place.met
+        ? [{ id: place.met, kind: "district" as const, name: place.district }]
+        : []),
+      { id: meta.forecastId, kind: "state" as const, name: stateName },
+    ],
+  };
+}
+
+/** Lokasi ramalan yang Hezy gunakan sahaja (negeri, daerah, zon, bandar Tn141 Lojing). */
+export function isUsedForecastId(id: string): boolean {
+  return (
+    id.startsWith("St") ||
+    id.startsWith("Ds") ||
+    id === "Tn141" ||
+    HIGHLANDS.some((h) => h.met === id)
+  );
+}
+
+/** Ramalan yang digunakan sahaja, dari `today` ke hadapan (respons /api/met lebih kecil). */
+export function pickForecasts(
+  all: Readonly<Record<string, MetDay[]>>,
+  today: string,
+): Record<string, MetDay[]> {
+  const out: Record<string, MetDay[]> = {};
+  for (const [id, days] of Object.entries(all)) {
+    if (!isUsedForecastId(id)) continue;
+    const upcoming = days.filter((d) => d.date >= today);
+    if (upcoming.length) out[id] = upcoming;
+  }
+  return out;
+}
 
 const str = (v: unknown) => (typeof v === "string" ? v.trim() : "");
 const time = (v: unknown) =>
@@ -206,13 +290,17 @@ function areaFor(
   return { ms: ms[index], en: en.length === ms.length ? en[index] : null };
 }
 
-/** Amaran dan ramalan MetMalaysia bagi negeri `state` pada `nowKey` (`YYYY-MM-DDTHH:mm`). */
+/**
+ * Amaran negeri dan ramalan lokasi pertama dalam `target.sources` yang ada data, pada `nowKey`
+ * (`YYYY-MM-DDTHH:mm`).
+ */
 export function metFor(
-  state: string,
+  target: MetTarget,
   warnings: readonly MetWarningRaw[],
   forecasts: Readonly<Record<string, MetDay[]>>,
   nowKey: string,
 ): MetReading | null {
+  const { state } = target;
   const meta = MET_STATES[state];
   if (!meta) return null;
   const now = nowKey.slice(0, 16);
@@ -230,31 +318,20 @@ export function metFor(
       },
     ];
   });
-  return {
-    state,
-    warnings: active,
-    forecast: (forecasts[meta.forecastId] ?? []).filter(
-      (d) => d.date >= now.slice(0, 10),
-    ),
-  };
-}
-
-/**
- * Negeri bagi amaran MetMalaysia: negeri stesen APIMS terdekat dalam 150 km. Lebih luas daripada
- * bendera kad kongsi (30 km) supaya kawasan jauh dari stesen pun menerima amaran negerinya.
- */
-export function metStateFor(
-  stations: readonly { lat: number; lon: number; stateId: number | null }[],
-  point: { lat: number; lon: number },
-): string | null {
-  let best: { id: string; d: number } | null = null;
-  for (const s of stations) {
-    const state = findStateByApimsId(s.stateId);
-    if (!state) continue;
-    const d = distanceKm(point, s);
-    if (d <= 150 && (best === null || d < best.d)) best = { id: state.id, d };
+  const today = now.slice(0, 10);
+  for (const source of target.sources) {
+    const forecast = (forecasts[source.id] ?? []).filter(
+      (d) => d.date >= today,
+    );
+    if (forecast.length)
+      return {
+        state,
+        area: { kind: source.kind, name: source.name },
+        warnings: active,
+        forecast,
+      };
   }
-  return best?.id ?? null;
+  return { state, warnings: active, forecast: [] };
 }
 
 export type MetKind = "storm" | "rain" | "dry" | "haze" | "other";

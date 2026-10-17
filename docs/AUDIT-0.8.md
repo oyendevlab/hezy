@@ -145,3 +145,18 @@ Kaveat: data model lepas ialah analisis terbaik Open-Meteo (bukan ramalan sebena
 | v0.8.6 | Anggaran kawasan tanpa stesen (D1) + pra-panas (S4), cache ikut jadual APIMS (D2)               |
 | v0.8.7 | MetMalaysia: amaran dan ramalan rasmi (D3), proksi WAQI (D4)                                    |
 | v0.9.0 | Penanda siri data & logik siap                                                                  |
+
+## 7. Ketepatan lokasi (v0.8.11, 17 Okt 2026)
+
+Maklum balas: di Cameron Highlands, stesen terdekat ialah Tasek Ipoh. Audit 121 titik (52 kawasan + 69 bandar) dengan sempadan geoBoundaries dan 68 stesen APIMS:
+
+| Isu                                                   | Sebelum                                                                | v0.8.11                                                                                |
+| ----------------------------------------------------- | ---------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| Negeri MetMalaysia (stesen terdekat ≤ 150 km)         | 25 titik salah (Kajang → Putrajaya, Cameron → Perak, Mersing → Pahang) | Sempadan sebenar (`places.ts`); 68/68 stesen dan 52/52 kawasan padan                   |
+| Bendera kad kongsi (stesen ≤ 30 km, null di sempadan) | 7 salah (Ampang → KL, Tampin → Melaka)                                 | Sempadan sebenar                                                                       |
+| Ramalan MetMalaysia                                   | Negeri sahaja (Cameron 24–34°C ikut Perak)                             | Tanah tinggi (Rc) → daerah (Ds, 160 daerah) → negeri; Cameron 16–24°C, Genting 18–25°C |
+| Stesen tanah rendah di tanah tinggi                   | Genting → Batu Muda 26 km "rasmi"; Bukit Bendera → Minden 8 km         | 10 kawasan tanah tinggi (`highlands.ts`): anggaran dibetulkan + penjelasan             |
+| Nama lokasi GPS                                       | 52 kawasan sahaja (Mersing → "Kluang" 73 km)                           | Kawasan ≤ 15 km, jika tidak nama daerah                                                |
+| Had data.gov.my 4 permintaan/minit                    | Setiap instans memanggil sendiri → 429, bahagian MetMalaysia hilang    | `/api/met` (CDN 15 min) dikongsi semua instans; salinan terakhir bila 429              |
+
+Ketinggian (Open-Meteo Elevation, Copernicus DEM): semua 68 stesen APIMS di bawah 300 m; Cameron ~1,420 m, Genting ~1,680 m, Bukit Fraser ~1,290 m. API ketinggian sendiri tidak digunakan masa larian (503 semasa gangguan Open-Meteo 17 Okt), jadi kawasan tanah tinggi ialah jadual tetap.

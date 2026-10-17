@@ -33,4 +33,5 @@ Buat cabang `feat/*`, buka PR ke `main`. Vercel akan menghasilkan preview untuk 
 - **APIMS (Jabatan Alam Sekitar)**: IPU rasmi stesen, nombor utama dan amaran
 - **Open-Meteo (CAMS)**: anggaran dan ramalan PM2.5 bila tiada stesen APIMS berdekatan
 - **[World Air Quality Index Project](https://waqi.info/)**: lapisan sensor tambahan pada peta (skala AQI AS), melalui `/api/waqi` tanpa cache (terma WAQI). Token di pelayan: `WAQI_TOKEN` (atau `NEXT_PUBLIC_WAQI_TOKEN` lama); tanpa token, lapisan ini tidak dipaparkan
-- **MetMalaysia ([data.gov.my](https://data.gov.my/))**: amaran cuaca rasmi dan ramalan negeri (tanpa kunci), dicache di pelayan
+- **MetMalaysia ([data.gov.my](https://data.gov.my/))**: amaran cuaca rasmi dan ramalan ikut daerah, tanah tinggi atau negeri (tanpa kunci; had 4 permintaan/minit), dikongsi semua instans melalui `/api/met` (CDN 15 min)
+- **[geoBoundaries](https://www.geoboundaries.org/)**: sempadan daerah Malaysia (ADM2, CC BY 3.0; Runfola et al. 2020) dan negeri/Putrajaya daripada © penyumbang [OpenStreetMap](https://www.openstreetmap.org/copyright) (ODbL), dipermudahkan dalam `src/lib/places-data.ts` oleh `scripts/build-places.mjs`

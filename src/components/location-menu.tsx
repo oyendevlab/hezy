@@ -103,7 +103,7 @@ export function LocationMenu({
       setError(t(GEO_ERROR_MESSAGE[result.reason]));
       return;
     }
-    choose(gpsToLocation(result.lat, result.lon));
+    choose(await gpsToLocation(result.lat, result.lon));
   }
 
   const row =

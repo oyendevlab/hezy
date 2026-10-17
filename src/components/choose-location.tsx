@@ -22,10 +22,8 @@ export function ChooseLocation({ onChosen }: { onChosen?: () => void }) {
       setError(t(GEO_ERROR_MESSAGE[result.reason]));
       return;
     }
-    updatePrefs((p) => ({
-      ...p,
-      current: gpsToLocation(result.lat, result.lon),
-    }));
+    const current = await gpsToLocation(result.lat, result.lon);
+    updatePrefs((p) => ({ ...p, current }));
     onChosen?.();
   }
 

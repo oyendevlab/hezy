@@ -1,12 +1,25 @@
 import { describe, expect, it } from "vitest";
 import {
+  MET_STATES,
   metCondition,
   metDayFor,
   metFor,
+  metTargetFor,
   parseForecasts,
+  parseMetBundle,
   parseWarnings,
+  pickForecasts,
   warningSegments,
+  type MetTarget,
 } from "./metmalaysia";
+
+/** Sasaran peringkat negeri sahaja (seperti sebelum v0.8.11). */
+const stateTarget = (state: string): MetTarget => ({
+  state,
+  sources: [
+    { id: MET_STATES[state]?.forecastId ?? "-", kind: "state", name: state },
+  ],
+});
 
 // Format sebenar api.data.gov.my (16 Okt 2026), dipendekkan.
 const THUNDER_MS =
@@ -104,7 +117,12 @@ describe("metFor", () => {
   ]);
 
   it("amaran darat bagi negeri dengan daerahnya; amaran laut diabaikan", () => {
-    const met = metFor("selangor", warnings, forecasts, "2026-10-16T22:00");
+    const met = metFor(
+      stateTarget("selangor"),
+      warnings,
+      forecasts,
+      "2026-10-16T22:00",
+    );
     expect(met?.warnings).toHaveLength(1);
     expect(met?.warnings[0]).toMatchObject({
       title: { ms: "Amaran Ribut Petir", en: "Thunderstorms Warning" },
@@ -118,20 +136,30 @@ describe("metFor", () => {
 
   it("Wilayah dan Sarawak dipadankan; negeri tidak disebut tiada amaran", () => {
     expect(
-      metFor("kuala-lumpur", warnings, forecasts, "2026-10-16T22:00")
-        ?.warnings[0].area.ms,
+      metFor(
+        stateTarget("kuala-lumpur"),
+        warnings,
+        forecasts,
+        "2026-10-16T22:00",
+      )?.warnings[0].area.ms,
     ).toBe("W.P. Kuala Lumpur");
     expect(
-      metFor("sarawak", warnings, forecasts, "2026-10-16T22:00")?.warnings[0]
-        .area.ms,
+      metFor(stateTarget("sarawak"), warnings, forecasts, "2026-10-16T22:00")
+        ?.warnings[0].area.ms,
     ).toBe("Sarawak: Limbang, Miri, Kapit (Song dan Kapit)");
     expect(
-      metFor("johor", warnings, forecasts, "2026-10-16T22:00")?.warnings,
+      metFor(stateTarget("johor"), warnings, forecasts, "2026-10-16T22:00")
+        ?.warnings,
     ).toEqual([]);
   });
 
   it("amaran tamat tidak dipaparkan; ramalan hari ini ke hadapan sahaja", () => {
-    const met = metFor("selangor", warnings, forecasts, "2026-10-17T00:30");
+    const met = metFor(
+      stateTarget("selangor"),
+      warnings,
+      forecasts,
+      "2026-10-17T00:30",
+    );
     expect(met?.warnings).toEqual([]);
     expect(met?.forecast.map((d) => d.date)).toEqual(["2026-10-17"]);
     expect(met?.forecast[0]).toMatchObject({
@@ -139,7 +167,10 @@ describe("metFor", () => {
       max: 33,
       when: "Petang",
     });
-    expect(metFor("tiada", warnings, forecasts, "2026-10-17T00:30")).toBeNull();
+    expect(met?.area).toEqual({ kind: "state", name: "selangor" });
+    expect(
+      metFor(stateTarget("tiada"), warnings, forecasts, "2026-10-17T00:30"),
+    ).toBeNull();
   });
 });
 
@@ -191,5 +222,98 @@ describe("metCondition (v0.8.9)", () => {
     expect(metDayFor(days, "2026-10-18")?.max).toBe(33);
     expect(metDayFor(days, "2026-10-19")).toBeUndefined();
     expect(metDayFor(undefined, "2026-10-18")).toBeUndefined();
+  });
+});
+
+describe("lokasi ramalan (v0.8.11)", () => {
+  const day = (date: string, max: number) => ({
+    date,
+    morning: "Tiada Hujan",
+    afternoon: "Ribut petir",
+    night: "Tiada Hujan",
+    summary: "Ribut petir",
+    when: "Petang",
+    min: max - 8,
+    max,
+  });
+
+  it("tanah tinggi, kemudian daerah, kemudian negeri", () => {
+    const genting = metTargetFor(
+      { lat: 3.42, lon: 101.79 },
+      { district: "Bentong", state: "pahang", met: "Ds059" },
+      "Pahang",
+    );
+    expect(genting?.sources.map((s) => [s.id, s.kind])).toEqual([
+      ["Rc016", "zone"],
+      ["Ds059", "district"],
+      ["St007", "state"],
+    ]);
+    const cameron = metTargetFor(
+      { lat: 4.47, lon: 101.38 },
+      { district: "Cameron Highlands", state: "pahang", met: "Ds038" },
+      "Pahang",
+    );
+    expect(cameron?.sources.map((s) => s.id)).toEqual(["Ds038", "St007"]);
+    expect(
+      metTargetFor(
+        { lat: 3, lon: 101 },
+        { district: "x", state: "atlantis", met: null },
+        "x",
+      ),
+    ).toBeNull();
+  });
+
+  it("metFor guna lokasi pertama yang ada data", () => {
+    const target = metTargetFor(
+      { lat: 4.47, lon: 101.38 },
+      { district: "Cameron Highlands", state: "pahang", met: "Ds038" },
+      "Pahang",
+    )!;
+    const forecasts = {
+      Ds038: [day("2026-10-18", 24)],
+      St007: [day("2026-10-18", 34)],
+    };
+    const met = metFor(target, [], forecasts, "2026-10-18T08:00");
+    expect(met?.area).toEqual({ kind: "district", name: "Cameron Highlands" });
+    expect(met?.forecast[0].max).toBe(24);
+    const fallback = metFor(
+      target,
+      [],
+      { St007: forecasts.St007 },
+      "2026-10-18T08:00",
+    );
+    expect(fallback?.area).toEqual({ kind: "state", name: "Pahang" });
+    expect(metFor(target, [], {}, "2026-10-18T08:00")?.forecast).toEqual([]);
+  });
+
+  it("pickForecasts menyimpan lokasi yang digunakan dari hari ini sahaja", () => {
+    const picked = pickForecasts(
+      {
+        St007: [day("2026-10-17", 33), day("2026-10-18", 34)],
+        Ds038: [day("2026-10-18", 24)],
+        Rc016: [day("2026-10-18", 25)],
+        Rc001: [day("2026-10-18", 32)],
+        Tn141: [day("2026-10-18", 30)],
+        Tn001: [day("2026-10-18", 32)],
+        Dv501: [day("2026-10-18", 32)],
+        St001: [day("2026-10-16", 32)],
+      },
+      "2026-10-18",
+    );
+    expect(Object.keys(picked).sort()).toEqual([
+      "Ds038",
+      "Rc016",
+      "St007",
+      "Tn141",
+    ]);
+    expect(picked.St007.map((d) => d.date)).toEqual(["2026-10-18"]);
+  });
+
+  it("parseMetBundle menolak bentuk lain", () => {
+    expect(
+      parseMetBundle({ warnings: [], forecasts: {}, fetchedAt: "x" }),
+    ).toEqual({ warnings: [], forecasts: {}, fetchedAt: "x" });
+    expect(() => parseMetBundle({ error: "x" })).toThrow();
+    expect(() => parseMetBundle(null)).toThrow();
   });
 });

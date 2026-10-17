@@ -284,6 +284,14 @@ Buka **https://hezy.my** pada telefon.
 - [ ] Lokasi dengan stesen (cth. Putrajaya) sentiasa "Rasmi · APIMS", termasuk sejurus selepas kemas kini aplikasi
 - [ ] Jika sekali-sekala "Anggaran model" muncul untuk lokasi berstesen, ia kembali kepada "Rasmi · APIMS" sendiri dalam ~1–2 minit (tanpa tarik untuk muat semula)
 
+## v0.8.11 — lokasi lebih tepat
+
+- [ ] Cameron Highlands: Utama "Anggaran tanah tinggi"; ⓘ sumber menyebut tanah tinggi ~1,400 m dan Tasek Ipoh sebagai stesen tanah rendah; amaran MetMalaysia ialah amaran Pahang
+- [ ] Cameron Highlands: Ramalan harian ~24°/16° dan ⓘ Ramalan rasmi MetMalaysia "Ramalan daerah Cameron Highlands, Pahang"
+- [ ] Lokasi (peta) di Cameron Highlands: nota tanah tinggi di atas STESEN TERDEKAT
+- [ ] Kajang/Ampang/Cyberjaya: ramalan MetMalaysia Selangor (daerah Hulu Langat/Sepang), bukan Putrajaya atau KL
+- [ ] GPS di kawasan jauh dari bandar senarai (cth. Mersing): nama lokasi ialah daerah, keterangan negeri betul
+
 ## Jika ada masalah
 
 Ambil tangkapan skrin dan catat model telefon serta versi OS, kemudian buka isu di

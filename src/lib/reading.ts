@@ -107,13 +107,18 @@ export type Reading = {
   accuracy?: AccuracySummary | null;
   /** Pembetulan ramalan dengan bacaan APIMS; tiada dalam bacaan lama tersimpan. */
   correction?: Correction | null;
-  /** Amaran dan ramalan rasmi MetMalaysia bagi negeri lokasi (v0.8.6); diisi oleh route API. */
+  /** Amaran negeri dan ramalan MetMalaysia bagi lokasi (v0.8.6; daerah sejak v0.8.11); diisi oleh route API. */
   met?: MetReading | null;
   /**
    * Tiada bacaan rasmi dalam 30 km: anggaran dibetulkan dengan bias stesen APIMS berdekatan
    * (IDW, v0.8.5). Diisi oleh route API.
    */
   spatial?: { stations: number; nearestName: string; nearestKm: number } | null;
+  /**
+   * Lokasi di kawasan tanah tinggi (v0.8.11): stesen APIMS tanah rendah tidak dianggap bacaan
+   * rasmi di sini. Diisi oleh route API.
+   */
+  highland?: { name: string; elevationM: number } | null;
   /**
    * Sumber pilihan (cuaca, titik panas, ketepatan, sejarah rasmi) lambat dan ditinggalkan;
    * klien mengambil semula tidak lama kemudian (v0.8.2). Diisi oleh route API.

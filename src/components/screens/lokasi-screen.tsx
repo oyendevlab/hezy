@@ -334,11 +334,15 @@ function SheetAddFavourite() {
   );
 }
 
-/** Keterangan lokasi; lokasi GPS memaparkan negeri, bukan "Lokasi semasa" (tanda SEMASA cukup). */
+/**
+ * Keterangan lokasi; lokasi GPS memaparkan negeri, bukan "Lokasi semasa" (tanda SEMASA cukup).
+ * Sejak v0.8.11 lokasi GPS menyimpan negeri ikut sempadan; yang lama diteka daripada kawasan.
+ */
 function locationDetail(location: SavedLocation): string | undefined {
-  return location.source === "gps"
-    ? nearestArea(location.lat, location.lon).state
-    : location.detail;
+  if (location.source !== "gps") return location.detail;
+  return location.detail && location.detail !== "Lokasi semasa"
+    ? location.detail
+    : nearestArea(location.lat, location.lon).state;
 }
 
 /** Nama lokasi + IPU semasa; klik untuk jadikan lokasi semasa. */

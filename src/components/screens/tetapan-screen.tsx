@@ -161,6 +161,10 @@ export function TetapanScreen() {
                   label={t("Cuaca rasmi")}
                   value="MetMalaysia (data.gov.my)"
                 />
+                <Row
+                  label={t("Sempadan daerah")}
+                  value="geoBoundaries · © OpenStreetMap"
+                />
                 <AccuracyRows />
               </div>
             </section>

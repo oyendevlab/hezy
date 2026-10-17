@@ -98,6 +98,25 @@ const checks = [
     },
   },
   {
+    name: "MetMalaysia: /api/met",
+    async run() {
+      const { status, body } = await getJson("/api/met");
+      if (status !== 200)
+        return `status ${status}: ${body?.error ?? "tiada mesej"}`;
+      const ids = Object.keys(body?.forecasts ?? {});
+      if (!ids.some((id) => id.startsWith("Ds")))
+        return `tiada ramalan daerah (${ids.length} lokasi)`;
+      const age = (Date.now() - Date.parse(body.fetchedAt)) / 3_600_000;
+      // CDN 15 min + stale-while-revalidate: salinan > 6 jam bermakna data.gov.my gagal lama.
+      if (!(age <= 6))
+        return `salinan MetMalaysia berusia ${Math.round(age)} jam`;
+      console.log(
+        `   ${ids.length} lokasi ramalan, ${body.warnings.length} amaran, salinan ${Math.round(age * 60)} min`,
+      );
+      return null;
+    },
+  },
+  {
     name: "Titik panas: /api/hotspots (NASA FIRMS)",
     async run() {
       const { status, body } = await getJson("/api/hotspots");
