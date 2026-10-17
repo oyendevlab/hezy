@@ -22,13 +22,17 @@ export type OfficialReading = {
 const hoursBetween = (a: string, b: string) =>
   (Date.parse(`${b}:00Z`) - Date.parse(`${a}:00Z`)) / 3_600_000;
 
-/** Bacaan rasmi stesen terdekat, atau null jika tiada stesen dekat dengan bacaan terkini. */
+/**
+ * Bacaan rasmi stesen terdekat, atau null jika tiada stesen dalam `maxKm` dengan bacaan
+ * terkini. `maxKm` lebih jauh hanya untuk rujukan (cth. stesen terdekat tanah tinggi, v0.8.12).
+ */
 export function officialFor(
   stations: readonly Station[],
   point: { lat: number; lon: number },
   nowKey: string,
+  maxKm = OFFICIAL_MAX_KM,
 ): OfficialReading | null {
-  const nearest = nearestStation(stations, point, OFFICIAL_MAX_KM);
+  const nearest = nearestStation(stations, point, maxKm);
   const ipu = nearest?.station.ipu ?? null;
   const time = nearest?.station.time ?? null;
   if (!nearest || ipu === null || time === null) return null;

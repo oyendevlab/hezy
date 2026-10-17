@@ -45,9 +45,9 @@ describe("formatWindow", () => {
 
 describe("formatChange", () => {
   it.each([
-    [12, "Naik 12 dalam 3 jam"],
-    [-4, "Turun 4 dalam 3 jam"],
-    [0, "Stabil dalam 3 jam"],
+    [12, "Naik 12 berbanding 3 jam lalu"],
+    [-4, "Turun 4 berbanding 3 jam lalu"],
+    [0, "Sama seperti 3 jam lalu"],
     [null, null],
   ])("%s → %s", (change, label) => {
     expect(formatChange(change)).toBe(label);
@@ -74,8 +74,8 @@ describe("format EN", () => {
     expect(
       formatWindow("2026-10-11T11:00", "2026-10-11T13:00", "2026-10-11", "en"),
     ).toBe("11 AM – 1 PM");
-    expect(formatChange(12, "en")).toBe("Up 12 in 3 hours");
-    expect(formatChange(0, "en")).toBe("Steady over 3 hours");
+    expect(formatChange(12, "en")).toBe("Up 12 from 3 hours ago");
+    expect(formatChange(0, "en")).toBe("Same as 3 hours ago");
     expect(formatDay("2026-10-14", "2026-10-11", "en")).toBe("Wed 14/10");
     expect(formatDay("2026-10-12", "2026-10-11", "en")).toBe("Tomorrow");
   });

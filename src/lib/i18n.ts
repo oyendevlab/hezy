@@ -1001,13 +1001,18 @@ const EN: Record<string, string> = {
     "No APIMS station within 30 km · nearest {station} ({km} km)",
   "Anggaran dibetulkan · dikemas kini {time}":
     "Corrected estimate · updated {time}",
-  "Anggaran tanah tinggi · dikemas kini {time}":
-    "Highland estimate · updated {time}",
   Kawasan: "Area",
+  "Anggaran · tanah tinggi": "Estimate · highlands",
+  "Terdekat: {station}": "Nearest: {station}",
+  "{km} km, tanah rendah": "{km} km, lowland",
+  "Tiada stesen APIMS di tanah tinggi · terdekat {station}, IPU {ipu} ({km} km, tanah rendah)":
+    "No APIMS station in the highlands · nearest {station}, API {ipu} ({km} km, lowland)",
+  "Model sahaja": "Model only",
+  "IPU {n} sebelum pembetulan": "API {n} before correction",
+  Perubahan: "Change",
+  "Dikemas kini {time}": "Updated {time}",
   "{name}, tanah tinggi ~{m} m": "{name}, highlands ~{m} m",
   "Tiada stesen APIMS di tanah tinggi": "No APIMS station in the highlands",
-  "Tiada stesen APIMS di tanah tinggi · terdekat {station} ({km} km, tanah rendah)":
-    "No APIMS station in the highlands · nearest {station} ({km} km, lowland)",
   "Lokasi ini di tanah tinggi, jauh di atas semua stesen APIMS berdekatan, jadi bacaan stesen tanah rendah tidak mewakili udara di sini. Nombor utama ialah anggaran model CAMS di koordinat anda yang dibetulkan dengan bacaan rasmi stesen berdekatan.":
     "This location is in the highlands, far above all nearby APIMS stations, so lowland station readings do not represent the air here. The main number is the CAMS model estimate at your coordinates, corrected with official readings from nearby stations.",
   "{name} di tanah tinggi (~{m} m); semua stesen APIMS di tanah rendah, jadi bacaannya mungkin tidak mewakili udara di sana.":
@@ -1022,6 +1027,11 @@ const EN: Record<string, string> = {
   "Bacaan rasmi terbaharu muncul lebih cepat selepas JAS menerbitkannya":
     "The latest official reading appears sooner after the DOE publishes it",
   "Bacaan rasmi lebih stabil": "More stable official readings",
+  "Anggaran tanah tinggi lebih jelas": "Clearer highland estimates",
+  "Di tanah tinggi, kad Utama menerangkan nombor ialah anggaran dan memaparkan bacaan stesen terdekat":
+    "In the highlands, the Home card explains the number is an estimate and shows the nearest station reading",
+  "Perubahan 3 jam kini dalam ⓘ sumber bacaan supaya kad lebih kemas":
+    "The 3-hour change is now in the reading source ⓘ for a tidier card",
   "Lokasi lebih tepat: negeri, daerah dan tanah tinggi":
     "More accurate locations: state, district and highlands",
   "Negeri dan ramalan MetMalaysia ikut sempadan sebenar dan daerah anda (cth. Cameron Highlands 16–24°C, bukan ramalan Perak)":

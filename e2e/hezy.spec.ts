@@ -93,9 +93,18 @@ test.describe("aliran utama", () => {
     await expect(
       page.getByRole("heading", { name: "IPU 156, Tidak Sihat" }),
     ).toBeVisible();
+    // Perubahan 3 jam dalam ⓘ sumber sejak v0.8.12, bukan di kad.
+    await expect(page.getByText(/berbanding 3 jam lalu/)).toHaveCount(0);
+    await page
+      .getByRole("button", { name: "Butiran sumber bacaan" })
+      .filter({ visible: true })
+      .click();
     await expect(
-      page.getByText("Naik 12 dalam 3 jam").filter({ visible: true }),
+      page
+        .getByRole("dialog", { name: "Sumber bacaan" })
+        .getByText("Naik 12 berbanding 3 jam lalu"),
     ).toBeVisible();
+    await page.keyboard.press("Escape");
     await expect(
       page
         .getByRole("navigation", { name: "Navigasi utama" })
@@ -2662,5 +2671,62 @@ test.describe("Privasi dan penafian v0.7.12", () => {
     await expect(page.getByTestId("disclaimer-sheet")).toContainText(
       "Status sekolah hanya panduan",
     );
+  });
+});
+
+test.describe("Kad tanah tinggi v0.8.12", () => {
+  test("anggaran dengan sebab dan stesen terdekat kecil; perubahan dalam ⓘ", async ({
+    page,
+  }) => {
+    await seedLocation(page);
+    await page.route("**/api/aqi?**", (route) =>
+      route.fulfill({
+        json: {
+          ...fakeReading(null),
+          current: {
+            time: "2026-10-11T10:00",
+            ipu: 75,
+            category: "sederhana",
+            label: "Sederhana",
+            emergency: false,
+            pm25Average: 43.6,
+          },
+          change3h: -1,
+          spatial: {
+            stations: 5,
+            nearestName: "Tasek Ipoh",
+            nearestKm: 34,
+            modelIpu: 55,
+          },
+          highland: {
+            name: "Cameron Highlands",
+            elevationM: 1400,
+            station: { name: "Tasek Ipoh", km: 34, ipu: 90 },
+          },
+        },
+      }),
+    );
+    await page.goto("/");
+    await expect(
+      page.getByText("Anggaran · tanah tinggi").filter({ visible: true }),
+    ).toBeVisible();
+    const line = page.getByTestId("highland-line").filter({ visible: true });
+    await expect(line).toContainText("Tiada stesen APIMS di tanah tinggi");
+    await expect(line).toContainText("Terdekat: Tasek Ipoh");
+    await expect(line).toContainText("90");
+    await expect(line).toContainText("34 km, tanah rendah");
+    await expect(page.getByText(/3 jam lalu/)).toHaveCount(0);
+
+    await page
+      .getByRole("button", { name: "Butiran sumber bacaan" })
+      .filter({ visible: true })
+      .click();
+    const sheet = page.getByRole("dialog", { name: "Sumber bacaan" });
+    await expect(sheet).toContainText(
+      "Cameron Highlands, tanah tinggi ~1,400 m",
+    );
+    await expect(sheet).toContainText("IPU 55 sebelum pembetulan");
+    await expect(sheet).toContainText("Turun 1 berbanding 3 jam lalu");
+    await expect(sheet).toContainText("terdekat Tasek Ipoh, IPU 90");
   });
 });
