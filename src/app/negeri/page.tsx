@@ -7,7 +7,7 @@ import { Notice } from "@/components/status";
 import { T } from "@/components/t";
 import type { Station } from "@/lib/apims";
 import { statesInMapOrder, type State } from "@/lib/areas";
-import { getStations } from "@/lib/data";
+import { getStationsResult } from "@/lib/data";
 import { ipuCategory } from "@/lib/ipu";
 import { PageTransition } from "@/components/page-transition";
 
@@ -27,12 +27,8 @@ export default function NegeriIndexPage() {
 }
 
 async function NegeriIndex() {
-  let stations: Station[] | null;
-  try {
-    stations = await getStations();
-  } catch {
-    stations = null;
-  }
+  // null bila APIMS gagal: notis, dijana semula ~1 minit (v0.8.13).
+  const { stations } = await getStationsResult();
   const { states, territories } = statesInMapOrder();
 
   return (

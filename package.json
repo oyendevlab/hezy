@@ -1,10 +1,11 @@
 {
   "name": "hezy",
-  "version": "0.8.12",
+  "version": "0.8.13",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:tanpa-sumber": "NODE_OPTIONS='--require ./scripts/sekat-sumber.cjs' next build",
     "start": "next start",
     "lint": "eslint",
     "typecheck": "next typegen && tsc --noEmit",

@@ -298,6 +298,13 @@ Buka **https://hezy.my** pada telefon.
 - [ ] Kad tidak lagi memaparkan "Turun/Naik … dalam 3 jam"; ⓘ sumber bacaan memaparkan "Perubahan: Turun 1 berbanding 3 jam lalu" dan "Model sahaja"
 - [ ] Lokasi biasa (Putrajaya, KL) tidak berubah; lokasi tanpa stesen bukan tanah tinggi (cth. Mersing) kekal "Anggaran dibetulkan"
 
+## v0.8.13 — halaman negeri tahan gangguan
+
+- [ ] Lokasi → IPU mengikut negeri: setiap negeri memaparkan bilangan stesen dan IPU maksimum (bukan notis "Data APIMS tidak dapat diambil")
+- [ ] Buka beberapa negeri (cth. Johor, Labuan, Perlis): jadual stesen dan "bacaan terkini" jam semasa dipaparkan
+- [ ] Utama (skrin alu-aluan): jalur "Malaysia sekarang" dipaparkan seperti biasa
+- [ ] Jika notis "Data APIMS tidak dapat diambil" muncul semasa APIMS terganggu, muat semula selepas ~1 minit: bacaan rasmi kembali sendiri
+
 ## Jika ada masalah
 
 Ambil tangkapan skrin dan catat model telefon serta versi OS, kemudian buka isu di

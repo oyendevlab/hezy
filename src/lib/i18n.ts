@@ -1028,6 +1028,12 @@ const EN: Record<string, string> = {
     "The latest official reading appears sooner after the DOE publishes it",
   "Bacaan rasmi lebih stabil": "More stable official readings",
   "Anggaran tanah tinggi lebih jelas": "Clearer highland estimates",
+  "Halaman negeri lebih tahan gangguan":
+    "State pages hold up better in outages",
+  "Bila APIMS terganggu, halaman IPU negeri memaparkan notis dan dimuat semula dengan bacaan rasmi dalam kira-kira seminit":
+    "When APIMS has an outage, state IPU pages show a notice and reload with official readings in about a minute",
+  "Kemas kini Hezy tidak lagi gagal bila sumber data luar lambat":
+    "Hezy updates no longer fail when external data sources are slow",
   "Di tanah tinggi, kad Utama menerangkan nombor ialah anggaran dan memaparkan bacaan stesen terdekat":
     "In the highlands, the Home card explains the number is an estimate and shows the nearest station reading",
   "Perubahan 3 jam kini dalam ⓘ sumber bacaan supaya kad lebih kemas":
