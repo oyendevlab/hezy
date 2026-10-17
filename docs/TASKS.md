@@ -644,8 +644,9 @@ Penemuan 16 Okt 2026: GitHub Actions menggugurkan dan melewatkan larian berjadua
 4. ✅ `scripts/monitor.mjs` (pantau harian): kira larian `push-check.yml` 24 jam lepas melalui API GitHub dan gagal (buka issue) bila jurang terbesar lebih 2 jam (diuji tempatan: 5 larian dalam 24 jam, jurang 5.8 jam → gagal); log ketepatan turut memaparkan model E (bayang)
 5. ✅ Ujian (294 unit, 186 E2E), versi 0.8.4, Apa yang baharu (dengan terjemahan EN), tag dan GitHub Release
 6. ✅ Selepas deployment: 5 cron Vercel didaftarkan pada URL deployment (bukan alias `hezy.vercel.app` yang mengubah hala), query `?back=1` dikekalkan; ujian `vercel crons run /api/history/collect?back=1` → 200 (melepasi perlindungan deployment, `CRON_SECRET` sah)
-7. ⬜ Semak 17 Okt: bilangan larian `push-check.yml` dan jurang terbesar dalam 24 jam (laporan `pantau.yml`), serta larian cron Vercel pertama dalam log
-8. ⬜ Jika jurang masih > 2 jam selepas seminggu: pertimbangkan penjadual luar (cron-job.org/QStash) atau Vercel Pro
+7. ✅ Semak 17 Okt (22:50): `push-check.yml` hanya **7 daripada 96** larian berjadual dalam 24 jam (semua berjaya), jurang terbesar 4.8 jam; `pantau.yml` mengesannya dan membuka isu #139 (5.8 jam, 6 larian). Cron Vercel: 5 jadual aktif (`vercel crons list`); `accuracy/run` disahkan berjalan (indeks dikemas kini 13:21 UTC, dalam tetingkap ±59 min, tanpa larian GitHub hari itu); larian `push/check` Vercel tidak dapat disahkan kerana log Hobby hanya ~1 jam. Kesimpulan: jadual GitHub tidak boleh diharap untuk amaran
+8. ⬜ Keputusan pengguna: penjadual luar percuma (cth. cron-job.org, setiap 15 min, rahsia khas untuk `/api/push/check` sahaja) — perlu akaun dan rahsia dimasukkan oleh pengguna sendiri; atau terima kelewatan amaran sehingga ~5 jam
+9. ⬜ Jika jurang masih > 2 jam selepas seminggu: pertimbangkan penjadual luar (cron-job.org/QStash) atau Vercel Pro
 
 ## Fasa 36 — v0.8.5 (anggaran kawasan tanpa stesen, cache ikut jadual APIMS; 16 Okt 2026)
 
@@ -694,7 +695,7 @@ Backtest (7 hari, 68 stesen; MAE / % tahap betul):
 2. ✅ Ujian dikemas kini (kembali ke model selepas 168 + 24 jam; reput bias ruang)
 3. ✅ Dokumen kaedah (komen kod, AUDIT-0.8.md) dikemas kini
 4. ✅ Semakan data sebenar (06:57; purata harian Esok → hari ke-4): KL 141→102→93→88 menjadi 154→133→135→123, Melaka 135→88→70→73 menjadi 149→116→106→107, Mersing 83→74→67→67 menjadi 88→85→84→84; jam awal tidak berubah. Versi 0.8.8, Apa yang baharu (BM/EN), tag dan GitHub Release
-5. ⬜ Pantau: perbandingan malam `forecastJas`; kaveat — bila jerebu reda dengan cepat, reput perlahan boleh terlebih anggar (backtest hanya satu minggu musim jerebu)
+5. ⬜ Pantau: perbandingan malam `forecastJas`; kaveat — bila jerebu reda dengan cepat, reput perlahan boleh terlebih anggar (backtest hanya satu minggu musim jerebu). Semakan 17 Okt: `/api/accuracy` `forecastJas` null, `jasDays` 0 — dijangka, kerana ramalan dinilai lusa. Snapshot dengan model E sudah tersimpan untuk 17 Okt (68 stesen, reput 72 j) dan 18 Okt (68 stesen, reput 168 j); keputusan pertama malam 18 Okt, cukup ≥ 3 hari untuk dipaparkan malam 20 Okt
 
 ## Fasa 40 — v0.8.9 (Ramalan harian guna MetMalaysia, bahagian MetMalaysia diseragamkan; 17 Okt 2026)
 
