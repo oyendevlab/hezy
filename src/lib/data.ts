@@ -52,6 +52,7 @@ export async function getAirQuality(
   cacheLife({ stale: 600, revalidate: 3600, expire: 21600 });
 
   const res = await fetch(airQualityUrl(lat, lon), {
+    cache: "no-store",
     signal: AbortSignal.timeout(10_000),
   });
   if (!res.ok) {
@@ -109,6 +110,7 @@ export async function getStationModels(
   const lists = await Promise.all(
     chunks.map(async (chunk) => {
       const res = await fetch(airQualityMultiUrl(chunk, 2, 1), {
+        cache: "no-store",
         signal: AbortSignal.timeout(15_000),
       });
       if (!res.ok)
@@ -121,27 +123,64 @@ export async function getStationModels(
 }
 
 /**
+ * Hayat cache bila APIMS gagal (v0.8.13): disegarkan selepas 1 minit. `stale` ≥ 30 s dan
+ * `expire` ≥ 5 min supaya entri masih boleh diprarender (bukan "dynamic hole" yang memerlukan
+ * Suspense di /negeri dan /).
+ */
+export const STATIONS_FAILURE_LIFE = { stale: 60, revalidate: 60, expire: 600 };
+
+/** Senarai stesen, atau `stations: null` dengan sebab bila APIMS gagal. */
+export type StationsResult =
+  { stations: Station[] } | { stations: null; error: string };
+
+/**
  * Senarai stesen APIMS dengan bacaan terkini (satu permintaan ke JAS bagi semua pengguna).
  * Tempoh cache ikut jadual terbitan APIMS (v0.8.5): 2 minit bila bacaan jam semasa dijangka,
  * jika tidak hingga beberapa minit selepas jam berikutnya.
+ *
+ * Tidak pernah ditolak (v0.8.13): ralat yang merentasi sempadan "use cache" semasa prarender
+ * build menggagalkan halaman yang berkongsi entri itu walaupun ralat ditangkap dalam halaman
+ * (CI 17 Okt 2026, `/negeri/johor` tamat masa APIMS). Kegagalan dicache sebagai "tiada data"
+ * dengan {@link STATIONS_FAILURE_LIFE}, jadi halaman memaparkan notis dan dijana semula ~1 minit.
  */
-export async function getStations(): Promise<Station[]> {
+export async function getStationsResult(): Promise<StationsResult> {
   "use cache";
-  // Cuba semula sekali bila APIMS memulangkan 5xx atau tamat masa (v0.8.10).
-  const res = await fetchWithRetry(APIMS_STATIONS_URL, {
-    headers: { "User-Agent": "Hezy (+https://hezy.my)" },
-    timeoutMs: 6000,
-  });
-  if (!res.ok) {
-    throw new Error(`APIMS memulangkan status ${res.status}`);
+  try {
+    // Cuba semula sekali bila APIMS memulangkan 5xx atau tamat masa (v0.8.10). `no-store`: semasa
+    // build, Next menyimpan fetch dalam cache fetch (.next/cache, dipulihkan antara build) dan
+    // mengesahkan semula entri lama tanpa `signal` — APIMS yang tergantung tidak pernah tamat masa
+    // dan build gagal selepas ~50 s. Entri "use cache" ini sendiri sudah cukup sebagai cache; fetch
+    // lain dalam fungsi "use cache" di fail ini juga `no-store` atas sebab yang sama.
+    const res = await fetchWithRetry(APIMS_STATIONS_URL, {
+      headers: { "User-Agent": "Hezy (+https://hezy.my)" },
+      cache: "no-store",
+      timeoutMs: 6000,
+    });
+    if (!res.ok) {
+      throw new Error(`APIMS memulangkan status ${res.status}`);
+    }
+    const stations = parseStations(await res.json());
+    cacheLife({
+      stale: 60,
+      revalidate: stationsRevalidateSeconds(stations, new Date()),
+      expire: 3600,
+    });
+    return { stations };
+  } catch (error) {
+    console.error("[data] APIMS gagal; senarai stesen kosong ~1 minit", error);
+    cacheLife(STATIONS_FAILURE_LIFE);
+    return {
+      stations: null,
+      error: error instanceof Error ? error.message : String(error),
+    };
   }
-  const stations = parseStations(await res.json());
-  cacheLife({
-    stale: 60,
-    revalidate: stationsRevalidateSeconds(stations, new Date()),
-    expire: 3600,
-  });
-  return stations;
+}
+
+/** {@link getStationsResult} yang melontar ralat bila APIMS gagal (untuk API dan sandaran). */
+export async function getStations(): Promise<Station[]> {
+  const result = await getStationsResult();
+  if (result.stations === null) throw new Error(result.error);
+  return result.stations;
 }
 
 /** Senarai stesen terakhir yang berjaya (setiap instans), untuk gangguan APIMS (v0.8.10). */
@@ -174,6 +213,7 @@ export async function getStateHistory(
 
   const res = await fetchWithRetry(apimsHourlyUrl(stateId, hourKey), {
     headers: { "User-Agent": "Hezy (+https://hezy.my)" },
+    cache: "no-store",
     timeoutMs: 6000,
   });
   if (!res.ok) {
@@ -242,7 +282,7 @@ export async function getWeather(
   // mengisi cache di latar belakang (v0.8.2).
   const res = await fetch(
     weatherUrl(Math.round(lat * 10) / 10, Math.round(lon * 10) / 10),
-    { signal: AbortSignal.timeout(15_000) },
+    { cache: "no-store", signal: AbortSignal.timeout(15_000) },
   );
   if (!res.ok)
     throw new Error(`Open-Meteo (cuaca) memulangkan status ${res.status}`);
@@ -254,6 +294,7 @@ export async function getWindGrid(): Promise<WindGrid> {
   "use cache";
   cacheLife({ stale: 1800, revalidate: 3600, expire: 10800 });
   const res = await fetch(windGridUrl(), {
+    cache: "no-store",
     signal: AbortSignal.timeout(10000),
   });
   if (!res.ok)
@@ -274,6 +315,7 @@ export async function getHotspots(): Promise<{
   const lists = await Promise.all(
     FIRMS_SOURCES.map(async (source) => {
       const res = await fetch(firmsUrl(key, source), {
+        cache: "no-store",
         signal: AbortSignal.timeout(20_000),
       });
       if (!res.ok) throw new Error(`FIRMS memulangkan status ${res.status}`);
@@ -295,7 +337,7 @@ export async function getHotspots(): Promise<{
 const lastGoodMet = createLastGoodStore<MetBundle>(1, 6 * 3600_000);
 
 async function metJson(url: string, label: string, timeoutMs: number) {
-  const res = await fetchWithRetry(url, { timeoutMs }, 1500);
+  const res = await fetchWithRetry(url, { cache: "no-store", timeoutMs }, 1500);
   if (!res.ok)
     throw new Error(`MetMalaysia (${label}) memulangkan status ${res.status}`);
   return (await res.json()) as unknown;
@@ -354,7 +396,10 @@ export async function getMetBundle(today: string): Promise<MetBundle> {
   const proxy = metProxyUrl();
   if (proxy) {
     try {
-      const res = await fetch(proxy, { signal: AbortSignal.timeout(4000) });
+      const res = await fetch(proxy, {
+        cache: "no-store",
+        signal: AbortSignal.timeout(4000),
+      });
       if (!res.ok) throw new Error(`/api/met memulangkan status ${res.status}`);
       return parseMetBundle(await res.json());
     } catch (error) {

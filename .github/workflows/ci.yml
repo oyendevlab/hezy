@@ -29,6 +29,12 @@ jobs:
       - run: npm run format:check
       - run: npm test
       - run: npm run build
+      # Build mesti lulus walaupun APIMS/Open-Meteo/MetMalaysia tergantung (v0.8.13; CI PR #142
+      # pernah gagal memprarender /negeri/johor kerana APIMS tamat masa).
+      - name: Build tanpa sumber luar (fetch tergantung hingga tamat masa)
+        run: npm run build:tanpa-sumber
+        env:
+          HEZY_SEKAT_MOD: tergantung
 
   e2e:
     name: Ujian E2E (Playwright)

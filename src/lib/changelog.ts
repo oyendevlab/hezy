@@ -13,6 +13,15 @@ export type Release = {
 
 export const CHANGELOG: readonly Release[] = [
   {
+    version: "0.8.13",
+    date: "2026-10-17",
+    title: "Halaman negeri lebih tahan gangguan",
+    items: [
+      "Bila APIMS terganggu, halaman IPU negeri memaparkan notis dan dimuat semula dengan bacaan rasmi dalam kira-kira seminit",
+      "Kemas kini Hezy tidak lagi gagal bila sumber data luar lambat",
+    ],
+  },
+  {
     version: "0.8.12",
     date: "2026-10-17",
     title: "Anggaran tanah tinggi lebih jelas",

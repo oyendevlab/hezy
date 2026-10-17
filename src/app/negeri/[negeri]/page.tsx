@@ -8,7 +8,7 @@ import { Notice, Skeleton } from "@/components/status";
 import { T } from "@/components/t";
 import type { Station } from "@/lib/apims";
 import { STATES, findState } from "@/lib/areas";
-import { getStations } from "@/lib/data";
+import { getStationsResult } from "@/lib/data";
 import { ipuCategory } from "@/lib/ipu";
 import { buildStateCardPath } from "@/lib/state-card";
 import { PageTransition } from "@/components/page-transition";
@@ -38,12 +38,10 @@ export async function generateMetadata({
   };
 }
 
+/** Stesen negeri, atau null bila APIMS gagal (notis; dijana semula ~1 minit, v0.8.13). */
 async function stationsFor(apimsStateId: number): Promise<Station[] | null> {
-  try {
-    return (await getStations()).filter((s) => s.stateId === apimsStateId);
-  } catch {
-    return null;
-  }
+  const { stations } = await getStationsResult();
+  return stations?.filter((s) => s.stateId === apimsStateId) ?? null;
 }
 
 async function StateContent({
