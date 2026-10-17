@@ -749,4 +749,4 @@ Soalan pengguna 17 Okt 2026: Cameron Highlands 75 di Hezy tetapi Tasek Ipoh 90 d
 2. ✅ Kad Utama (tanah tinggi sahaja): label "Anggaran · tanah tinggi"; baris berikon gunung "Tiada stesen APIMS di tanah tinggi" + "Terdekat: Tasek Ipoh ● 90 · 34 km, tanah rendah" (ketinggian dalam ⓘ supaya satu baris di telefon 375 px)
 3. ✅ ⓘ Sumber bacaan: baris "Model sahaja" (sebelum pembetulan) bagi anggaran dibetulkan
 4. ✅ Perubahan 3 jam dibuang dari kad dan dipaparkan dalam ⓘ sebagai "Turun 1 berbanding 3 jam lalu" (semua anggaran)
-5. ⬜ Ujian, semakan visual, versi 0.8.12, Apa yang baharu (BM/EN), tag dan GitHub Release
+5. ✅ Ujian (330 unit, E2E 192 lulus termasuk "Kad tanah tinggi v0.8.12"), semakan visual 375 px, versi 0.8.12, Apa yang baharu (BM/EN), tag dan GitHub Release (PR #142; E2E CI gagal sekali kerana prarender `/negeri/johor` tamat masa sumber luar, lulus bila dijalankan semula). Production: Cameron 75 dengan rujukan Tasek Ipoh 90, model sahaja 55, perubahan −1; Genting 111 dengan rujukan Batu Muda 160
