@@ -740,3 +740,13 @@ Audit (122 titik: 52 kawasan + 70 bandar; sempadan geoBoundaries; 68 stesen APIM
 5. ✅ Tanah tinggi: jadual tetap 10 kawasan (`highlands.ts`: Cameron, Genting, Bukit Fraser, Bukit Bendera, Bukit Larut, Gunung Jerai, Kundasang, Taman Kinabalu, Bario, Ba'kelalan) — API ketinggian Open-Meteo 503 semasa gangguan, jadi tidak digunakan masa larian. Stesen tanah rendah bukan bacaan rasmi di situ; anggaran dibetulkan + penjelasan di ⓘ sumber dan nota di STESEN TERDEKAT
 6. ✅ Nama lokasi GPS: kawasan senarai jika ≤ 15 km, jika tidak nama daerah; negeri ikut sempadan
 7. ✅ Ujian (330 unit, E2E 190 lulus), versi 0.8.11, Apa yang baharu (BM/EN), tag dan GitHub Release (PR #140). Production disahkan: `/api/met` CDN HIT (189 lokasi, 4 amaran); Cameron Highlands Pahang, daerah 16–24°C, tanah tinggi (terdekat Tasek Ipoh); Genting zon 18–25°C; Kajang dan Ampang Selangor (Hulu Langat); Mersing Johor; Putrajaya rasmi 167; semua respons lengkap (tidak separa), tiada ralat dalam log
+
+## Fasa 43 — v0.8.12 (kad Utama tanah tinggi; 17 Okt 2026)
+
+Soalan pengguna 17 Okt 2026: Cameron Highlands 75 di Hezy tetapi Tasek Ipoh 90 di MyEQMS — mengapa berbeza? Kiraan (21:00): model CAMS di Cameron 17.2 µg/m³ (IPU 55) + pembetulan stesen berdekatan +26.4 (Tasek Ipoh +40.3, Pegoh Ipoh +25.7; dipudarkan 17% kerana 34 km) = 43.6 µg/m³ = IPU 75. Beza juga besar di Genting (111 vs Batu Muda 160). Keputusan pengguna: terangkan dengan jelas di kad bahawa ini anggaran, dengan sebab dan bacaan stesen terdekat dalam tulisan kecil — kes tanah tinggi sahaja; "Turun 1 dalam 3 jam" dipindah ke ⓘ supaya kad lebih kemas.
+
+1. ✅ Pelayan: `reading.highland.station` (stesen terdekat dengan bacaan: nama, IPU, jarak) dan `reading.spatial.modelIpu` (model sebelum pembetulan)
+2. ✅ Kad Utama (tanah tinggi sahaja): label "Anggaran · tanah tinggi"; baris berikon gunung "Tiada stesen APIMS di tanah tinggi" + "Terdekat: Tasek Ipoh ● 90 · 34 km, tanah rendah" (ketinggian dalam ⓘ supaya satu baris di telefon 375 px)
+3. ✅ ⓘ Sumber bacaan: baris "Model sahaja" (sebelum pembetulan) bagi anggaran dibetulkan
+4. ✅ Perubahan 3 jam dibuang dari kad dan dipaparkan dalam ⓘ sebagai "Turun 1 berbanding 3 jam lalu" (semua anggaran)
+5. ⬜ Ujian, semakan visual, versi 0.8.12, Apa yang baharu (BM/EN), tag dan GitHub Release

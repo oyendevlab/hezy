@@ -13,6 +13,15 @@ export type Release = {
 
 export const CHANGELOG: readonly Release[] = [
   {
+    version: "0.8.12",
+    date: "2026-10-17",
+    title: "Anggaran tanah tinggi lebih jelas",
+    items: [
+      "Di tanah tinggi, kad Utama menerangkan nombor ialah anggaran dan memaparkan bacaan stesen terdekat",
+      "Perubahan 3 jam kini dalam ⓘ sumber bacaan supaya kad lebih kemas",
+    ],
+  },
+  {
     version: "0.8.11",
     date: "2026-10-17",
     title: "Lokasi lebih tepat: negeri, daerah dan tanah tinggi",

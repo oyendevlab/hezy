@@ -51,11 +51,11 @@ export function formatChange(
 ): string | null {
   if (change === null) return null;
   if (lang === "en") {
-    if (change === 0) return "Steady over 3 hours";
-    return `${change > 0 ? "Up" : "Down"} ${Math.abs(change)} in 3 hours`;
+    if (change === 0) return "Same as 3 hours ago";
+    return `${change > 0 ? "Up" : "Down"} ${Math.abs(change)} from 3 hours ago`;
   }
-  if (change === 0) return "Stabil dalam 3 jam";
-  return `${change > 0 ? "Naik" : "Turun"} ${Math.abs(change)} dalam 3 jam`;
+  if (change === 0) return "Sama seperti 3 jam lalu";
+  return `${change > 0 ? "Naik" : "Turun"} ${Math.abs(change)} berbanding 3 jam lalu`;
 }
 
 const DAY_NAMES: Record<Lang, string[]> = {

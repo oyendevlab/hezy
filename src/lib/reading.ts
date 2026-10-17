@@ -113,12 +113,23 @@ export type Reading = {
    * Tiada bacaan rasmi dalam 30 km: anggaran dibetulkan dengan bias stesen APIMS berdekatan
    * (IDW, v0.8.5). Diisi oleh route API.
    */
-  spatial?: { stations: number; nearestName: string; nearestKm: number } | null;
+  spatial?: {
+    stations: number;
+    nearestName: string;
+    nearestKm: number;
+    /** IPU model pada jam semasa sebelum pembetulan (v0.8.12); tiada dalam bacaan lama. */
+    modelIpu?: number | null;
+  } | null;
   /**
    * Lokasi di kawasan tanah tinggi (v0.8.11): stesen APIMS tanah rendah tidak dianggap bacaan
    * rasmi di sini. Diisi oleh route API.
    */
-  highland?: { name: string; elevationM: number } | null;
+  highland?: {
+    name: string;
+    elevationM: number;
+    /** Stesen terdekat dengan bacaan terkini (≤ 150 km), rujukan sahaja (v0.8.12). */
+    station?: { name: string; km: number; ipu: number } | null;
+  } | null;
   /**
    * Sumber pilihan (cuaca, titik panas, ketepatan, sejarah rasmi) lambat dan ditinggalkan;
    * klien mengambil semula tidak lama kemudian (v0.8.2). Diisi oleh route API.

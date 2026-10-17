@@ -292,6 +292,12 @@ Buka **https://hezy.my** pada telefon.
 - [ ] Kajang/Ampang/Cyberjaya: ramalan MetMalaysia Selangor (daerah Hulu Langat/Sepang), bukan Putrajaya atau KL
 - [ ] GPS di kawasan jauh dari bandar senarai (cth. Mersing): nama lokasi ialah daerah, keterangan negeri betul
 
+## v0.8.12 — kad tanah tinggi
+
+- [ ] Cameron Highlands / Genting: label "Anggaran · tanah tinggi" dan baris berikon gunung "Tiada stesen APIMS di tanah tinggi" dengan "Terdekat: Tasek Ipoh ● 90 · 34 km, tanah rendah" (Genting: Batu Muda), tidak terbalut janggal
+- [ ] Kad tidak lagi memaparkan "Turun/Naik … dalam 3 jam"; ⓘ sumber bacaan memaparkan "Perubahan: Turun 1 berbanding 3 jam lalu" dan "Model sahaja"
+- [ ] Lokasi biasa (Putrajaya, KL) tidak berubah; lokasi tanpa stesen bukan tanah tinggi (cth. Mersing) kekal "Anggaran dibetulkan"
+
 ## Jika ada masalah
 
 Ambil tangkapan skrin dan catat model telefon serta versi OS, kemudian buka isu di

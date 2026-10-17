@@ -1,6 +1,6 @@
 "use client";
 
-import { Info } from "@phosphor-icons/react";
+import { Info, Mountains } from "@phosphor-icons/react";
 import Link from "next/link";
 import { Fragment, useLayoutEffect, useRef, useState } from "react";
 import { shownError } from "@/lib/accuracy";
@@ -8,6 +8,7 @@ import { HEALTH_PROFILES, adviceFor, type QuickTone } from "@/lib/advice";
 import { CATEGORY_STYLE } from "@/lib/category-style";
 import { useMediaQuery } from "@/lib/use-media-query";
 import { formatChange, formatClock, formatStamp } from "@/lib/format";
+import { ipuCategory } from "@/lib/ipu";
 import { displayIpu, primaryReading } from "@/lib/official";
 import type { Prefs, SavedLocation } from "@/lib/prefs";
 import type { Reading } from "@/lib/reading";
@@ -488,7 +489,8 @@ function Headline({
     );
   }
 
-  // Perubahan 3 jam dikira daripada model, jadi hanya dipaparkan bila nombor utama ialah anggaran model.
+  // Perubahan 3 jam dikira daripada model, jadi hanya bila nombor utama ialah anggaran; dalam ⓘ
+  // sumber sejak v0.8.12 supaya kad lebih kemas.
   const change =
     current.source === "model" ? formatChange(reading.change3h, lang) : null;
   // Anggaran dibetulkan IDW mempunyai ralat sendiri (tinggal-satu-keluar, v0.8.5).
@@ -531,15 +533,12 @@ function Headline({
                 />
                 {current.source === "apims"
                   ? t("Rasmi · APIMS")
-                  : reading.spatial
-                    ? t("Anggaran dibetulkan")
-                    : t("Anggaran model")}
+                  : reading.highland
+                    ? t("Anggaran · tanah tinggi")
+                    : reading.spatial
+                      ? t("Anggaran dibetulkan")
+                      : t("Anggaran model")}
               </span>
-              {change && (
-                <span className="text-muted text-[13px] font-semibold">
-                  {change}
-                </span>
-              )}
               {entry?.status === "loading" && (
                 <span className="text-muted text-xs">
                   {t("Mengemas kini…")}
@@ -579,13 +578,63 @@ function Headline({
           }),
         )}
       </p>
-      {reading.wind && <WindLine wind={reading.wind} />}
+      {(reading.wind || reading.highland) && (
+        <div className="flex flex-col gap-1.5">
+          {reading.wind && <WindLine wind={reading.wind} />}
+          {reading.highland && <HighlandLine highland={reading.highland} />}
+        </div>
+      )}
       <SourceLine
         reading={reading}
         current={current}
         estimateError={estimateError}
+        change={change}
       />
     </>
+  );
+}
+
+/**
+ * Tanah tinggi (v0.8.12): sebab nombor utama ialah anggaran, dengan bacaan stesen terdekat
+ * (tanah rendah) sebagai rujukan kecil supaya sama dengan MyEQMS bila dibandingkan.
+ */
+function HighlandLine({
+  highland,
+}: {
+  highland: NonNullable<Reading["highland"]>;
+}) {
+  const { t } = useI18n();
+  const station = highland.station;
+  const category = station ? ipuCategory(station.ipu) : null;
+  return (
+    <div data-testid="highland-line" className="flex items-start gap-2 text-sm">
+      <Mountains
+        aria-hidden="true"
+        size={20}
+        weight="duotone"
+        color="#6f8f5f"
+        className="shrink-0"
+      />
+      <div className="flex min-w-0 flex-col gap-0.5">
+        <p className="font-semibold">
+          {t("Tiada stesen APIMS di tanah tinggi")}
+        </p>
+        {station && category && (
+          <p className="text-muted flex flex-wrap items-center gap-x-1.5 text-xs">
+            <span>{t("Terdekat: {station}", { station: station.name })}</span>
+            <span className="text-ink inline-flex items-center gap-1 font-semibold">
+              <span
+                aria-hidden="true"
+                className="size-1.5 rounded-full"
+                style={{ background: CATEGORY_STYLE[category.key].accent }}
+              />
+              {station.ipu}
+            </span>
+            <span>· {t("{km} km, tanah rendah", { km: station.km })}</span>
+          </p>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -594,10 +643,13 @@ function SourceLine({
   reading,
   current,
   estimateError,
+  change,
 }: {
   reading: Reading;
   current: NonNullable<ReturnType<typeof primaryReading>>;
   estimateError: number | null;
+  /** Perubahan 3 jam anggaran, cth. "Turun 1 berbanding 3 jam lalu" (v0.8.12). */
+  change: string | null;
 }) {
   const { t, lang } = useI18n();
   const [open, setOpen] = useState(false);
@@ -641,12 +693,13 @@ function SourceLine({
         [
           t("Stesen"),
           reading.highland
-            ? reading.spatial
+            ? reading.highland.station
               ? t(
-                  "Tiada stesen APIMS di tanah tinggi · terdekat {station} ({km} km, tanah rendah)",
+                  "Tiada stesen APIMS di tanah tinggi · terdekat {station}, IPU {ipu} ({km} km, tanah rendah)",
                   {
-                    station: reading.spatial.nearestName,
-                    km: reading.spatial.nearestKm,
+                    station: reading.highland.station.name,
+                    ipu: reading.highland.station.ipu,
+                    km: reading.highland.station.km,
                   },
                 )
               : t("Tiada stesen APIMS di tanah tinggi")
@@ -660,7 +713,18 @@ function SourceLine({
                 )
               : t("Tiada stesen APIMS dalam 30 km"),
         ],
+        ...(reading.spatial?.modelIpu != null
+          ? ([
+              [
+                t("Model sahaja"),
+                t("IPU {n} sebelum pembetulan", {
+                  n: reading.spatial.modelIpu,
+                }),
+              ],
+            ] as [string, string][])
+          : []),
         [t("Masa bacaan"), formatClock(current.time, lang)],
+        ...(change ? ([[t("Perubahan"), change]] as [string, string][]) : []),
         ...(estimateError !== null
           ? ([
               [
@@ -684,7 +748,7 @@ function SourceLine({
               })
             : t(
                 reading.highland
-                  ? "Anggaran tanah tinggi · dikemas kini {time}"
+                  ? "Dikemas kini {time}"
                   : reading.spatial
                     ? "Anggaran dibetulkan · dikemas kini {time}"
                     : "Anggaran model · dikemas kini {time}",

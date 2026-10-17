@@ -10,9 +10,12 @@ import {
 } from "./data";
 import { highlandAt } from "./highlands";
 import { addDays } from "./history";
+import { pm25ToIpu, rolling24hAverage } from "./ipu";
+import type { AirQualitySeries } from "./openmeteo";
 import { officialFor, withOfficialHistory } from "./official";
 import { buildReading, localHourKey, type Reading } from "./reading";
 import {
+  SPATIAL_MAX_KM,
   applySpatialBias,
   idwBias,
   stationBiases,
@@ -102,19 +105,40 @@ export async function loadReading(
   );
   reading.official = official;
   reading = withOfficialHistory(reading, hours);
-  if (bias) reading = withSpatial(reading, bias);
-  if (highland)
+  if (bias) reading = withSpatial(reading, bias, series);
+  if (highland) {
+    // Stesen terdekat sebagai rujukan kecil di kad (v0.8.12), walaupun bukan bacaan rasmi lokasi.
+    const ref = list
+      ? officialFor([...list], coords, nowKey, SPATIAL_MAX_KM)
+      : null;
     reading.highland = {
       name: highland.name,
       elevationM: highland.elevationM,
+      station: ref
+        ? {
+            name: ref.stationName,
+            km: Math.round(ref.distanceKm),
+            ipu: ref.ipu,
+          }
+        : null,
     };
+  }
   if (station)
     reading.schoolTwoPm = await schoolTwoPm(station.id, hours, nowKey);
   return { reading, station, partial: history.late || spatial.late };
 }
 
-/** Tandakan bacaan yang dibetulkan dengan bias ruang (label "dibetulkan" dalam graf). */
-function withSpatial(reading: Reading, bias: SpatialBias): Reading {
+/**
+ * Tandakan bacaan yang dibetulkan dengan bias ruang (label "dibetulkan" dalam graf), dengan IPU
+ * model sebelum pembetulan pada jam semasa untuk ⓘ sumber (v0.8.12).
+ */
+function withSpatial(
+  reading: Reading,
+  bias: SpatialBias,
+  raw: AirQualitySeries,
+): Reading {
+  const index = reading.current ? raw.times.indexOf(reading.current.time) : -1;
+  const average = index >= 0 ? rolling24hAverage(raw.pm25)[index] : null;
   return {
     ...reading,
     today: reading.today.map((h) => ({ ...h, corrected: true })),
@@ -122,6 +146,7 @@ function withSpatial(reading: Reading, bias: SpatialBias): Reading {
       stations: bias.stations,
       nearestName: bias.nearestName,
       nearestKm: bias.nearestKm,
+      modelIpu: average == null ? null : pm25ToIpu(average),
     },
   };
 }
