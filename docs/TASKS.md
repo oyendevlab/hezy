@@ -718,7 +718,7 @@ Laporan pengguna 17 Okt 2026 (~7–8 pagi): Putrajaya memaparkan 83 "Anggaran mo
 3. ✅ `/api/aqi`: senarai stesen ditunggu ≤ 4 s; bila gagal atau lambat, respons ditanda `partial` (cache 60 s, klien cuba semula ~75 s) — bukan dicache 5–20 min sebagai lengkap; sejarah APIMS dan model stesen yang gagal juga separa
 4. ✅ Semakan amaran (`/api/push/check`) guna senarai stesen dengan sandaran yang sama
 5. ✅ Ujian (318 unit, E2E), versi 0.8.10, Apa yang baharu (BM/EN), tag dan GitHub Release; tingkah laku biasa disahkan tempatan (Putrajaya rasmi 162, KL 161, Mersing dibetulkan 88, tidak separa)
-6. ⬜ Susulan: negeri MetMalaysia ikut sempadan negeri sebenar — kini negeri stesen APIMS terdekat (cth. Mersing dipadankan dengan Pahang melalui stesen Rompin 72 km; kaedah kawasan terdekat pula menyalahkan Lawas → Labuan)
+6. ✅ Susulan: negeri MetMalaysia ikut sempadan negeri sebenar — dahulu negeri stesen APIMS terdekat (cth. Mersing dipadankan dengan Pahang melalui stesen Rompin 72 km; kaedah kawasan terdekat pula menyalahkan Lawas → Labuan). Siap dalam v0.8.11 (Fasa 42)
 
 ## Fasa 42 — v0.8.11 (lokasi tepat: negeri, daerah dan tanah tinggi; 17 Okt 2026)
 
@@ -739,4 +739,4 @@ Audit (122 titik: 52 kawasan + 70 bandar; sempadan geoBoundaries; 68 stesen APIM
 4. ✅ MetMalaysia dikongsi semua instans: `/api/met` (amaran + ramalan, CDN 15 min, satu permintaan ramalan) dibaca oleh `/api/aqi`; sandaran salinan terakhir bila 429
 5. ✅ Tanah tinggi: jadual tetap 10 kawasan (`highlands.ts`: Cameron, Genting, Bukit Fraser, Bukit Bendera, Bukit Larut, Gunung Jerai, Kundasang, Taman Kinabalu, Bario, Ba'kelalan) — API ketinggian Open-Meteo 503 semasa gangguan, jadi tidak digunakan masa larian. Stesen tanah rendah bukan bacaan rasmi di situ; anggaran dibetulkan + penjelasan di ⓘ sumber dan nota di STESEN TERDEKAT
 6. ✅ Nama lokasi GPS: kawasan senarai jika ≤ 15 km, jika tidak nama daerah; negeri ikut sempadan
-7. ⬜ Ujian, semakan production, versi 0.8.11, Apa yang baharu (BM/EN), tag dan GitHub Release
+7. ✅ Ujian (330 unit, E2E 190 lulus), versi 0.8.11, Apa yang baharu (BM/EN), tag dan GitHub Release (PR #140). Production disahkan: `/api/met` CDN HIT (189 lokasi, 4 amaran); Cameron Highlands Pahang, daerah 16–24°C, tanah tinggi (terdekat Tasek Ipoh); Genting zon 18–25°C; Kajang dan Ampang Selangor (Hulu Langat); Mersing Johor; Putrajaya rasmi 167; semua respons lengkap (tidak separa), tiada ralat dalam log
