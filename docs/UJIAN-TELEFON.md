@@ -279,6 +279,11 @@ Buka **https://hezy.my** pada telefon.
 - [ ] Ramalan rasmi MetMalaysia: tajuk tanpa ikon, ⓘ memaparkan negeri dan sumber; kad Hari ini / Esok / Lusa dengan ikon pagi, petang, malam
 - [ ] Bahasa Inggeris: frasa dan kelayakan (cth. "most places", "inland") diterjemah
 
+## v0.8.10 — bacaan rasmi lebih stabil
+
+- [ ] Lokasi dengan stesen (cth. Putrajaya) sentiasa "Rasmi · APIMS", termasuk sejurus selepas kemas kini aplikasi
+- [ ] Jika sekali-sekala "Anggaran model" muncul untuk lokasi berstesen, ia kembali kepada "Rasmi · APIMS" sendiri dalam ~1–2 minit (tanpa tarik untuk muat semula)
+
 ## Jika ada masalah
 
 Ambil tangkapan skrin dan catat model telefon serta versi OS, kemudian buka isu di

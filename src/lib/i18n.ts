@@ -1009,6 +1009,11 @@ const EN: Record<string, string> = {
     "Areas far from APIMS stations are now corrected with official readings from nearby stations",
   "Bacaan rasmi terbaharu muncul lebih cepat selepas JAS menerbitkannya":
     "The latest official reading appears sooner after the DOE publishes it",
+  "Bacaan rasmi lebih stabil": "More stable official readings",
+  "Bila pelayan APIMS terganggu seketika, Hezy cuba semula dan guna senarai stesen terakhir":
+    "When the APIMS server has a brief outage, Hezy retries and uses the last station list",
+  "Bacaan tidak lengkap dimuat semula sendiri dalam beberapa minit":
+    "Incomplete readings reload by themselves within a few minutes",
   "Ramalan harian guna data rasmi MetMalaysia":
     "Daily forecast uses official MetMalaysia data",
   "Suhu dan keadaan cuaca harian kini daripada MetMalaysia":

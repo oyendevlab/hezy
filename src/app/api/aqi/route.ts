@@ -9,7 +9,7 @@ import {
   getHotspots,
   getMetForecasts,
   getMetWarnings,
-  getStations,
+  getStationsResilient,
   getWeather,
 } from "@/lib/data";
 import { metFor, metStateFor } from "@/lib/metmalaysia";
@@ -24,6 +24,8 @@ import { localHourKey } from "@/lib/reading";
 const OPTIONAL_DEADLINE_MS = 2500;
 /** Had menunggu sejarah APIMS (graf rasmi dan pembetulan ramalan). */
 const HISTORY_BUDGET_MS = 3000;
+/** Had menunggu senarai stesen APIMS (termasuk satu cubaan semula). */
+const STATIONS_BUDGET_MS = 4000;
 
 const FULL_CACHE = "public, s-maxage=300, stale-while-revalidate=900";
 /** Respons tanpa sumber yang lambat dicache sebentar sahaja supaya permintaan seterusnya lengkap. */
@@ -47,9 +49,19 @@ export async function GET(request: Request) {
     return Response.json({ error: coords.error }, { status: 400 });
   }
 
-  const stationsPromise = getStations().catch((error: unknown) => {
-    // APIMS hanya tambahan; anggaran model masih dipulangkan.
-    console.error("[api/aqi] APIMS", error);
+  const late: Promise<unknown>[] = [];
+  // Senarai stesen APIMS (bacaan rasmi, bias stesen, negeri MetMalaysia) ditunggu ≤ 4 s. Bila
+  // gagal atau lambat, respons ditanda separa supaya tidak dicache lama sebagai lengkap (v0.8.10).
+  let stationsMissing = false;
+  const stationsPending = handled(getStationsResilient());
+  const stationsPromise = withinBudget(
+    stationsPending,
+    STATIONS_BUDGET_MS,
+  ).then((result) => {
+    if (result.status === "ok") return result.value;
+    stationsMissing = true;
+    if (result.status === "late") late.push(stationsPending);
+    else console.error("[api/aqi] APIMS", result.error);
     return null;
   });
   // Cuaca juga ikut sel 0.1° (grid Open-Meteo) supaya cache dikongsi koordinat berdekatan.
@@ -76,10 +88,8 @@ export async function GET(request: Request) {
     );
   }
   const { reading, station } = loaded;
-  let partial = loaded.partial;
   const stations = await stationsPromise;
-
-  const late: Promise<unknown>[] = [];
+  let partial = loaded.partial || stationsMissing;
   /** Nilai sumber pilihan, atau `undefined` bila gagal atau melepasi had masa. */
   const optional = async <T>(
     name: string,

@@ -13,6 +13,15 @@ export type Release = {
 
 export const CHANGELOG: readonly Release[] = [
   {
+    version: "0.8.10",
+    date: "2026-10-17",
+    title: "Bacaan rasmi lebih stabil",
+    items: [
+      "Bila pelayan APIMS terganggu seketika, Hezy cuba semula dan guna senarai stesen terakhir",
+      "Bacaan tidak lengkap dimuat semula sendiri dalam beberapa minit",
+    ],
+  },
+  {
     version: "0.8.9",
     date: "2026-10-17",
     title: "Ramalan harian guna data rasmi MetMalaysia",

@@ -1,6 +1,7 @@
 import { cacheLife } from "next/cache";
 import { stationsRevalidateSeconds } from "./apims-schedule";
 import { createLastGoodStore } from "./budget";
+import { fetchWithRetry } from "./http";
 import {
   MET_FORECAST_URL,
   MET_WARNING_URL,
@@ -125,9 +126,10 @@ export async function getStationModels(
  */
 export async function getStations(): Promise<Station[]> {
   "use cache";
-  const res = await fetch(APIMS_STATIONS_URL, {
+  // Cuba semula sekali bila APIMS memulangkan 5xx atau tamat masa (v0.8.10).
+  const res = await fetchWithRetry(APIMS_STATIONS_URL, {
     headers: { "User-Agent": "Hezy (+https://hezy.my)" },
-    signal: AbortSignal.timeout(8000),
+    timeoutMs: 6000,
   });
   if (!res.ok) {
     throw new Error(`APIMS memulangkan status ${res.status}`);
@@ -141,6 +143,26 @@ export async function getStations(): Promise<Station[]> {
   return stations;
 }
 
+/** Senarai stesen terakhir yang berjaya (setiap instans), untuk gangguan APIMS (v0.8.10). */
+const lastGoodStations = createLastGoodStore<Station[]>(1, 2 * 3600_000);
+
+/**
+ * {@link getStations} dengan sandaran: bila APIMS gagal (cth. 502), guna senarai terakhir yang
+ * berjaya (≤ 2 jam). Bacaan lebih lama daripada 3 jam tetap ditolak oleh `officialFor`.
+ */
+export async function getStationsResilient(): Promise<Station[]> {
+  try {
+    const stations = await getStations();
+    lastGoodStations.remember("all", stations);
+    return stations;
+  } catch (error) {
+    const saved = lastGoodStations.recall("all");
+    if (!saved) throw error;
+    console.error("[data] APIMS gagal; guna senarai stesen terakhir", error);
+    return saved;
+  }
+}
+
 /** Sejarah IPU rasmi 25 jam bagi semua stesen dalam negeri, dicache 15 minit. */
 export async function getStateHistory(
   stateId: number,
@@ -149,9 +171,9 @@ export async function getStateHistory(
   "use cache";
   cacheLife({ stale: 300, revalidate: 900, expire: 3600 });
 
-  const res = await fetch(apimsHourlyUrl(stateId, hourKey), {
+  const res = await fetchWithRetry(apimsHourlyUrl(stateId, hourKey), {
     headers: { "User-Agent": "Hezy (+https://hezy.my)" },
-    signal: AbortSignal.timeout(8000),
+    timeoutMs: 6000,
   });
   if (!res.ok) {
     throw new Error(`APIMS (sejarah) memulangkan status ${res.status}`);

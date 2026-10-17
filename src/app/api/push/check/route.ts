@@ -1,5 +1,5 @@
 import webpush, { WebPushError } from "web-push";
-import { getStations } from "@/lib/data";
+import { getStationsResilient } from "@/lib/data";
 import { loadReading } from "@/lib/load-reading";
 import { applySent, planNotifications } from "@/lib/push-plan";
 import { allRecords, deleteRecord, saveRecord } from "@/lib/push-store";
@@ -32,7 +32,7 @@ export async function GET(request: Request) {
   );
 
   const now = new Date();
-  const stations = await getStations().catch(() => null);
+  const stations = await getStationsResilient().catch(() => null);
   const readings = new Map<string, Promise<Reading | null>>();
   const readingFor = (lat: number, lon: number) => {
     const key = `${lat},${lon}`;
