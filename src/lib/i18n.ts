@@ -1001,6 +1001,18 @@ const EN: Record<string, string> = {
     "No APIMS station within 30 km · nearest {station} ({km} km)",
   "Anggaran dibetulkan · dikemas kini {time}":
     "Corrected estimate · updated {time}",
+  "Anggaran tanah tinggi · dikemas kini {time}":
+    "Highland estimate · updated {time}",
+  Kawasan: "Area",
+  "{name}, tanah tinggi ~{m} m": "{name}, highlands ~{m} m",
+  "Tiada stesen APIMS di tanah tinggi": "No APIMS station in the highlands",
+  "Tiada stesen APIMS di tanah tinggi · terdekat {station} ({km} km, tanah rendah)":
+    "No APIMS station in the highlands · nearest {station} ({km} km, lowland)",
+  "Lokasi ini di tanah tinggi, jauh di atas semua stesen APIMS berdekatan, jadi bacaan stesen tanah rendah tidak mewakili udara di sini. Nombor utama ialah anggaran model CAMS di koordinat anda yang dibetulkan dengan bacaan rasmi stesen berdekatan.":
+    "This location is in the highlands, far above all nearby APIMS stations, so lowland station readings do not represent the air here. The main number is the CAMS model estimate at your coordinates, corrected with official readings from nearby stations.",
+  "{name} di tanah tinggi (~{m} m); semua stesen APIMS di tanah rendah, jadi bacaannya mungkin tidak mewakili udara di sana.":
+    "{name} is in the highlands (~{m} m); all APIMS stations are in the lowlands, so their readings may not represent the air there.",
+  "Sempadan daerah": "District boundaries",
   "Tiada stesen APIMS dalam 30 km, jadi nombor utama ialah anggaran model CAMS di koordinat anda yang dibetulkan dengan bacaan rasmi stesen berdekatan. Ketepatan berkurang bila stesen lebih jauh.":
     "There is no APIMS station within 30 km, so the main number is the CAMS model estimate at your coordinates, corrected with official readings from nearby stations. Accuracy drops as stations get further away.",
   "Anggaran lebih tepat di kawasan tanpa stesen":
@@ -1010,6 +1022,14 @@ const EN: Record<string, string> = {
   "Bacaan rasmi terbaharu muncul lebih cepat selepas JAS menerbitkannya":
     "The latest official reading appears sooner after the DOE publishes it",
   "Bacaan rasmi lebih stabil": "More stable official readings",
+  "Lokasi lebih tepat: negeri, daerah dan tanah tinggi":
+    "More accurate locations: state, district and highlands",
+  "Negeri dan ramalan MetMalaysia ikut sempadan sebenar dan daerah anda (cth. Cameron Highlands 16–24°C, bukan ramalan Perak)":
+    "State and MetMalaysia forecast now follow real boundaries and your district (e.g. Cameron Highlands 16–24°C, not the Perak forecast)",
+  "Di tanah tinggi seperti Cameron Highlands dan Genting, stesen tanah rendah tidak lagi dianggap bacaan rasmi":
+    "In the highlands such as Cameron Highlands and Genting, lowland stations are no longer treated as the official reading",
+  "Lokasi GPS jauh dari bandar senarai dinamakan ikut daerah, cth. Mersing":
+    "GPS locations far from listed towns are named after their district, e.g. Mersing",
   "Bila pelayan APIMS terganggu seketika, Hezy cuba semula dan guna senarai stesen terakhir":
     "When the APIMS server has a brief outage, Hezy retries and uses the last station list",
   "Bacaan tidak lengkap dimuat semula sendiri dalam beberapa minit":
@@ -1042,6 +1062,9 @@ const EN: Record<string, string> = {
     "About the official MetMalaysia forecast",
   "Ramalan negeri {state}, ikut lokasi anda":
     "{state} state forecast, based on your location",
+  "Ramalan daerah {name}, {state}": "{name} district forecast, {state}",
+  "Ramalan {name} (tanah tinggi), {state}":
+    "{name} (highlands) forecast, {state}",
   "Sumber rasmi: Jabatan Meteorologi Malaysia (MetMalaysia) melalui data.gov.my":
     "Official source: Malaysian Meteorological Department (MetMalaysia) via data.gov.my",
   "Dikemas kini oleh MetMalaysia setiap hari":

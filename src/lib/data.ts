@@ -6,9 +6,10 @@ import {
   MET_FORECAST_URL,
   MET_WARNING_URL,
   parseForecasts,
+  parseMetBundle,
   parseWarnings,
-  type MetDay,
-  type MetWarningRaw,
+  pickForecasts,
+  type MetBundle,
 } from "./metmalaysia";
 import {
   APIMS_STATIONS_URL,
@@ -290,26 +291,75 @@ export async function getHotspots(): Promise<{
   };
 }
 
-/** Amaran cuaca rasmi MetMalaysia (api.data.gov.my), dicache 15 minit. */
-export async function getMetWarnings(): Promise<MetWarningRaw[]> {
-  "use cache";
-  cacheLife({ stale: 300, revalidate: 900, expire: 3600 });
-  const res = await fetch(MET_WARNING_URL, {
-    signal: AbortSignal.timeout(8000),
-  });
+/** Salinan MetMalaysia terakhir yang berjaya (setiap instans), untuk bila data.gov.my 429. */
+const lastGoodMet = createLastGoodStore<MetBundle>(1, 6 * 3600_000);
+
+async function metJson(url: string, label: string, timeoutMs: number) {
+  const res = await fetchWithRetry(url, { timeoutMs }, 1500);
   if (!res.ok)
-    throw new Error(`MetMalaysia (amaran) memulangkan status ${res.status}`);
-  return parseWarnings(await res.json());
+    throw new Error(`MetMalaysia (${label}) memulangkan status ${res.status}`);
+  return (await res.json()) as unknown;
 }
 
-/** Ramalan rasmi MetMalaysia peringkat negeri (7 hari), dicache 1 jam. */
-export async function getMetForecasts(): Promise<Record<string, MetDay[]>> {
+/**
+ * MetMalaysia terus daripada data.gov.my: amaran + semua ramalan (2 permintaan). Had
+ * data.gov.my 4 permintaan/minit dikongsi alamat IP Vercel, jadi hanya /api/met (CDN 15 min)
+ * dan sandarannya memanggil ini. Bahagian yang gagal diganti salinan terakhir (≤ 6 jam);
+ * `stale` bila mana-mana bahagian tidak segar.
+ */
+export async function fetchMetUpstream(
+  today: string,
+): Promise<{ bundle: MetBundle; stale: boolean }> {
+  const [warnings, forecasts] = await Promise.allSettled([
+    metJson(MET_WARNING_URL, "amaran", 8000).then(parseWarnings),
+    metJson(MET_FORECAST_URL, "ramalan", 15_000).then((json) =>
+      pickForecasts(parseForecasts(json), today),
+    ),
+  ]);
+  for (const part of [warnings, forecasts])
+    if (part.status === "rejected")
+      console.error("[data] MetMalaysia", part.reason);
+  const saved = lastGoodMet.recall("met");
+  const w = warnings.status === "fulfilled" ? warnings.value : saved?.warnings;
+  const f =
+    forecasts.status === "fulfilled" ? forecasts.value : saved?.forecasts;
+  if (!w && !f) throw new Error("MetMalaysia tidak tersedia");
+  const bundle: MetBundle = {
+    warnings: w ?? [],
+    forecasts: f ?? {},
+    fetchedAt: new Date().toISOString(),
+  };
+  const fresh =
+    warnings.status === "fulfilled" && forecasts.status === "fulfilled";
+  if (warnings.status === "fulfilled" || forecasts.status === "fulfilled")
+    lastGoodMet.remember("met", bundle);
+  return { bundle, stale: !fresh };
+}
+
+/** /api/met production (salinan CDN dikongsi semua instans), atau null di luar production. */
+function metProxyUrl(): string | null {
+  const host = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+  return process.env.VERCEL_ENV === "production" && host
+    ? `https://${host}/api/met`
+    : null;
+}
+
+/**
+ * MetMalaysia untuk /api/aqi (v0.8.11), dicache 5 min setiap instans. Di production dibaca
+ * melalui /api/met supaya semua instans berkongsi satu salinan; sandaran: terus ke data.gov.my.
+ */
+export async function getMetBundle(today: string): Promise<MetBundle> {
   "use cache";
-  cacheLife({ stale: 600, revalidate: 3600, expire: 21600 });
-  const res = await fetch(MET_FORECAST_URL, {
-    signal: AbortSignal.timeout(8000),
-  });
-  if (!res.ok)
-    throw new Error(`MetMalaysia (ramalan) memulangkan status ${res.status}`);
-  return parseForecasts(await res.json());
+  cacheLife({ stale: 120, revalidate: 300, expire: 3600 });
+  const proxy = metProxyUrl();
+  if (proxy) {
+    try {
+      const res = await fetch(proxy, { signal: AbortSignal.timeout(4000) });
+      if (!res.ok) throw new Error(`/api/met memulangkan status ${res.status}`);
+      return parseMetBundle(await res.json());
+    } catch (error) {
+      console.error("[data] /api/met gagal; terus ke data.gov.my", error);
+    }
+  }
+  return (await fetchMetUpstream(today)).bundle;
 }

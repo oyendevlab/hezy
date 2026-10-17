@@ -627,17 +627,38 @@ function SourceLine({
               )
             : t("Anggaran daripada PM2.5 (Open-Meteo, model CAMS)"),
         ],
+        ...(reading.highland
+          ? ([
+              [
+                t("Kawasan"),
+                t("{name}, tanah tinggi ~{m} m", {
+                  name: reading.highland.name,
+                  m: reading.highland.elevationM.toLocaleString("en-US"),
+                }),
+              ],
+            ] as [string, string][])
+          : []),
         [
           t("Stesen"),
-          reading.spatial
-            ? t(
-                "Tiada stesen APIMS dalam 30 km · terdekat {station} ({km} km)",
-                {
-                  station: reading.spatial.nearestName,
-                  km: reading.spatial.nearestKm,
-                },
-              )
-            : t("Tiada stesen APIMS dalam 30 km"),
+          reading.highland
+            ? reading.spatial
+              ? t(
+                  "Tiada stesen APIMS di tanah tinggi · terdekat {station} ({km} km, tanah rendah)",
+                  {
+                    station: reading.spatial.nearestName,
+                    km: reading.spatial.nearestKm,
+                  },
+                )
+              : t("Tiada stesen APIMS di tanah tinggi")
+            : reading.spatial
+              ? t(
+                  "Tiada stesen APIMS dalam 30 km · terdekat {station} ({km} km)",
+                  {
+                    station: reading.spatial.nearestName,
+                    km: reading.spatial.nearestKm,
+                  },
+                )
+              : t("Tiada stesen APIMS dalam 30 km"),
         ],
         [t("Masa bacaan"), formatClock(current.time, lang)],
         ...(estimateError !== null
@@ -662,9 +683,11 @@ function SourceLine({
                 time: formatClock(official.time, lang),
               })
             : t(
-                reading.spatial
-                  ? "Anggaran dibetulkan · dikemas kini {time}"
-                  : "Anggaran model · dikemas kini {time}",
+                reading.highland
+                  ? "Anggaran tanah tinggi · dikemas kini {time}"
+                  : reading.spatial
+                    ? "Anggaran dibetulkan · dikemas kini {time}"
+                    : "Anggaran model · dikemas kini {time}",
                 { time: formatClock(current.time, lang) },
               )}
         </span>
@@ -700,9 +723,11 @@ function SourceLine({
             {t(
               official
                 ? "Nombor utama ialah bacaan rasmi stesen APIMS terdekat. Anggaran model dikira daripada PM2.5 di koordinat anda dan boleh berbeza daripada bacaan rasmi."
-                : reading.spatial
-                  ? "Tiada stesen APIMS dalam 30 km, jadi nombor utama ialah anggaran model CAMS di koordinat anda yang dibetulkan dengan bacaan rasmi stesen berdekatan. Ketepatan berkurang bila stesen lebih jauh."
-                  : "Tiada stesen APIMS berdekatan, jadi nombor utama ialah anggaran daripada PM2.5 (model CAMS) di koordinat anda.",
+                : reading.highland
+                  ? "Lokasi ini di tanah tinggi, jauh di atas semua stesen APIMS berdekatan, jadi bacaan stesen tanah rendah tidak mewakili udara di sini. Nombor utama ialah anggaran model CAMS di koordinat anda yang dibetulkan dengan bacaan rasmi stesen berdekatan."
+                  : reading.spatial
+                    ? "Tiada stesen APIMS dalam 30 km, jadi nombor utama ialah anggaran model CAMS di koordinat anda yang dibetulkan dengan bacaan rasmi stesen berdekatan. Ketepatan berkurang bila stesen lebih jauh."
+                    : "Tiada stesen APIMS berdekatan, jadi nombor utama ialah anggaran daripada PM2.5 (model CAMS) di koordinat anda.",
             )}
           </p>
         </BottomSheet>

@@ -26,6 +26,7 @@ import {
   clusterPoints,
 } from "@/lib/cluster";
 import { formatClock } from "@/lib/format";
+import { highlandAt } from "@/lib/highlands";
 import { ipuCategory } from "@/lib/ipu";
 import {
   MAX_FAVOURITES,
@@ -606,6 +607,8 @@ export function StationMap() {
           .sort((a, b) => a.km - b.km)
           .slice(0, 5)
       : [];
+  // Lokasi tanah tinggi (v0.8.11): semua stesen APIMS di tanah rendah.
+  const highland = current ? highlandAt(current) : null;
 
   const choose = (station: Station) => {
     updatePrefs((p) => ({ ...p, current: stationToLocation(station) }));
@@ -1034,6 +1037,17 @@ export function StationMap() {
           >
             {t("STESEN TERDEKAT")}
           </h2>
+          {highland && (
+            <p className="text-muted mb-2 text-xs leading-snug">
+              {t(
+                "{name} di tanah tinggi (~{m} m); semua stesen APIMS di tanah rendah, jadi bacaannya mungkin tidak mewakili udara di sana.",
+                {
+                  name: highland.name,
+                  m: highland.elevationM.toLocaleString("en-US"),
+                },
+              )}
+            </p>
+          )}
           <ul className="divide-line bg-surface divide-y rounded-2xl">
             {nearby.map(({ station, km }) => (
               <li key={station.id}>

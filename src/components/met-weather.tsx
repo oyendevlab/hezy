@@ -200,8 +200,9 @@ function MetDayCard({ day, label }: { day: MetDay; label: string }) {
 }
 
 /**
- * Ramalan rasmi MetMalaysia peringkat negeri, 3 hari (v0.8.6; diseragamkan v0.8.9): tajuk + ⓘ
- * seperti bahagian lain, negeri dan sumber dalam helaian ⓘ, suhu dalam Ramalan harian.
+ * Ramalan rasmi MetMalaysia, 3 hari (v0.8.6; diseragamkan v0.8.9; ikut daerah atau tanah tinggi
+ * sejak v0.8.11): tajuk + ⓘ seperti bahagian lain, lokasi ramalan dan sumber dalam helaian ⓘ,
+ * suhu dalam Ramalan harian.
  */
 export function MetForecast({
   met,
@@ -214,6 +215,16 @@ export function MetForecast({
   const headingId = useId();
   if (!met || met.forecast.length === 0) return null;
   const state = findState(met.state)?.name ?? met.state;
+  // Lokasi ramalan (v0.8.11): tanah tinggi atau daerah bila ada, jika tidak negeri.
+  const where =
+    met.area?.kind === "zone"
+      ? t("Ramalan {name} (tanah tinggi), {state}", {
+          name: met.area.name,
+          state,
+        })
+      : met.area?.kind === "district"
+        ? t("Ramalan daerah {name}, {state}", { name: met.area.name, state })
+        : t("Ramalan negeri {state}, ikut lokasi anda", { state });
   return (
     <section
       aria-labelledby={headingId}
@@ -229,10 +240,7 @@ export function MetForecast({
           label={t("Tentang ramalan rasmi MetMalaysia")}
           testId="info-met"
           rows={[
-            {
-              icon: MapPin,
-              text: t("Ramalan negeri {state}, ikut lokasi anda", { state }),
-            },
+            { icon: MapPin, text: where },
             {
               icon: SealCheck,
               text: "Sumber rasmi: Jabatan Meteorologi Malaysia (MetMalaysia) melalui data.gov.my",

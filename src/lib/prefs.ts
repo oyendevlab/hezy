@@ -10,7 +10,7 @@ export { PREFS_KEY };
 export type SavedLocation = {
   id: string;
   name: string;
-  /** Negeri atau keterangan tambahan, cth. "Selangor" atau "Lokasi semasa". */
+  /** Negeri atau keterangan tambahan, cth. "Selangor" (GPS lama: "Lokasi semasa"). */
   detail?: string;
   lat: number;
   lon: number;

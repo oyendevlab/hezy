@@ -13,6 +13,16 @@ export type Release = {
 
 export const CHANGELOG: readonly Release[] = [
   {
+    version: "0.8.11",
+    date: "2026-10-17",
+    title: "Lokasi lebih tepat: negeri, daerah dan tanah tinggi",
+    items: [
+      "Negeri dan ramalan MetMalaysia ikut sempadan sebenar dan daerah anda (cth. Cameron Highlands 16–24°C, bukan ramalan Perak)",
+      "Di tanah tinggi seperti Cameron Highlands dan Genting, stesen tanah rendah tidak lagi dianggap bacaan rasmi",
+      "Lokasi GPS jauh dari bandar senarai dinamakan ikut daerah, cth. Mersing",
+    ],
+  },
+  {
     version: "0.8.10",
     date: "2026-10-17",
     title: "Bacaan rasmi lebih stabil",

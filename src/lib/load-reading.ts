@@ -8,6 +8,7 @@ import {
   getStationModels,
   getTwoPmReadings,
 } from "./data";
+import { highlandAt } from "./highlands";
 import { addDays } from "./history";
 import { officialFor, withOfficialHistory } from "./official";
 import { buildReading, localHourKey, type Reading } from "./reading";
@@ -61,10 +62,19 @@ export async function loadReading(
   const seriesPromise = handled(getAirQualityResilient(cell.lat, cell.lon));
   const nowKey = localHourKey(now);
   const list = await stations;
-  const official = list ? officialFor([...list], coords, nowKey) : null;
-  const station = official
-    ? list?.find((s) => s.id === official.stationId)
+  const nearest = list ? officialFor([...list], coords, nowKey) : null;
+  const nearestStation = nearest
+    ? list?.find((s) => s.id === nearest.stationId)
     : undefined;
+  // Tanah tinggi (v0.8.11): stesen di luar kawasan tanah tinggi itu (semuanya tanah rendah)
+  // bukan bacaan rasmi lokasi; anggaran dibetulkan dengan stesen berdekatan digunakan.
+  const highland = highlandAt(coords);
+  const lowlandStation =
+    highland !== null &&
+    nearestStation !== undefined &&
+    highlandAt(nearestStation) === null;
+  const official = lowlandStation ? null : nearest;
+  const station = official ? nearestStation : undefined;
   // Tiada bacaan rasmi dalam 30 km: betulkan model dengan bias stesen berdekatan (v0.8.5).
   const spatialPending =
     !official && list && list.length > 0
@@ -93,6 +103,11 @@ export async function loadReading(
   reading.official = official;
   reading = withOfficialHistory(reading, hours);
   if (bias) reading = withSpatial(reading, bias);
+  if (highland)
+    reading.highland = {
+      name: highland.name,
+      elevationM: highland.elevationM,
+    };
   if (station)
     reading.schoolTwoPm = await schoolTwoPm(station.id, hours, nowKey);
   return { reading, station, partial: history.late || spatial.late };

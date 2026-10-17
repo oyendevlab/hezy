@@ -7,17 +7,17 @@ import { parseCoords } from "@/lib/coords";
 import {
   getAccuracyIndex,
   getHotspots,
-  getMetForecasts,
-  getMetWarnings,
+  getMetBundle,
   getStationsResilient,
   getWeather,
 } from "@/lib/data";
-import { metFor, metStateFor } from "@/lib/metmalaysia";
+import { findState } from "@/lib/areas";
+import { metFor, metTargetFor } from "@/lib/metmalaysia";
+import { placeAt } from "@/lib/places";
 import { upwindHotspots } from "@/lib/hotspots";
 import { currentWeather } from "@/lib/weather";
 import { CALM_KMH, windAt } from "@/lib/wind";
 import { loadReading, modelCell } from "@/lib/load-reading";
-import { stateForPoint } from "@/lib/state-flag";
 import { localHourKey } from "@/lib/reading";
 
 /** Had (ms dari permulaan permintaan) menunggu sumber pilihan: cuaca, titik panas, ketepatan. */
@@ -70,7 +70,7 @@ export async function GET(request: Request) {
   const accuracyPromise = handled(getAccuracyIndex());
   const hotspotsPromise = handled(getHotspots());
   const metPromise = handled(
-    Promise.all([getMetWarnings(), getMetForecasts()]),
+    getMetBundle(localHourKey(new Date()).slice(0, 10)),
   );
 
   const now = new Date();
@@ -132,7 +132,9 @@ export async function GET(request: Request) {
       };
     });
   }
-  reading.state = stations ? stateForPoint(stations, coords) : null;
+  // Negeri dan daerah ikut sempadan sebenar (v0.8.11), bukan stesen terdekat.
+  const place = placeAt(coords);
+  reading.state = place?.state ?? null;
   if (reading.wind && reading.wind.speed >= CALM_KMH) {
     const hotspots = await optional("titik panas", hotspotsPromise);
     if (hotspots) {
@@ -157,11 +159,14 @@ export async function GET(request: Request) {
     );
   }
 
-  // Amaran dan ramalan rasmi MetMalaysia bagi negeri lokasi (v0.8.6).
-  const metState = stations ? metStateFor(stations, coords) : null;
-  if (metState) {
+  // Amaran negeri dan ramalan MetMalaysia: tanah tinggi, daerah, kemudian negeri (v0.8.11).
+  const metTarget = place
+    ? metTargetFor(coords, place, findState(place.state)?.name ?? place.state)
+    : null;
+  if (metTarget) {
     const met = await optional("MetMalaysia", metPromise);
-    if (met) reading.met = metFor(metState, met[0], met[1], nowKey);
+    if (met)
+      reading.met = metFor(metTarget, met.warnings, met.forecasts, nowKey);
   }
 
   if (partial) reading.partial = true;

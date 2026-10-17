@@ -719,3 +719,24 @@ Laporan pengguna 17 Okt 2026 (~7–8 pagi): Putrajaya memaparkan 83 "Anggaran mo
 4. ✅ Semakan amaran (`/api/push/check`) guna senarai stesen dengan sandaran yang sama
 5. ✅ Ujian (318 unit, E2E), versi 0.8.10, Apa yang baharu (BM/EN), tag dan GitHub Release; tingkah laku biasa disahkan tempatan (Putrajaya rasmi 162, KL 161, Mersing dibetulkan 88, tidak separa)
 6. ⬜ Susulan: negeri MetMalaysia ikut sempadan negeri sebenar — kini negeri stesen APIMS terdekat (cth. Mersing dipadankan dengan Pahang melalui stesen Rompin 72 km; kaedah kawasan terdekat pula menyalahkan Lawas → Labuan)
+
+## Fasa 42 — v0.8.11 (lokasi tepat: negeri, daerah dan tanah tinggi; 17 Okt 2026)
+
+Maklum balas pengguna 17 Okt 2026: di Cameron Highlands, stesen terdekat ialah Tasek Ipoh; semak semua lokasi supaya lebih tepat.
+
+Audit (122 titik: 52 kawasan + 70 bandar; sempadan geoBoundaries; 68 stesen APIMS):
+
+- Negeri MetMalaysia salah bagi 25 titik kerana ikut stesen terdekat: Kajang, Cyberjaya, Bangi → Putrajaya; Ampang, Rawang, Genting → KL; Cameron Highlands, Bukit Fraser, Raub, Gua Musang → Perak; Mersing → Pahang; Gemas, Jasin → Johor; Sipitang → Labuan
+- Bendera kad kongsi salah bagi 7 titik (cth. Ampang → KL, Cyberjaya → Putrajaya, Tampin → Melaka)
+- Ramalan negeri tidak sesuai di tanah tinggi: Cameron Highlands dipaparkan 24–34°C (Perak), sedangkan MetMalaysia ada ramalan daerah Tanah Tinggi Cameron 16–24°C; Genting 18–25°C
+- Stesen tanah rendah dipaparkan sebagai bacaan rasmi tanah tinggi: Genting (~1,680 m) → Batu Muda 26 km, Bukit Fraser (~1,290 m) → Tanjung Malim 24 km, Bukit Bendera (~620 m) → Minden 8 km. Cameron Highlands (~1,420 m) tiada stesen dalam 30 km; Tasek Ipoh 34 km memang terdekat tetapi di seberang Banjaran Titiwangsa, tanpa penjelasan. Semua 68 stesen APIMS di bawah 300 m
+- Nama lokasi GPS ikut 52 kawasan sahaja: Mersing → "Kluang" (73 km), Lawas → "Labuan", Kudat → "Kota Kinabalu" (131 km)
+- Log production: MetMalaysia memulangkan 429 (had data.gov.my 4 permintaan/minit) pada 20:13 dan 20:26 — bahagian MetMalaysia hilang; setiap instans fungsi memanggil data.gov.my sendiri. Open-Meteo (cuaca) juga 503/lambat pada masa sama (luaran)
+
+1. ✅ Sempadan daerah dan negeri: geoBoundaries ADM2 (CC BY 3.0; Putrajaya daripada ADM1, © OpenStreetMap, ODbL) dipermudahkan oleh `scripts/build-places.mjs` → `src/lib/places-data.ts`; `placeAt()` (titik dalam poligon, sandaran sempadan terdekat untuk pulau kecil dan pantai); diuji: 52/52 kawasan, 68/68 stesen APIMS (negeri rasmi stesen), bandar sempadan; 160 daerah semuanya ada ramalan MetMalaysia (Ds, Lojing Tn141)
+2. ✅ Negeri ikut sempadan untuk MetMalaysia (amaran, ramalan), bendera kad kongsi dan `reading.state`
+3. ✅ Ramalan MetMalaysia ikut daerah (168 daerah) dan kawasan tanah tinggi (Genting, Bukit Fraser, Kundasang, Taman Kinabalu, Lojing); sandaran ramalan negeri
+4. ✅ MetMalaysia dikongsi semua instans: `/api/met` (amaran + ramalan, CDN 15 min, satu permintaan ramalan) dibaca oleh `/api/aqi`; sandaran salinan terakhir bila 429
+5. ✅ Tanah tinggi: jadual tetap 10 kawasan (`highlands.ts`: Cameron, Genting, Bukit Fraser, Bukit Bendera, Bukit Larut, Gunung Jerai, Kundasang, Taman Kinabalu, Bario, Ba'kelalan) — API ketinggian Open-Meteo 503 semasa gangguan, jadi tidak digunakan masa larian. Stesen tanah rendah bukan bacaan rasmi di situ; anggaran dibetulkan + penjelasan di ⓘ sumber dan nota di STESEN TERDEKAT
+6. ✅ Nama lokasi GPS: kawasan senarai jika ≤ 15 km, jika tidak nama daerah; negeri ikut sempadan
+7. ⬜ Ujian, semakan production, versi 0.8.11, Apa yang baharu (BM/EN), tag dan GitHub Release
