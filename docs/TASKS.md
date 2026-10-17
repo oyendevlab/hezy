@@ -708,3 +708,14 @@ Penemuan: peluang hujan dalam Ramalan harian datang daripada Open-Meteo (peluang
 4. ✅ Teks ⓘ Ramalan harian dikemas kini dengan sumber setiap lajur (BM/EN)
 5. ✅ Hari ke-3 dilabel "Lusa" dalam Ramalan harian juga (seragam dengan bahagian MetMalaysia)
 6. ✅ Ujian, semakan visual (Putrajaya: Hari ini ribut petir 33°/25°, Esok dan Lusa jerebu), versi 0.8.9, Apa yang baharu (BM/EN), tag dan GitHub Release
+
+## Fasa 41 — v0.8.10 (sandaran bila APIMS gagal; 17 Okt 2026)
+
+Laporan pengguna 17 Okt 2026 (~7–8 pagi): Putrajaya memaparkan 83 "Anggaran model" dan graf "Lepas (anggaran)", sedangkan bacaan rasmi ~160. Log production: "APIMS memulangkan status 502" dan tamat masa sekitar 07:59–08:00, Open-Meteo 503 pada masa sama, sejurus selepas deployment v0.8.9 (cache kosong). Bila senarai stesen gagal, bacaan rasmi, pembetulan stesen berdekatan dan MetMalaysia hilang serentak, dan respons itu dicache seperti lengkap (CDN 5 + 15 min, peranti 10 min).
+
+1. ✅ APIMS (senarai stesen, sejarah 25 jam): cuba semula sekali selepas ralat 5xx/429/rangkaian/tamat masa (`fetchWithRetry`, diuji)
+2. ✅ Senarai stesen terakhir yang berjaya (≤ 2 jam) digunakan bila APIMS gagal; bacaan > 3 jam tetap ditolak oleh `officialFor`
+3. ✅ `/api/aqi`: senarai stesen ditunggu ≤ 4 s; bila gagal atau lambat, respons ditanda `partial` (cache 60 s, klien cuba semula ~75 s) — bukan dicache 5–20 min sebagai lengkap; sejarah APIMS dan model stesen yang gagal juga separa
+4. ✅ Semakan amaran (`/api/push/check`) guna senarai stesen dengan sandaran yang sama
+5. ✅ Ujian (318 unit, E2E), versi 0.8.10, Apa yang baharu (BM/EN), tag dan GitHub Release; tingkah laku biasa disahkan tempatan (Putrajaya rasmi 162, KL 161, Mersing dibetulkan 88, tidak separa)
+6. ⬜ Susulan: negeri MetMalaysia ikut sempadan negeri sebenar — kini negeri stesen APIMS terdekat (cth. Mersing dipadankan dengan Pahang melalui stesen Rompin 72 km; kaedah kawasan terdekat pula menyalahkan Lawas → Labuan)

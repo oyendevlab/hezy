@@ -134,7 +134,8 @@ async function settle<T>(
     return { value: null, late: true };
   }
   console.error(`[loadReading] ${label}`, result.error);
-  return { value: null, late: false };
+  // Ralat (cth. APIMS 502) juga separa: respons dicache sebentar dan klien cuba semula (v0.8.10).
+  return { value: null, late: true };
 }
 
 /**
