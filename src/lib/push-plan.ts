@@ -323,3 +323,42 @@ export function applySent(
   });
   return { ...record, locations };
 }
+
+/**
+ * Gabung hantaran semakan ini ke rekod terkini dalam indeks (v0.8.14): pengguna mungkin mengemas
+ * kini langganan semasa semakan berjalan. Kemas kini lokasi hanya digunakan bila lokasi pada
+ * kedudukan itu masih sama (id), supaya status amaran tidak tersalah lokasi.
+ */
+export function reapplySent(
+  latest: PushRecord,
+  processed: PushRecord,
+  updates: readonly PlannedUpdate[],
+  now: Date,
+): PushRecord {
+  return updates.reduce(
+    (record, update) =>
+      update.kind !== "morning" &&
+      record.locations[update.index]?.id !==
+        processed.locations[update.index]?.id
+        ? record
+        : applySent(record, update, now),
+    latest,
+  );
+}
+
+/**
+ * Versi data bagi semakan (v0.8.14): jam semasa dan masa bacaan APIMS terkini. Semua logik
+ * amaran berasaskan jam, jadi larian dengan versi yang sudah diproses tidak menghasilkan
+ * notifikasi baharu dan boleh dilangkau (jimat panggilan model Open-Meteo).
+ */
+export function checkVersion(
+  nowKey: string,
+  stations: readonly { time: string | null }[] | null,
+): string {
+  const latest = (stations ?? [])
+    .map((s) => s.time)
+    .filter((t): t is string => t !== null)
+    .sort()
+    .at(-1);
+  return `${nowKey}|${latest ?? "-"}`;
+}

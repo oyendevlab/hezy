@@ -3,17 +3,8 @@
 
 const BASE = process.env.HEZY_URL ?? "https://hezy.my";
 const MAX_AGE_HOURS = 6;
-/** Jurang maksimum antara semakan amaran (push-check.yml) dalam 24 jam lepas (v0.8.4). */
-const MAX_ALERT_GAP_HOURS = 2;
-
-/** Jurang terbesar (jam) antara masa larian dalam tempoh [start, end], termasuk kedua-dua hujung. */
-function maxGapHours(times, start, end) {
-  const points = [start, ...times.filter((t) => t >= start && t <= end), end];
-  let gap = 0;
-  for (let i = 1; i < points.length; i++)
-    gap = Math.max(gap, points[i] - points[i - 1]);
-  return gap / 3_600_000;
-}
+/** Umur maksimum larian semakan amaran terakhir (Vercel Cron setiap 15 minit, v0.8.14). */
+const MAX_ALERT_GAP_HOURS = 1;
 
 /** Jam semasa waktu Malaysia, `YYYY-MM-DDTHH:00`. */
 function malaysiaHourKey(now = new Date()) {
@@ -159,43 +150,22 @@ const checks = [
     },
   },
   {
-    name: "Jadual: semakan amaran (push-check.yml, 24 jam)",
+    name: "Jadual: semakan amaran (Vercel Cron, /api/push/status)",
     async run() {
-      const token = process.env.GITHUB_TOKEN;
-      if (!token) {
-        console.log("   (dilangkau: GITHUB_TOKEN tiada)");
-        return null;
-      }
-      const repo = process.env.GITHUB_REPOSITORY ?? "oyendevlab/hezy";
-      const end = Date.now();
-      const start = end - 24 * 3_600_000;
-      const params = new URLSearchParams({
-        per_page: "100",
-        created: `>=${new Date(start).toISOString()}`,
-      });
-      const res = await fetch(
-        `https://api.github.com/repos/${repo}/actions/workflows/push-check.yml/runs?${params}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: "application/vnd.github+json",
-          },
-          signal: AbortSignal.timeout(30_000),
-        },
-      );
-      if (!res.ok) return `API GitHub memulangkan status ${res.status}`;
-      const { workflow_runs: runs = [] } = await res.json();
-      // Larian yang selesai (berjaya atau ada notifikasi gagal) bermakna semakan berlaku.
-      const times = runs
-        .filter((r) => r.conclusion === "success" || r.conclusion === "failure")
-        .map((r) => Date.parse(r.run_started_at ?? r.created_at))
-        .sort((a, b) => a - b);
-      const gap = maxGapHours(times, start, end);
+      const { status, body } = await getJson("/api/push/status");
+      if (status !== 200)
+        return `status ${status}: ${body?.error ?? "tiada mesej"}`;
+      if (!body?.checkedAt) return "tiada rekod larian semakan amaran";
+      const age = (Date.now() - Date.parse(body.checkedAt)) / 3_600_000;
+      const processed = body.processedAt
+        ? `${((Date.now() - Date.parse(body.processedAt)) / 3_600_000).toFixed(1)} jam`
+        : "tiada";
       console.log(
-        `   ${times.length} larian dalam 24 jam, jurang terbesar ${gap.toFixed(1)} jam`,
+        `   larian terakhir ${(age * 60).toFixed(0)} min lalu, pemprosesan terakhir ${processed} lalu`,
       );
-      if (gap > MAX_ALERT_GAP_HOURS)
-        return `jurang ${gap.toFixed(1)} jam antara semakan amaran (had ${MAX_ALERT_GAP_HOURS} jam; ${times.length} larian dalam 24 jam) — amaran IPU mungkin lewat`;
+      // Cron setiap 15 minit (v0.8.14): lebih daripada had bermakna larian terhenti.
+      if (age > MAX_ALERT_GAP_HOURS)
+        return `semakan amaran terakhir ${age.toFixed(1)} jam lalu (had ${MAX_ALERT_GAP_HOURS} jam) — amaran IPU mungkin lewat`;
       return null;
     },
   },

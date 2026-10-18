@@ -13,6 +13,15 @@ export type Release = {
 
 export const CHANGELOG: readonly Release[] = [
   {
+    version: "0.8.14",
+    date: "2026-10-18",
+    title: "Amaran setiap 15 minit dan aplikasi lebih ringan",
+    items: [
+      "Amaran IPU kini disemak setiap 15 minit (dahulu kadang-kadang lewat beberapa jam)",
+      "Aplikasi lebih ringan: ikon disimpan di peranti dan tab dimuat bila disentuh",
+    ],
+  },
+  {
     version: "0.8.13",
     date: "2026-10-17",
     title: "Halaman negeri lebih tahan gangguan",

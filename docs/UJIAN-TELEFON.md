@@ -305,6 +305,12 @@ Buka **https://hezy.my** pada telefon.
 - [ ] Utama (skrin alu-aluan): jalur "Malaysia sekarang" dipaparkan seperti biasa
 - [ ] Jika notis "Data APIMS tidak dapat diambil" muncul semasa APIMS terganggu, muat semula selepas ~1 minit: bacaan rasmi kembali sendiri
 
+## v0.8.14 — amaran 15 minit, aplikasi lebih ringan
+
+- [ ] Amaran IPU (ambang, lonjakan, ringkasan pagi) tiba dalam ~15–30 minit selepas bacaan rasmi baharu, bukan berjam-jam kemudian
+- [ ] Butang "Hantar notifikasi ujian" di Tetapan masih berfungsi; langganan sedia ada tidak perlu dilanggan semula
+- [ ] Tukar tab (Utama, Trend, Lokasi, Tetapan) masih pantas; ikon aplikasi dan bendera tidak berkelip bila dibuka semula
+
 ## Jika ada masalah
 
 Ambil tangkapan skrin dan catat model telefon serta versi OS, kemudian buka isu di

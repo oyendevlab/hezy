@@ -1,12 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import { CATEGORY_STYLE } from "@/lib/category-style";
 import { ipuCategory } from "@/lib/ipu";
 import { displayIpu } from "@/lib/official";
 import type { HourPoint } from "@/lib/reading";
 import { useI18n } from "@/lib/use-i18n";
 import { Chevron } from "./chevron";
+import { TabLink } from "./tab-link";
 
 const SCALE_MAX = 200;
 
@@ -14,7 +14,7 @@ const SCALE_MAX = 200;
 export function TrendLink({ hours }: { hours: HourPoint[] }) {
   const { t } = useI18n();
   return (
-    <Link
+    <TabLink
       href="/trend"
       className="bg-surface hover:bg-line flex flex-col gap-3 rounded-[22px] p-4 transition-colors"
     >
@@ -50,7 +50,7 @@ export function TrendLink({ hours }: { hours: HourPoint[] }) {
           })}
         </span>
       )}
-    </Link>
+    </TabLink>
   );
 }
 
