@@ -13,6 +13,14 @@ export type Release = {
 
 export const CHANGELOG: readonly Release[] = [
   {
+    version: "0.8.15",
+    date: "2026-10-18",
+    title: "Pembetulan semakan amaran",
+    items: [
+      "Semakan amaran setiap 15 minit kini menyimpan status dengan betul, jadi notifikasi tidak berulang",
+    ],
+  },
+  {
     version: "0.8.14",
     date: "2026-10-18",
     title: "Amaran setiap 15 minit dan aplikasi lebih ringan",

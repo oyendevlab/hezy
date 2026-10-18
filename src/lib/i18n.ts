@@ -1027,6 +1027,9 @@ const EN: Record<string, string> = {
   "Bacaan rasmi terbaharu muncul lebih cepat selepas JAS menerbitkannya":
     "The latest official reading appears sooner after the DOE publishes it",
   "Bacaan rasmi lebih stabil": "More stable official readings",
+  "Pembetulan semakan amaran": "Alert check fix",
+  "Semakan amaran setiap 15 minit kini menyimpan status dengan betul, jadi notifikasi tidak berulang":
+    "The 15-minute alert check now saves its state correctly, so notifications are not repeated",
   "Amaran setiap 15 minit dan aplikasi lebih ringan":
     "Alerts every 15 minutes and a lighter app",
   "Amaran IPU kini disemak setiap 15 minit (dahulu kadang-kadang lewat beberapa jam)":

@@ -8,6 +8,8 @@ const store = vi.hoisted(() => ({
   gets: 0,
   /** Dipanggil sekali sebelum `put` seterusnya (untuk mensimulasikan tulisan serentak). */
   beforePut: null as null | (() => void),
+  /** Respons dimampatkan memulangkan ETag lemah `W/"…"` (seperti production). */
+  weak: false,
 }));
 
 vi.mock("@vercel/blob", () => {
@@ -22,7 +24,7 @@ vi.mock("@vercel/blob", () => {
       return {
         statusCode: 200,
         stream: new Response(file.body).body,
-        blob: { etag: file.etag },
+        blob: { etag: store.weak ? `W/${file.etag}` : file.etag },
       };
     }),
     put: vi.fn(
@@ -84,6 +86,7 @@ beforeEach(() => {
   store.files.clear();
   store.gets = 0;
   store.beforePut = null;
+  store.weak = false;
 });
 
 describe("push-store (indeks satu fail, v0.8.14)", () => {
@@ -145,6 +148,16 @@ describe("push-store (indeks satu fail, v0.8.14)", () => {
       "https://fcm.googleapis.com/fcm/send/baru",
     );
     expect(records.every((r) => r.lastMorning === "2026-10-18")).toBe(true);
+  });
+
+  it("ETag lemah daripada respons dimampatkan tidak menggagalkan tulisan", async () => {
+    await saveRecord(record("a"));
+    store.weak = true;
+    await saveRecord(record("b"));
+    await deleteRecord(record("a").subscription.endpoint);
+    expect((await allRecords()).map((r) => r.subscription.endpoint)).toEqual([
+      "https://fcm.googleapis.com/fcm/send/b",
+    ]);
   });
 
   it("tiada perubahan: tiada tulisan", async () => {

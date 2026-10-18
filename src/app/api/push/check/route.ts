@@ -124,27 +124,41 @@ export async function GET(request: Request) {
   }
 
   // Satu tulisan indeks, digabung dengan data terkini (langganan baharu semasa larian kekal).
+  let saveFailed = false;
   if (removed.size || sent.size) {
-    await updateRecords((latest) =>
-      latest
-        .filter((r) => !removed.has(r.subscription.endpoint))
-        .map((r) => {
-          const change = sent.get(r.subscription.endpoint);
-          return change
-            ? reapplySent(r, change.processed, change.updates, now)
-            : r;
-        }),
-    );
+    try {
+      await updateRecords((latest) =>
+        latest
+          .filter((r) => !removed.has(r.subscription.endpoint))
+          .map((r) => {
+            const change = sent.get(r.subscription.endpoint);
+            return change
+              ? reapplySent(r, change.processed, change.updates, now)
+              : r;
+          }),
+      );
+    } catch (error) {
+      // Notifikasi sudah dihantar: versi tetap direkod supaya larian 15 minit seterusnya tidak
+      // menghantarnya semula (paling banyak sekali sejam bila jam berubah).
+      console.error("[api/push/check] indeks", error);
+      saveFailed = true;
+    }
   }
   summary.removed = removed.size;
   await writeCheckStatus({
     checkedAt: now.toISOString(),
     processedAt: now.toISOString(),
-    // Larian dengan kegagalan diulang pada larian seterusnya.
-    version: summary.failed === 0 ? version : (previous?.version ?? null),
+    // Larian dengan hantaran gagal diulang pada larian seterusnya.
+    version:
+      summary.failed === 0 || saveFailed
+        ? version
+        : (previous?.version ?? null),
     checked: summary.checked,
     sent: summary.sent,
     failed: summary.failed,
   });
-  return Response.json({ ...summary, version });
+  return Response.json(
+    { ...summary, version, ...(saveFailed ? { saveFailed } : {}) },
+    { status: saveFailed ? 500 : 200 },
+  );
 }

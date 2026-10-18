@@ -13,20 +13,32 @@ export const INDEX_PATH = "push-index/subscriptions.json";
 export const STATUS_PATH = "push-index/status.json";
 /** Fail lama satu-per-peranti (`push/<sha256>.json`), dipindah sekali ke indeks. */
 export const LEGACY_PREFIX = "push/";
-const MAX_ATTEMPTS = 4;
+const MAX_ATTEMPTS = 5;
 
 type IndexFile = { version: 1; records: PushRecord[] };
 
 const json = (data: unknown) => JSON.stringify(data);
 
+/**
+ * ETag kuat untuk `ifMatch`. Respons dimampatkan (indeks ~48 KB) memulangkan ETag lemah
+ * `W/"…"` dengan cincangan yang sama, dan `ifMatch` dengan ETag lemah sentiasa gagal (production
+ * 18 Okt 2026: "Precondition failed: ETag mismatch").
+ */
+export const strongEtag = (etag: string) => etag.replace(/^W\//, "");
+
 async function readBlobJson(
   path: string,
 ): Promise<{ value: unknown; etag: string } | null> {
-  const result = await get(path, { access: "private", useCache: false });
+  const result = await get(path, {
+    access: "private",
+    useCache: false,
+    // Tanpa mampatan supaya ETag yang dipulangkan ialah ETag kuat.
+    headers: { "Accept-Encoding": "identity" },
+  });
   if (!result || result.statusCode !== 200) return null;
   return {
     value: await new Response(result.stream).json(),
-    etag: result.blob.etag,
+    etag: strongEtag(result.blob.etag),
   };
 }
 
@@ -103,6 +115,8 @@ export async function updateRecords(
         attempt >= MAX_ATTEMPTS
       )
         throw error;
+      // Penulis lain baru menulis: beri masa sebelum membaca semula.
+      await new Promise((resolve) => setTimeout(resolve, 150 * attempt));
     }
   }
 }
