@@ -771,7 +771,7 @@ Konteks 18 Okt 2026: e-mel Vercel — kuota Hobby "Simple Requests" Blob 75% (10
 3. ✅ CDN: ikon/bendera cache 7 hari dan manifest 1 hari; tab navigasi tanpa prefetch automatik (prefetch bila disentuh/dihover); `/api/met` dicache 15 minit setiap instans
 4. ✅ Speed Insights disampel 5% (kekal dalam had percuma 10,000 event/30 hari, tiada jeda 14 hari)
 5. ✅ Amaran DEP0169 web-push disenyapkan (hanya kod itu)
-6. ⬜ Ujian, semakan, versi 0.8.14, Apa yang baharu (BM/EN), tag dan GitHub Release; sahkan production (cron, indeks, cache)
+6. ✅ Ujian (346 unit, E2E 192), versi 0.8.14, Apa yang baharu (BM/EN), tag dan GitHub Release (PR #147). Pengesahan production mendedahkan pepijat ETag lemah → rollback dan pembetulan dalam Fasa 46
 
 ## Fasa 46 — v0.8.15 (pembetulan ETag indeks langganan; 18 Okt 2026)
 
@@ -780,4 +780,5 @@ Selepas v0.8.14 di production (20:50), larian cron pertama (20:55) memindah 59 l
 1. ✅ `get()` indeks dengan `Accept-Encoding: identity` (ETag kuat) dan `strongEtag()` membuang `W/` sebagai sandaran; disahkan dengan fail ujian 65 KB di Blob sebenar (ETag lemah dan kuat berkongsi cincangan); jeda antara cubaan semula
 2. ✅ Bila kemas kini indeks masih gagal selepas notifikasi dihantar, versi tetap direkod (paling banyak sekali sejam, bukan setiap 15 minit) dan respons 500 untuk log
 3. ✅ Ujian: ETag lemah tidak menggagalkan tulisan (stor palsu)
-4. ⬜ Deploy: padam indeks lama (dicipta 20:55) supaya migrasi semula daripada fail lama terkini; aktifkan selepas 23:00 (tetingkap ramalan esok 20–23 tamat, elak notifikasi ramalan berganda daripada larian 20:55); sahkan larian cron, status dan bilangan langganan
+4. ✅ Deploy: indeks lama (20:55) dipadam 21:2x; v0.8.15 (PR #148) diaktifkan 19 Okt 02:40 dengan `vercel promote` (auto-aktif kembali `true`). Disahkan: cron `/api/push/check` `7,22,37,52 * * * *`; larian pertama memindah **60 langganan** (sama dengan fail lama), memproses 60, hantar 0, gagal 0, status ditulis (`/api/push/status`); dua tulisan bersyarat tanpa perubahan pada indeks sebenar (~48 KB) berjaya; tiada ralat dalam log; ikon `max-age=604800`, manifest 1 hari
+5. ⬜ Kemudian: padam fail lama `push/*.json` (60) selepas indeks stabil beberapa hari
