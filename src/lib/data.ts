@@ -387,12 +387,13 @@ function metProxyUrl(): string | null {
 }
 
 /**
- * MetMalaysia untuk /api/aqi (v0.8.11), dicache 5 min setiap instans. Di production dibaca
- * melalui /api/met supaya semua instans berkongsi satu salinan; sandaran: terus ke data.gov.my.
+ * MetMalaysia untuk /api/aqi (v0.8.11), dicache 15 min setiap instans (sama seperti CDN /api/met;
+ * dahulu 5 min, ~1,400 permintaan /api/met sehari). Di production dibaca melalui /api/met supaya
+ * semua instans berkongsi satu salinan; sandaran: terus ke data.gov.my.
  */
 export async function getMetBundle(today: string): Promise<MetBundle> {
   "use cache";
-  cacheLife({ stale: 120, revalidate: 300, expire: 3600 });
+  cacheLife({ stale: 300, revalidate: 900, expire: 3600 });
   const proxy = metProxyUrl();
   if (proxy) {
     try {

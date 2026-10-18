@@ -72,6 +72,31 @@ const nextConfig: NextConfig = {
         ],
       },
       {
+        // Ikon, bendera, splash dan kredit jarang berubah: cache 7 hari (v0.8.14). Lalai `public/`
+        // ialah `max-age=0`, jadi pelayar menyemak semula setiap kali (~5,000 permintaan CDN sehari).
+        source: "/:dir(icons|flags|splash|kredit)/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=604800, stale-while-revalidate=86400",
+          },
+        ],
+      },
+      {
+        source: "/favicon.ico",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=604800, stale-while-revalidate=86400",
+          },
+        ],
+      },
+      {
+        // Manifest boleh berubah dengan keluaran: 1 hari.
+        source: "/manifest.webmanifest",
+        headers: [{ key: "Cache-Control", value: "public, max-age=86400" }],
+      },
+      {
         // Service worker mesti sentiasa terkini supaya kemas kini aplikasi sampai kepada pengguna.
         source: "/sw.js",
         headers: [

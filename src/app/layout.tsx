@@ -67,7 +67,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <main className="flex-1 pb-28 md:pb-12">{children}</main>
         <BottomNav />
         <Analytics />
-        <SpeedInsights />
+        {/* Sampel 5% (v0.8.14): kekal dalam had percuma 10,000 event/30 hari tanpa jeda 14 hari. */}
+        <SpeedInsights sampleRate={0.05} />
       </body>
     </html>
   );

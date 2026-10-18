@@ -4,8 +4,6 @@
   "crons": [
     { "path": "/api/accuracy/run", "schedule": "50 12 * * *" },
     { "path": "/api/history/collect?back=1", "schedule": "30 16 * * *" },
-    { "path": "/api/push/check", "schedule": "30 23 * * *" },
-    { "path": "/api/push/check", "schedule": "10 7 * * *" },
-    { "path": "/api/push/check", "schedule": "10 12 * * *" }
+    { "path": "/api/push/check", "schedule": "7,22,37,52 * * * *" }
   ]
 }

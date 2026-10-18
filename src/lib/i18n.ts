@@ -1027,6 +1027,12 @@ const EN: Record<string, string> = {
   "Bacaan rasmi terbaharu muncul lebih cepat selepas JAS menerbitkannya":
     "The latest official reading appears sooner after the DOE publishes it",
   "Bacaan rasmi lebih stabil": "More stable official readings",
+  "Amaran setiap 15 minit dan aplikasi lebih ringan":
+    "Alerts every 15 minutes and a lighter app",
+  "Amaran IPU kini disemak setiap 15 minit (dahulu kadang-kadang lewat beberapa jam)":
+    "API alerts are now checked every 15 minutes (previously sometimes hours late)",
+  "Aplikasi lebih ringan: ikon disimpan di peranti dan tab dimuat bila disentuh":
+    "Lighter app: icons are kept on your device and tabs load when tapped",
   "Anggaran tanah tinggi lebih jelas": "Clearer highland estimates",
   "Halaman negeri lebih tahan gangguan":
     "State pages hold up better in outages",

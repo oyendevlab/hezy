@@ -761,3 +761,14 @@ E2E CI PR #142 gagal sekali (larian 39038271905): `next build` gagal memprarende
 3. ✅ Simulasi build tanpa sumber luar (`npm run build:tanpa-sumber`, `scripts/sekat-sumber.cjs` menyekat fetch ke APIMS/Open-Meteo/MetMalaysia/FIRMS/WAQI): sebelum pembetulan gagal (mod gagal: 3 halaman negeri; mod tergantung: "use cache took too long" selepas 1:14); selepas: lulus dalam mod `gagal` (8 s), `503` (12 s) dan `tergantung` (32 s). Langkah CI baharu dalam job semakan (mod tergantung)
 4. ✅ Halaman negeri masih memaparkan data sebenar bila sumber pulih: build dengan APIMS disekat → `next start` dengan rangkaian biasa: `/negeri/johor` notis (`s-maxage=60`) → ~35 s kemudian 8 stesen (Pasir Gudang 195) dengan `s-maxage` ikut jadual APIMS; `/negeri` dan `/` pulih sama
 5. ✅ Versi 0.8.13, Apa yang baharu (BM/EN), UJIAN-TELEFON, tag dan GitHub Release (PR #144). CI: langkah "Build tanpa sumber luar" lulus dalam 28 s (APIMS tamat masa ~12 s → notis sandaran), E2E 3m53s lulus. Production: Versi 0.8.13 di Tetapan; `/negeri/johor` diprarender dengan 8 stesen
+
+## Fasa 45 — v0.8.14 (Pro: cron amaran 15 minit, Blob dan CDN lebih jimat; 18 Okt 2026)
+
+Konteks 18 Okt 2026: e-mel Vercel — kuota Hobby "Simple Requests" Blob 75% (10,000). Punca: semakan amaran membaca 58 fail langganan satu persatu setiap larian. Pengguna naik taraf ke Pro (kitaran bil bermula 18 Okt; 5 jam pertama $0.10). Trafik 24 jam: 53K permintaan CDN (~17 setiap paparan halaman: prefetch tab ~3K setiap tab, ikon/manifest disemak semula setiap kali `max-age=0`, beacon Analytics 3.1K dan Speed Insights 1.9K), 3.1K paparan halaman. Log: `DEP0169 url.parse()` daripada web-push 3.6.7 dilabel "error".
+
+1. ✅ Langganan dalam satu fail indeks Blob (`push-index/subscriptions.json`) dengan tulisan bersyarat ETag (`ifMatch`, cuba semula bila bertembung); migrasi automatik daripada fail lama `push/*.json` (fail lama dikekalkan sebagai sandaran); semakan = 1 bacaan, bukan 58
+2. ✅ Semakan amaran melalui cron Vercel setiap 15 minit (`7,22,37,52 * * * *`); jadual GitHub dibuang (kekal manual); larian hanya memproses semula bila jam atau bacaan APIMS terkini berubah (atau larian lepas gagal) supaya panggilan Open-Meteo tidak meningkat; status larian `/api/push/status` untuk pemantauan
+3. ✅ CDN: ikon/bendera cache 7 hari dan manifest 1 hari; tab navigasi tanpa prefetch automatik (prefetch bila disentuh/dihover); `/api/met` dicache 15 minit setiap instans
+4. ✅ Speed Insights disampel 5% (kekal dalam had percuma 10,000 event/30 hari, tiada jeda 14 hari)
+5. ✅ Amaran DEP0169 web-push disenyapkan (hanya kod itu)
+6. ⬜ Ujian, semakan, versi 0.8.14, Apa yang baharu (BM/EN), tag dan GitHub Release; sahkan production (cron, indeks, cache)

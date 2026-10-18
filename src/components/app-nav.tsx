@@ -1,11 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { NAV_ITEMS, isActive } from "@/lib/nav";
 import { useI18n } from "@/lib/use-i18n";
 import { NavIcon } from "./icons";
 import { Logo } from "./logo";
+import { TabLink } from "./tab-link";
 
 /** Bar atas untuk tablet dan desktop (≥ 768 px). */
 export function TopNav() {
@@ -19,13 +19,13 @@ export function TopNav() {
       style={{ viewTransitionName: "top-nav" }}
     >
       <div className="mx-auto flex max-w-[1200px] items-center gap-3 px-10 py-5">
-        <Link
+        <TabLink
           href="/"
           className="font-display flex items-center gap-2.5 text-[28px] font-extrabold tracking-tight"
         >
           <Logo size={36} />
           Hezy
-        </Link>
+        </TabLink>
         <nav
           aria-label={t("Navigasi utama")}
           className="bg-surface ml-auto flex gap-1 rounded-full p-1"
@@ -33,7 +33,7 @@ export function TopNav() {
           {NAV_ITEMS.map((item) => {
             const active = isActive(pathname, item.href);
             return (
-              <Link
+              <TabLink
                 key={item.href}
                 href={item.href}
                 aria-current={active ? "page" : undefined}
@@ -43,7 +43,7 @@ export function TopNav() {
               >
                 <NavIcon name={item.icon} active={active} size={18} />
                 {t(item.label)}
-              </Link>
+              </TabLink>
             );
           })}
         </nav>
@@ -68,7 +68,7 @@ export function BottomNav() {
       {NAV_ITEMS.map((item) => {
         const active = isActive(pathname, item.href);
         return (
-          <Link
+          <TabLink
             key={item.href}
             href={item.href}
             aria-current={active ? "page" : undefined}
@@ -78,7 +78,7 @@ export function BottomNav() {
           >
             <NavIcon name={item.icon} active={active} />
             {t(item.label)}
-          </Link>
+          </TabLink>
         );
       })}
     </nav>

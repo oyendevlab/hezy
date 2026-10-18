@@ -1,12 +1,9 @@
 name: Semak amaran IPU
 
 on:
-  schedule:
-    # Empat kali sejam pada minit ganjil (v0.8.4): GitHub menggugurkan banyak larian berjadual,
-    # terutama pada awal jam (dahulu "12 * * * *" hanya ~21% berjalan). Logik amaran berasaskan
-    # keadaan, jadi larian tambahan tidak menghantar notifikasi berganda. Vercel Cron turut
-    # memanggil pada tetingkap ringkasan pagi, status sekolah dan ramalan esok.
-    - cron: "7,22,37,52 * * * *"
+  # Semakan berjadual kini oleh Vercel Cron setiap 15 minit (v0.8.14, pelan Pro): jadual GitHub
+  # hanya ~7/96 larian sehari berjalan (17 Okt 2026). Aliran kerja ini kekal untuk larian manual
+  # (`force=1` memproses walaupun data belum berubah).
   workflow_dispatch:
 
 concurrency:
@@ -27,7 +24,7 @@ jobs:
         run: |
           RESULT=$(curl -fsS --max-time 120 \
             -H "Authorization: Bearer $CRON_SECRET" \
-            https://hezy.my/api/push/check)
+            "https://hezy.my/api/push/check?force=1")
           echo "$RESULT"
           echo "### Semakan amaran: \`$RESULT\`" >> "$GITHUB_STEP_SUMMARY"
           # Gagalkan job jika ada notifikasi yang gagal dihantar (bukan langganan tamat).

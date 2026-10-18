@@ -2,10 +2,12 @@ import { describe, expect, it } from "vitest";
 import { ipuCategory } from "./ipu";
 import {
   applySent,
+  checkVersion,
   detectExpected,
   detectSpike,
   inQuietHours,
   planNotifications,
+  reapplySent,
 } from "./push-plan";
 import type { PushRecord } from "./push-record";
 import { LEGACY_OPTIONS } from "./push-validate";
@@ -462,5 +464,48 @@ describe("notifikasi bacaan tinggi berterusan (sekolah)", () => {
         at("2026-10-12T15:12"),
       ),
     ).toEqual([]);
+  });
+});
+
+describe("reapplySent dan checkVersion (v0.8.14)", () => {
+  const now = at("2026-10-18T07:30");
+
+  it("hantaran digabung ke rekod terkini; pilihan baharu pengguna kekal", () => {
+    const processed = record();
+    const latest = record({ threshold: 200 });
+    const merged = reapplySent(
+      latest,
+      processed,
+      [{ kind: "morning" }, { kind: "spike", index: 0 }],
+      now,
+    );
+    expect(merged.threshold).toBe(200);
+    expect(merged.lastMorning).toBe("2026-10-18");
+    expect(merged.locations[0].lastSpike).toBe("2026-10-18T07:00");
+  });
+
+  it("lokasi yang sudah ditukar pengguna tidak menerima status lama", () => {
+    const processed = record();
+    const latest = record({
+      locations: [{ ...record().locations[0], id: "fav-1", name: "Klang" }],
+    });
+    const merged = reapplySent(
+      latest,
+      processed,
+      [{ kind: "spike", index: 0 }],
+      now,
+    );
+    expect(merged.locations[0].lastSpike).toBeUndefined();
+  });
+
+  it("versi = jam semasa + bacaan APIMS terkini", () => {
+    expect(
+      checkVersion("2026-10-18T21:00", [
+        { time: "2026-10-18T20:00" },
+        { time: null },
+        { time: "2026-10-18T21:00" },
+      ]),
+    ).toBe("2026-10-18T21:00|2026-10-18T21:00");
+    expect(checkVersion("2026-10-18T21:00", null)).toBe("2026-10-18T21:00|-");
   });
 });

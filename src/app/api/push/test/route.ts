@@ -1,4 +1,3 @@
-import webpush, { WebPushError } from "web-push";
 import { deleteRecord, readRecord } from "@/lib/push-store";
 import { isPushServiceEndpoint } from "@/lib/push-validate";
 import { isCrossSite, readJsonBody } from "@/lib/request-guard";
@@ -7,6 +6,7 @@ import {
   cooldownSeconds,
   testPayload,
 } from "@/lib/push-test";
+import { WebPushError, webpush } from "@/lib/web-push";
 
 // Had kadar dalam memori (setiap instans): kasar tetapi cukup untuk butang ujian.
 const lastSent = new Map<string, number>();
