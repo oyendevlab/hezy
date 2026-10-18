@@ -772,3 +772,12 @@ Konteks 18 Okt 2026: e-mel Vercel — kuota Hobby "Simple Requests" Blob 75% (10
 4. ✅ Speed Insights disampel 5% (kekal dalam had percuma 10,000 event/30 hari, tiada jeda 14 hari)
 5. ✅ Amaran DEP0169 web-push disenyapkan (hanya kod itu)
 6. ⬜ Ujian, semakan, versi 0.8.14, Apa yang baharu (BM/EN), tag dan GitHub Release; sahkan production (cron, indeks, cache)
+
+## Fasa 46 — v0.8.15 (pembetulan ETag indeks langganan; 18 Okt 2026)
+
+Selepas v0.8.14 di production (20:50), larian cron pertama (20:55) memindah 59 langganan ke indeks dan menghantar notifikasi, tetapi kemas kini indeks gagal: "Vercel Blob: Precondition failed: ETag mismatch". Punca: indeks ~48 KB dimampatkan, jadi `get()` memulangkan ETag lemah `W/"…"`; `ifMatch` dengan ETag lemah sentiasa gagal (fail ujian kecil tidak dimampatkan, jadi ujian tempatan lulus). Status tidak ditulis, jadi setiap larian 15 minit akan menghantar semula notifikasi yang sama. Production dikembalikan ke deployment sebelumnya pada 21:01 (sebelum larian 21:07); fail langganan lama masih utuh.
+
+1. ✅ `get()` indeks dengan `Accept-Encoding: identity` (ETag kuat) dan `strongEtag()` membuang `W/` sebagai sandaran; disahkan dengan fail ujian 65 KB di Blob sebenar (ETag lemah dan kuat berkongsi cincangan); jeda antara cubaan semula
+2. ✅ Bila kemas kini indeks masih gagal selepas notifikasi dihantar, versi tetap direkod (paling banyak sekali sejam, bukan setiap 15 minit) dan respons 500 untuk log
+3. ✅ Ujian: ETag lemah tidak menggagalkan tulisan (stor palsu)
+4. ⬜ Deploy: padam indeks lama (dicipta 20:55) supaya migrasi semula daripada fail lama terkini; aktifkan selepas 23:00 (tetingkap ramalan esok 20–23 tamat, elak notifikasi ramalan berganda daripada larian 20:55); sahkan larian cron, status dan bilangan langganan

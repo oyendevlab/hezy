@@ -311,6 +311,10 @@ Buka **https://hezy.my** pada telefon.
 - [ ] Butang "Hantar notifikasi ujian" di Tetapan masih berfungsi; langganan sedia ada tidak perlu dilanggan semula
 - [ ] Tukar tab (Utama, Trend, Lokasi, Tetapan) masih pantas; ikon aplikasi dan bendera tidak berkelip bila dibuka semula
 
+## v0.8.15 — pembetulan semakan amaran
+
+- [ ] Notifikasi amaran tidak berulang setiap 15 minit (satu notifikasi bagi setiap perubahan)
+
 ## Jika ada masalah
 
 Ambil tangkapan skrin dan catat model telefon serta versi OS, kemudian buka isu di
